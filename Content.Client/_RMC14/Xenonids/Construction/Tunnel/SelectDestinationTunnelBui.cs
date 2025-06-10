@@ -3,10 +3,12 @@ using System.Numerics;
 using Content.Shared._RMC14.Areas;
 using Content.Shared._RMC14.TacticalMap;
 using Content.Shared._RMC14.Xenonids.Construction.Tunnel;
+using Content.Shared.Actions;
 using JetBrains.Annotations;
 using Robust.Client.Player;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Control;
 
@@ -595,6 +597,7 @@ public sealed class SelectDestinationTunnelBui : BoundUserInterface
 
         _window = this.CreateWindow<SelectDestinationTunnelWindow>();
         _window.SelectButton.Disabled = true;
+        _window.SetBlipUpdateCallback(() => UpdateBlips());
 
         var wrapper = _window.TacticalMapWrapper;
         TabContainer.SetTabVisible(wrapper.CanvasTab, false);
@@ -619,7 +622,7 @@ public sealed class SelectDestinationTunnelBui : BoundUserInterface
 
         _window.SelectButton.OnButtonDown += args =>
         {
-
+            
             if (_selectedTunnel is null)
             {
                 args.Button.Disabled = true;
