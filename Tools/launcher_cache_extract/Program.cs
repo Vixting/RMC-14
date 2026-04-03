@@ -469,7 +469,7 @@ internal static class Program
                 foreach (var day in HrefFinder.Matches(monthHtml).Select(match => match.Groups[1].Value).Reverse())
                 {
                     var dayHtml = Http.GetStringAsync($"{normalizedRoot}/{year}/{month}/{day}/").GetAwaiter().GetResult();
-                    foreach (var replay in ReplayFinder.Matches(dayHtml).Select(match => match.Groups[1].Value))
+                    foreach (var replay in ReplayFinder.Matches(dayHtml).Select(match => match.Groups[1].Value).Reverse())
                     {
                         replayUrls.Add($"{normalizedRoot}/{year}/{month}/{day}/{replay}");
                         if (replayUrls.Count >= limit)

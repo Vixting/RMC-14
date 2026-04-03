@@ -337,7 +337,7 @@ internal sealed class ReplayChatExporter
                 foreach (var day in HrefFinder.Matches(monthHtml).Select(match => match.Groups[1].Value).Reverse())
                 {
                     var dayHtml = await _http.GetStringAsync($"{rootUrl}/{year}/{month}/{day}/");
-                    foreach (var replay in ReplayFinder.Matches(dayHtml).Select(match => match.Groups[1].Value))
+                    foreach (var replay in ReplayFinder.Matches(dayHtml).Select(match => match.Groups[1].Value).Reverse())
                     {
                         replayUrls.Add($"{rootUrl}/{year}/{month}/{day}/{replay}");
                         if (lastRounds is { } limit && replayUrls.Count >= limit)
