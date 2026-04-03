@@ -6,8 +6,11 @@ using Content.Shared._RMC14.CCVar;
 using Content.Shared._RMC14.Line;
 using Content.Shared._RMC14.Projectiles;
 using Content.Shared._RMC14.Smoke;
+using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Bombard;
 using Content.Shared._RMC14.Xenonids.Burrow;
+using Content.Shared._RMC14.Xenonids.Construction;
+using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.Spray;
 using Content.Shared.Actions.Components;
 using Content.Shared.Maps;
@@ -50,11 +53,14 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
     private readonly IMapManager _mapManager;
     private readonly IPrototypeManager _prototypes;
     private readonly IComponentFactory _componentFactory;
+    private readonly IEntityManager _entities;
     private readonly SharedMapSystem _mapSystem;
     private readonly SharedPhysicsSystem _physics;
     private readonly SharedTransformSystem _transform;
+    private readonly SharedXenoHiveSystem _hive;
     private readonly LineSystem _line;
     private readonly EntityQuery<ActionsComponent> _actionsQ;
+    private readonly EntityQuery<FixturesComponent> _fixturesQ;
     private readonly EntityQuery<TargetActionComponent> _targetActionQ;
     private readonly EntityQuery<WorldTargetActionComponent> _worldTargetQ;
     private readonly EntityQuery<XenoSprayAcidComponent> _sprayQ;
@@ -64,6 +70,7 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
 
     public XenoAbilityPreviewOverlay(IEntityManager ents)
     {
+        _entities = ents;
         _input = IoCManager.Resolve<IInputManager>();
         _eye = IoCManager.Resolve<IEyeManager>();
         _player = IoCManager.Resolve<IPlayerManager>();
@@ -75,8 +82,10 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
         _mapSystem = ents.System<SharedMapSystem>();
         _physics = ents.System<SharedPhysicsSystem>();
         _transform = ents.System<SharedTransformSystem>();
+        _hive = ents.System<SharedXenoHiveSystem>();
         _line = ents.System<LineSystem>();
         _actionsQ = ents.GetEntityQuery<ActionsComponent>();
+        _fixturesQ = ents.GetEntityQuery<FixturesComponent>();
         _targetActionQ = ents.GetEntityQuery<TargetActionComponent>();
         _worldTargetQ = ents.GetEntityQuery<WorldTargetActionComponent>();
         _sprayQ = ents.GetEntityQuery<XenoSprayAcidComponent>();
@@ -179,12 +188,15 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
         var color = baseColor.WithAlpha(OutlineAlpha);
 
         var impact = mousePos;
-        var collisionMask = GetProjectileCollisionMask(bombard.Projectile);
-        if (TryGetProjectileImpact(originMap, mousePos, collisionMask, player, out var hitEntity, out var hitCoordinates))
+        var (collisionMask, collisionLayer) = GetProjectileCollisionData(bombard.Projectile);
+        var projectileHalfWidth = GetProjectileHalfWidth(bombard.Projectile);
+
+        if (TryGetProjectileImpact(originMap, mousePos, collisionMask, collisionLayer, projectileHalfWidth, player, out var hitEntity, out var hitCoordinates))
         {
             impact = hitCoordinates;
         }
 
+        args.WorldHandle.DrawLine(originMap.Position, mousePos.Position, color);
         impact = AdjustProjectileImpact(bombard.Projectile, originMap, impact);
 
         var toCoordinates = _transform.ToCoordinates(player, impact);
@@ -446,22 +458,47 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
         return BombardFallbackColor;
     }
 
-    private int GetProjectileCollisionMask(EntProtoId projectile)
+    private (int Mask, int Layer) GetProjectileCollisionData(EntProtoId projectile)
     {
         if (_prototypes.TryIndex<EntityPrototype>(projectile, out var projectileProto) &&
             projectileProto.TryGetComponent<FixturesComponent>(out var fixtures, _componentFactory))
         {
             var mask = 0;
+            var layer = 0;
             foreach (var fixture in fixtures.Fixtures.Values)
             {
+                // Combine all projectile fixtures so the preview uses the same broad collision set.
                 mask |= fixture.CollisionMask;
+                layer |= fixture.CollisionLayer;
             }
 
-            if (mask != 0)
-                return mask;
+            if (mask != 0 || layer != 0)
+                return (mask, layer);
         }
 
-        return (int) (CollisionGroup.Impassable | CollisionGroup.BulletImpassable | CollisionGroup.XenoProjectileImpassable);
+        return ((int) (CollisionGroup.Impassable | CollisionGroup.BulletImpassable | CollisionGroup.XenoProjectileImpassable), 0);
+    }
+
+    private float GetProjectileHalfWidth(EntProtoId projectile)
+    {
+        if (!_prototypes.TryIndex<EntityPrototype>(projectile, out var projectileProto) ||
+            !projectileProto.TryGetComponent<FixturesComponent>(out var fixtures, _componentFactory))
+        {
+            return 0.1f;
+        }
+
+        var halfWidth = 0.1f;
+        foreach (var fixture in fixtures.Fixtures.Values)
+        {
+            for (var i = 0; i < fixture.Shape.ChildCount; i++)
+            {
+                // the widest fixture extent so corner clips show up in the preview.
+                var aabb = fixture.Shape.ComputeAABB(new Robust.Shared.Physics.Transform(Vector2.Zero, Angle.Zero), i);
+                halfWidth = MathF.Max(halfWidth, MathF.Max(aabb.Width, aabb.Height) * 0.5f);
+            }
+        }
+
+        return halfWidth;
     }
 
     private MapCoordinates AdjustProjectileImpact(EntProtoId projectile, MapCoordinates origin, MapCoordinates impact)
@@ -482,6 +519,8 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
         MapCoordinates origin,
         MapCoordinates target,
         int collisionMask,
+        int collisionLayer,
+        float projectileHalfWidth,
         EntityUid? ignored,
         out EntityUid? hitEntity,
         out MapCoordinates hitCoordinates)
@@ -494,15 +533,69 @@ public sealed class XenoAbilityPreviewOverlay : Overlay
         if (distance <= 0f)
             return false;
 
-        var ray = new CollisionRay(origin.Position, direction / distance, collisionMask);
-        foreach (var result in _physics.IntersectRay(origin.MapId, ray, distance, ignored, returnOnFirstHit: true))
+        var dirNorm = direction / distance;
+        var perp = new Vector2(-dirNorm.Y, dirNorm.X);
+        // sample the center line & both projectile edges to catch narrow-gap and corner collisions
+        var offsets = new[] { Vector2.Zero, perp * projectileHalfWidth, -perp * projectileHalfWidth };
+
+        var closestDistance = float.MaxValue;
+        Vector2? closestPoint = null;
+        foreach (var offset in offsets)
         {
-            hitEntity = result.HitEntity;
-            hitCoordinates = new MapCoordinates(result.HitPos, origin.MapId);
-            return true;
+            var rayOrigin = origin.Position + offset;
+            var ray = new CollisionRay(rayOrigin, dirNorm, collisionMask);
+
+            foreach (var result in _physics.IntersectRay(origin.MapId, ray, distance, ignored, returnOnFirstHit: false))
+            {
+                if (!CanProjectileCollidePreview(ignored, result.HitEntity))
+                    continue;
+
+                if (!_fixturesQ.TryComp(result.HitEntity, out var fixtures))
+                    continue;
+
+                var blocks = false;
+                foreach (var fixture in fixtures.Fixtures.Values)
+                {
+                    // match physics collision checks instead of only looking at the blocker layer
+                    if ((fixture.CollisionLayer & collisionMask) != 0 ||
+                        (fixture.CollisionMask & collisionLayer) != 0)
+                    {
+                        blocks = true;
+                        break;
+                    }
+                }
+
+                if (!blocks)
+                    continue;
+
+                var hitDistance = (result.HitPos - origin.Position).Length();
+                if (hitDistance >= closestDistance)
+                    continue;
+
+                closestDistance = hitDistance;
+                closestPoint = result.HitPos;
+                hitEntity = result.HitEntity;
+            }
         }
 
-        return false;
+        if (hitEntity == null || closestPoint == null)
+            return false;
+
+        hitCoordinates = new MapCoordinates(closestPoint.Value, origin.MapId);
+        return true;
+    }
+
+    private bool CanProjectileCollidePreview(EntityUid? shooter, EntityUid target)
+    {
+        // pas through same hive stuffs
+        if (shooter != null &&
+            _hive.FromSameHive(shooter.Value, target) &&
+            (_entities.HasComponent<XenoComponent>(target) || _entities.HasComponent<HiveCoreComponent>(target)))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private static void DrawEdge(DrawingHandleWorld handle, Vector2 from, Vector2 to, Color color)
