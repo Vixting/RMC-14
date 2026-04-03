@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO.Compression;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Reflection;
@@ -15,9 +16,16 @@ using Robust.Shared.Utility;
 
 internal static class Program
 {
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(60) };
+    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromMinutes(10) };
     private static readonly Regex HrefFinder = new("<a href=\"([\\d]+)/\">", RegexOptions.Compiled);
     private static readonly Regex ReplayFinder = new("<a href=\"([^\"]+\\.zip)\">", RegexOptions.Compiled);
+    private const string ExtractModeFull = "full";
+    private const string ExtractModeChatOnly = "chat-only";
+    private static readonly string[] ChatAssemblyPaths =
+    [
+        "Assemblies/Content.Shared.dll",
+        "Assemblies/Content.Shared.Database.dll",
+    ];
 
     public static int Main(string[] args)
     {
@@ -27,6 +35,9 @@ internal static class Program
             SQLitePCL.Batteries_V2.Init();
 
             var options = Options.Parse(args);
+            var replayCandidates = ResolveReplayCandidates(options, tempFiles);
+            if (options.Jobs > 1 && replayCandidates.Count > 1)
+                return RunReplayExportsInParallel(options, replayCandidates);
 
             using var connection = new SqliteConnection(new SqliteConnectionStringBuilder
             {
@@ -35,79 +46,14 @@ internal static class Program
             }.ToString());
             connection.Open();
 
-            var replayCandidates = ResolveReplayCandidates(options, tempFiles);
-
-            var attemptedBuilds = new List<string>();
-            var matchedReplayCount = 0;
-            long totalExtractedBytes = 0;
-            var totalExtractedFiles = 0;
-            var totalChatMessages = 0;
-
+            var total = new ExportStats();
             foreach (var replayPath in replayCandidates)
             {
-                var replayInfo = ReplayInfo.Read(replayPath);
-                Console.WriteLine($"Replay build: {replayInfo.ForkId}/{replayInfo.ForkVersion}");
-                Console.WriteLine($"Replay engine: {replayInfo.EngineVersion}");
-
-                var cachedVersion = CachedVersion.Find(
-                    connection,
-                    replayInfo.ForkId,
-                    replayInfo.ForkVersion);
-
-                if (cachedVersion == null)
-                {
-                    attemptedBuilds.Add($"{replayInfo.ForkId}/{replayInfo.ForkVersion}");
-                    Console.WriteLine("No matching launcher cache entry for this replay. Trying next replay...");
-                    continue;
-                }
-
-                matchedReplayCount++;
-                Console.WriteLine($"Using cached version id {cachedVersion.Id} with engine {cachedVersion.EngineVersion}");
-                Console.WriteLine($"Selected replay: {replayPath}");
-                Console.WriteLine($"Writing files under {options.OutputPath}");
-
-                Directory.CreateDirectory(options.OutputPath);
-
-                var replayFolderName = GetReplayFolderName(replayPath, replayInfo);
-                var replayOutputPath = Path.Combine(options.OutputPath, replayFolderName);
-                var buildOutputPath = Path.Combine(replayOutputPath, "build");
-                var chatOutputPath = ResolveChatOutputPath(options.ChatOutputPath, replayOutputPath);
-
-                Console.WriteLine($"Replay export folder: {replayOutputPath}");
-                Directory.CreateDirectory(replayOutputPath);
-
-                var (fileCount, extractedBytes) = ExtractCachedBuild(connection, cachedVersion.Id, buildOutputPath);
-                totalExtractedFiles += fileCount;
-                totalExtractedBytes += extractedBytes;
-
-                File.WriteAllLines(
-                    Path.Combine(replayOutputPath, "launcher_cache_extract.txt"),
-                    [
-                        $"replay_file={Path.GetFileName(replayPath)}",
-                        $"fork_id={replayInfo.ForkId}",
-                        $"fork_version={replayInfo.ForkVersion}",
-                        $"engine_version={cachedVersion.EngineVersion}",
-                        $"content_version_id={cachedVersion.Id}",
-                        $"extracted_at_utc={DateTime.UtcNow:O}",
-                    ]);
-
-                Console.WriteLine($"Writing chat logs to {chatOutputPath}");
-                var chatCount = ExtractChatLogs(replayPath, buildOutputPath, chatOutputPath);
-                totalChatMessages += chatCount;
-                Console.WriteLine($"Wrote {chatCount} chat messages.");
-            }
-
-            if (matchedReplayCount == 0)
-            {
-                var detail = attemptedBuilds.Count == 0
-                    ? "No replay candidates were found."
-                    : $"Tried replay builds: {string.Join(", ", attemptedBuilds)}";
-                throw new InvalidOperationException(
-                    $"No cached launcher content matched the selected replay source. {detail}");
+                total += ExportReplay(options, replayPath, connection);
             }
 
             Console.WriteLine(
-                $"Done. Exported {matchedReplayCount} replay(s), wrote {totalChatMessages} chat messages, extracted {totalExtractedFiles} files, {totalExtractedBytes} bytes.");
+                $"Done. Exported {total.MatchedReplayCount} replay(s), wrote {total.ChatMessages} chat messages, extracted {total.ExtractedFiles} files, {total.ExtractedBytes} bytes.");
             return 0;
         }
         catch (Exception e)
@@ -129,6 +75,193 @@ internal static class Program
                 }
             }
         }
+    }
+
+    private static ExportStats ExportReplay(Options options, string replayPath, SqliteConnection connection)
+    {
+        var replayInfo = ReplayInfo.Read(replayPath);
+        Console.WriteLine($"Replay build: {replayInfo.ForkId}/{replayInfo.ForkVersion}");
+        Console.WriteLine($"Replay engine: {replayInfo.EngineVersion}");
+
+        var cachedVersion = CachedVersion.Find(
+            connection,
+            replayInfo.ForkId,
+            replayInfo.ForkVersion);
+
+        if (cachedVersion == null)
+            throw new InvalidOperationException(
+                $"No cached launcher content matched replay build {replayInfo.ForkId}/{replayInfo.ForkVersion}.");
+
+        Console.WriteLine($"Using cached version id {cachedVersion.Id} with engine {cachedVersion.EngineVersion}");
+        Console.WriteLine($"Selected replay: {replayPath}");
+        Console.WriteLine($"Writing files under {options.OutputPath}");
+
+        Directory.CreateDirectory(options.OutputPath);
+
+        var replayFolderName = GetReplayFolderName(replayPath, replayInfo);
+        var replayOutputPath = Path.Combine(options.OutputPath, replayFolderName);
+        var buildOutputPath = Path.Combine(replayOutputPath, "build");
+        var chatOutputPath = ResolveChatOutputPath(options.ChatOutputPath, replayOutputPath);
+
+        Console.WriteLine($"Replay export folder: {replayOutputPath}");
+        Directory.CreateDirectory(replayOutputPath);
+
+        var extractionMode = options.ChatOnly ? ExtractModeChatOnly : ExtractModeFull;
+        var (fileCount, extractedBytes) = options.ChatOnly
+            ? EnsureChatAssembliesExtracted(cachedVersion.Id, replayOutputPath, buildOutputPath, connection)
+            : EnsureCachedBuildExtracted(cachedVersion.Id, replayOutputPath, buildOutputPath, connection);
+
+        WriteExtractionManifest(replayOutputPath, replayPath, replayInfo, cachedVersion.EngineVersion, cachedVersion.Id, extractionMode);
+
+        Console.WriteLine($"Writing chat logs to {chatOutputPath}");
+        var chatCount = ExtractChatLogs(replayPath, buildOutputPath, chatOutputPath);
+        Console.WriteLine($"Wrote {chatCount} chat messages.");
+
+        return new ExportStats(1, fileCount, extractedBytes, chatCount);
+    }
+
+    private static int RunReplayExportsInParallel(Options options, IReadOnlyList<string> replayCandidates)
+    {
+        Console.WriteLine($"Running {replayCandidates.Count} replay exports with {options.Jobs} worker(s).");
+
+        var failures = 0;
+        Parallel.ForEach(
+            replayCandidates,
+            new ParallelOptions { MaxDegreeOfParallelism = options.Jobs },
+            replayPath =>
+            {
+                var exitCode = RunReplayExportWorker(options, replayPath);
+                if (exitCode != 0)
+                    Interlocked.Increment(ref failures);
+            });
+
+        return failures == 0 ? 0 : 1;
+    }
+
+    private static int RunReplayExportWorker(Options options, string replayPath)
+    {
+        var startInfo = CreateWorkerStartInfo(options, replayPath);
+        using var process = Process.Start(startInfo)
+            ?? throw new InvalidOperationException("Failed to start replay export worker process.");
+        process.WaitForExit();
+        return process.ExitCode;
+    }
+
+    private static ProcessStartInfo CreateWorkerStartInfo(Options options, string replayPath)
+    {
+        var processPath = Environment.ProcessPath
+            ?? throw new InvalidOperationException("Could not determine current process path.");
+        var entryAssemblyPath = Assembly.GetEntryAssembly()?.Location
+            ?? throw new InvalidOperationException("Could not determine entry assembly path.");
+        var processName = Path.GetFileNameWithoutExtension(processPath);
+
+        var workerArgs = new List<string>
+        {
+            "--replay", replayPath,
+            "--output", options.OutputPath,
+            "--content-db", options.ContentDbPath,
+            "--jobs", "1",
+        };
+
+        if (options.ChatOnly)
+            workerArgs.Add("--chat-only");
+
+        if (!string.IsNullOrWhiteSpace(options.ChatOutputPath))
+        {
+            workerArgs.Add("--chat-output");
+            workerArgs.Add(options.ChatOutputPath);
+        }
+
+        if (string.Equals(processName, "dotnet", StringComparison.OrdinalIgnoreCase))
+        {
+            var psi = new ProcessStartInfo(processPath)
+            {
+                UseShellExecute = false,
+            };
+            psi.ArgumentList.Add(entryAssemblyPath);
+            foreach (var arg in workerArgs)
+                psi.ArgumentList.Add(arg);
+            return psi;
+        }
+        else
+        {
+            var psi = new ProcessStartInfo(processPath)
+            {
+                UseShellExecute = false,
+            };
+            foreach (var arg in workerArgs)
+                psi.ArgumentList.Add(arg);
+            return psi;
+        }
+    }
+
+    private static (int FileCount, long TotalBytes) EnsureCachedBuildExtracted(
+        long versionId,
+        string replayOutputPath,
+        string buildOutputPath,
+        SqliteConnection connection)
+    {
+        var manifestPath = Path.Combine(replayOutputPath, "launcher_cache_extract.txt");
+        if (Directory.Exists(buildOutputPath) &&
+            File.Exists(manifestPath) &&
+            TryReadExtractManifest(manifestPath, out var existingVersionId, out var existingMode) &&
+            existingVersionId == versionId &&
+            existingMode == ExtractModeFull)
+        {
+            Console.WriteLine("Reusing previously extracted build.");
+            return (0, 0);
+        }
+
+        return ExtractCachedBuild(connection, versionId, buildOutputPath);
+    }
+
+    private static (int FileCount, long TotalBytes) EnsureChatAssembliesExtracted(
+        long versionId,
+        string replayOutputPath,
+        string buildOutputPath,
+        SqliteConnection connection)
+    {
+        var manifestPath = Path.Combine(replayOutputPath, "launcher_cache_extract.txt");
+        if (Directory.Exists(buildOutputPath) &&
+            File.Exists(manifestPath) &&
+            TryReadExtractManifest(manifestPath, out var existingVersionId, out var existingMode) &&
+            existingVersionId == versionId &&
+            (existingMode == ExtractModeFull || existingMode == ExtractModeChatOnly) &&
+            HasRequiredChatAssemblies(buildOutputPath))
+        {
+            Console.WriteLine("Reusing previously extracted chat assemblies.");
+            return (0, 0);
+        }
+
+        return ExtractCachedBuildFiles(connection, versionId, buildOutputPath, ChatAssemblyPaths);
+    }
+
+    private static bool HasRequiredChatAssemblies(string buildOutputPath)
+    {
+        return File.Exists(Path.Combine(buildOutputPath, "Assemblies", "Content.Shared.dll"));
+    }
+
+    private static bool TryReadExtractManifest(string manifestPath, out long versionId, out string? mode)
+    {
+        versionId = default;
+        mode = null;
+
+        foreach (var line in File.ReadLines(manifestPath))
+        {
+            if (line.StartsWith("content_version_id=", StringComparison.Ordinal))
+            {
+                long.TryParse(
+                    line["content_version_id=".Length..],
+                    CultureInfo.InvariantCulture,
+                    out versionId);
+                continue;
+            }
+
+            if (line.StartsWith("extraction_mode=", StringComparison.Ordinal))
+                mode = line["extraction_mode=".Length..];
+        }
+
+        return versionId != default || mode != null;
     }
 
     private static (int FileCount, long TotalBytes) ExtractCachedBuild(SqliteConnection connection, long versionId, string outputPath)
@@ -168,6 +301,76 @@ internal static class Program
         }
 
         return (fileCount, totalBytes);
+    }
+
+    private static (int FileCount, long TotalBytes) ExtractCachedBuildFiles(
+        SqliteConnection connection,
+        long versionId,
+        string outputPath,
+        IEnumerable<string> relativePaths)
+    {
+        var fileCount = 0;
+        long totalBytes = 0;
+
+        using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT m.Path, c.Size, c.Compression, c.Data
+            FROM ContentManifest m
+            INNER JOIN Content c ON c.Id = m.ContentId
+            WHERE m.VersionId = $versionId AND m.Path = $path
+            """;
+        command.Parameters.AddWithValue("$versionId", versionId);
+        var pathParameter = command.CreateParameter();
+        pathParameter.ParameterName = "$path";
+        command.Parameters.Add(pathParameter);
+
+        foreach (var relativeDbPath in relativePaths)
+        {
+            pathParameter.Value = relativeDbPath;
+            using var reader = command.ExecuteReader();
+            if (!reader.Read())
+                continue;
+
+            var relativePath = reader.GetString(0).Replace('/', Path.DirectorySeparatorChar);
+            var expectedSize = reader.GetInt64(1);
+            var compression = reader.GetInt32(2);
+            var data = (byte[]) reader["Data"];
+
+            var fullPath = Path.Combine(outputPath, relativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+            var bytes = Decompress(data, compression, expectedSize);
+            File.WriteAllBytes(fullPath, bytes);
+
+            fileCount++;
+            totalBytes += bytes.LongLength;
+        }
+
+        if (!File.Exists(Path.Combine(outputPath, "Assemblies", "Content.Shared.dll")))
+            throw new FileNotFoundException("Cached build is missing Assemblies/Content.Shared.dll");
+
+        return (fileCount, totalBytes);
+    }
+
+    private static void WriteExtractionManifest(
+        string replayOutputPath,
+        string replayPath,
+        ReplayInfo replayInfo,
+        string engineVersion,
+        long contentVersionId,
+        string extractionMode)
+    {
+        File.WriteAllLines(
+            Path.Combine(replayOutputPath, "launcher_cache_extract.txt"),
+            [
+                $"replay_file={Path.GetFileName(replayPath)}",
+                $"fork_id={replayInfo.ForkId}",
+                $"fork_version={replayInfo.ForkVersion}",
+                $"engine_version={engineVersion}",
+                $"content_version_id={contentVersionId}",
+                $"extraction_mode={extractionMode}",
+                $"extracted_at_utc={DateTime.UtcNow:O}",
+            ]);
     }
 
     private static int ExtractChatLogs(string replayPath, string extractedBuildPath, string chatOutputPath)
@@ -443,15 +646,39 @@ internal static class Program
 
     private static string DownloadReplay(string replayUrl, List<string> tempFiles)
     {
-        Console.WriteLine($"Downloading replay {replayUrl}");
-        var tempPath = Path.Combine(Path.GetTempPath(), $"launcher-cache-replay-{Guid.NewGuid():N}.zip");
-        using var response = Http.GetAsync(replayUrl).GetAwaiter().GetResult();
-        response.EnsureSuccessStatusCode();
-        using var input = response.Content.ReadAsStream();
-        using var output = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        input.CopyTo(output);
-        tempFiles.Add(tempPath);
-        return tempPath;
+        const int attempts = 3;
+
+        for (var attempt = 1; attempt <= attempts; attempt++)
+        {
+            var tempPath = Path.Combine(Path.GetTempPath(), $"launcher-cache-replay-{Guid.NewGuid():N}.zip");
+
+            try
+            {
+                Console.WriteLine($"Downloading replay {replayUrl} (attempt {attempt}/{attempts})");
+                using var response = Http.GetAsync(replayUrl, HttpCompletionOption.ResponseHeadersRead).GetAwaiter().GetResult();
+                response.EnsureSuccessStatusCode();
+                using var input = response.Content.ReadAsStream();
+                using var output = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                input.CopyTo(output);
+                tempFiles.Add(tempPath);
+                return tempPath;
+            }
+            catch when (attempt < attempts)
+            {
+                try
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                }
+                catch
+                {
+                }
+
+                Console.Error.WriteLine($"Download failed for {replayUrl}. Retrying...");
+            }
+        }
+
+        throw new InvalidOperationException($"Failed to download replay after {attempts} attempts: {replayUrl}");
     }
 
     private static List<string> GetRemoteReplayUrls(string rootUrl, int limit)
@@ -519,6 +746,8 @@ sealed class Options
     public required string OutputPath { get; init; }
     public string? ChatOutputPath { get; init; }
     public required string ContentDbPath { get; init; }
+    public bool ChatOnly { get; init; }
+    public int Jobs { get; init; }
 
     public static Options Parse(string[] args)
     {
@@ -528,6 +757,8 @@ sealed class Options
         string? outputPath = null;
         string? chatOutputPath = null;
         int? lastRounds = null;
+        var chatOnly = false;
+        var jobs = 1;
         var contentDbPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "Space Station 14",
@@ -557,6 +788,13 @@ sealed class Options
                     break;
                 case "--chat-output":
                     chatOutputPath = Next(args, ref i, "--chat-output");
+                    break;
+                case "--chat-only":
+                    chatOnly = true;
+                    break;
+                case "--jobs":
+                    if (!int.TryParse(Next(args, ref i, "--jobs"), CultureInfo.InvariantCulture, out jobs) || jobs <= 0)
+                        throw new ArgumentException("--jobs must be a positive integer");
                     break;
                 case "--content-db":
                     contentDbPath = Next(args, ref i, "--content-db");
@@ -597,6 +835,8 @@ sealed class Options
             OutputPath = Path.GetFullPath(outputPath),
             ChatOutputPath = string.IsNullOrWhiteSpace(chatOutputPath) ? null : Path.GetFullPath(chatOutputPath),
             ContentDbPath = Path.GetFullPath(contentDbPath),
+            ChatOnly = chatOnly,
+            Jobs = jobs,
         };
     }
 
@@ -613,8 +853,20 @@ sealed class Options
         Console.WriteLine("Usage:");
         Console.WriteLine("  dotnet run --project Tools/launcher_cache_extract -- --replay <replay.zip> --output <directory> [--content-db <content.db>]");
         Console.WriteLine("  dotnet run --project Tools/launcher_cache_extract -- --replay-url <replay.zip url> --output <directory> [--content-db <content.db>]");
-        Console.WriteLine("  dotnet run --project Tools/launcher_cache_extract -- --last-rounds <n> --output <directory> [--chat-output <chat.jsonl>] [--replay-root-url <url>] [--content-db <content.db>]");
+        Console.WriteLine("  dotnet run --project Tools/launcher_cache_extract -- --last-rounds <n> --output <directory> [--chat-output <chat.jsonl>] [--chat-only] [--jobs <n>] [--replay-root-url <url>] [--content-db <content.db>]");
         Environment.Exit(0);
+    }
+}
+
+readonly record struct ExportStats(int MatchedReplayCount = 0, int ExtractedFiles = 0, long ExtractedBytes = 0, int ChatMessages = 0)
+{
+    public static ExportStats operator +(ExportStats left, ExportStats right)
+    {
+        return new ExportStats(
+            left.MatchedReplayCount + right.MatchedReplayCount,
+            left.ExtractedFiles + right.ExtractedFiles,
+            left.ExtractedBytes + right.ExtractedBytes,
+            left.ChatMessages + right.ChatMessages);
     }
 }
 
