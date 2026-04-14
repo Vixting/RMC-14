@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Shared._RMC14.CCVar;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared._RMC14.Light;
 using Content.Shared._RMC14.Movement;
@@ -18,6 +19,7 @@ using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Physics.Components;
@@ -34,6 +36,7 @@ namespace Content.Shared._RMC14.Xenonids.Projectile;
 public sealed class XenoProjectileSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly SharedGunPredictionSystem _gunPrediction = default!;
     [Dependency] private readonly SharedXenoHiveSystem _hive = default!;
@@ -51,6 +54,9 @@ public sealed class XenoProjectileSystem : EntitySystem
 
     private EntityQuery<ProjectileComponent> _projectileQuery;
     private EntityQuery<PreventAttackLightOffComponent> _preventAttackLightOffQuery;
+    private readonly List<(XenoProjectilePredictedHitEvent Event, ICommonSession Player)> _predictedHits = new();
+    private float _aabbEnlargement;
+    private float _coordinateDeviation;
 
     private int _limitHitsId;
 
@@ -73,11 +79,15 @@ public sealed class XenoProjectileSystem : EntitySystem
         SubscribeLocalEvent<XenoProjectileComponent, PreventCollideEvent>(OnPreventCollide);
         SubscribeLocalEvent<XenoProjectileComponent, ProjectileHitEvent>(OnProjectileHit);
         SubscribeLocalEvent<XenoProjectileComponent, CMClusterSpawnedEvent>(OnClusterSpawned);
+
+        Subs.CVar(_config, RMCCVars.RMCGunPredictionAabbEnlargement, v => _aabbEnlargement = v, true);
+        Subs.CVar(_config, RMCCVars.RMCGunPredictionCoordinateDeviation, v => _coordinateDeviation = v, true);
     }
 
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
     {
         _limitHitsId = 0;
+        _predictedHits.Clear();
     }
 
     private void OnPredictedHit(XenoProjectilePredictedHitEvent msg, EntitySessionEventArgs args)
@@ -85,7 +95,12 @@ public sealed class XenoProjectileSystem : EntitySystem
         if (_net.IsClient || !_gunPrediction.GunPrediction)
             return;
 
-        if (args.SenderSession.AttachedEntity is not { } ent)
+        _predictedHits.Add((msg, args.SenderSession));
+    }
+
+    private void ProcessPredictedHit(XenoProjectilePredictedHitEvent msg, ICommonSession player)
+    {
+        if (player.AttachedEntity is not { } ent)
             return;
 
         if (GetEntity(msg.Target) is not { Valid: true } target)
@@ -103,8 +118,8 @@ public sealed class XenoProjectileSystem : EntitySystem
         if (TerminatingOrDeleted(shot))
             return;
 
-        _rmcLagCompensation.SetLastRealTick(args.SenderSession.UserId, msg.LastRealTick);
-        var coordinates = _transform.ToMapCoordinates(_rmcLagCompensation.GetCoordinates(target, args.SenderSession));
+        _rmcLagCompensation.SetLastRealTick(player.UserId, msg.LastRealTick);
+        var coordinates = _transform.ToMapCoordinates(_rmcLagCompensation.GetCoordinates(target, player));
 
         if (!TryComp(shot, out ProjectileComponent? projectile) ||
             !TryComp(shot, out PhysicsComponent? physics))
@@ -112,8 +127,16 @@ public sealed class XenoProjectileSystem : EntitySystem
             return;
         }
 
-        if (!_rmcLagCompensation.Collides(target, (shot.Value, physics), coordinates))
+        var clientCoordinates = msg.TargetCoordinates;
+        var clientCoordinatesValid = clientCoordinates.MapId == coordinates.MapId &&
+                                     clientCoordinates.InRange(coordinates, _coordinateDeviation);
+
+        if (!_rmcLagCompensation.Collides(target, (shot.Value, physics), coordinates, _aabbEnlargement) &&
+            (!clientCoordinatesValid ||
+             !_rmcLagCompensation.Collides(target, (shot.Value, physics), clientCoordinates, _aabbEnlargement)))
+        {
             return;
+        }
 
         _projectile.ProjectileCollide((shot.Value, projectile, physics), target, true);
     }
@@ -155,6 +178,7 @@ public sealed class XenoProjectileSystem : EntitySystem
         var ev = new XenoProjectilePredictedHitEvent(
             shot.Id,
             GetNetEntity(args.OtherEntity),
+            _transform.GetMapCoordinates(args.OtherEntity),
             _rmcLagCompensation.GetLastRealTick(null)
         );
         RaiseNetworkEvent(ev);
@@ -330,5 +354,20 @@ public sealed class XenoProjectileSystem : EntitySystem
 
         RaiseLocalEvent(xeno, ammoShotEvent);
         return true;
+    }
+
+    public override void Update(float frameTime)
+    {
+        try
+        {
+            foreach (var hit in _predictedHits)
+            {
+                ProcessPredictedHit(hit.Event, hit.Player);
+            }
+        }
+        finally
+        {
+            _predictedHits.Clear();
+        }
     }
 }

@@ -110,7 +110,7 @@ public abstract class SharedRMCLagCompensationSystem : EntitySystem
         RaiseNetworkEvent(new RMCSetLastRealTickEvent(GetLastRealTick(null)));
     }
 
-    public bool Collides(Entity<FixturesComponent?> target, Entity<PhysicsComponent?> projectile, MapCoordinates targetCoordinates)
+    public bool Collides(Entity<FixturesComponent?> target, Entity<PhysicsComponent?> projectile, MapCoordinates targetCoordinates, float aabbEnlargement = 0f)
     {
         if (!Resolve(target, ref target.Comp, false) ||
             !Resolve(projectile, ref projectile.Comp, false))
@@ -134,6 +134,9 @@ public abstract class SharedRMCLagCompensationSystem : EntitySystem
                 bounds = bounds.Union(boundy);
             }
         }
+
+        if (aabbEnlargement > 0)
+            bounds = bounds.Enlarged(aabbEnlargement);
 
         if (bounds.Contains(projectilePosition))
             return true;
