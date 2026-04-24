@@ -7,6 +7,7 @@ Expected export folder contents:
 - `manifest.json`
 - `maps/*.json`
 - `images/*.png`
+- `icons/*.png`
 
 Generate that data with:
 

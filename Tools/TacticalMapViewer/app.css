@@ -147,6 +147,31 @@ input:disabled {
   margin-bottom: 0;
 }
 
+.choiceList {
+  display: grid;
+  gap: 8px;
+}
+
+.choiceItem {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(13, 17, 23, 0.45);
+}
+
+.choiceItem label {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.choiceMeta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .fieldGrid,
 .buttonRow {
   display: grid;

@@ -11,6 +11,8 @@ using Content.Shared._RMC14.Rules;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Content.MapRenderer;
 
@@ -35,6 +37,13 @@ internal static class RenderedMapExporter
         public readonly HashSet<string> MatchKeys = new(StringComparer.OrdinalIgnoreCase);
     }
 
+    private sealed class CachedInsertRender
+    {
+        public required string PatchFile;
+        public required MapBounds RenderBounds;
+        public required List<MapSpawnCell> Spawns;
+    }
+
     public static string GetOutputRoot(CommandLineArguments arguments)
     {
         return Path.Combine(arguments.OutputPath, TacMapOutputDirectoryName);
@@ -57,8 +66,14 @@ internal static class RenderedMapExporter
         var outputRoot = GetOutputRoot(arguments);
         var mapsDirectory = Path.Combine(outputRoot, "maps");
         var imagesDirectory = Path.Combine(outputRoot, "images");
+        var iconsDirectory = Path.Combine(outputRoot, "icons");
+        var insertSourceDirectory = Path.Combine(outputRoot, "insert_sources");
+        var insertOverlayDirectory = Path.Combine(outputRoot, "insert_overlays");
         Directory.CreateDirectory(mapsDirectory);
         Directory.CreateDirectory(imagesDirectory);
+        Directory.CreateDirectory(iconsDirectory);
+        Directory.CreateDirectory(insertSourceDirectory);
+        Directory.CreateDirectory(insertOverlayDirectory);
 
         var jsonOptions = new JsonSerializerOptions
         {
@@ -70,6 +85,11 @@ internal static class RenderedMapExporter
         {
             GeneratedUtc = DateTime.UtcNow
         };
+        var savedSpawnIcons = new Dictionary<string, string>(StringComparer.Ordinal);
+        var usedIconNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var cachedInsertRenders = new Dictionary<string, CachedInsertRender>(StringComparer.OrdinalIgnoreCase);
+        var usedInsertPatchNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var usedInsertOverlayNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         Console.WriteLine($"Exporting rendered maps to {outputRoot}");
 
@@ -79,17 +99,25 @@ internal static class RenderedMapExporter
 
             var renderTarget = new RenderMapFile { FileName = target.FilePath };
             await using var painter = new MapPainter(renderTarget, testContext);
+            Dictionary<string, Image<Rgba32>>? spawnIcons = null;
 
             try
             {
                 await painter.Initialize();
                 var mapData = await painter.ExportRenderedMapData(target.Id, target.Name);
+                spawnIcons = painter.TakeSpawnIcons();
 
                 if (mapData.Grids.Count == 0)
                 {
-                    Console.WriteLine($"[map-export] Skipping {target.Id}: no AreaGrid components found.");
+                    DisposeSpawnIcons(spawnIcons);
+                    spawnIcons = null;
+                    Console.WriteLine($"[map-export] Skipping {target.Id}: no grids were exported.");
                     continue;
                 }
+
+                await SaveSpawnIcons(spawnIcons, iconsDirectory, savedSpawnIcons, usedIconNames);
+                spawnIcons = null;
+                ApplySpawnIconPaths(mapData, savedSpawnIcons);
 
                 var gridsById = mapData.Grids.ToDictionary(g => g.GridId, StringComparer.Ordinal);
                 await foreach (var renderedGrid in painter.Paint())
@@ -117,6 +145,19 @@ internal static class RenderedMapExporter
                     renderedGrid.Image.Dispose();
                 }
 
+                await ExportInsertOverlays(
+                    mapData,
+                    target,
+                    testContext,
+                    outputRoot,
+                    insertSourceDirectory,
+                    insertOverlayDirectory,
+                    savedSpawnIcons,
+                    usedIconNames,
+                    cachedInsertRenders,
+                    usedInsertPatchNames,
+                    usedInsertOverlayNames);
+
                 var mapFileName = $"{target.Id}.json";
                 var mapFilePath = Path.Combine(mapsDirectory, mapFileName);
                 var mapJson = JsonSerializer.Serialize(mapData, jsonOptions);
@@ -133,6 +174,8 @@ internal static class RenderedMapExporter
             }
             catch (Exception ex)
             {
+                if (spawnIcons != null)
+                    DisposeSpawnIcons(spawnIcons);
                 Console.WriteLine($"[map-export] Failed to export {target.ResourcePath}:");
                 Console.WriteLine(ex);
             }
@@ -160,6 +203,254 @@ internal static class RenderedMapExporter
         Console.WriteLine($"[map-export] Export complete. Maps exported: {manifest.Maps.Count}");
         Console.WriteLine($"[map-export] Open the standalone viewer: {GetStandaloneViewerPath()}");
         Console.WriteLine($"[map-export] Then load export folder: {outputRoot}");
+    }
+
+    private static async Task ExportInsertOverlays(
+        MapExport mapData,
+        TacMapTarget target,
+        ExternalTestContext testContext,
+        string outputRoot,
+        string insertSourceDirectory,
+        string insertOverlayDirectory,
+        Dictionary<string, string> savedSpawnIcons,
+        HashSet<string> usedIconNames,
+        Dictionary<string, CachedInsertRender> cachedInsertRenders,
+        HashSet<string> usedInsertPatchNames,
+        HashSet<string> usedInsertOverlayNames)
+    {
+        foreach (var grid in mapData.Grids)
+        {
+            if (grid.Image == null)
+                continue;
+
+            foreach (var cell in grid.Inserts)
+            {
+                foreach (var insert in cell.Inserts)
+                {
+                    for (var i = 0; i < insert.Variations.Count; i++)
+                    {
+                        var variation = insert.Variations[i];
+                        if (!TryNormalizeResourcePath(variation.Spawn, out var resourcePath))
+                            continue;
+
+                        var diskPath = ResourcePathToDiskPath(resourcePath);
+                        if (!File.Exists(diskPath))
+                            continue;
+
+                        var cached = await GetOrCreateInsertRender(
+                            resourcePath,
+                            diskPath,
+                            testContext,
+                            insertSourceDirectory,
+                            savedSpawnIcons,
+                            usedIconNames,
+                            cachedInsertRenders,
+                            usedInsertPatchNames);
+
+                        if (cached == null)
+                            continue;
+
+                        var overlayFileName = $"{MakeUniqueId(SanitizeId($"{target.Id}_{grid.GridId}_{cell.X}_{cell.Y}_{insert.PrototypeId ?? insert.Name}_{i}"), usedInsertOverlayNames)}.png";
+                        var overlayDiskPath = Path.Combine(insertOverlayDirectory, overlayFileName);
+                        using var overlay = new Image<Rgba32>(grid.Image.Width, grid.Image.Height, new Rgba32(0, 0, 0, 0));
+                        using (var patch = await Image.LoadAsync<Rgba32>(cached.PatchFile))
+                        {
+                            var drawX = (int) Math.Round((cell.X + variation.OffsetX + cached.RenderBounds.MinX - grid.RenderBounds.MinX) * grid.Image.PixelsPerTile);
+                            var drawY = (int) Math.Round((grid.RenderBounds.MaxY - (cell.Y + variation.OffsetY + cached.RenderBounds.MaxY)) * grid.Image.PixelsPerTile);
+                            overlay.Mutate(ctx => ctx.DrawImage(patch, new Point(drawX, drawY), 1f));
+                        }
+
+                        await overlay.SaveAsPngAsync(overlayDiskPath);
+                        variation.Overlay = Path.Combine("insert_overlays", overlayFileName).Replace('\\', '/');
+                        variation.Spawns = TransformInsertSpawnCells(cached.Spawns, cell.X, cell.Y, variation.OffsetX, variation.OffsetY, grid.RenderBounds);
+                    }
+                }
+            }
+        }
+    }
+
+    private static async Task<CachedInsertRender?> GetOrCreateInsertRender(
+        string resourcePath,
+        string diskPath,
+        ExternalTestContext testContext,
+        string insertSourceDirectory,
+        Dictionary<string, string> savedSpawnIcons,
+        HashSet<string> usedIconNames,
+        Dictionary<string, CachedInsertRender> cachedInsertRenders,
+        HashSet<string> usedInsertPatchNames)
+    {
+        if (cachedInsertRenders.TryGetValue(diskPath, out var cached))
+            return cached;
+
+        var renderTarget = new RenderMapFile { FileName = diskPath };
+        await using var painter = new MapPainter(renderTarget, testContext);
+
+        Dictionary<string, Image<Rgba32>>? spawnIcons = null;
+        try
+        {
+            await painter.Initialize();
+            var insertMap = await painter.ExportRenderedMapData(Path.GetFileNameWithoutExtension(diskPath), Path.GetFileNameWithoutExtension(diskPath));
+            spawnIcons = painter.TakeSpawnIcons();
+
+            await SaveSpawnIcons(spawnIcons, Path.Combine(Path.GetDirectoryName(insertSourceDirectory)!, "icons"), savedSpawnIcons, usedIconNames);
+            spawnIcons = null;
+            ApplySpawnIconPaths(insertMap, savedSpawnIcons);
+
+            var grid = insertMap.Grids.FirstOrDefault();
+            if (grid == null)
+                return null;
+
+            await foreach (var renderedGrid in painter.Paint())
+            {
+                var patchName = $"{MakeUniqueId(SanitizeId(Path.GetFileNameWithoutExtension(diskPath)), usedInsertPatchNames)}.png";
+                var patchPath = Path.Combine(insertSourceDirectory, patchName);
+                await renderedGrid.Image.SaveAsPngAsync(patchPath);
+                renderedGrid.Image.Dispose();
+
+                cached = new CachedInsertRender
+                {
+                    PatchFile = patchPath,
+                    RenderBounds = grid.RenderBounds,
+                    Spawns = CloneSpawnCells(grid.Spawns),
+                };
+                cachedInsertRenders[diskPath] = cached;
+                return cached;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[map-export] Failed to render insert overlay source {resourcePath}: {ex}");
+        }
+        finally
+        {
+            if (spawnIcons != null)
+                DisposeSpawnIcons(spawnIcons);
+
+            await painter.CleanReturnAsync();
+        }
+
+        return null;
+    }
+
+    private static List<MapSpawnCell> CloneSpawnCells(IEnumerable<MapSpawnCell> cells)
+    {
+        return cells.Select(cell => new MapSpawnCell(
+            cell.X,
+            cell.Y,
+            cell.Spawns.Select(CloneSpawnInfo).ToList())).ToList();
+    }
+
+    private static List<MapSpawnCell> TransformInsertSpawnCells(
+        IEnumerable<MapSpawnCell> cells,
+        int insertTileX,
+        int insertTileY,
+        float offsetX,
+        float offsetY,
+        MapBounds targetBounds)
+    {
+        var transformed = new List<MapSpawnCell>();
+        foreach (var cell in cells)
+        {
+            var x = (int) MathF.Floor(insertTileX + offsetX + cell.X);
+            var y = (int) MathF.Floor(insertTileY + offsetY + cell.Y);
+            if (x < targetBounds.MinX || x > targetBounds.MaxX || y < targetBounds.MinY || y > targetBounds.MaxY)
+                continue;
+
+            transformed.Add(new MapSpawnCell(
+                x,
+                y,
+                cell.Spawns.Select(spawn =>
+                {
+                    var clone = CloneSpawnInfo(spawn);
+                    clone.Origin = "sourceInsert";
+                    return clone;
+                }).ToList()));
+        }
+
+        transformed.Sort(static (a, b) =>
+        {
+            var compareX = a.X.CompareTo(b.X);
+            return compareX != 0 ? compareX : a.Y.CompareTo(b.Y);
+        });
+        return transformed;
+    }
+
+    private static MapSpawnInfo CloneSpawnInfo(MapSpawnInfo spawn)
+    {
+        return new MapSpawnInfo
+        {
+            Name = spawn.Name,
+            PrototypeId = spawn.PrototypeId,
+            Kind = spawn.Kind,
+            Origin = spawn.Origin,
+            SpawnType = spawn.SpawnType,
+            JobId = spawn.JobId,
+            IntelType = spawn.IntelType,
+            Chance = spawn.Chance,
+            RareChance = spawn.RareChance,
+            MinCount = spawn.MinCount,
+            MaxCount = spawn.MaxCount,
+            Quota = spawn.Quota,
+            Ratio = spawn.Ratio,
+            DeleteAfterSpawn = spawn.DeleteAfterSpawn,
+            TargetId = spawn.TargetId,
+            GroupId = spawn.GroupId,
+            SpawnPath = spawn.SpawnPath,
+            Targets = new List<string>(spawn.Targets),
+            RareTargets = new List<string>(spawn.RareTargets),
+            Icon = spawn.Icon,
+        };
+    }
+
+    private static async Task SaveSpawnIcons(
+        Dictionary<string, Image<Rgba32>> spawnIcons,
+        string iconsDirectory,
+        Dictionary<string, string> savedSpawnIcons,
+        HashSet<string> usedIconNames)
+    {
+        foreach (var (prototypeId, icon) in spawnIcons)
+        {
+            try
+            {
+                if (savedSpawnIcons.ContainsKey(prototypeId))
+                    continue;
+
+                var fileName = $"{MakeUniqueId(SanitizeId(prototypeId), usedIconNames)}.png";
+                var iconPath = Path.Combine(iconsDirectory, fileName);
+                await icon.SaveAsPngAsync(iconPath);
+                savedSpawnIcons[prototypeId] = Path.Combine("icons", fileName).Replace('\\', '/');
+            }
+            finally
+            {
+                icon.Dispose();
+            }
+        }
+    }
+
+    private static void ApplySpawnIconPaths(MapExport mapData, Dictionary<string, string> savedSpawnIcons)
+    {
+        foreach (var grid in mapData.Grids)
+        {
+            foreach (var cell in grid.Spawns)
+            {
+                foreach (var spawn in cell.Spawns)
+                {
+                    if (spawn.PrototypeId != null &&
+                        savedSpawnIcons.TryGetValue(spawn.PrototypeId, out var iconPath))
+                    {
+                        spawn.Icon = iconPath;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void DisposeSpawnIcons(Dictionary<string, Image<Rgba32>> spawnIcons)
+    {
+        foreach (var icon in spawnIcons.Values)
+        {
+            icon.Dispose();
+        }
     }
 
     private static MapExportManifest RebuildManifestFromExports(
