@@ -27,3 +27,12 @@ rmc-xeno-tracker-target-HiveCore = Hive Core
 rmc-xeno-ui-ovi-needed-label = [bold][color=red]The Queen must be in their\novipositor for you to gain points![/color][/bold]
 rmc-xeno-ui-evolution-points = Evolution points: { $points } / { $maxPoints }
 rmc-ui-xeno-strain-confirm = Confirm
+
+rmc-xeno-t3-raffle-label = T3 Raffle — Register Your Preferred Form
+rmc-xeno-t3-raffle-status = [color=cyan]Registered for: {$choice}[/color]
+rmc-xeno-t3-raffle-registered = Registered for the T3 raffle as {$choice}.
+rmc-xeno-t3-raffle-won = The hive's will surges through us — we have been chosen to ascend!
+rmc-xeno-t3-raffle-result = The T3 raffle has concluded. {$count} sisters ascended to their greater forms.
+
+rmc-xeno-early-evolve-label = Pre-Landing Evolution (Available until marines land)
+rmc-xeno-t3-raffle-forfeit = We have abandoned our form — our entry in the T3 raffle is forfeited.

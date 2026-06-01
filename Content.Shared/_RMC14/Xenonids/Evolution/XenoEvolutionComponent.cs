@@ -58,4 +58,10 @@ public sealed partial class XenoEvolutionComponent : Component
 
     [DataField, AutoNetworkedField]
     public TimeSpan EvolutionJitterDuration = TimeSpan.FromSeconds(10);
+
+    [DataField, AutoNetworkedField]
+    public List<EntProtoId> EarlyEvolvesTo = new();
+
+    [DataField, AutoNetworkedField]
+    public EntProtoId? T3RaffleChoice;
 }

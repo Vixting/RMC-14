@@ -57,6 +57,8 @@ rmc-xeno-evolution-failed-early-weeds = The hive hasn't developed enough yet for
 rmc-xeno-evolution-failed-bad-location = We can't evolve here.
 rmc-xeno-evolution-start-self = We begin to twist and contort.
 rmc-xeno-evolution-start-others = {$xeno} begins to twist and contort.
+rmc-xeno-evolution-queen-already-exists = A Queen already leads this hive. We cannot become a second.
+rmc-xeno-evolution-t3-raffle-pending = The raffle to determine who ascends is still underway. Wait for it to resolve.
 
 # Fortify
 cm-xeno-fortify-cant-headbutt = We can't headbutt while fortifying!

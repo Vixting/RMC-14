@@ -96,6 +96,10 @@
     - CMXenoHivelord
     evolvesToWithoutPoints:
     - CMXenoQueen
+    earlyEvolvesTo:
+    - CMXenoLurker
+    - CMXenoSpitter
+    - CMXenoWarrior
   - type: Evasion
     evasion: 20
   - type: XenoInhands
