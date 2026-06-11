@@ -16,12 +16,12 @@ using Content.Shared.Throwing;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using static Robust.Shared.Utility.SpriteSpecifier;
 
@@ -38,16 +38,18 @@ public sealed class RMCFishingSystem : EntitySystem
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly RMCMapSystem _rmcMap = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
     [Dependency] private readonly RMCWaterSystem _water = default!;
 
     private readonly Dictionary<EntityUid, EntityUid> _lineVisuals = new();
+
+    private readonly Dictionary<EntityUid, (EntityUid User, EntProtoId Loot, EntityCoordinates Target, int Token)> _pendingMinigames = new();
 
     public override void Initialize()
     {
@@ -55,14 +57,20 @@ public sealed class RMCFishingSystem : EntitySystem
 
         SubscribeLocalEvent<RMCFishingRodComponent, ComponentInit>(OnRodInit);
         SubscribeLocalEvent<RMCFishingRodComponent, UseInHandEvent>(OnRodUseInHand);
-        SubscribeLocalEvent<RMCFishingRodComponent, InteractUsingEvent>(OnRodInteractUsing);
         SubscribeLocalEvent<RMCFishingRodComponent, InteractHandEvent>(OnRodInteractHand);
-        SubscribeLocalEvent<RMCFishingRodComponent, GetVerbsEvent<AlternativeVerb>>(OnRodGetAlternativeVerbs);
+        SubscribeLocalEvent<RMCFishingRodComponent, InteractUsingEvent>(OnRodInteractUsing);
         SubscribeLocalEvent<RMCFishingRodComponent, ExaminedEvent>(OnRodExamined);
+        SubscribeLocalEvent<RMCFishingRodComponent, GetVerbsEvent<AlternativeVerb>>(OnRodGetAlternativeVerbs);
         SubscribeLocalEvent<RMCFishingRodComponent, RMCFishingDeployDoAfterEvent>(OnRodDeployDoAfter);
         SubscribeLocalEvent<RMCFishingRodComponent, RMCFishingPackDoAfterEvent>(OnRodPackDoAfter);
         SubscribeLocalEvent<RMCFishingRodComponent, RMCFishingWaitDoAfterEvent>(OnRodWaitDoAfter);
         SubscribeLocalEvent<RMCFishingRodComponent, ComponentShutdown>(OnRodShutdown);
+
+        Subs.BuiEvents<RMCFishingRodComponent>(RMCFishingMinigameUiKey.Key, subs =>
+        {
+            subs.Event<RMCFishingMinigameResultMsg>(OnMinigameResult);
+            subs.Event<BoundUIClosedEvent>(OnMinigameClosed);
+        });
 
         SubscribeLocalEvent<RMCFishComponent, MapInitEvent>(OnFishMapInit);
         SubscribeLocalEvent<RMCFishComponent, ExaminedEvent>(OnFishExamined);
@@ -70,25 +78,6 @@ public sealed class RMCFishingSystem : EntitySystem
 
         SubscribeLocalEvent<RMCFishingSpearComponent, AfterInteractEvent>(OnSpearAfterInteract);
         SubscribeLocalEvent<RMCFishingSpearComponent, RMCFishingSpearDoAfterEvent>(OnSpearDoAfter);
-    }
-
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        var now = _timing.CurTime;
-        var query = EntityQueryEnumerator<RMCFishingRodComponent>();
-        while (query.MoveNext(out var uid, out var rod))
-        {
-            if (!rod.Deployed ||
-                rod.State != RMCFishingRodState.Biting ||
-                now < rod.BiteEndsAt)
-            {
-                continue;
-            }
-
-            FailBite((uid, rod), rod.CurrentFisher, "rmc-fishing-hook-timeout");
-        }
     }
 
     private void OnRodInit(Entity<RMCFishingRodComponent> ent, ref ComponentInit args)
@@ -101,6 +90,8 @@ public sealed class RMCFishingSystem : EntitySystem
     {
         ent.Comp.WaitToken++;
         ent.Comp.BiteToken++;
+        if (_pendingMinigames.Remove(ent.Owner))
+            _ui.CloseUi(ent.Owner, RMCFishingMinigameUiKey.Key);
         ClearFishingLine(ent.Owner);
     }
 
@@ -117,6 +108,7 @@ public sealed class RMCFishingSystem : EntitySystem
             return;
         }
 
+        ent.Comp.Direction = direction;
         var doAfter = new DoAfterArgs(EntityManager, args.User, ent.Comp.DeployDelay, new RMCFishingDeployDoAfterEvent(direction), ent.Owner, used: ent.Owner)
         {
             BreakOnMove = true,
@@ -128,82 +120,47 @@ public sealed class RMCFishingSystem : EntitySystem
 
     private void OnRodDeployDoAfter(Entity<RMCFishingRodComponent> ent, ref RMCFishingDeployDoAfterEvent args)
     {
-        if (args.Cancelled || args.Handled)
+        if (args.Handled || args.Cancelled || ent.Comp.Deployed)
             return;
 
         args.Handled = true;
-        var user = args.User;
-        if (ent.Comp.Deployed ||
-            !TryGetRodWater(user, args.Direction, user, out _, out _))
-        {
-            return;
-        }
-
-        var dropCoords = _transform.GetMoverCoordinates(user).SnapToGrid(EntityManager);
-        if (!_hands.TryDrop(user, ent.Owner, dropCoords))
+        if (!_hands.TryDrop(args.User, ent.Owner, doDropInteraction: false))
             return;
 
-        _transform.SetLocalRotation(ent.Owner, args.Direction.ToAngle());
         _transform.AnchorEntity(ent.Owner);
         _physics.SetBodyType(ent.Owner, BodyType.Static);
 
         ent.Comp.Deployed = true;
         ent.Comp.Direction = args.Direction;
+        Dirty(ent);
+        UpdateRodAppearance(ent);
+        _popup.PopupEntity(Loc.GetString("rmc-fishing-deploy-finish"), ent.Owner, args.User);
+    }
+
+    private void OnRodPackDoAfter(Entity<RMCFishingRodComponent> ent, ref RMCFishingPackDoAfterEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        args.Handled = true;
+        if (!ent.Comp.Deployed || ent.Comp.State != RMCFishingRodState.Idle)
+            return;
+
+        _transform.Unanchor(ent.Owner);
+        _physics.SetBodyType(ent.Owner, BodyType.Dynamic);
+
+        if (!_hands.TryPickupAnyHand(args.User, ent.Owner))
+        {
+            _transform.AnchorEntity(ent.Owner);
+            _physics.SetBodyType(ent.Owner, BodyType.Static);
+            _popup.PopupEntity(Loc.GetString("rmc-fishing-pack-no-hand"), ent.Owner, args.User, PopupType.SmallCaution);
+            return;
+        }
+
+        ent.Comp.Deployed = false;
         ClearRodState(ent, updateAppearance: false);
         UpdateRodAppearance(ent);
-
-        _popup.PopupEntity(Loc.GetString("rmc-fishing-deploy-finish"), ent.Owner, user);
-    }
-
-    private void OnRodInteractUsing(Entity<RMCFishingRodComponent> ent, ref InteractUsingEvent args)
-    {
-        if (args.Handled || !HasComp<RMCFishBaitComponent>(args.Used))
-            return;
-
-        args.Handled = true;
-        if (!_container.TryGetContainer(ent.Owner, ent.Comp.BaitSlotId, out var baseContainer) ||
-            baseContainer is not ContainerSlot slot)
-        {
-            return;
-        }
-
-        if (slot.ContainedEntity != null)
-        {
-            _popup.PopupEntity(Loc.GetString("rmc-fishing-bait-already"), ent.Owner, args.User, PopupType.SmallCaution);
-            return;
-        }
-
-        if (!_hands.TryDrop(args.User, args.Used, doDropInteraction: false))
-            return;
-
-        if (!_container.Insert(args.Used, slot))
-        {
-            _hands.TryPickupAnyHand(args.User, args.Used);
-            return;
-        }
-
-        _popup.PopupEntity(Loc.GetString("rmc-fishing-bait-loaded", ("bait", args.Used), ("rod", ent.Owner)), ent.Owner, args.User);
-    }
-
-    private void OnRodInteractHand(Entity<RMCFishingRodComponent> ent, ref InteractHandEvent args)
-    {
-        if (args.Handled || !ent.Comp.Deployed)
-            return;
-
-        args.Handled = true;
-        switch (ent.Comp.State)
-        {
-            case RMCFishingRodState.Waiting:
-                _popup.PopupEntity(Loc.GetString("rmc-fishing-already-waiting"), ent.Owner, args.User, PopupType.SmallCaution);
-                return;
-            case RMCFishingRodState.Biting:
-                TryHookFish(ent, args.User);
-                return;
-            case RMCFishingRodState.Idle:
-            default:
-                StartWaiting(ent, args.User);
-                return;
-        }
+        _popup.PopupEntity(Loc.GetString("rmc-fishing-pack-finish"), args.User, args.User);
     }
 
     private void OnRodGetAlternativeVerbs(Entity<RMCFishingRodComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
@@ -239,30 +196,55 @@ public sealed class RMCFishingSystem : EntitySystem
         _doAfter.TryStartDoAfter(doAfter);
     }
 
-    private void OnRodPackDoAfter(Entity<RMCFishingRodComponent> ent, ref RMCFishingPackDoAfterEvent args)
+    private void OnRodInteractHand(Entity<RMCFishingRodComponent> ent, ref InteractHandEvent args)
     {
-        if (args.Cancelled || args.Handled)
+        if (args.Handled || !ent.Comp.Deployed)
             return;
 
         args.Handled = true;
-        if (!ent.Comp.Deployed || ent.Comp.State != RMCFishingRodState.Idle)
+        switch (ent.Comp.State)
+        {
+            case RMCFishingRodState.Waiting:
+                _popup.PopupEntity(Loc.GetString("rmc-fishing-already-waiting"), ent.Owner, args.User, PopupType.SmallCaution);
+                return;
+            case RMCFishingRodState.Biting:
+                TryHookFish(ent, args.User);
+                return;
+            case RMCFishingRodState.Idle:
+            default:
+                StartWaiting(ent, args.User);
+                return;
+        }
+    }
+
+    private void OnRodInteractUsing(Entity<RMCFishingRodComponent> ent, ref InteractUsingEvent args)
+    {
+        if (args.Handled || !HasComp<RMCFishBaitComponent>(args.Used))
             return;
 
-        _transform.Unanchor(ent.Owner);
-        _physics.SetBodyType(ent.Owner, BodyType.Dynamic);
-
-        if (!_hands.TryPickupAnyHand(args.User, ent.Owner))
+        args.Handled = true;
+        if (!_container.TryGetContainer(ent.Owner, ent.Comp.BaitSlotId, out var baseContainer) ||
+            baseContainer is not ContainerSlot slot)
         {
-            _transform.AnchorEntity(ent.Owner);
-            _physics.SetBodyType(ent.Owner, BodyType.Static);
-            _popup.PopupEntity(Loc.GetString("rmc-fishing-pack-no-hand"), ent.Owner, args.User, PopupType.SmallCaution);
             return;
         }
 
-        ent.Comp.Deployed = false;
-        ClearRodState(ent, updateAppearance: false);
-        UpdateRodAppearance(ent);
-        _popup.PopupEntity(Loc.GetString("rmc-fishing-pack-finish"), args.User, args.User);
+        if (slot.ContainedEntity != null)
+        {
+            _popup.PopupEntity(Loc.GetString("rmc-fishing-bait-already"), ent.Owner, args.User, PopupType.SmallCaution);
+            return;
+        }
+
+        if (!_hands.TryDrop(args.User, args.Used, doDropInteraction: false))
+            return;
+
+        if (!_container.Insert(args.Used, slot))
+        {
+            _hands.TryPickupAnyHand(args.User, args.Used);
+            return;
+        }
+
+        _popup.PopupEntity(Loc.GetString("rmc-fishing-bait-loaded", ("bait", args.Used), ("rod", ent.Owner)), ent.Owner, args.User);
     }
 
     private void OnRodExamined(Entity<RMCFishingRodComponent> ent, ref ExaminedEvent args)
@@ -289,7 +271,7 @@ public sealed class RMCFishingSystem : EntitySystem
         RefreshFishingLine(ent, adjacent, biting: false);
 
         _audio.PlayPvs(ent.Comp.StartSound, ent.Owner);
-        var doAfter = new DoAfterArgs(EntityManager, user, RandomTime(ent.Comp.WaitMin, ent.Comp.WaitMax), new RMCFishingWaitDoAfterEvent(token), ent.Owner, ent.Owner)
+        var doAfter = new DoAfterArgs(EntityManager, user, RandomTime(ent.Comp.WaitMin, ent.Comp.WaitMax), new RMCFishingWaitDoAfterEvent(token), ent.Owner)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
@@ -321,9 +303,7 @@ public sealed class RMCFishingSystem : EntitySystem
         }
 
         ent.Comp.State = RMCFishingRodState.Biting;
-        // The token invalidates stale hook windows from old bites if a do-after is cancelled or restarted late.
         ent.Comp.BiteToken++;
-        ent.Comp.BiteEndsAt = _timing.CurTime + RandomTime(ent.Comp.BiteMin, ent.Comp.BiteMax);
         Dirty(ent);
         UpdateRodAppearance(ent);
         RefreshFishingLine(ent, adjacent, biting: true);
@@ -339,6 +319,9 @@ public sealed class RMCFishingSystem : EntitySystem
             _popup.PopupEntity(Loc.GetString("rmc-fishing-not-owner"), ent.Owner, user, PopupType.SmallCaution);
             return;
         }
+
+        if (_pendingMinigames.ContainsKey(ent.Owner))
+            return;
 
         if (!TryGetRodWater(ent, user, out _, out var target))
         {
@@ -357,16 +340,48 @@ public sealed class RMCFishingSystem : EntitySystem
             return;
         }
 
-        var caught = Spawn(loot, target);
-        _throwing.TryThrow(caught, _transform.GetMoverCoordinates(user), 2f, user, compensateFriction: true);
-
-        _audio.PlayPvs(ent.Comp.SuccessSound, ent.Owner);
-        _popup.PopupEntity(Loc.GetString("rmc-fishing-success", ("item", caught)), ent.Owner, user, PopupType.Medium);
-
         if (hadBait)
             QueueDel(baitUid);
 
+        var token = ent.Comp.BiteToken;
+        _pendingMinigames[ent.Owner] = (user, loot, target, token);
+
+        _ui.SetUiState(ent.Owner, RMCFishingMinigameUiKey.Key, new RMCFishingMinigameBuiState(ent.Comp.MinigameDifficulty, token));
+        _ui.OpenUi(ent.Owner, RMCFishingMinigameUiKey.Key, user);
+    }
+
+    private void OnMinigameResult(Entity<RMCFishingRodComponent> ent, ref RMCFishingMinigameResultMsg args)
+    {
+        if (!_pendingMinigames.TryGetValue(ent.Owner, out var pending))
+            return;
+
+        if (pending.Token != args.Token || pending.User != args.Actor)
+            return;
+
+        _pendingMinigames.Remove(ent.Owner);
+        _ui.CloseUi(ent.Owner, RMCFishingMinigameUiKey.Key, pending.User);
+
+        if (!args.Success)
+        {
+            FailBite(ent, pending.User, "rmc-fishing-fail");
+            return;
+        }
+
+        var caught = Spawn(pending.Loot, pending.Target);
+        _throwing.TryThrow(caught, _transform.GetMoverCoordinates(pending.User), 2f, pending.User, compensateFriction: true);
+
+        _audio.PlayPvs(ent.Comp.SuccessSound, ent.Owner);
+        _popup.PopupEntity(Loc.GetString("rmc-fishing-success", ("item", caught)), ent.Owner, pending.User, PopupType.Medium);
         ClearRodState(ent);
+    }
+
+    private void OnMinigameClosed(Entity<RMCFishingRodComponent> ent, ref BoundUIClosedEvent args)
+    {
+        if (!_pendingMinigames.TryGetValue(ent.Owner, out var pending))
+            return;
+
+        _pendingMinigames.Remove(ent.Owner);
+        FailBite(ent, pending.User, "rmc-fishing-fail");
     }
 
     private void FailBite(Entity<RMCFishingRodComponent> ent, EntityUid? user, string locId)
@@ -382,7 +397,6 @@ public sealed class RMCFishingSystem : EntitySystem
     {
         ent.Comp.State = RMCFishingRodState.Idle;
         ent.Comp.CurrentFisher = null;
-        ent.Comp.BiteEndsAt = TimeSpan.Zero;
         ent.Comp.WaitToken++;
         ent.Comp.BiteToken++;
         Dirty(ent);

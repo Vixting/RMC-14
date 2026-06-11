@@ -10,9 +10,6 @@ namespace Content.Shared._RMC14.Fishing;
 public sealed partial class RMCFishingRodComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public bool Deployed;
-
-    [DataField, AutoNetworkedField]
     public RMCFishingRodState State = RMCFishingRodState.Idle;
 
     [DataField, AutoNetworkedField]
@@ -20,6 +17,9 @@ public sealed partial class RMCFishingRodComponent : Component
 
     [DataField, AutoNetworkedField]
     public Direction Direction = Direction.South;
+
+    [DataField, AutoNetworkedField]
+    public bool Deployed;
 
     [DataField]
     public string BaitSlotId = "bait";
@@ -31,16 +31,11 @@ public sealed partial class RMCFishingRodComponent : Component
     public TimeSpan PackDelay = TimeSpan.FromSeconds(3);
 
     [DataField]
-    public TimeSpan WaitMin = TimeSpan.FromSeconds(5);
+    public TimeSpan WaitMin = TimeSpan.FromSeconds(2);
 
     [DataField]
-    public TimeSpan WaitMax = TimeSpan.FromSeconds(10);
+    public TimeSpan WaitMax = TimeSpan.FromSeconds(5);
 
-    [DataField]
-    public TimeSpan BiteMin = TimeSpan.FromSeconds(0.5);
-
-    [DataField]
-    public TimeSpan BiteMax = TimeSpan.FromSeconds(2);
 
     [DataField]
     public int CommonWeight = 80;
@@ -76,7 +71,7 @@ public sealed partial class RMCFishingRodComponent : Component
     public int BiteToken;
 
     [DataField]
-    public TimeSpan BiteEndsAt;
+    public float MinigameDifficulty = 1.8f;
 }
 
 [RegisterComponent]

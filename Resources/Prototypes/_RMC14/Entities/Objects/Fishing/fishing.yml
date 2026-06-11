@@ -68,6 +68,10 @@
   - type: PhysicalComposition
     materialComposition:
       RMCWood: 50
+  - type: UserInterface
+    interfaces:
+      enum.RMCFishingMinigameUiKey.Key:
+        type: RMCFishingMinigameBui
 
 - type: entity
   id: RMCFishingLineVisualBase
