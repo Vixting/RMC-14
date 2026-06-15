@@ -1,0 +1,12 @@
+- type: entity
+  id: RMCFloraDataDisc
+  parent: BaseItem
+  name: flora data disc
+  description: A small data disc used to store and transfer plant genetic sequences extracted by the Lysis-Isolation Centrifuge.
+  components:
+  - type: Sprite
+    sprite: Objects/Tools/Hydroponics/disk.rsi
+    state: disk
+  - type: Item
+    size: Tiny
+  - type: FloraDataDisc

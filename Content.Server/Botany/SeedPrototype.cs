@@ -11,6 +11,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 using Robust.Shared.Utility;
 
 using Content.Server.EntityEffects;
+using Content.Server._RMC14.Botany;
 
 namespace Content.Server.Botany;
 
@@ -84,7 +85,7 @@ public partial struct SeedChemQuantity
 
 // TODO reduce the number of friends to a reasonable level. Requires ECS-ing things like plant holder component.
 [Virtual, DataDefinition]
-[Access(typeof(BotanySystem), typeof(PlantHolderSystem), typeof(SeedExtractorSystem), typeof(PlantHolderComponent), typeof(EntityEffectSystem), typeof(MutationSystem))]
+[Access(typeof(BotanySystem), typeof(PlantHolderSystem), typeof(SeedExtractorSystem), typeof(PlantHolderComponent), typeof(EntityEffectSystem), typeof(MutationSystem), typeof(LysisCentrifugeSystem), typeof(GeneEditorSystem), typeof(PlantGene))]
 public partial class SeedData
 {
     #region Tracking
@@ -121,6 +122,13 @@ public partial class SeedData
     /// </summary>
     [ViewVariables]
     public bool Unique = false; // seed-prototypes or yaml-defined seeds for entity prototypes will not generally be unique.
+
+    /// <summary>
+    ///     How many times this seed has had genes applied via the Bioballistic Delivery System.
+    ///     Used as a percentage failure chance (0 = 0%, 100 = 100%). Past 100 the seed is ruined.
+    /// </summary>
+    [DataField]
+    public int GeneEditCount;
     #endregion
 
     #region Output
@@ -307,6 +315,7 @@ public partial class SeedData
             TurnIntoKudzu = TurnIntoKudzu,
             SplatPrototype = SplatPrototype,
             Mutations = new List<RandomPlantMutation>(),
+            GeneEditCount = GeneEditCount,
 
             // Newly cloned seed is unique. No need to unnecessarily clone if repeatedly modified.
             Unique = true,
