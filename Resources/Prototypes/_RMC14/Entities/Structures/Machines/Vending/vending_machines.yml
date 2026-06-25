@@ -599,16 +599,21 @@
     ChemistryBottleEZNutrient: 35
     ChemistryBottleLeft4Zed: 25
     ChemistryBottleRobustHarvest: 15
+    WeedSpray: 20
     PestSpray: 20
+    PlantBGoneSpray: 5
     Syringe: 5
     RMCStoragePlantBag: 5
+    RMCToolMiniHoe: 3
     RMCToolSpade: 3
     RMCToolHatchet: 3
-    # AmmoniaBottle: 10 #Premium
-    # DiethylamineBottle: 5 #Premium
-    HydroponicsToolSpade: 3
-    HydroponicsToolHatchet: 3
     HydroponicsToolScythe: 3
+    HydroponicsToolClippers: 3
+    ChemistryBottleAmmonia: 10
+    ChemistryBottleDiethylamine: 5
+    RMCPlantAnalyzer: 2
+    RMCAutoHarvestUpgrade: 3
+    RMCFloraDataDiscBox: 2
 
 
 # Seeds
@@ -627,7 +632,7 @@
 
 - type: vendingMachineInventory
   id: CMVendorSeeds
-  startingInventory: # TODO RMC14
+  startingInventory:
     BananaSeeds: 3
     BerrySeeds: 3
     CarrotSeeds: 3
@@ -655,21 +660,36 @@
     GrassSeeds: 3
     CocoaSeeds: 3
     PlumpSeeds: 2
+    LingzhiSeeds: 3
     CabbageSeeds: 3
     GrapeSeeds: 3
     PumpkinSeeds: 3
     CherrySeeds: 3
     RiceSeeds: 3
-    # LibertyMycelium: 1 #Contraband
-    # MessaTearSeeds: 1 #Contraband
-    # AmbrosiaVulgarisSeeds: 1 #Contraband
-    NettleSeeds: 1 #Contraband
-    LingzhiSeeds: 1 #ReishiMycelium #Contraband
-    # WaterFlower: 1 #Premium
     GarlicSeeds: 3
     OnionSeeds: 3
     OnionRedSeeds: 3
     RMCMangoSeeds: 3
+    ShandSeeds: 2
+    RMCIcePepperSeeds: 3
+    RMCGlowberrySeeds: 2
+    RMCMoldSeeds: 2
+    RMCReishiSeeds: 2
+    RMCGlowshroomSeeds: 2
+    RMCPlastelliumSeeds: 2
+    RMCHarebellSeeds: 2
+    RMCGreengrapeSeeds: 3
+    RMCBluespacetomaSeeds: 1
+    RMCKudzuSeeds: 1
+    RMCPoisonberrySeeds: 1
+  emaggedInventory:
+    RMCLibertySeeds: 1
+    MtearSeeds: 1
+    AmbrosiaVulgarisSeeds: 1
+    NettleSeeds: 1
+    RMCDeathberrySeeds: 1
+    RMCAngelSeeds: 1
+    RMCWeedsSeeds: 1
 
 
 # Dinnerware
