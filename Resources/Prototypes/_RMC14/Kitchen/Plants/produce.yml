@@ -95,6 +95,11 @@
   - type: Tag
     tags:
     - Vegetable
+  - type: MeleeWeapon
+    wideAnimationRotation: 135
+    damage:
+      types:
+        Heat: 1
 
 - type: entity
   name: bundle of grass

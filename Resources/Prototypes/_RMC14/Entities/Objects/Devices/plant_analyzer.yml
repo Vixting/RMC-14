@@ -1,0 +1,25 @@
+- type: entity
+  parent: BaseItem
+  id: RMCPlantAnalyzer
+  name: plant analyzer
+  description: A handheld device for analyzing plant genetics. Use it on a seed packet, hydroponics tray, or harvested produce to read detailed stats.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/forensic_scanner.rsi
+    state: icon
+  - type: Item
+    size: Small
+    sprite: Objects/Devices/forensic_scanner.rsi
+  - type: RMCPlantAnalyzer
+  - type: Tag
+    tags:
+    - PlantAnalyzer
+  - type: UseDelay
+    delay: 0.5
+  - type: PhysicalComposition
+    materialComposition:
+      CMSteel: 200
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno

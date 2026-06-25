@@ -85,7 +85,7 @@ public partial struct SeedChemQuantity
 
 // TODO reduce the number of friends to a reasonable level. Requires ECS-ing things like plant holder component.
 [Virtual, DataDefinition]
-[Access(typeof(BotanySystem), typeof(PlantHolderSystem), typeof(SeedExtractorSystem), typeof(PlantHolderComponent), typeof(EntityEffectSystem), typeof(MutationSystem), typeof(LysisCentrifugeSystem), typeof(GeneEditorSystem), typeof(PlantGene))]
+[Access(typeof(BotanySystem), typeof(PlantHolderSystem), typeof(SeedExtractorSystem), typeof(PlantHolderComponent), typeof(EntityEffectSystem), typeof(MutationSystem), typeof(LysisCentrifugeSystem), typeof(GeneEditorSystem), typeof(PlantGene), typeof(RMCPlantAnalyzerSystem))]
 public partial class SeedData
 {
     #region Tracking
