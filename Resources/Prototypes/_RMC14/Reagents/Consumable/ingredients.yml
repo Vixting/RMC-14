@@ -8,6 +8,9 @@
   flavor: cherry
   color: "#801E28"
   recognizable: true
+  plantMetabolism:
+  - !type:Nutritious
+    potency: 8.0
   metabolisms:
     Food:
       metabolismRate: 0.1
@@ -45,6 +48,9 @@
   flavor: sweet
   color: "#FF00FF"
   recognizable: true
+  plantMetabolism:
+  - !type:Nutritious
+    potency: 8.0
   metabolisms:
     Food:
       metabolismRate: 0.1

@@ -1,4 +1,4 @@
-using Content.Server.Botany.Components;
+using Content.Shared.Botany.Components;
 using Content.Server.Botany.Systems;
 using Content.Shared._RMC14.Botany;
 using Content.Shared.Chemistry.EntitySystems;

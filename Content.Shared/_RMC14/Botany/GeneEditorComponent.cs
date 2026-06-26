@@ -1,5 +1,6 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
+using Robust.Shared.GameObjects;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._RMC14.Botany;
@@ -26,4 +27,5 @@ public sealed partial class GeneEditorComponent : Component
     [AutoNetworkedField] public bool HasSeed;
     [AutoNetworkedField] public string? SeedName;
     [AutoNetworkedField] public int SeedEditCount;
+    [AutoNetworkedField] public NetEntity? SeedEntityNet;
 }

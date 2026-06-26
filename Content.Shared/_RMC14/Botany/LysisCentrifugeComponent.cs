@@ -1,5 +1,6 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
+using Robust.Shared.GameObjects;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._RMC14.Botany;
@@ -24,6 +25,8 @@ public sealed partial class LysisCentrifugeComponent : Component
     [AutoNetworkedField] public string? GenomeName;
     [AutoNetworkedField] public List<LysisCentrifugeGeneSlot> GeneSlots = new();
     [AutoNetworkedField] public bool HasDisc;
+    [AutoNetworkedField] public bool DiscFull;
     [AutoNetworkedField] public bool HasSeed;
     [AutoNetworkedField] public string? SeedPacketName;
+    [AutoNetworkedField] public NetEntity? SeedEntityNet;
 }

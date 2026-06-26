@@ -1,5 +1,6 @@
-using Content.Server.Botany;
 using Content.Server.Botany.Components;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Server.Botany.Systems;
 using Content.Server.Power.EntitySystems;
 using Content.Shared._RMC14.Botany;
@@ -72,7 +73,6 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             if (!_container.Insert(args.Used, ent.Comp.DiscSlot))
                 return;
 
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-disc-inserted"), args.User);
             UpdateState(ent);
             args.Handled = true;
             return;
@@ -101,7 +101,6 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             if (!_container.Insert(args.Used, ent.Comp.SeedSlot))
                 return;
 
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-seed-inserted"), args.User);
             UpdateState(ent);
             args.Handled = true;
         }
@@ -151,10 +150,6 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         QueueDel(seedEnt);
 
         _audio.PlayPvs(comp.ScanSound, ent);
-        _popup.PopupCursor(
-            Loc.GetString("rmc-lysis-centrifuge-scanned", ("plant", comp.GenomeName)),
-            args.Actor);
-
         UpdateState(ent);
     }
 
@@ -199,6 +194,12 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
+        if (disc.Genes.Count >= 1)
+        {
+            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-disc-full"), args.Actor);
+            return;
+        }
+
         var geneType = args.GeneType;
         if (disc.Genes.Any(g => g.Type == geneType))
         {
@@ -213,20 +214,20 @@ public sealed class LysisCentrifugeSystem : EntitySystem
 
         comp.Degradation += _random.Next(comp.DegradationMin, comp.DegradationMax + 1);
 
-        _audio.PlayPvs(comp.ExtractSound, ent);
-        _popup.PopupCursor(
-            Loc.GetString("rmc-lysis-centrifuge-extracted",
-                ("gene", gene.GetLabel()),
-                ("degradation", comp.Degradation),
-                ("max", comp.MaxDegradation)),
-            args.Actor);
-
         if (comp.Degradation >= comp.MaxDegradation)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-buffer-wiped"), args.Actor);
             _audio.PlayPvs(comp.FailSound, ent);
             WipeBuffer(comp, server);
+            _container.Remove(discEnt.Value, comp.DiscSlot);
+            _hands.TryPickupAnyHand(args.Actor, discEnt.Value);
+            UpdateState(ent);
+            return;
         }
+
+        _audio.PlayPvs(comp.ExtractSound, ent);
+
+        _container.Remove(discEnt.Value, comp.DiscSlot);
+        _hands.TryPickupAnyHand(args.Actor, discEnt.Value);
 
         UpdateState(ent);
     }
@@ -240,7 +241,6 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
 
         WipeBuffer(ent.Comp, server);
-        _popup.PopupEntity(Loc.GetString("rmc-lysis-centrifuge-cleared"), ent, args.Actor);
         UpdateState(ent);
     }
 
@@ -295,8 +295,10 @@ public sealed class LysisCentrifugeSystem : EntitySystem
                 onDiscTypes.Contains(t)))
             .ToList();
         comp.HasDisc = disc != null;
+        comp.DiscFull = disc != null && disc.Genes.Count >= 1;
         comp.HasSeed = seedEnt != null;
         comp.SeedPacketName = seedEnt != null ? Name(seedEnt.Value) : null;
+        comp.SeedEntityNet = seedEnt != null ? GetNetEntity(seedEnt.Value) : null;
 
         Dirty(ent, comp);
     }

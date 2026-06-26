@@ -1,6 +1,4 @@
-﻿// using Content.Server.Botany.Systems;
-
-namespace Content.Shared.EntityEffects.Effects.PlantMetabolism;
+﻿namespace Content.Shared.EntityEffects.Effects.PlantMetabolism;
 
 /// <summary>
 ///     Handles increase or decrease of plant potency.

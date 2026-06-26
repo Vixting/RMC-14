@@ -483,6 +483,8 @@
   harvestRepeat: Repeat
   productPrototypes:
   - RMCFoodGlowberry
+  mutationPrototypes:
+  - glowshroom
   lifespan: 45
   maturation: 6
   production: 6
@@ -513,6 +515,8 @@
   harvestRepeat: Repeat
   productPrototypes:
   - RMCFoodPoisonberry
+  mutationPrototypes:
+  - deathberry
   lifespan: 45
   maturation: 6
   production: 6
@@ -603,6 +607,8 @@
   harvestRepeat: Repeat
   productPrototypes:
   - RMCFoodMold
+  mutationPrototypes:
+  - reishi
   lifespan: 30
   maturation: 4
   production: 4
@@ -629,6 +635,8 @@
   harvestRepeat: Repeat
   productPrototypes:
   - RMCFoodReishi
+  mutationPrototypes:
+  - liberty
   lifespan: 30
   maturation: 5
   production: 5
@@ -659,6 +667,8 @@
   harvestRepeat: Repeat
   productPrototypes:
   - RMCFoodLiberty
+  mutationPrototypes:
+  - angel
   lifespan: 25
   maturation: 4
   production: 5
@@ -711,6 +721,8 @@
   harvestRepeat: Repeat
   productPrototypes:
   - RMCFoodGlowshroom
+  mutationPrototypes:
+  - glowberry
   lifespan: 30
   maturation: 5
   production: 5

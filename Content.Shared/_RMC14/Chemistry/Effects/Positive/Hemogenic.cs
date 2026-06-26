@@ -1,13 +1,16 @@
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
+using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
+using Content.Shared.Popups;
 using Content.Shared._RMC14.Body;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
@@ -27,6 +30,19 @@ public sealed partial class Hemogenic : RMCChemicalEffect
         return ActualPotency > 3
             ? $"Deals [color=red]{PotencyPerSecond}[/color] brute, [color=red]{PotencyPerSecond * 2}[/color] airloss damage, and slows you down.\n{baseText}"
             : baseText;
+    }
+
+    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (!plant.Sampled)
+            return;
+        var random = IoCManager.Resolve<IRobustRandom>();
+        if (random.Prob(0.6f))
+        {
+            plant.Sampled = false;
+            var popup = args.EntityManager.System<SharedPopupSystem>();
+            popup.PopupEntity(Loc.GetString("plant-hemogenic-healed"), args.TargetEntity);
+        }
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

@@ -1,4 +1,6 @@
 using Content.Server.Botany.Components;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Server.Popups;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.Interaction;

@@ -1,4 +1,5 @@
 using System.Threading;
+using Content.Shared.Botany;
 
 namespace Content.Server.Botany
 {

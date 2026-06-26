@@ -1,5 +1,6 @@
-using Content.Server.Botany;
 using Content.Server.Botany.Components;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Server.Botany.Systems;
 using Content.Server.Power.EntitySystems;
 using Content.Shared._RMC14.Botany;
@@ -65,7 +66,6 @@ public sealed class GeneEditorSystem : EntitySystem
             if (!_container.Insert(args.Used, ent.Comp.DiscSlot))
                 return;
 
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-disc-loaded"), args.User);
             UpdateState(ent);
             args.Handled = true;
             return;
@@ -88,7 +88,6 @@ public sealed class GeneEditorSystem : EntitySystem
             if (!_container.Insert(args.Used, ent.Comp.SeedSlot))
                 return;
 
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-seed-loaded"), args.User);
             UpdateState(ent);
             args.Handled = true;
         }
@@ -204,9 +203,6 @@ public sealed class GeneEditorSystem : EntitySystem
         {
             seed.GeneEditCount += _random.Next(comp.EditCountAddMin, comp.EditCountAddMax + 1);
             _audio.PlayPvs(comp.ApplySound, ent);
-            _popup.PopupCursor(
-                Loc.GetString("rmc-gene-editor-applied", ("remaining", comp.MaxEditCount - seed.GeneEditCount)),
-                user);
         }
 
         var newName = Loc.GetString("botany-seed-packet-name",
@@ -254,6 +250,7 @@ public sealed class GeneEditorSystem : EntitySystem
         }
 
         comp.HasSeed = seedEnt != null;
+        comp.SeedEntityNet = seedEnt != null ? GetNetEntity(seedEnt.Value) : null;
         comp.SeedName = null;
         comp.SeedEditCount = 0;
 

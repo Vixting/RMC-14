@@ -1,6 +1,9 @@
 using System.Linq;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Shared.Atmos;
 using Content.Shared.EntityEffects;
+using Content.Shared.FixedPoint;
 using Content.Shared.Random;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -9,53 +12,257 @@ namespace Content.Server.Botany;
 
 public sealed class MutationSystem : EntitySystem
 {
-    private static ProtoId<RandomPlantMutationListPrototype> RandomPlantMutations = "RandomPlantMutations";
+    private static readonly ProtoId<WeightedRandomFillSolutionPrototype> RandomPickBotanyReagent = "RandomPickBotanyReagent";
 
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    private RandomPlantMutationListPrototype _randomMutations = default!;
 
-    public override void Initialize()
+    private static class Slot
     {
-        _randomMutations = _prototypeManager.Index(RandomPlantMutations);
+        public const string PlantCancer = "Plant Cancer";
+        public const string Gluttony = "Gluttony";
+        public const string Endurance = "Endurance";
+        public const string LightTolerance = "Light Tolerance";
+        public const string ToxinTolerance = "Toxin Tolerance";
+        public const string WeedTolerance = "Weed Tolerance";
+        public const string Production = "Production";
+        public const string Lifespan = "Lifespan";
+        public const string Potency = "Potency";
+        public const string Maturity = "Maturity";
+        public const string Bioluminescence = "Bioluminescence";
+        public const string Flowers = "Flowers";
+        public const string NewChems = "New Chems";
+        public const string NewChems2 = "New Chems2";
+        public const string NewChems3 = "New Chems3";
+        public const string MutateSpecies = "Mutate Species";
     }
 
-    /// <summary>
-    /// For each random mutation, see if it occurs on this plant this check.
-    /// </summary>
-    /// <param name="seed"></param>
-    /// <param name="severity"></param>
-    public void CheckRandomMutations(EntityUid plantHolder, ref SeedData seed, float severity)
-    {
-        return; // RMC14 no seed mutationsD
-        foreach (var mutation in _randomMutations.mutations)
-        {
-            if (Random(Math.Min(mutation.BaseOdds * severity, 1.0f)))
-            {
-                if (mutation.AppliesToPlant)
-                {
-                    var args = new EntityEffectBaseArgs(plantHolder, EntityManager);
-                    mutation.Effect.Effect(args);
-                }
-                // Stat adjustments do not persist by being an attached effect, they just change the stat.
-                if (mutation.Persists && !seed.Mutations.Any(m => m.Name == mutation.Name))
-                    seed.Mutations.Add(mutation);
-            }
-        }
-    }
+    // CM13 mutation slot names in order (indices match CM13's 1-16 numbering)
+    private static readonly string[] MutationSlots =
+    [
+        Slot.PlantCancer,
+        Slot.Gluttony,
+        Slot.Endurance,
+        Slot.LightTolerance,
+        Slot.ToxinTolerance,
+        Slot.WeedTolerance,
+        Slot.Production,
+        Slot.Lifespan,
+        Slot.Potency,
+        Slot.Maturity,
+        Slot.Bioluminescence,
+        Slot.Flowers,
+        Slot.NewChems,
+        Slot.NewChems2,
+        Slot.NewChems3,
+        Slot.MutateSpecies,
+    ];
 
     /// <summary>
-    /// Checks all defined mutations against a seed to see which of them are applied.
+    ///     Port of CM13's datum/seed/mutate(). Applies 1-3 random mutations filtered by MutationController.
+    ///     MutationController slots are reset to 0 after each call (unless strongly suppressed at &lt;= -3).
     /// </summary>
     public void MutateSeed(EntityUid plantHolder, ref SeedData seed, float severity)
     {
         if (!seed.Unique)
         {
-            Log.Error($"Attempted to mutate a shared seed");
+            Log.Error("Attempted to mutate a shared seed");
             return;
         }
 
-        CheckRandomMutations(plantHolder, ref seed, severity);
+        if (seed.Immutable)
+            return;
+
+        // Severity maps to a degree 1-3 used to scale mutation magnitude.
+        var degree = severity switch
+        {
+            <= 8f => 1,
+            <= 16f => 2,
+            _ => 3,
+        };
+
+        var controller = seed.MutationController;
+
+        // Build candidate list:
+        // - superAllowed: slots set > 0 by peutic reagents → these take priority
+        // - normalAllowed: slots at 0 (default) or -1 (mildly suppressed) → only used if no super
+        var superAllowed = new List<string>();
+        var normalAllowed = new List<string>();
+
+        // Species mutation is only allowed at degree >= 2
+        for (var i = 0; i < MutationSlots.Length; i++)
+        {
+            var slotName = MutationSlots[i];
+            if (slotName == Slot.MutateSpecies && degree < 2)
+                continue;
+
+            var val = controller.GetValueOrDefault(slotName, 0f);
+
+            if (val > 0f)
+                superAllowed.Add(slotName);
+            else if (val >= -1f)
+                normalAllowed.Add(slotName);
+            // val < -1 means suppressed — excluded from both lists
+        }
+
+        var candidates = superAllowed.Count > 0 ? superAllowed : normalAllowed;
+
+        if (candidates.Count == 0)
+        {
+            ResetController(seed);
+            return;
+        }
+
+        var totalMutations = _robustRandom.Next(1, 1 + degree + 1); // rand(1, 1+degree)
+
+        for (var i = 0; i < totalMutations; i++)
+        {
+            if (candidates.Count == 0)
+                break;
+
+            var slot = _robustRandom.Pick(candidates);
+            candidates.Remove(slot);
+            ApplyMutation(plantHolder, ref seed, slot, degree);
+        }
+
+        ResetController(seed);
+    }
+
+    private void ResetController(SeedData seed)
+    {
+        // CM13: reset all slots > -3 back to 0 after each mutation cycle.
+        foreach (var key in seed.MutationController.Keys.ToList())
+        {
+            if (seed.MutationController[key] > -3f)
+                seed.MutationController[key] = 0f;
+        }
+    }
+
+    private void ApplyMutation(EntityUid plantHolder, ref SeedData seed, string slot, int degree)
+    {
+        switch (slot)
+        {
+            case Slot.PlantCancer:
+                seed.Lifespan = MathF.Max(0f, seed.Lifespan - _robustRandom.Next(1, 6));
+                seed.Endurance = MathF.Max(0f, seed.Endurance - _robustRandom.Next(10, 21));
+                break;
+
+            case Slot.Gluttony:
+                seed.NutrientConsumption = Math.Clamp(
+                    seed.NutrientConsumption + _robustRandom.NextFloat(-degree * 0.1f, degree * 0.1f),
+                    0f, 5f);
+                seed.WaterConsumption = Math.Clamp(
+                    seed.WaterConsumption + _robustRandom.NextFloat(-degree, degree),
+                    0f, 50f);
+                break;
+
+            case Slot.Endurance:
+                seed.Endurance = Math.Clamp(
+                    seed.Endurance + _robustRandom.Next(-5, 6) * degree,
+                    10f, 100f);
+                break;
+
+            case Slot.LightTolerance:
+                seed.IdealLight = Math.Clamp(
+                    seed.IdealLight + _robustRandom.Next(-1, 2) * degree,
+                    0f, 30f);
+                seed.LightTolerance = Math.Clamp(
+                    seed.LightTolerance + _robustRandom.Next(-1, 2) * degree,
+                    0f, 10f);
+                break;
+
+            case Slot.ToxinTolerance:
+                seed.ToxinsTolerance = Math.Clamp(
+                    seed.ToxinsTolerance + _robustRandom.Next(-1, 2) * degree,
+                    0f, 10f);
+                break;
+
+            case Slot.WeedTolerance:
+                seed.WeedTolerance = Math.Clamp(
+                    seed.WeedTolerance + _robustRandom.Next(-1, 2) * degree,
+                    0f, 10f);
+                break;
+
+            case Slot.Production:
+                seed.Production = Math.Clamp(
+                    seed.Production + _robustRandom.Next(-1, 2) * degree,
+                    1f, 10f);
+                break;
+
+            case Slot.Lifespan:
+                seed.Lifespan = Math.Clamp(
+                    seed.Lifespan + _robustRandom.Next(-2, 3) * degree,
+                    10f, 30f);
+                if (seed.Yield != -1)
+                    seed.Yield = Math.Clamp(seed.Yield + _robustRandom.Next(-2, 3) * degree, 0, 10);
+                break;
+
+            case Slot.Potency:
+                seed.Potency = Math.Clamp(
+                    seed.Potency + _robustRandom.Next(-20, 21) * degree,
+                    0f, 200f);
+                break;
+
+            case Slot.Maturity:
+                seed.Maturation = Math.Clamp(
+                    seed.Maturation + _robustRandom.Next(-1, 2) * degree,
+                    0f, 30f);
+                if (_robustRandom.Prob(degree * 0.05f))
+                    seed.HarvestRepeat = seed.HarvestRepeat == HarvestType.NoRepeat
+                        ? HarvestType.Repeat
+                        : HarvestType.NoRepeat;
+                break;
+
+            case Slot.Bioluminescence:
+                // Visual effect — no RS14 implementation yet; stub only.
+                break;
+
+            case Slot.Flowers:
+                // Visual effect — no RS14 implementation yet; stub only.
+                break;
+
+            case Slot.NewChems:
+            case Slot.NewChems2:
+            case Slot.NewChems3:
+                AddRandomChem(ref seed);
+                break;
+
+            case Slot.MutateSpecies:
+                if (seed.MutationPrototypes.Count > 0)
+                {
+                    var targetProto = _robustRandom.Pick(seed.MutationPrototypes);
+                    if (_prototypeManager.TryIndex(targetProto, out SeedPrototype? protoSeed))
+                        seed = seed.SpeciesChange(protoSeed);
+                }
+                break;
+        }
+    }
+
+    private void AddRandomChem(ref SeedData seed)
+    {
+        var fills = _prototypeManager.Index(RandomPickBotanyReagent).Fills;
+        if (fills.Count == 0)
+            return;
+
+        var pick = _robustRandom.Pick(fills);
+        if (pick.Reagents.Count == 0)
+            return;
+
+        var chemicalId = _robustRandom.Pick(pick.Reagents);
+        var amount = _robustRandom.Next(1, (int) pick.Quantity + 1);
+
+        var chemicals = seed.Chemicals;
+        SeedChemQuantity seedChemQuantity;
+        if (chemicals.TryGetValue(chemicalId, out var existing))
+        {
+            seedChemQuantity = new SeedChemQuantity { Min = existing.Min, Max = existing.Max + amount, Inherent = existing.Inherent };
+        }
+        else
+        {
+            seedChemQuantity = new SeedChemQuantity { Min = 1, Max = 1 + amount, Inherent = false };
+        }
+        seedChemQuantity.PotencyDivisor = (int) Math.Ceiling(100.0 / seedChemQuantity.Max);
+        chemicals[chemicalId] = seedChemQuantity;
     }
 
     public SeedData Cross(SeedData a, SeedData b)
@@ -87,6 +294,8 @@ public sealed class MutationSystem : EntitySystem
         CrossBool(ref result.Ligneous, a.Ligneous);
         CrossBool(ref result.TurnIntoKudzu, a.TurnIntoKudzu);
         CrossBool(ref result.CanScream, a.CanScream);
+        CrossBool(ref result.Parasite, a.Parasite);
+        CrossInt(ref result.Carnivorous, a.Carnivorous);
 
         CrossGasses(ref result.ExudeGasses, a.ExudeGasses);
         CrossGasses(ref result.ConsumeGasses, a.ConsumeGasses);
@@ -149,7 +358,7 @@ public sealed class MutationSystem : EntitySystem
         // Go through gasses from the pollen in swab
         foreach (var otherGas in other)
         {
-            // if both have same gas, randomly pick ammount from the two.
+            // if both have same gas, randomly pick amount from the two.
             if (val.ContainsKey(otherGas.Key))
             {
                 val[otherGas.Key] = Random(0.5f) ? otherGas.Value : val[otherGas.Key];
@@ -175,6 +384,7 @@ public sealed class MutationSystem : EntitySystem
             }
         }
     }
+
     private void CrossFloat(ref float val, float other)
     {
         val = Random(0.5f) ? val : other;

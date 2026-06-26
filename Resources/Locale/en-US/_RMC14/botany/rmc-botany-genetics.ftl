@@ -19,7 +19,7 @@ rmc-gene-type-vigour-desc = yield, lifespan & growth rate
 rmc-gene-type-flowers = Flowers
 rmc-gene-type-flowers-desc = plant appearance
 
-# Lysis-Isolation Centrifuge — popups
+# Lysis Isolation Centrifuge — popups
 rmc-lysis-centrifuge-no-power = The centrifuge has no power.
 rmc-lysis-centrifuge-no-seed-data = This seed packet contains no genetic data.
 rmc-lysis-centrifuge-seedless = This plant is seedless — its genome cannot be extracted.
@@ -33,14 +33,17 @@ rmc-lysis-centrifuge-degraded = Buffer fully degraded. Genome wiped.
 rmc-lysis-centrifuge-disc-already-loaded = A disc is already loaded. Eject it first via the interface.
 rmc-lysis-centrifuge-disc-inserted = Flora data disc inserted.
 rmc-lysis-centrifuge-no-disc = No disc loaded. Insert a flora data disc first.
+rmc-lysis-centrifuge-disc-full = The disc already contains a gene sequence.
 rmc-lysis-centrifuge-disc-has-gene = This sequence is already stored on the disc.
 rmc-lysis-centrifuge-extracted = [color=cyan]{ $gene }[/color] extracted. Buffer degradation: { $degradation }/{ $max }.
 rmc-lysis-centrifuge-buffer-wiped = Buffer fully degraded — genome lost.
 rmc-lysis-centrifuge-clear-verb = Clear buffer
 rmc-lysis-centrifuge-cleared = Genetic buffer cleared.
 
-# Lysis-Isolation Centrifuge — UI
-rmc-centrifuge-window-title = Lysis-Isolation Centrifuge
+# Lysis Isolation Centrifuge — UI
+rmc-centrifuge-window-title = Lysis Isolation Centrifuge
+rmc-centrifuge-seed-label = Seed:
+rmc-centrifuge-genome-label = Genome:
 rmc-centrifuge-seed-header = SEED PACKET
 rmc-centrifuge-no-seed = [No seed loaded]
 rmc-centrifuge-seed-loaded = [Seed inserted]
@@ -59,6 +62,7 @@ rmc-centrifuge-genes-header = GENE SEQUENCES
 rmc-centrifuge-gene-label = { $code } - { $type }:
 rmc-centrifuge-gene-label-copied = { $code } - { $type }: ✓
 rmc-centrifuge-extract-gene = Extract gene
+rmc-centrifuge-disc-full = Disc already contains a gene sequence.
 rmc-centrifuge-gene-already-copied = This gene sequence is already on the disc.
 
 # Bioballistic Delivery System — popups

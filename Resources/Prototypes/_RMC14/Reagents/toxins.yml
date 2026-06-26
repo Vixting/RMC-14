@@ -7,6 +7,9 @@
   color: "#CF3600"
   unknown: true
   toxin: true
+  plantMetabolism:
+  - !type:Toxic
+    potency: 4.0
   metabolisms:
     Poison:
       metabolismRate: 0.05
@@ -23,6 +26,11 @@
   color: "#669900"
   unknown: true
   toxin: true
+  plantMetabolism:
+  - !type:Toxic
+    potency: 4.0
+  - !type:Corrosive
+    potency: 8.0
   metabolisms:
     Poison:
       #TODO hurts on inject equal to amount

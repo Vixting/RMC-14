@@ -1,8 +1,9 @@
+using Content.Shared.Botany;
 using Content.Shared.Chemistry.Components;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Robust.Shared.Audio;
 
-namespace Content.Server.Botany.Components;
+namespace Content.Shared.Botany.Components;
 
 [RegisterComponent]
 public sealed partial class PlantHolderComponent : Component
@@ -138,4 +139,17 @@ public sealed partial class PlantHolderComponent : Component
 
     [ViewVariables]
     public Entity<SolutionComponent>? SoilSolution = null;
+
+    /// <summary>
+    ///     Adjusts growth cycle speed. Positive = slower (hypometabolic), negative = faster (hypermetabolic).
+    ///     Applied as an offset in seconds to CycleDelay for the current cycle and decays each update.
+    /// </summary>
+    [DataField]
+    public float MetabolismAdjust;
+
+    /// <summary>
+    ///     Accumulates from Excreting reagent property. When it hits 100, grants a potency boost.
+    /// </summary>
+    [DataField]
+    public float PotencyCounter;
 }

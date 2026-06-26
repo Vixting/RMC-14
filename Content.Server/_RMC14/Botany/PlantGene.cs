@@ -1,4 +1,4 @@
-using Content.Server.Botany;
+using Content.Shared.Botany;
 using Content.Shared._RMC14.Botany;
 using Robust.Shared.Utility;
 

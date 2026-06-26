@@ -1,11 +1,10 @@
 <DefaultWindow
     xmlns="https://spacestation14.io"
-    MinSize="340 420">
-    <BoxContainer Orientation="Vertical" Margin="8" VerticalExpand="True">
+    MinSize="340 300">
+    <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
 
-        <!-- Disc panel -->
-        <PanelContainer StyleClasses="Inset" Margin="0 0 0 6" VerticalExpand="True">
-            <BoxContainer Orientation="Vertical" Margin="6">
+        <PanelContainer StyleClasses="Inset" Margin="0 0 0 4" VerticalExpand="True">
+            <BoxContainer Orientation="Vertical" Margin="4">
                 <BoxContainer Orientation="Horizontal">
                     <Label Text="{Loc rmc-gene-editor-disc-header}"
                            StyleClasses="LabelKeyText"
@@ -19,30 +18,32 @@
                 <ScrollContainer HScrollEnabled="False"
                                  VerticalExpand="True"
                                  MinHeight="80"
-                                 Margin="0 4 0 0">
+                                 Margin="0 2 0 0">
                     <BoxContainer Name="DiscGenesContainer" Orientation="Vertical" />
                 </ScrollContainer>
             </BoxContainer>
         </PanelContainer>
 
-        <!-- Seed panel -->
-        <PanelContainer StyleClasses="Inset" Margin="0 0 0 8">
-            <BoxContainer Orientation="Vertical" Margin="6">
+        <PanelContainer StyleClasses="Inset" Margin="0 0 0 4">
+            <BoxContainer Orientation="Vertical" Margin="4">
                 <BoxContainer Orientation="Horizontal">
                     <Label Text="{Loc rmc-gene-editor-seed-header}"
                            StyleClasses="LabelKeyText"
                            HorizontalExpand="True" />
+                    <SpriteView Name="SeedSpriteView"
+                                SetSize="28 28"
+                                OverrideDirection="South"
+                                Stretch="Fit"
+                                VerticalAlignment="Center"
+                                Margin="0 0 4 0" />
                     <Label Name="SeedStatusLabel"
                            VerticalAlignment="Center" />
                 </BoxContainer>
-                <BoxContainer Orientation="Horizontal" Margin="0 6 0 0" VerticalAlignment="Center">
-                    <Label Text="{Loc rmc-gene-editor-edit-count-label}"
-                           VerticalAlignment="Center"
-                           Margin="0 0 6 0" />
+                <BoxContainer Orientation="Horizontal" Margin="0 2 0 0" VerticalAlignment="Center">
                     <ProgressBar Name="EditCountBar"
                                  HorizontalExpand="True"
                                  MaxValue="1"
-                                 SetHeight="18"
+                                 SetHeight="16"
                                  VerticalAlignment="Center">
                         <Label Name="EditCountLabel"
                                Margin="4 0"
@@ -52,7 +53,6 @@
             </BoxContainer>
         </PanelContainer>
 
-        <!-- Action buttons -->
         <BoxContainer Orientation="Horizontal">
             <Button Name="ApplyButton"
                     Text="{Loc rmc-gene-editor-apply-button}"

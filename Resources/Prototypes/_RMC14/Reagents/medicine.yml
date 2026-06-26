@@ -7,6 +7,9 @@
   color: "#3fc92a"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Antitoxic
+    potency: 8.0
   metabolisms:
     Medicine:
       metabolismRate: 0.1
@@ -41,6 +44,11 @@
   color: "#3c8529"
   overdose: 15
   criticalOverdose: 25
+  plantMetabolism:
+  - !type:Antitoxic
+    potency: 4.0
+  - !type:Biocidic
+    potency: 4.0
   metabolisms:
     Medicine:
       metabolismRate: 0.03
@@ -116,6 +124,9 @@
   color: "#e2972e"
   overdose: 15
   criticalOverdose: 25
+  plantMetabolism:
+  - !type:Anticorrosive
+    potency: 12.0
   metabolisms:
     Medicine:
       metabolismRate: 0.1
@@ -238,6 +249,9 @@
   color: "#f5e123"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Anticorrosive
+    potency: 8.0
   metabolisms:
     Medicine:
       metabolismRate: 0.1
@@ -270,6 +284,11 @@
   color: "#d87f2b"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Anticorrosive
+    potency: 4.0
+  - !type:Antitoxic
+    potency: 4.0
   metabolisms:
     Medicine:
       metabolismRate: 0.1

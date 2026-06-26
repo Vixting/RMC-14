@@ -7,6 +7,10 @@
   physicalDesc: reagent-physical-desc-opaque
   flavor: nutriment
   color: "#664330"
+  plantMetabolism:
+  - !type:Nutritious
+    potency: 4.0
+  - !type:Hemogenic {}
   metabolisms:
     Food:
       metabolismRate: 0.1

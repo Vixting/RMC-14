@@ -1,7 +1,7 @@
 - type: entity
   id: RMCLysisCentrifuge
   parent: CMBaseStructure
-  name: Lysis-Isolation Centrifuge
+  name: Lysis Isolation Centrifuge
   description: A specialized centrifuge that isolates and extracts genetic sequences from plant samples for later use. Insert a seed packet to scan the genome, then use a flora data disc to extract specific gene types. Each extraction degrades the genetic buffer.
   components:
   - type: Sprite
@@ -9,7 +9,7 @@
     drawdepth: SmallObjects
     snapCardinals: true
     layers:
-    - state: traitscanner
+    - state: traitcopier
   - type: Physics
     bodyType: Static
   - type: Fixtures
@@ -54,7 +54,7 @@
     drawdepth: SmallObjects
     snapCardinals: true
     layers:
-    - state: traitcopier
+    - state: traitgun
   - type: Physics
     bodyType: Static
   - type: Fixtures
@@ -82,6 +82,41 @@
   - type: RMCPowerReceiver
     idleLoad: 5
     activeLoad: 200
+    channel: Equipment
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+
+- type: entity
+  id: RMCSeedExtractor
+  parent: CMBaseStructure
+  name: seed extractor
+  description: Extracts seed packets from plant produce.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Structures/hydroponics.rsi
+    drawdepth: SmallObjects
+    snapCardinals: true
+    layers:
+    - state: sextractor
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.4,0.25,0.4"
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: SeedExtractor
+  - type: RMCPowerReceiver
+    idleLoad: 5
+    activeLoad: 50
     channel: Equipment
   - type: InteractedBlacklist
     blacklist:

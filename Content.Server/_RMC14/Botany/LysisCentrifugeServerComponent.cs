@@ -1,4 +1,4 @@
-using Content.Server.Botany;
+using Content.Shared.Botany;
 
 namespace Content.Server._RMC14.Botany;
 
