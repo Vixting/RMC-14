@@ -9,6 +9,7 @@ using Content.Shared._RMC14.OnCollide;
 using Content.Shared._RMC14.Vehicle;
 using Content.Shared._RMC14.Weapons.Melee;
 using Content.Shared._RMC14.Xenonids.Plasma;
+using Content.Shared._RMC14.Xenonids.Rest;
 using Content.Shared.Alert;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
@@ -187,6 +188,12 @@ public abstract class SharedRMCFlammableSystem : EntitySystem
         if (!TryComp(user, out TileFirePatterComponent? patter))
             return;
 
+        if (HasComp<XenoRestingComponent>(user))
+        {
+            _popup.PopupClient(Loc.GetString("rmc-xeno-rest-cant-pat-fire"), user, user);
+            return;
+        }
+
         var time = _timing.CurTime;
         if (time < patter.Last + patter.Cooldown)
             return;
@@ -338,6 +345,13 @@ public abstract class SharedRMCFlammableSystem : EntitySystem
             !TryComp(ent, out FlammableComponent? flammable) ||
             !flammable.OnFire)
         {
+            return;
+        }
+
+        if (HasComp<XenoRestingComponent>(user))
+        {
+            args.Handled = true;
+            _popup.PopupClient(Loc.GetString("rmc-xeno-rest-cant-pat-fire"), user, user);
             return;
         }
 
