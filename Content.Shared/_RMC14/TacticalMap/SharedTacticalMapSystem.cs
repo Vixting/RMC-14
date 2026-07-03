@@ -55,7 +55,7 @@ public abstract class SharedTacticalMapSystem : EntitySystem
         UpdateMapData(computer, map);
     }
 
-    protected void UpdateMapData(Entity<TacticalMapComputerComponent> computer, TacticalMapComponent map)
+    protected virtual void UpdateMapData(Entity<TacticalMapComputerComponent> computer, TacticalMapComponent map)
     {
         var ev = new TacticalMapIncludeXenosEvent();
         RaiseLocalEvent(ref ev);

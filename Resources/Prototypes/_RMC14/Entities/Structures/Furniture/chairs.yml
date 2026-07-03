@@ -15,6 +15,7 @@
   - type: Sprite
     sprite: _RMC14/Structures/Furniture/chairs.rsi
     state: chair
+    drawdepth: BelowMobs
   - type: Tag
     tags:
     - RMCSeat
