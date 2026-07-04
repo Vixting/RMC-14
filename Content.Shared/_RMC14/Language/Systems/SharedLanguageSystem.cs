@@ -1,4 +1,5 @@
 using System.Text;
+using Content.Shared._RMC14.Language;
 using Content.Shared._RMC14.Language.Components;
 using Content.Shared._RMC14.Language.Prototypes;
 using Content.Shared.Ghost;
@@ -11,6 +12,7 @@ public abstract class SharedLanguageSystem : EntitySystem
 {
     [Dependency] protected readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly SharedLanguageLearningSystem _learning = default!;
 
     public static readonly ProtoId<LanguagePrototype> CommonLanguage = "English";
     private static readonly IReadOnlySet<ProtoId<LanguagePrototype>> DefaultLanguages =
@@ -82,6 +84,36 @@ public abstract class SharedLanguageSystem : EntitySystem
             return DefaultLanguages;
 
         return ent.Comp.SpokenLanguages;
+    }
+
+    public string ObfuscateMessageForSpeaker(EntityUid speaker, string message, ProtoId<LanguagePrototype> language)
+    {
+        if (CanUnderstand(speaker, language))
+            return message;
+
+        if (TryComp<LanguageLearningComponent>(speaker, out var learningComp) &&
+            learningComp.Languages.ContainsKey(language))
+        {
+            return _learning.ProcessMessageForSpeaker(speaker, message, language);
+        }
+
+        var languageLearningEv = new ProcessSpeakerLanguageEvent(speaker, language, message);
+        RaiseLocalEvent(speaker, ref languageLearningEv);
+        return languageLearningEv.ProcessedMessage;
+    }
+
+    public string ObfuscateMessageForListener(EntityUid listener, string speakerMessage, ProtoId<LanguagePrototype> language)
+    {
+        if (CanUnderstand(listener, language))
+            return speakerMessage;
+
+        if (TryComp<LanguageLearningComponent>(listener, out var learningComp) &&
+            learningComp.Languages.ContainsKey(language))
+        {
+            return _learning.ProcessMessageForListener(listener, speakerMessage, language);
+        }
+
+        return ObfuscateMessage(speakerMessage, language);
     }
 
     public string ObfuscateMessage(string message, ProtoId<LanguagePrototype> language)

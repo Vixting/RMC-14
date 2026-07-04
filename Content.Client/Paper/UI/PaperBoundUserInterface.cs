@@ -42,7 +42,9 @@ public sealed class PaperBoundUserInterface : BoundUserInterface
     protected override void UpdateState(BoundUserInterfaceState state)
     {
         base.UpdateState(state);
-        _window?.Populate((PaperBoundUserInterfaceState) state);
+
+        var content = EntMan.TryGetComponent<PaperComponent>(Owner, out var paper) ? paper.Content : string.Empty;
+        _window?.Populate((PaperBoundUserInterfaceState) state, content);
     }
 
     private void InputOnTextEntered(string text)

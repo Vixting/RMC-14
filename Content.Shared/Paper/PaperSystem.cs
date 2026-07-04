@@ -1,4 +1,7 @@
 using System.Linq;
+using System.Text.RegularExpressions;
+using Content.Shared._RMC14.Language.Prototypes;
+using Content.Shared._RMC14.Language.Systems;
 using Content.Shared.Administration.Logs;
 using Content.Shared.UserInterface;
 using Content.Shared.Database;
@@ -7,6 +10,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Popups;
 using Content.Shared.Tag;
+using Robust.Shared.GameStates;
 using Robust.Shared.Player;
 using Robust.Shared.Audio.Systems;
 using static Content.Shared.Paper.PaperComponent;
@@ -27,6 +31,7 @@ public sealed class PaperSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedInteractionSystem _interaction = default!;
+    [Dependency] private readonly SharedLanguageSystem _language = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly TagSystem _tagSystem = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _uiSystem = default!;
@@ -49,6 +54,8 @@ public sealed class PaperSystem : EntitySystem
         SubscribeLocalEvent<PaperComponent, ExaminedEvent>(OnExamined);
         SubscribeLocalEvent<PaperComponent, InteractUsingEvent>(OnInteractUsing);
         SubscribeLocalEvent<PaperComponent, PaperInputTextMessage>(OnInputTextMessage);
+        SubscribeLocalEvent<PaperComponent, ComponentGetState>(OnGetState); // RMC14
+        SubscribeLocalEvent<PaperComponent, ComponentHandleState>(OnHandleState); // RMC14
 
         SubscribeLocalEvent<RandomPaperContentComponent, MapInitEvent>(OnRandomPaperContentMapInit);
 
@@ -85,7 +92,70 @@ public sealed class PaperSystem : EntitySystem
     {
         entity.Comp.Mode = PaperAction.Read;
         UpdateUserInterface(entity);
+
+        Dirty(entity);
     }
+
+    private static readonly Regex LanguageSegmentRegex = new(
+        @"\[rmclang=(?<lang>[^\]]+)\](?<text>.*?)\[/rmclang\]",
+        RegexOptions.Compiled | RegexOptions.Singleline);
+
+    public static string TagLanguageSegment(string text, ProtoId<LanguagePrototype> language)
+    {
+        return $"[rmclang={language}]{text}[/rmclang]";
+    }
+
+    private string ObfuscateContentForViewer(PaperComponent comp, EntityUid viewer)
+    {
+        if (LanguageSegmentRegex.IsMatch(comp.Content))
+        {
+            return LanguageSegmentRegex.Replace(comp.Content, match =>
+            {
+                var language = new ProtoId<LanguagePrototype>(match.Groups["lang"].Value);
+                return _language.ObfuscateMessageForListener(viewer, match.Groups["text"].Value, language);
+            });
+        }
+
+        if (comp.Language is { } docLanguage)
+            return _language.ObfuscateMessageForListener(viewer, comp.Content, docLanguage);
+
+        return comp.Content;
+    }
+
+    private void OnGetState(Entity<PaperComponent> ent, ref ComponentGetState args)
+    {
+        var content = ent.Comp.Content;
+        if (!args.ReplayState && args.Player.AttachedEntity is { } viewer)
+            content = ObfuscateContentForViewer(ent.Comp, viewer);
+
+        args.State = new PaperComponentState
+        {
+            TextColor = ent.Comp.TextColor,
+            Color = ent.Comp.Color,
+            Thickness = ent.Comp.Thickness,
+            Content = content,
+            StampedBy = ent.Comp.StampedBy,
+            StampState = ent.Comp.StampState,
+            EditingDisabled = ent.Comp.EditingDisabled,
+            Language = ent.Comp.Language,
+        };
+    }
+
+    private void OnHandleState(Entity<PaperComponent> ent, ref ComponentHandleState args)
+    {
+        if (args.Current is not PaperComponentState state)
+            return;
+
+        ent.Comp.TextColor = state.TextColor;
+        ent.Comp.Color = state.Color;
+        ent.Comp.Thickness = state.Thickness;
+        ent.Comp.Content = state.Content;
+        ent.Comp.StampedBy = new List<StampDisplayInfo>(state.StampedBy);
+        ent.Comp.StampState = state.StampState;
+        ent.Comp.EditingDisabled = state.EditingDisabled;
+        ent.Comp.Language = state.Language;
+    }
+    // RMC14
 
     private void OnExamined(Entity<PaperComponent> entity, ref ExaminedEvent args)
     {
@@ -201,6 +271,11 @@ public sealed class PaperSystem : EntitySystem
         {
             SetContent(entity, args.Text);
 
+            entity.Comp.Language = string.IsNullOrWhiteSpace(args.Text)
+                ? (ProtoId<LanguagePrototype>?) null
+                : _language.GetCurrentLanguage(args.Actor);
+            Dirty(entity);
+
             var paperStatus = string.IsNullOrWhiteSpace(args.Text) ? PaperStatus.Blank : PaperStatus.Written;
 
             if (TryComp<AppearanceComponent>(entity, out var appearance))
@@ -257,14 +332,14 @@ public sealed class PaperSystem : EntitySystem
         if (!entity.Comp.StampedBy.Contains(stampInfo))
         {
             entity.Comp.StampedBy.Add(stampInfo);
-            
+
             // Clean unfilled form and signature tags when stamping to finalize the document
             var cleanedContent = CleanUnfilledTags(entity.Comp.Content);
             if (cleanedContent != entity.Comp.Content)
             {
                 SetContent(entity, cleanedContent);
             }
-            
+
             Dirty(entity);
             if (entity.Comp.StampState == null && TryComp<AppearanceComponent>(entity, out var appearance))
             {
@@ -321,7 +396,7 @@ public sealed class PaperSystem : EntitySystem
 
     private void UpdateUserInterface(Entity<PaperComponent> entity)
     {
-        _uiSystem.SetUiState(entity.Owner, PaperUiKey.Key, new PaperBoundUserInterfaceState(entity.Comp.Content, entity.Comp.StampedBy, entity.Comp.Mode));
+        _uiSystem.SetUiState(entity.Owner, PaperUiKey.Key, new PaperBoundUserInterfaceState(entity.Comp.StampedBy, entity.Comp.Mode));
     }
 
     private void OnSignatureRequest(Entity<PaperComponent> entity, ref PaperSignatureRequestMessage args)
@@ -342,7 +417,7 @@ public sealed class PaperSystem : EntitySystem
         var name = string.Empty;
         var rank = string.Empty;
         var role = string.Empty;
-        
+
         // Get the identity entity (ID card, etc.)
         var identityEntity = player;
         if (TryComp<IdentityComponent>(player, out var identity) &&
@@ -350,17 +425,17 @@ public sealed class PaperSystem : EntitySystem
         {
             identityEntity = idEntity;
         }
-        
+
         // Get name from identity or fallback to entity name
         name = MetaData(identityEntity).EntityName;
-        
+
         // Get rank from RankComponent
         if (TryComp<RankComponent>(player, out var rankComp))
         {
             var rankSystem = EntityManager.System<SharedRankSystem>();
             rank = rankSystem.GetRankString(player, isShort: true) ?? string.Empty;
         }
-        
+
         // Get role from mind system
         if (TryComp<MindContainerComponent>(player, out var mindContainer) &&
             mindContainer.Mind != null)
@@ -372,7 +447,7 @@ public sealed class PaperSystem : EntitySystem
                 role = Loc.GetString(roleInfo[0].Name);
             }
         }
-        
+
         // Format: "Rank Name, Role" or fallback combinations
         var signature = string.Empty;
         if (!string.IsNullOrEmpty(rank) && !string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(role))
@@ -391,7 +466,7 @@ public sealed class PaperSystem : EntitySystem
         {
             signature = name;
         }
-        
+
         return signature;
     }
 

@@ -59,6 +59,7 @@ public sealed partial class CloningSystem : EntitySystem
         if (TryComp<PaperComponent>(args.CloneUid, out var clonePaperComp))
         {
             _paper.SetContent((args.CloneUid, clonePaperComp), ent.Comp.Content);
+            clonePaperComp.Language = ent.Comp.Language; // RMC14
             _paper.CopyStamps(ent.AsNullable(), (args.CloneUid, clonePaperComp));
         }
     }

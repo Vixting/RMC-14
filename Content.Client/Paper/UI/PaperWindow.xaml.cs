@@ -264,11 +264,12 @@ namespace Content.Client.Paper.UI
         /// Handles both editing mode (showing text input) and reading mode (showing formatted text).
         /// Processes markup tags like [form] and [signature] for interactive elements.
         /// </summary>
-        /// <param name="state">Current paper state containing text, mode, and stamp information</param>
-        public void Populate(PaperComponent.PaperBoundUserInterfaceState state)
+        /// <param name="state">Current paper state containing mode and stamp information</param>
+        /// <param name="content">Current text content, sourced from the paper's component (per-viewer obfuscated)</param>
+        public void Populate(PaperComponent.PaperBoundUserInterfaceState state, string content)
         {
             _currentState = state;
-            _currentRawText = state.Text;
+            _currentRawText = content;
             var isEditing = state.Mode == PaperComponent.PaperAction.Write;
 
             // Show/hide UI elements based on edit mode
@@ -276,7 +277,7 @@ namespace Content.Client.Paper.UI
             EditButtons.Visible = isEditing;
             WrittenTextLabel.Visible = !isEditing;
             WrittenTextContainer.Visible = false;
-            BlankPaperIndicator.Visible = !isEditing && state.Text.Length == 0;
+            BlankPaperIndicator.Visible = !isEditing && content.Length == 0;
 
             if (isEditing)
             {
@@ -285,7 +286,7 @@ namespace Content.Client.Paper.UI
 
                 // Initialize the text input field with server content if it's currently empty
                 // This allows editing existing documents while preserving any text the user has already typed
-                var shouldCopy = Input.TextLength == 0 && state.Text.Length > 0;
+                var shouldCopy = Input.TextLength == 0 && content.Length > 0;
                 if (shouldCopy)
                 {
                     // We can get repeated messages with state.Mode == Write if another
@@ -294,14 +295,14 @@ namespace Content.Client.Paper.UI
                     // don't want to lose any text they already input.
                     Input.TextRope = Rope.Leaf.Empty;
                     Input.CursorPosition = new TextEdit.CursorPos();
-                    Input.InsertAtCursor(state.Text);
+                    Input.InsertAtCursor(content);
                 }
                 return;
             }
 
             // Reset form, signature, and check counters before processing to ensure consistent indexing
             // This is crucial because the tag handlers maintain state between renders
-            FormTagHandler.SetFormText(state.Text);
+            FormTagHandler.SetFormText(content);
             FormTagHandler.ResetFormCounter();
             SignatureTagHandler.ResetSignatureCounter();
             CheckTagHandler.ResetCheckCounter();
@@ -309,11 +310,11 @@ namespace Content.Client.Paper.UI
             // Display text with markup processing (forms, signatures, colors, etc.)
             // The markup system converts [form] and [signature] tags into interactive buttons
             var fm = new FormattedMessage();
-            fm.AddMarkupPermissive(state.Text);
+            fm.AddMarkupPermissive(content);
             WrittenTextLabel.SetMessage(fm, _allowedTags, DefaultTextColor);
 
             // Add extra bottom margin based on tag count to prevent cutoff (only in read mode)
-            var tagCount = CountTags(state.Text);
+            var tagCount = CountTags(content);
             var extraBottomMargin = tagCount * 3.0f; // 3 pixels per tag for extra height
             PaperContent.Margin = new Thickness(_originalContentMargin.Left, _originalContentMargin.Top,
                 _originalContentMargin.Right, _originalContentMargin.Bottom + extraBottomMargin);

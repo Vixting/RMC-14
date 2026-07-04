@@ -1,37 +1,39 @@
+using Content.Shared._RMC14.Language.Prototypes;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Paper;
 
-[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent]
 public sealed partial class PaperComponent : Component
 {
-    [DataField, AutoNetworkedField]
+    [DataField]
     public Color TextColor = new(25, 25, 25);
-    [DataField, AutoNetworkedField]
+    [DataField]
     public Color Color = Color.White;
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public int Thickness = 20;
 
     public PaperAction Mode;
-    [DataField("content"), AutoNetworkedField]
+    [DataField("content")]
     public string Content { get; set; } = "";
 
     [DataField("contentSize")]
     public int ContentSize { get; set; } = 10000;
 
-    [DataField("stampedBy"), AutoNetworkedField]
+    [DataField("stampedBy")]
     public List<StampDisplayInfo> StampedBy { get; set; } = new();
 
     /// <summary>
     ///     Stamp to be displayed on the paper, state from bureaucracy.rsi
     /// </summary>
-    [DataField("stampState"), AutoNetworkedField]
+    [DataField("stampState")]
     public string? StampState { get; set; }
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public bool EditingDisabled;
 
     /// <summary>
@@ -40,16 +42,19 @@ public sealed partial class PaperComponent : Component
     [DataField("sound")]
     public SoundSpecifier? Sound { get; private set; } = new SoundCollectionSpecifier("PaperScribbles", AudioParams.Default.WithVariation(0.1f));
 
+    // RMC14
+    [DataField]
+    public ProtoId<LanguagePrototype>? Language;
+    // RMC14
+
     [Serializable, NetSerializable]
     public sealed class PaperBoundUserInterfaceState : BoundUserInterfaceState
     {
-        public readonly string Text;
         public readonly List<StampDisplayInfo> StampedBy;
         public readonly PaperAction Mode;
 
-        public PaperBoundUserInterfaceState(string text, List<StampDisplayInfo> stampedBy, PaperAction mode = PaperAction.Read)
+        public PaperBoundUserInterfaceState(List<StampDisplayInfo> stampedBy, PaperAction mode = PaperAction.Read)
         {
-            Text = text;
             StampedBy = stampedBy;
             Mode = mode;
         }
@@ -76,6 +81,21 @@ public sealed partial class PaperComponent : Component
             SignatureIndex = signatureIndex;
         }
     }
+
+    // RMC14
+    [Serializable, NetSerializable]
+    public sealed class PaperComponentState : IComponentState
+    {
+        public Color TextColor;
+        public Color Color;
+        public int Thickness;
+        public string Content = string.Empty;
+        public List<StampDisplayInfo> StampedBy = new();
+        public string? StampState;
+        public bool EditingDisabled;
+        public ProtoId<LanguagePrototype>? Language;
+    }
+    // RMC14
 
     [Serializable, NetSerializable]
     public enum PaperUiKey

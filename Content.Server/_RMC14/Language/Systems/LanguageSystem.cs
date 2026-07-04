@@ -11,7 +11,6 @@ namespace Content.Server._RMC14.Language.Systems;
 
 public sealed partial class LanguageSystem : SharedLanguageSystem
 {
-    [Dependency] private readonly LanguageLearningSystem _learning = default!;
     [Dependency] private readonly IComponentFactory _compFactory = default!;
 
     public override void Initialize()
@@ -151,35 +150,5 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
         }
 
         Dirty(ent);
-    }
-
-    public string ObfuscateMessageForSpeaker(EntityUid speaker, string message, ProtoId<LanguagePrototype> language)
-    {
-        if (CanUnderstand(speaker, language))
-            return message;
-
-        if (TryComp<LanguageLearningComponent>(speaker, out var learningComp) &&
-            learningComp.Languages.ContainsKey(language))
-        {
-            return _learning.ProcessMessageForSpeaker(speaker, message, language);
-        }
-
-        var languageLearningEv = new ProcessSpeakerLanguageEvent(speaker, language, message);
-        RaiseLocalEvent(speaker, ref languageLearningEv);
-        return languageLearningEv.ProcessedMessage;
-    }
-
-    public string ObfuscateMessageForListener(EntityUid listener, string speakerMessage, ProtoId<LanguagePrototype> language)
-    {
-        if (CanUnderstand(listener, language))
-            return speakerMessage;
-
-        if (TryComp<LanguageLearningComponent>(listener, out var learningComp) &&
-            learningComp.Languages.ContainsKey(language))
-        {
-            return _learning.ProcessMessageForListener(listener, speakerMessage, language);
-        }
-
-        return ObfuscateMessage(speakerMessage, language);
     }
 }

@@ -892,9 +892,13 @@ public sealed class UniversalRecorderSystem : EntitySystem
             if (text.Length >= paperComp.ContentSize)
                 break;
 
-            var entryText = _language.ObfuscateMessageForListener(user, entry.Text, entry.Language);
-            var line = FormatTranscriptLine(entry.Timestamp, entry.SpeakerName, entry.SpeechVerb, entryText);
-            AppendLineLimited(text, FormattedMessage.EscapeText(line), paperComp.ContentSize);
+            var taggedText = PaperSystem.TagLanguageSegment(FormattedMessage.EscapeText(entry.Text), entry.Language);
+            var line = FormatTranscriptLine(
+                entry.Timestamp,
+                FormattedMessage.EscapeText(entry.SpeakerName),
+                FormattedMessage.EscapeText(entry.SpeechVerb),
+                taggedText);
+            AppendLineLimited(text, line, paperComp.ContentSize);
         }
 
         _paper.SetContent((printed, paperComp), text.ToString());
