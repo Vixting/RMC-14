@@ -1,4 +1,5 @@
 using System.Text;
+using Content.Server._RMC14.Language.Systems;
 using Content.Server.Atmos;
 using Content.Server.Chat.Managers;
 using Content.Server.Chat.Systems;
@@ -28,6 +29,7 @@ using Robust.Shared.GameObjects;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Replays;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Robust.Server.GameObjects;
@@ -47,11 +49,13 @@ public sealed class UniversalRecorderSystem : EntitySystem
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedItemSystem _item = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly LanguageSystem _language = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly PaperSystem _paper = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly IReplayRecordingManager _replay = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedToolSystem _tool = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
@@ -553,7 +557,8 @@ public sealed class UniversalRecorderSystem : EntitySystem
             args.Message,
             speech.FontId,
             speech.FontSize,
-            speech.Bold));
+            speech.Bold,
+            args.Language));
         tapeRuntime.UsedCapacity = currentDuration;
     }
 
@@ -887,7 +892,8 @@ public sealed class UniversalRecorderSystem : EntitySystem
             if (text.Length >= paperComp.ContentSize)
                 break;
 
-            var line = FormatTranscriptLine(entry.Timestamp, entry.SpeakerName, entry.SpeechVerb, entry.Text);
+            var entryText = _language.ObfuscateMessageForListener(user, entry.Text, entry.Language);
+            var line = FormatTranscriptLine(entry.Timestamp, entry.SpeakerName, entry.SpeechVerb, entryText);
             AppendLineLimited(text, FormattedMessage.EscapeText(line), paperComp.ContentSize);
         }
 
@@ -983,26 +989,49 @@ public sealed class UniversalRecorderSystem : EntitySystem
 
     private void SendPlaybackSpeech(Entity<UniversalRecorderComponent> ent, RecorderEntry entry)
     {
-        var wrapped = Loc.GetString(
+        var speakerName = FormattedMessage.EscapeText(entry.SpeakerName);
+
+        var filter = Filter.Pvs(ent.Owner, entityManager: EntityManager);
+        filter.RemoveWhereAttachedEntity(HasComp<XenoComponent>);
+
+        foreach (var recipient in filter.Recipients)
+        {
+            if (recipient.AttachedEntity is not { Valid: true } listener)
+                continue;
+
+            var listenerText = _language.ObfuscateMessageForListener(listener, entry.Text, entry.Language);
+            var listenerWrapped = Loc.GetString(
+                entry.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
+                ("entityName", speakerName),
+                ("verb", entry.SpeechVerb),
+                ("fontType", entry.FontId),
+                ("fontSize", entry.FontSize),
+                ("message", FormattedMessage.EscapeText(listenerText)));
+
+            _chatManager.ChatMessageToOne(
+                ChatChannel.Local,
+                listenerText,
+                listenerWrapped,
+                ent.Owner,
+                true,
+                recipient.Channel);
+        }
+
+        var replayWrapped = Loc.GetString(
             entry.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
-            ("entityName", FormattedMessage.EscapeText(entry.SpeakerName)),
+            ("entityName", speakerName),
             ("verb", entry.SpeechVerb),
             ("fontType", entry.FontId),
             ("fontSize", entry.FontSize),
             ("message", FormattedMessage.EscapeText(entry.Text)));
 
-        var filter = Filter.Pvs(ent.Owner, entityManager: EntityManager);
-        filter.RemoveWhereAttachedEntity(HasComp<XenoComponent>);
-
-        _chatManager.ChatMessageToManyFiltered(
-            filter,
+        _replay.RecordServerMessage(new ChatMessage(
             ChatChannel.Local,
             entry.Text,
-            wrapped,
-            ent.Owner,
-            hideChat: true,
-            recordReplay: true,
-            colorOverride: null);
+            replayWrapped,
+            GetNetEntity(ent.Owner),
+            null,
+            hideChat: true));
     }
 
     private TimeSpan GetCurrentRecordedDuration(
