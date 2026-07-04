@@ -990,6 +990,9 @@ public sealed class UniversalRecorderSystem : EntitySystem
     private void SendPlaybackSpeech(Entity<UniversalRecorderComponent> ent, RecorderEntry entry)
     {
         var speakerName = FormattedMessage.EscapeText(entry.SpeakerName);
+        var languageIcon = _prototype.TryIndex(entry.Language, out var languagePrototype)
+            ? languagePrototype.DisplayedLanguageIcon
+            : null;
 
         var filter = Filter.Pvs(ent.Owner, entityManager: EntityManager);
         filter.RemoveWhereAttachedEntity(HasComp<XenoComponent>);
@@ -1014,7 +1017,8 @@ public sealed class UniversalRecorderSystem : EntitySystem
                 listenerWrapped,
                 ent.Owner,
                 true,
-                recipient.Channel);
+                recipient.Channel,
+                languageIcon: languageIcon);
         }
 
         var replayWrapped = Loc.GetString(
