@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Content.Shared._RMC14.Language.Prototypes;
 using Content.Shared._RMC14.Language.Systems;
@@ -100,9 +101,37 @@ public sealed class PaperSystem : EntitySystem
         @"\[rmclang=(?<lang>[^\]]+)\](?<text>.*?)\[/rmclang\]",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
+    private static readonly Regex MarkupTagRegex = new(
+        @"\[/?[a-zA-Z][a-zA-Z0-9]*(=[^\]]*)?\]",
+        RegexOptions.Compiled);
+
     public static string TagLanguageSegment(string text, ProtoId<LanguagePrototype> language)
     {
-        return $"[rmclang={language}]{text}[/rmclang]";
+        return $"[rmclang={language}]{EscapeForgedLanguageTags(text)}[/rmclang]";
+    }
+
+    private static string EscapeForgedLanguageTags(string text)
+    {
+        return text.Replace("rmclang", "rmc\u200Blang", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string ObfuscateTextPreservingMarkup(string text, EntityUid viewer, ProtoId<LanguagePrototype> language)
+    {
+        var result = new StringBuilder(text.Length);
+        var lastIndex = 0;
+        foreach (Match match in MarkupTagRegex.Matches(text))
+        {
+            if (match.Index > lastIndex)
+                result.Append(_language.ObfuscateMessageForListener(viewer, text[lastIndex..match.Index], language));
+
+            result.Append(match.Value);
+            lastIndex = match.Index + match.Length;
+        }
+
+        if (lastIndex < text.Length)
+            result.Append(_language.ObfuscateMessageForListener(viewer, text[lastIndex..], language));
+
+        return result.ToString();
     }
 
     private string ObfuscateContentForViewer(PaperComponent comp, EntityUid viewer)
@@ -112,12 +141,12 @@ public sealed class PaperSystem : EntitySystem
             return LanguageSegmentRegex.Replace(comp.Content, match =>
             {
                 var language = new ProtoId<LanguagePrototype>(match.Groups["lang"].Value);
-                return _language.ObfuscateMessageForListener(viewer, match.Groups["text"].Value, language);
+                return ObfuscateTextPreservingMarkup(match.Groups["text"].Value, viewer, language);
             });
         }
 
         if (comp.Language is { } docLanguage)
-            return _language.ObfuscateMessageForListener(viewer, comp.Content, docLanguage);
+            return ObfuscateTextPreservingMarkup(comp.Content, viewer, docLanguage);
 
         return comp.Content;
     }
