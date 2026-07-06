@@ -1,7 +1,12 @@
-﻿using Content.Shared.Hands.EntitySystems;
+﻿using System.Linq;
+using Content.Shared.Chemistry.Reagent;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.FixedPoint;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 namespace Content.Shared._RMC14.Chemistry.SmartFridge;
@@ -11,6 +16,7 @@ public abstract class SharedRMCSmartFridgeSystem : EntitySystem
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
 
     private readonly HashSet<Entity<RMCSmartFridgeComponent>> _smartFridges = new();
 
@@ -45,6 +51,50 @@ public abstract class SharedRMCSmartFridgeSystem : EntitySystem
         var container = _container.EnsureContainer<Container>(fridge.Value, fridge.Value.Comp.ContainerId);
         _container.Insert(transfer, container);
         Dirty(fridge.Value);
+    }
+
+    public bool TryDrainStock(EntityCoordinates coords, float range, ProtoId<ReagentPrototype> reagent, FixedPoint2 amount, out FixedPoint2 drained)
+    {
+        drained = FixedPoint2.Zero;
+
+        _smartFridges.Clear();
+        _entityLookup.GetEntitiesInRange(coords, range, _smartFridges);
+        if (!_smartFridges.TryFirstOrNull(out var fridge))
+            return false;
+
+        if (!_container.TryGetContainer(fridge.Value, fridge.Value.Comp.ContainerId, out var container))
+            return false;
+
+        foreach (var contained in container.ContainedEntities.ToArray())
+        {
+            if (drained >= amount)
+                break;
+
+            if (!_solution.TryGetSolution(contained, "beaker", out var solnEnt, out var solution))
+                continue;
+
+            var have = solution.GetReagentQuantity(new ReagentId(reagent, null));
+            if (have <= FixedPoint2.Zero)
+                continue;
+
+            var take = FixedPoint2.Min(have, amount - drained);
+            if (take <= FixedPoint2.Zero)
+                continue;
+
+            _solution.RemoveReagent(solnEnt.Value, reagent, take);
+            drained += take;
+
+            if (solution.Volume <= FixedPoint2.Zero)
+            {
+                _container.Remove(contained, container);
+                QueueDel(contained);
+            }
+        }
+
+        if (drained > FixedPoint2.Zero)
+            Dirty(fridge.Value);
+
+        return drained > FixedPoint2.Zero;
     }
 
     private void OnVend(Entity<RMCSmartFridgeComponent> ent, ref RMCSmartFridgeVendMsg args)

@@ -1,0 +1,371 @@
+using System.Numerics;
+using Content.Client._RMC14.UserInterface;
+using Content.Client.Chemistry.Containers.EntitySystems;
+using Content.Client.Resources;
+using Content.Client.UserInterface.ControlExtensions;
+using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared._RMC14.Chemistry.TuringDispenser;
+using Content.Shared._RMC14.UserInterface;
+using Content.Shared.FixedPoint;
+using JetBrains.Annotations;
+using Robust.Client.GameObjects;
+using Robust.Client.Graphics;
+using Robust.Client.ResourceManagement;
+using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Maths;
+
+namespace Content.Client._RMC14.Chemistry.TuringDispenser;
+
+[UsedImplicitly]
+public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
+{
+    private const string TrashIcon = "/Textures/_RMC14/Interface/Icons/trash.svg.192dpi.png";
+    private const string TrashIconWhite = "/Textures/_RMC14/Interface/Icons/trash-white.svg.192dpi.png";
+    private const string PlayIcon = "/Textures/_RMC14/Interface/Icons/play.svg.192dpi.png";
+    private const string PlayIconWhite = "/Textures/_RMC14/Interface/Icons/play-white.svg.192dpi.png";
+    private const string SaveIcon = "/Textures/_RMC14/Interface/Icons/floppy-disk.svg.192dpi.png";
+    private const string SaveIconWhite = "/Textures/_RMC14/Interface/Icons/floppy-disk-white.svg.192dpi.png";
+    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
+    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
+    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/flask.svg.192dpi.png";
+    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/flask-white.svg.192dpi.png";
+    private const string LinkIcon = "/Textures/_RMC14/Interface/Icons/link.svg.192dpi.png";
+    private const string LinkIconWhite = "/Textures/_RMC14/Interface/Icons/link-white.svg.192dpi.png";
+    private const string CycleIcon = "/Textures/_RMC14/Interface/Icons/arrows-rotate.svg.192dpi.png";
+    private const string CycleIconWhite = "/Textures/_RMC14/Interface/Icons/arrows-rotate-white.svg.192dpi.png";
+    private const string StopIcon = "/Textures/_RMC14/Interface/Icons/stop.svg.192dpi.png";
+    private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/stop-white.svg.192dpi.png";
+
+    // Matches RMCVial's SolutionContainerManager maxVol.
+    private const float VialMaxVolume = 30f;
+
+    private static readonly Color HeaderColor = Color.FromHex("#12141A");
+    private static readonly Color GreyButtonFill = Color.FromHex("#bfbfbf");
+    private static readonly Color GreenColor = Color.FromHex("#4CAF50");
+    private static readonly Color TanColor = Color.FromHex("#ffb950");
+    private static readonly Color OrangeColor = Color.FromHex("#C99A29");
+    private static readonly Color RedColor = Color.FromHex("#8B2020");
+
+    private readonly ContainerSystem _container;
+    private readonly IResourceCache _resourceCache;
+    private readonly RMCReagentSystem _rmcReagent;
+    private readonly SolutionContainerSystem _solution;
+    private readonly Font _boldItalicFont;
+
+    private RMCTuringDispenserWindow? _window;
+    private FloatSpinBox? _multiplierSpinBox;
+    private FloatSpinBox? _cyclesSpinBox;
+
+    private IconHandle? _autoRunIcon;
+    private Label? _autoRunLabel;
+    private Label? _smartLinkLabel;
+    private Label? _outputModeLabel;
+
+    public RMCTuringDispenserBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
+    {
+        _container = EntMan.System<ContainerSystem>();
+        _resourceCache = IoCManager.Resolve<IResourceCache>();
+        _rmcReagent = EntMan.System<RMCReagentSystem>();
+        _solution = EntMan.System<SolutionContainerSystem>();
+        _boldItalicFont = _resourceCache.GetFont("/Fonts/NotoSans/NotoSans-BoldItalic.ttf", 12);
+    }
+
+    protected override void Open()
+    {
+        base.Open();
+        _window = this.CreateWindow<RMCTuringDispenserWindow>();
+
+        Header(_window.ControlsHeader);
+        Header(_window.SettingsHeader);
+        Header(_window.MemoryHeader);
+        Header(_window.BoxHeader);
+
+        _window.EnergyBar.ForegroundStyleBoxOverride = Flat(GreenColor);
+
+        GreyButton(_window.ClearMemoryButton);
+        Icon(_window.ClearMemoryButton, TrashIcon, TrashIconWhite, "Clear memory");
+        GreyButton(_window.RunProgramButton);
+        Icon(_window.RunProgramButton, PlayIcon, PlayIconWhite, "Run program");
+        GreyButton(_window.SaveToMemoryButton);
+        Icon(_window.SaveToMemoryButton, SaveIcon, SaveIconWhite, "Save box to memory");
+        GreyButton(_window.EjectBoxButton);
+        Icon(_window.EjectBoxButton, EjectIcon, EjectIconWhite, "Eject box");
+        GreyButton(_window.DisposeBeakerButton);
+        Icon(_window.DisposeBeakerButton, FlaskIcon, FlaskIconWhite, "Flush beaker");
+        GreyButton(_window.EjectBeakerButton);
+        Icon(_window.EjectBeakerButton, EjectIcon, EjectIconWhite, "Eject beaker");
+
+        Toggle(_window.AutoRunButton);
+        _autoRunIcon = IconHandled(_window.AutoRunButton, StopIcon, StopIconWhite, "Autorun: disabled");
+        _autoRunLabel = _autoRunIcon.Label;
+        Toggle(_window.SmartLinkButton);
+        _smartLinkLabel = Icon(_window.SmartLinkButton, LinkIcon, LinkIconWhite, "Smartlink: enabled");
+        Toggle(_window.OutputModeButton);
+        _outputModeLabel = Icon(_window.OutputModeButton, FlaskIcon, FlaskIconWhite, "Outputting to: CONTAINER");
+
+        _window.SaveToMemoryButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserSaveToMemoryBuiMsg());
+        _window.EjectBoxButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserEjectBoxBuiMsg());
+        _window.DisposeBeakerButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserDisposeBeakerBuiMsg());
+        _window.EjectBeakerButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserEjectBeakerBuiMsg());
+        _window.ClearMemoryButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserClearMemoryBuiMsg());
+        _window.RunProgramButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserRunProgramBuiMsg());
+        _window.AutoRunButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserToggleAutoRunBuiMsg());
+        _window.SmartLinkButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserToggleSmartLinkBuiMsg());
+        _window.OutputModeButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserToggleOutputModeBuiMsg());
+
+        FixedPoint2 initialMultiplier = EntMan.TryGetComponent(Owner, out RMCTuringDispenserComponent? comp) ? comp.Multiplier : FixedPoint2.New(1);
+        var multiplier = initialMultiplier.Float();
+        _multiplierSpinBox = UIExtensions.CreateDialSpinBox(multiplier,
+            args => SendPredictedMessage(new RMCTuringDispenserSetMultiplierBuiMsg(FixedPoint2.New(args.Value))));
+        _window.MultiplierContainer.AddChild(_multiplierSpinBox);
+
+        var cycles = comp?.CycleLimit ?? 1;
+        _cyclesSpinBox = UIExtensions.CreateDialSpinBox(cycles,
+            args => SendPredictedMessage(new RMCTuringDispenserSetCyclesBuiMsg((int) args.Value)));
+        _window.CyclesContainer.AddChild(_cyclesSpinBox);
+
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        if (_window is not { IsOpen: true })
+            return;
+
+        if (!EntMan.TryGetComponent(Owner, out RMCTuringDispenserComponent? comp))
+            return;
+
+        var maxEnergy = comp.MaxEnergy;
+        var energy = comp.Energy;
+        _window.EnergyBar.MaxValue = maxEnergy.Float();
+        _window.EnergyBar.Value = energy.Float();
+        _window.EnergyLabel.Text = $"Energy: {(maxEnergy.Float() > 0 ? energy.Float() / maxEnergy.Float() * 100 : 0):0}%";
+
+        var (statusText, statusColor) = comp.Status switch
+        {
+            TuringDispenserStatus.Idle => ("Status: IDLE", TanColor),
+            TuringDispenserStatus.Running => ("Status: RUNNING", OrangeColor),
+            TuringDispenserStatus.Finished => ("Status: FINISHED", GreenColor),
+            TuringDispenserStatus.Stuck => ($"Status: STUCK - {comp.Error}", RedColor),
+            _ => ("Status: IDLE", TanColor),
+        };
+        Row(_window.StatusPanel, _window.StatusLabel, statusText, statusColor, _boldItalicFont);
+
+        UpdateProgramRows(_window.MemoryProgramContainer, _window.MemoryEmptyPanel, _window.MemoryEmptyLabel, comp.MemoryProgram);
+        UpdateProgramRows(_window.BoxProgramContainer, _window.BoxEmptyPanel, _window.BoxEmptyLabel, comp.BoxProgram);
+
+        if (_container.TryGetContainer(Owner, comp.InputBoxSlotId, out var boxContainer) &&
+            boxContainer.ContainedEntities.Count > 0)
+        {
+            Row(_window.BoxAlertPanel, _window.BoxStatusLabel, "Box loaded", TanColor, _boldItalicFont);
+        }
+        else
+        {
+            Row(_window.BoxAlertPanel, _window.BoxStatusLabel, "No input box loaded!", RedColor, _boldItalicFont);
+        }
+
+        if (_container.TryGetContainer(Owner, comp.OutputBeakerSlotId, out var beakerContainer) &&
+            beakerContainer.ContainedEntities.Count > 0 &&
+            _solution.TryGetMixableSolution(beakerContainer.ContainedEntities[0], out _, out var solution))
+        {
+            Row(_window.BeakerAlertPanel, _window.BeakerStatusLabel, $"{solution.Volume}/{solution.MaxVolume} units", TanColor, _boldItalicFont);
+        }
+        else
+        {
+            Row(_window.BeakerAlertPanel, _window.BeakerStatusLabel, "No output beaker loaded!", RedColor, _boldItalicFont);
+        }
+
+        if (_autoRunLabel != null)
+            _autoRunLabel.Text = comp.AutoRun ? "Autorun: enabled" : "Autorun: disabled";
+
+        _autoRunIcon?.SetPath(comp.AutoRun ? CycleIcon : StopIcon, comp.AutoRun ? CycleIconWhite : StopIconWhite);
+
+        if (_smartLinkLabel != null)
+            _smartLinkLabel.Text = comp.SmartLink ? "Smartlink: enabled" : "Smartlink: disabled";
+
+        if (_outputModeLabel != null)
+        {
+            _outputModeLabel.Text = comp.OutputMode switch
+            {
+                TuringDispenserOutputMode.Container => "Outputting to: CONTAINER",
+                TuringDispenserOutputMode.SmartFridge => "Outputting to: SMARTFRIDGE",
+                TuringDispenserOutputMode.Centrifuge => "Outputting to: CENTRIFUGE",
+                _ => "Outputting to: CONTAINER",
+            };
+        }
+
+        if (_multiplierSpinBox != null)
+        {
+            var multiplierValue = comp.Multiplier;
+            _multiplierSpinBox.Value = multiplierValue.Float();
+        }
+
+        if (_cyclesSpinBox != null)
+            _cyclesSpinBox.Value = comp.CycleLimit;
+    }
+
+    private void UpdateProgramRows(BoxContainer container, Control emptyPanel, Label emptyLabel, List<TuringProgramEntry> program)
+    {
+        emptyPanel.Visible = program.Count == 0;
+        if (program.Count == 0)
+            Row(emptyPanel, emptyLabel, emptyLabel.Text ?? string.Empty, RedColor, _boldItalicFont);
+
+        for (var i = 0; i < program.Count; i++)
+        {
+            var entry = program[i];
+            RMCTuringDispenserProgramRow row;
+            if (i < container.ChildCount)
+            {
+                row = (RMCTuringDispenserProgramRow) container.GetChild(i);
+            }
+            else
+            {
+                row = new RMCTuringDispenserProgramRow();
+                container.AddChild(row);
+            }
+
+            var name = entry.Reagent.Id;
+            var fillColor = Color.White;
+            if (_rmcReagent.TryIndex(entry.Reagent, out var reagent))
+            {
+                name = reagent.LocalizedName;
+                fillColor = reagent.SubstanceColor;
+            }
+
+            row.ReagentLabel.Text = name;
+            row.AmountLabel.Text = $"{entry.Amount}u";
+            row.VialFillIcon.ModulateSelfOverride = fillColor;
+            row.SetFillFraction(entry.Amount.Float() / VialMaxVolume);
+        }
+
+        container.RemoveChildrenAfter(program.Count);
+    }
+
+    private static void Header(PanelContainer panel)
+    {
+        panel.PanelOverride = Flat(HeaderColor);
+    }
+
+    private static void GreyButton(Button button)
+    {
+        button.StyleBoxOverride = Flat(GreyButtonFill);
+        button.ModulateSelfOverride = Color.White;
+    }
+
+    private static void Toggle(Button button)
+    {
+        button.StyleBoxOverride = Flat(TanColor);
+        button.ModulateSelfOverride = Color.White;
+    }
+
+    private static void Row(Control panelControl, Label label, string text, Color color, Font font)
+    {
+        label.Text = text;
+        label.FontColorOverride = color == RedColor ? Color.White : Color.Black;
+        label.FontOverride = font;
+
+        if (panelControl is PanelContainer panel)
+            panel.PanelOverride = Flat(color);
+    }
+
+    private Label Icon(Button button, string texturePath, string whiteTexturePath, string text)
+    {
+        return IconHandled(button, texturePath, whiteTexturePath, text).Label;
+    }
+
+    /// <summary>
+    /// Builds a left-aligned icon+label row inside a button, and wires hover so the icon swaps to its
+    /// white variant while the mouse is over the button.
+    /// </summary>
+    private IconHandle IconHandled(Button button, string texturePath, string whiteTexturePath, string text)
+    {
+        button.Text = null;
+
+        var row = new BoxContainer
+        {
+            Orientation = BoxContainer.LayoutOrientation.Horizontal,
+            HorizontalAlignment = Control.HAlignment.Left,
+            VerticalAlignment = Control.VAlignment.Center,
+            SeparationOverride = 6,
+        };
+
+        var texture = new TextureRect
+        {
+            Stretch = TextureRect.StretchMode.KeepAspectCentered,
+            SetSize = new Vector2(14, 14),
+            VerticalAlignment = Control.VAlignment.Center,
+        };
+        row.AddChild(texture);
+
+        var label = new Label
+        {
+            Text = text,
+            FontColorOverride = Color.Black,
+            VerticalAlignment = Control.VAlignment.Center,
+        };
+        row.AddChild(label);
+
+        button.AddChild(row);
+
+        var handle = new IconHandle(_resourceCache, texture, label);
+        handle.SetPath(texturePath, whiteTexturePath);
+
+        button.OnMouseEntered += _ => handle.SetHovered(true);
+        button.OnMouseExited += _ => handle.SetHovered(false);
+
+        return handle;
+    }
+
+    private static StyleBoxFlat Flat(Color color)
+    {
+        return new StyleBoxFlat
+        {
+            BackgroundColor = color,
+            ContentMarginLeftOverride = 6,
+            ContentMarginRightOverride = 6,
+            ContentMarginTopOverride = 1,
+            ContentMarginBottomOverride = 1,
+        };
+    }
+
+    /// <summary>
+    /// Tracks a button icon's normal and hover (white) texture paths explicitly, so hover and dynamic
+    /// icon changes (e.g. Autorun's rotate/stop swap) both resolve to the correct texture.
+    /// </summary>
+    private sealed class IconHandle
+    {
+        private readonly IResourceCache _resourceCache;
+        private readonly TextureRect _texture;
+        public readonly Label Label;
+
+        private string _path = "";
+        private string _whitePath = "";
+        private bool _hovered;
+
+        public IconHandle(IResourceCache resourceCache, TextureRect texture, Label label)
+        {
+            _resourceCache = resourceCache;
+            _texture = texture;
+            Label = label;
+        }
+
+        public void SetPath(string path, string whitePath)
+        {
+            _path = path;
+            _whitePath = whitePath;
+            Apply();
+        }
+
+        public void SetHovered(bool hovered)
+        {
+            _hovered = hovered;
+            Apply();
+        }
+
+        private void Apply()
+        {
+            _texture.Texture = _resourceCache.GetTexture(_hovered ? _whitePath : _path);
+        }
+    }
+}
