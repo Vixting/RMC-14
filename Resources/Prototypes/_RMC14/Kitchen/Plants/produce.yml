@@ -95,6 +95,11 @@
   - type: Tag
     tags:
     - Vegetable
+  - type: MeleeWeapon
+    wideAnimationRotation: 135
+    damage:
+      types:
+        Heat: 1
 
 - type: entity
   name: bundle of grass
@@ -108,6 +113,52 @@
     heldPrefix: produce
   - type: Produce
     seedId: grass
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: S'randar's Hand
+  parent: FoodProduceBase
+  id: FoodShand
+  description: A succulent medicinal herb with remarkable regenerative properties. Bitter to the taste, but effective.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Bicaridine
+          Quantity: 5
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/shand.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: shand
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: Messa's Tear
+  parent: FoodProduceBase
+  id: FoodMtear
+  description: A small, translucent berry said to have been named after a Unathi goddess. Relieves burns and pain.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Nutriment
+          Quantity: 2
+        - ReagentId: Kelotane
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/mtear.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: mtear
   - type: Tag
     tags:
     - Vegetable
@@ -149,3 +200,349 @@
     entries:
       Taco: RMCMango
       Burger: RMCMangoBurger
+
+- type: entity
+  name: ice pepper
+  parent: FoodProduceBase
+  id: RMCFoodIcePepper
+  description: A chili pepper that grows in frigid conditions, producing a numbing chill rather than heat.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: FrostOil
+          Quantity: 5
+        - ReagentId: Nutriment
+          Quantity: 2
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/chiliice.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: chiliice
+  - type: Tag
+    tags:
+    - Fruit
+
+- type: entity
+  name: glowberry
+  parent: FoodProduceBase
+  id: RMCFoodGlowberry
+  description: A luminescent berry. Beautiful, and dangerously radioactive. Do not eat.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Radium
+          Quantity: 3
+        - ReagentId: Uranium
+          Quantity: 2
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/glowberry.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: glowberry
+  - type: Tag
+    tags:
+    - Fruit
+
+- type: entity
+  name: poisonberry
+  parent: FoodProduceBase
+  id: RMCFoodPoisonberry
+  description: A bright red berry. The colour is nature's warning. Don't eat it.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Toxin
+          Quantity: 5
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/poisonberry.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: poisonberry
+  - type: Tag
+    tags:
+    - Fruit
+
+- type: entity
+  name: deathberry
+  parent: FoodProduceBase
+  id: RMCFoodDeathberry
+  description: A deep purple berry with a glossy sheen. Consumption is invariably fatal.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Amatoxin
+          Quantity: 3
+        - ReagentId: Toxin
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/deathberry.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: deathberry
+  - type: Tag
+    tags:
+    - Fruit
+
+- type: entity
+  name: bluespace tomato
+  parent: FoodProduceBase
+  id: RMCFoodBluespaceTomato
+  description: A tomato infused with bluespace energy. Eating it may cause... unexpected spatial side effects.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Singulo
+          Quantity: 2
+        - ReagentId: SpaceDrugs
+          Quantity: 2
+        - ReagentId: Nutriment
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/bluespacetomato.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: bluespacetomato
+  - type: Tag
+    tags:
+    - Fruit
+
+- type: entity
+  name: mold
+  parent: FoodProduceBase
+  id: RMCFoodMold
+  description: A clump of common mold. Technically edible. Barely.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Nutriment
+          Quantity: 5
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/mold.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: mold
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: reishi mushroom
+  parent: FoodProduceBase
+  id: RMCFoodReishi
+  description: A woody, fan-shaped mushroom with a glossy surface. Known for its psychoactive properties.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: SpaceDrugs
+          Quantity: 2
+        - ReagentId: Nutriment
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/reishi.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: reishi
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: liberty cap
+  parent: FoodProduceBase
+  id: RMCFoodLiberty
+  description: A small, conical mushroom with a distinctive nipple at the cap. Highly psychoactive.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: SpaceDrugs
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/liberty.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: liberty
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: destroying angel
+  parent: FoodProduceBase
+  id: RMCFoodAngel
+  description: A pristine white mushroom of terrifying beauty. One cap contains enough amatoxin to kill several humans.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Amatoxin
+          Quantity: 5
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/angel.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: angel
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: glowshroom
+  parent: FoodProduceBase
+  id: RMCFoodGlowshroom
+  description: A bioluminescent mushroom that emits a soft blue glow. The glow comes from uranium compounds in its flesh.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Radium
+          Quantity: 3
+        - ReagentId: Uranium
+          Quantity: 2
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/glowshroom.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: glowshroom
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: plastellium
+  parent: FoodProduceBase
+  id: RMCFoodPlastellium
+  description: A strange tuberous plant that accumulates plastic compounds in its flesh. Useful if you're desperate.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Nutriment
+          Quantity: 5
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/plastellium.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: plastellium
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: harebell
+  parent: FoodProduceBase
+  id: RMCFoodHarebell
+  description: A delicate blue bell-shaped flower. Its extract induces deep, restful sleep.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Lexorin
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/harebell.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: harebell
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: green grape
+  parent: FoodProduceBase
+  id: RMCFoodGreengrape
+  description: A bunch of fresh green grapes. Crisp and slightly tart.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Nutriment
+          Quantity: 5
+        - ReagentId: Vitamin
+          Quantity: 2
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/greengrape.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: greengrape
+  - type: Tag
+    tags:
+    - Fruit
+
+- type: entity
+  name: kudzu pod
+  parent: FoodProduceBase
+  id: RMCFoodKudzu
+  description: A seed pod from kudzu vine. Starchy and filling, if you can stop the vine from taking over everything first.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Nutriment
+          Quantity: 3
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/kudzu.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: kudzu
+  - type: Tag
+    tags:
+    - Vegetable
+
+- type: entity
+  name: weeds
+  parent: FoodProduceBase
+  id: RMCFoodWeeds
+  description: A clump of common weeds. Technically edible in a survival situation.
+  components:
+  - type: SolutionContainerManager
+    solutions:
+      food:
+        reagents:
+        - ReagentId: Nutriment
+          Quantity: 2
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/weeds.rsi
+  - type: Item
+    heldPrefix: produce
+  - type: Produce
+    seedId: weeds
+  - type: Tag
+    tags:
+    - Vegetable

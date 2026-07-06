@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Damage;
+using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -37,5 +38,11 @@ public sealed partial class Corrosive : RMCChemicalEffect
         var damage = new DamageSpecifier();
         damage.DamageDict[CausticType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
+    }
+
+    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        plant.Health -= (float) potency;
+        plant.Toxins += (float) potency;
     }
 }

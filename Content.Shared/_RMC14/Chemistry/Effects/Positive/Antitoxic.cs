@@ -1,6 +1,7 @@
 ﻿using Content.Shared._RMC14.Body;
 using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Stun;
+using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -24,6 +25,12 @@ public sealed partial class Antitoxic : RMCChemicalEffect
         return $"Heals [color=green]{healing}[/color] toxin damage and removes [color=green]0.125[/color] units of toxic chemicals from the bloodstream.\n" +
                //$"Overdoses cause [color=red]{PotencyPerSecond}[/color] damage to the eyes.\n" +
                $"Critical overdoses cause [color=red]5[/color] seconds of unconsciousness with a [color=red]5%[/color] chance";
+    }
+
+    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (plant.Toxins > 0)
+            plant.Toxins = MathF.Max(0f, plant.Toxins - (float) potency);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

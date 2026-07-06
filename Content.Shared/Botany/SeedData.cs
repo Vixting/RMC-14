@@ -1,5 +1,3 @@
-using Content.Server.Botany.Components;
-using Content.Server.Botany.Systems;
 using Content.Shared.Atmos;
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
@@ -10,9 +8,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.List;
 using Robust.Shared.Utility;
 
-using Content.Server.EntityEffects;
-
-namespace Content.Server.Botany;
+namespace Content.Shared.Botany;
 
 [Prototype]
 public sealed partial class SeedPrototype : SeedData, IPrototype
@@ -82,9 +78,7 @@ public partial struct SeedChemQuantity
     [DataField("Inherent")] public bool Inherent = true;
 }
 
-// TODO reduce the number of friends to a reasonable level. Requires ECS-ing things like plant holder component.
 [Virtual, DataDefinition]
-[Access(typeof(BotanySystem), typeof(PlantHolderSystem), typeof(SeedExtractorSystem), typeof(PlantHolderComponent), typeof(EntityEffectSystem), typeof(MutationSystem))]
 public partial class SeedData
 {
     #region Tracking
@@ -121,6 +115,13 @@ public partial class SeedData
     /// </summary>
     [ViewVariables]
     public bool Unique = false; // seed-prototypes or yaml-defined seeds for entity prototypes will not generally be unique.
+
+    /// <summary>
+    ///     How many times this seed has had genes applied via the Bioballistic Delivery System.
+    ///     Used as a percentage failure chance (0 = 0%, 100 = 100%). Past 100 the seed is ruined.
+    /// </summary>
+    [DataField]
+    public int GeneEditCount;
     #endregion
 
     #region Output
@@ -203,13 +204,30 @@ public partial class SeedData
     //public PlantSpread Spread { get; set; }
     //public PlantMutation Mutation { get; set; }
     //public float AlterTemperature { get; set; }
-    //public PlantCarnivorous Carnivorous { get; set; }
-    //public bool Parasite { get; set; }
     //public bool Hematophage { get; set; }
     //public bool Thorny { get; set; }
     //public bool Stinging { get; set; }
     // public bool Teleporting { get; set; }
     // public PlantJuicy Juicy { get; set; }
+
+    /// <summary>
+    ///     0 = not carnivorous, 1 = eats pests, 2 = eats living beings (vine).
+    /// </summary>
+    [DataField]
+    public int Carnivorous;
+
+    /// <summary>
+    ///     If true, the plant gains health from weeds instead of taking damage from them.
+    /// </summary>
+    [DataField]
+    public bool Parasite;
+
+    /// <summary>
+    ///     Controls which mutations can fire on this plant. Keys are mutation type names.
+    ///     Values: &gt; 0 = enabled (boosts probability), 0 = default random chance, &lt; 0 = suppressed (won't fire).
+    /// </summary>
+    [DataField]
+    public Dictionary<string, float> MutationController = new();
 
     #endregion
 
@@ -300,6 +318,9 @@ public partial class SeedData
             Seedless = Seedless,
             Viable = Viable,
             Ligneous = Ligneous,
+            Carnivorous = Carnivorous,
+            Parasite = Parasite,
+            MutationController = new Dictionary<string, float>(MutationController),
 
             PlantRsi = PlantRsi,
             PlantIconState = PlantIconState,
@@ -307,6 +328,7 @@ public partial class SeedData
             TurnIntoKudzu = TurnIntoKudzu,
             SplatPrototype = SplatPrototype,
             Mutations = new List<RandomPlantMutation>(),
+            GeneEditCount = GeneEditCount,
 
             // Newly cloned seed is unique. No need to unnecessarily clone if repeatedly modified.
             Unique = true,
@@ -363,6 +385,9 @@ public partial class SeedData
             Seedless = Seedless,
             Viable = Viable,
             Ligneous = Ligneous,
+            Carnivorous = Carnivorous,
+            Parasite = Parasite,
+            MutationController = new Dictionary<string, float>(MutationController),
 
             PlantRsi = other.PlantRsi,
             PlantIconState = other.PlantIconState,

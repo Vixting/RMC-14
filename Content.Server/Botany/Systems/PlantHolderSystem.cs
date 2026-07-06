@@ -1,5 +1,7 @@
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Botany.Components;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Server.Hands.Systems;
 using Content.Server.Kitchen.Components;
 using Content.Server.Popups;
@@ -390,11 +392,21 @@ public sealed class PlantHolderSystem : EntitySystem
 
         if (component.ForceUpdate)
             component.ForceUpdate = false;
-        else if (curTime < (component.LastCycle + component.CycleDelay))
+        else
         {
-            if (component.UpdateSpriteAfterUpdate)
-                UpdateSprite(uid, component);
-            return;
+            var adjustedDelay = component.CycleDelay + TimeSpan.FromSeconds(component.MetabolismAdjust);
+            if (curTime < (component.LastCycle + adjustedDelay))
+            {
+                if (component.UpdateSpriteAfterUpdate)
+                    UpdateSprite(uid, component);
+                return;
+            }
+
+            // Decay MetabolismAdjust back toward zero each cycle.
+            if (component.MetabolismAdjust > 0)
+                component.MetabolismAdjust = MathF.Max(0f, component.MetabolismAdjust - 5f);
+            else if (component.MetabolismAdjust < 0)
+                component.MetabolismAdjust = MathF.Min(0f, component.MetabolismAdjust + 5f);
         }
 
         component.LastCycle = curTime;
@@ -606,8 +618,13 @@ public sealed class PlantHolderSystem : EntitySystem
         // Weed levels.
         if (component.PestLevel > 0)
         {
-            // TODO: Carnivorous plants?
-            if (component.PestLevel > component.Seed.PestTolerance)
+            if (component.Seed.Carnivorous > 0)
+            {
+                // Carnivorous plants eat pests instead of being harmed by them.
+                component.PestLevel -= HydroponicsSpeedMultiplier;
+                component.Health += HydroponicsSpeedMultiplier * 0.5f;
+            }
+            else if (component.PestLevel > component.Seed.PestTolerance)
             {
                 component.Health -= HydroponicsSpeedMultiplier;
             }
@@ -619,8 +636,12 @@ public sealed class PlantHolderSystem : EntitySystem
         // Weed levels.
         if (component.WeedLevel > 0)
         {
-            // TODO: Parasitic plants.
-            if (component.WeedLevel >= component.Seed.WeedTolerance)
+            if (component.Seed.Parasite)
+            {
+                // Parasitic plants gain health from weeds.
+                component.Health += HydroponicsSpeedMultiplier * 0.5f;
+            }
+            else if (component.WeedLevel >= component.Seed.WeedTolerance)
             {
                 component.Health -= HydroponicsSpeedMultiplier;
             }

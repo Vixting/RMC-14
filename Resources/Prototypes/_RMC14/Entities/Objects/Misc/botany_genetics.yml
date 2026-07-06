@@ -1,0 +1,38 @@
+- type: entity
+  parent: BoxBase
+  id: RMCFloraDataDiscBox
+  name: flora data disc box
+  description: A cardboard box containing fourteen flora data discs for use with the Lysis Isolation Centrifuge.
+  components:
+  - type: Sprite
+    sprite: Objects/Storage/boxes.rsi
+    state: box
+  - type: StorageFill
+    contents:
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+    - id: RMCFloraDataDisc
+
+- type: entity
+  id: RMCFloraDataDisc
+  parent: BaseItem
+  name: flora data disc
+  description: A small data disc used to store and transfer plant genetic sequences extracted by the Lysis Isolation Centrifuge.
+  components:
+  - type: Sprite
+    sprite: Objects/Tools/Hydroponics/disk.rsi
+    state: disk
+  - type: Item
+    size: Tiny
+  - type: FloraDataDisc

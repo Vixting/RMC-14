@@ -1,4 +1,5 @@
-﻿using Content.Shared.Damage;
+﻿using Content.Shared.Botany.Components;
+using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 
@@ -37,6 +38,13 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         var boost = CalculateReagentBoost(reagentArgs);
         _moddedPotency = Potency + boost;
         var scaledPotency = PotencyPerSecond * scale;
+
+        if (args.EntityManager.TryGetComponent<PlantHolderComponent>(args.TargetEntity, out var plant))
+        {
+            TickHydroTray(plant, scaledPotency, reagentArgs);
+            return;
+        }
+
         Tick(damageable, scaledPotency, reagentArgs);
 
         var totalQuantity = FixedPoint2.Zero;
@@ -70,6 +78,10 @@ public abstract partial class RMCChemicalEffect : EntityEffect
     }
 
     protected virtual void ReagentBoost(EntityEffectReagentArgs args, ref float boost)
+    {
+    }
+
+    protected virtual void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
     }
 

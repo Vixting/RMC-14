@@ -46,6 +46,9 @@
   unknown: true
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Biocidic
+    potency: 4.0
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -80,6 +83,9 @@
   color: "#808080"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Toxic
+    potency: 4.0
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -146,6 +152,8 @@
   color: "#a19d94"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Hemogenic {}
   metabolisms:
     Medicine:
       metabolismRate: 0.1
@@ -254,6 +262,11 @@
   flavor: metallic
   color: "#C7C7C7"
   unknown: true
+  plantMetabolism:
+  - !type:Carcinogenic
+    potency: 8.0
+  - !type:Hemorrhaging
+    potency: 4.0
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -340,6 +353,9 @@
   flavor: metallic
   color: "#B8B8C0"
   unknown: true
+  plantMetabolism:
+  - !type:Carcinogenic
+    potency: 8.0
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -444,6 +460,9 @@
   flavor: sweet
   color: white
   unknown: true # Yes a health analyzer can't detect sugar. How about that
+  plantMetabolism:
+  - !type:Nutritious
+    potency: 4.0
   metabolisms:
     Food:
       metabolismRate: 0.1
@@ -468,6 +487,11 @@
   color: "#DB5008"
   unknown: true
   toxin: true
+  plantMetabolism:
+  - !type:Toxic
+    potency: 4.0
+  - !type:Corrosive
+    potency: 12.0
   metabolisms:
     #TODO hurts on inject equal to amount
     Poison:

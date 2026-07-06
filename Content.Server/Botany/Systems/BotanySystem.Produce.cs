@@ -1,4 +1,6 @@
 using Content.Server.Botany.Components;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Shared.EntityEffects;
 using Content.Shared.Examine;
 using Content.Shared.FixedPoint;

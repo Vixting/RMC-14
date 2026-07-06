@@ -1,0 +1,16 @@
+- type: entity
+  parent: BaseItem
+  id: RMCAutoHarvestUpgrade
+  name: auto harvest upgrade
+  description: A small mechanical module that attaches to a hydroponics tray and automatically collects plant products when they are ready. Use it on a tray to install it.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/module.rsi
+    state: datadisk_hydro
+  - type: Item
+    size: Tiny
+    sprite: Objects/Misc/module.rsi
+  - type: RMCAutoHarvestUpgrade
+  - type: PhysicalComposition
+    materialComposition:
+      CMSteel: 50

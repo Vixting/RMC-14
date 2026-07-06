@@ -4,7 +4,8 @@ using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
 using Content.Server.Botany;
-using Content.Server.Botany.Components;
+using Content.Shared.Botany;
+using Content.Shared.Botany.Components;
 using Content.Server.Botany.Systems;
 using Content.Server.Chat.Systems;
 using Content.Server.Emp;
@@ -82,6 +83,7 @@ public sealed class EntityEffectSystem : EntitySystem
         SubscribeLocalEvent<CheckEntityEffectConditionEvent<TemperatureCondition>>(OnCheckTemperature);
         SubscribeLocalEvent<CheckEntityEffectConditionEvent<Breathing>>(OnCheckBreathing);
         SubscribeLocalEvent<CheckEntityEffectConditionEvent<OrganType>>(OnCheckOrganType);
+        SubscribeLocalEvent<ExecuteEntityEffectEvent<PlantMutationController>>(OnExecutePlantMutationController);
         SubscribeLocalEvent<ExecuteEntityEffectEvent<PlantAdjustHealth>>(OnExecutePlantAdjustHealth);
         SubscribeLocalEvent<ExecuteEntityEffectEvent<PlantAdjustMutationLevel>>(OnExecutePlantAdjustMutationLevel);
         SubscribeLocalEvent<ExecuteEntityEffectEvent<PlantAdjustMutationMod>>(OnExecutePlantAdjustMutationMod);
@@ -973,5 +975,32 @@ public sealed class EntityEffectSystem : EntitySystem
                 return;
 
         _narcolepsy.AdjustNarcolepsyTimer(args.Args.TargetEntity, args.Effect.TimerReset);
+    }
+
+    private void OnExecutePlantMutationController(ref ExecuteEntityEffectEvent<PlantMutationController> args)
+    {
+        if (!CanMetabolizePlant(args.Args.TargetEntity, out var comp))
+            return;
+
+        if (comp.Seed == null)
+            return;
+
+        _plantHolder.EnsureUniqueSeed(args.Args.TargetEntity, comp);
+        var controller = comp.Seed!.MutationController;
+
+        foreach (var slot in args.Effect.Slots)
+        {
+            var current = controller.GetValueOrDefault(slot, 0f);
+            if (args.Effect.Enable)
+            {
+                if (current < args.Effect.EnableValue)
+                    controller[slot] = args.Effect.EnableValue;
+            }
+            else
+            {
+                if (current > args.Effect.SuppressValue)
+                    controller[slot] = args.Effect.SuppressValue;
+            }
+        }
     }
 }

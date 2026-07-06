@@ -1,0 +1,124 @@
+- type: entity
+  id: RMCLysisCentrifuge
+  parent: CMBaseStructure
+  name: Lysis Isolation Centrifuge
+  description: A specialized centrifuge that isolates and extracts genetic sequences from plant samples for later use. Insert a seed packet to scan the genome, then use a flora data disc to extract specific gene types. Each extraction degrades the genetic buffer.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Structures/hydroponics.rsi
+    drawdepth: SmallObjects
+    snapCardinals: true
+    layers:
+    - state: traitcopier
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.4,0.25,0.4"
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: LysisCentrifuge
+  - type: ContainerContainer
+    containers:
+      centrifuge_disc: !type:ContainerSlot
+      centrifuge_seed: !type:ContainerSlot
+  - type: ActivatableUI
+    key: enum.LysisCentrifugeUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.LysisCentrifugeUiKey.Key:
+        type: LysisCentrifugeBui
+  - type: RMCPowerReceiver
+    idleLoad: 5
+    activeLoad: 200
+    channel: Equipment
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+
+- type: entity
+  id: RMCGeneEditor
+  parent: CMBaseStructure
+  name: Bioballistic Delivery System
+  description: A precision gene-delivery apparatus that uses bioballistic methods to splice extracted genetic sequences into a target seed. Load a flora data disc and a seed packet, then trigger the application. Repeated edits increase the risk of catastrophic failure.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Structures/hydroponics.rsi
+    drawdepth: SmallObjects
+    snapCardinals: true
+    layers:
+    - state: traitgun
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.4,0.25,0.4"
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: ContainerContainer
+    containers:
+      gene_editor_disc: !type:ContainerSlot
+      gene_editor_seed: !type:ContainerSlot
+  - type: GeneEditor
+  - type: ActivatableUI
+    key: enum.GeneEditorUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.GeneEditorUiKey.Key:
+        type: GeneEditorBui
+  - type: RMCPowerReceiver
+    idleLoad: 5
+    activeLoad: 200
+    channel: Equipment
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+
+- type: entity
+  id: RMCSeedExtractor
+  parent: CMBaseStructure
+  name: seed extractor
+  description: Extracts seed packets from plant produce.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Structures/hydroponics.rsi
+    drawdepth: SmallObjects
+    snapCardinals: true
+    layers:
+    - state: sextractor
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.4,0.25,0.4"
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: SeedExtractor
+  - type: RMCPowerReceiver
+    idleLoad: 5
+    activeLoad: 50
+    channel: Equipment
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
