@@ -149,10 +149,6 @@ public sealed class RMCCentrifugeBui : BoundUserInterface, IRefreshableBui
         };
     }
 
-    /// <summary>
-    /// Builds a left-aligned icon+label row inside a button, and wires hover so the icon swaps to its
-    /// white variant while the mouse is over the button.
-    /// </summary>
     private Label Icon(Button button, string texturePath, string whiteTexturePath, string text)
     {
         button.Text = null;

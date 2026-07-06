@@ -7,6 +7,7 @@ using Content.Shared.Containers.ItemSlots;
 using Content.Shared.FixedPoint;
 using Content.Shared.Popups;
 using Content.Shared.Storage;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
@@ -15,9 +16,10 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared._RMC14.Chemistry.Centrifuge;
 
-public abstract class SharedRMCCentrifugeSystem : EntitySystem
+public sealed class SharedRMCCentrifugeSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
@@ -29,11 +31,15 @@ public abstract class SharedRMCCentrifugeSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedRMCTuringDispenserSystem _turing = default!;
 
+    private readonly HashSet<Entity<RMCCentrifugeComponent>> _centrifuges = new();
+    private readonly HashSet<Entity<RMCTuringDispenserComponent>> _turings = new();
+
     public override void Initialize()
     {
         SubscribeLocalEvent<RMCCentrifugeComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<RMCCentrifugeComponent, EntInsertedIntoContainerMessage>(OnEntInserted);
         SubscribeLocalEvent<RMCCentrifugeComponent, EntRemovedFromContainerMessage>(OnEntRemoved);
+        SubscribeLocalEvent<RMCCentrifugeComponent, ItemSlotInsertAttemptEvent>(OnInsertAttempt);
 
         Subs.BuiEvents<RMCCentrifugeComponent>(RMCCentrifugeUi.Key,
             subs =>
@@ -60,8 +66,9 @@ public abstract class SharedRMCCentrifugeSystem : EntitySystem
         if (ent.Comp.TuringDispenser != null)
             return;
 
-        var turings = _entityLookup.GetEntitiesInRange<RMCTuringDispenserComponent>(Transform(ent).Coordinates, ent.Comp.TetherRange);
-        foreach (var turing in turings)
+        _turings.Clear();
+        _entityLookup.GetEntitiesInRange(Transform(ent).Coordinates, ent.Comp.TetherRange, _turings);
+        foreach (var turing in _turings)
         {
             ent.Comp.TuringDispenser = turing.Owner;
             Dirty(ent);
@@ -70,12 +77,11 @@ public abstract class SharedRMCCentrifugeSystem : EntitySystem
         }
     }
 
-    /// <summary>
-    /// Used by the Turing Dispenser's output-mode toggle to know whether a centrifuge exists nearby to feed.
-    /// </summary>
     public bool HasNearbyCentrifuge(EntityCoordinates coords, float range)
     {
-        return _entityLookup.GetEntitiesInRange<RMCCentrifugeComponent>(coords, range).Count > 0;
+        _centrifuges.Clear();
+        _entityLookup.GetEntitiesInRange(coords, range, _centrifuges);
+        return _centrifuges.Count > 0;
     }
 
     private bool TuringReady(Entity<RMCCentrifugeComponent> ent)
@@ -98,6 +104,24 @@ public abstract class SharedRMCCentrifugeSystem : EntitySystem
         }
 
         return _turing.IsReadyForCentrifuge((turingUid, turingComp));
+    }
+
+    private void OnInsertAttempt(Entity<RMCCentrifugeComponent> ent, ref ItemSlotInsertAttemptEvent args)
+    {
+        if (args.Cancelled)
+            return;
+
+        var comp = ent.Comp;
+        var slotId = args.Slot.ContainerSlot?.ID;
+
+        if (comp.Spinning)
+        {
+            args.Cancelled = true;
+            return;
+        }
+
+        if (slotId == comp.InputSlotId && comp.InputSource == CentrifugeInputSource.Turing)
+            args.Cancelled = true;
     }
 
     private void OnEntInserted(Entity<RMCCentrifugeComponent> ent, ref EntInsertedIntoContainerMessage args)
@@ -188,6 +212,7 @@ public abstract class SharedRMCCentrifugeSystem : EntitySystem
         comp.FinishAt = _timing.CurTime + comp.SpinDuration;
         Dirty(ent);
         UpdateAppearance(ent);
+        _audio.PlayPvs(comp.SpinSound, ent);
     }
 
     private void UpdateAppearance(Entity<RMCCentrifugeComponent> ent)
@@ -388,6 +413,9 @@ public abstract class SharedRMCCentrifugeSystem : EntitySystem
                 }
                 else
                 {
+                    if (turingComp.Status != TuringDispenserStatus.Running)
+                        _audio.PlayPvs(comp.RequestRunSound, ent);
+
                     _turing.RequestRun((turingUid, turingComp));
                 }
 

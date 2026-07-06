@@ -1,6 +1,8 @@
 using Content.Shared._RMC14.Chemistry.Centrifuge;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared._RMC14.Chemistry.SmartFridge;
+using Content.Shared._RMC14.Medical.Refill;
+using Content.Shared._RMC14.Vendors;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
@@ -9,16 +11,19 @@ using Content.Shared.FixedPoint;
 using Content.Shared.Storage;
 using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Shared._RMC14.Chemistry.TuringDispenser;
 
-public abstract class SharedRMCTuringDispenserSystem : EntitySystem
+public sealed class SharedRMCTuringDispenserSystem : EntitySystem
 {
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedRMCCentrifugeSystem _centrifuge = default!;
+    [Dependency] private readonly CMRefillableSolutionSystem _cmRefillable = default!;
+    [Dependency] private readonly SharedCMAutomatedVendorSystem _cmVendor = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
@@ -30,6 +35,15 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
 
     private static readonly EntProtoId VialPrototype = "RMCVial";
+
+    public static readonly (EntProtoId Id, FixedPoint2 MaxVol, bool VendorStocked)[] BeakerOptions =
+    [
+        ("RMCVial", 30, false),
+        ("CMBeaker", 60, true),
+        ("CMBeakerLarge", 120, true),
+    ];
+
+    private readonly HashSet<Entity<RMCSmartFridgeComponent>> _smartFridges = new();
 
     public override void Initialize()
     {
@@ -52,6 +66,7 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
                 subs.Event<RMCTuringDispenserToggleAutoRunBuiMsg>(OnToggleAutoRunMsg);
                 subs.Event<RMCTuringDispenserToggleSmartLinkBuiMsg>(OnToggleSmartLinkMsg);
                 subs.Event<RMCTuringDispenserToggleOutputModeBuiMsg>(OnToggleOutputModeMsg);
+                subs.Event<RMCTuringDispenserSetPreferredBeakerBuiMsg>(OnSetPreferredBeakerMsg);
             });
     }
 
@@ -60,6 +75,7 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         _container.EnsureContainer<ContainerSlot>(ent, ent.Comp.InputBoxSlotId);
         _container.EnsureContainer<ContainerSlot>(ent, ent.Comp.OutputBeakerSlotId);
         ent.Comp.NextRecharge = _timing.CurTime + ent.Comp.RechargeEvery;
+        ent.Comp.NextProcess = _timing.CurTime;
     }
 
     private void OnInsertAttempt(Entity<RMCTuringDispenserComponent> ent, ref ItemSlotInsertAttemptEvent args)
@@ -87,7 +103,6 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
             return;
         }
 
-        // Matches CM's attackby: once both a box and a beaker are loaded, autorun starts the program for you.
         if (ent.Comp is { AutoRun: true, OutputMode: TuringDispenserOutputMode.Container } &&
             ent.Comp.Status is TuringDispenserStatus.Idle or TuringDispenserStatus.Finished &&
             _itemSlots.TryGetSlot(ent, ent.Comp.InputBoxSlotId, out var boxSlot) && boxSlot.ContainerSlot?.ContainedEntity != null &&
@@ -175,10 +190,14 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
             return;
         }
 
+        if (comp.Status == TuringDispenserStatus.Running)
+            return;
+
         comp.Stage = 0;
         comp.Cycle = 0;
         comp.StageMissing = FixedPoint2.Zero;
         comp.Error = null;
+        comp.FlushedContainers.Clear();
         SetStatus(ent, TuringDispenserStatus.Running);
     }
 
@@ -201,10 +220,6 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         StopProgram(ent);
     }
 
-    /// <summary>
-    /// Resets the dispenser back to idle, matching CM's stop_program(): clears stage/cycle/error state and
-    /// flushes the buffer if it was feeding a smartfridge.
-    /// </summary>
     private void StopProgram(Entity<RMCTuringDispenserComponent> ent)
     {
         var comp = ent.Comp;
@@ -300,10 +315,31 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         Dirty(ent);
     }
 
+    private void OnSetPreferredBeakerMsg(Entity<RMCTuringDispenserComponent> ent, ref RMCTuringDispenserSetPreferredBeakerBuiMsg args)
+    {
+        if (args.Beaker is not { } beaker)
+        {
+            ent.Comp.PreferredBeaker = null;
+            Dirty(ent);
+            return;
+        }
+
+        foreach (var option in BeakerOptions)
+        {
+            if (option.Id != beaker)
+                continue;
+
+            ent.Comp.PreferredBeaker = beaker;
+            Dirty(ent);
+            return;
+        }
+    }
+
     private bool HasNearbySmartFridge(Entity<RMCTuringDispenserComponent> ent)
     {
-        var fridges = _entityLookup.GetEntitiesInRange<RMCSmartFridgeComponent>(Transform(ent).Coordinates, ent.Comp.SmartFridgeRange);
-        return fridges.Count > 0;
+        _smartFridges.Clear();
+        _entityLookup.GetEntitiesInRange(Transform(ent).Coordinates, ent.Comp.SmartFridgeRange, _smartFridges);
+        return _smartFridges.Count > 0;
     }
 
     private bool HasNearbyCentrifuge(Entity<RMCTuringDispenserComponent> ent)
@@ -322,35 +358,99 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         var coords = Transform(ent).Coordinates;
         var hasFridge = HasNearbySmartFridge(ent);
 
+        if (!hasFridge)
+        {
+            _solution.RemoveAllSolution(bufferEnt.Value);
+            return;
+        }
+
         while (buffer.Volume > FixedPoint2.Zero)
         {
-            var reagent = buffer.Contents[0].Reagent;
-            var amount = FixedPoint2.Min(FixedPoint2.New(30), buffer.GetReagentQuantity(reagent));
-            if (amount <= FixedPoint2.Zero)
-                break;
+            var remaining = buffer.Volume;
 
-            if (!hasFridge)
-            {
-                _solution.RemoveReagent(bufferEnt.Value, reagent, amount);
-                continue;
-            }
-
-            var vial = Spawn(VialPrototype, coords);
-            if (!_solution.TryGetSolution(vial, "beaker", out var vialSolnEnt, out _))
-            {
-                QueueDel(vial);
-                _solution.RemoveReagent(bufferEnt.Value, reagent, amount);
-                continue;
-            }
-
-            _solution.RemoveReagent(bufferEnt.Value, reagent, amount);
-            _solution.TryAddReagent(vialSolnEnt.Value, reagent.Prototype, amount, data: reagent.Data);
-
-            if (_rmcReagent.TryIndex(reagent.Prototype, out var reagentProto))
-                _metaData.SetEntityName(vial, $"vial ({reagentProto.LocalizedName})");
-
-            _smartFridge.TransferToNearby(coords, ent.Comp.SmartFridgeRange, vial);
+            if (ent.Comp.PreferredBeaker is { } preferred)
+                FlushIntoPreferredBeaker(ent, bufferEnt.Value, coords, remaining, preferred);
+            else
+                FlushIntoAutoBeaker(ent, bufferEnt.Value, coords, remaining);
         }
+    }
+
+    private void FlushIntoPreferredBeaker(Entity<RMCTuringDispenserComponent> ent, Entity<SolutionComponent> bufferEnt, EntityCoordinates coords, FixedPoint2 remaining, EntProtoId preferred)
+    {
+        if (_smartFridge.TryGetEmptyContainerByPrototype(coords, ent.Comp.SmartFridgeRange, preferred, out var existing) &&
+            _solution.TryGetSolution(existing, "beaker", out var existingSolnEnt, out var existingSolution))
+        {
+            BottleInto(ent, bufferEnt, existing, existingSolnEnt.Value, existingSolution, remaining);
+            return;
+        }
+
+        var isVendorStocked = false;
+        foreach (var option in BeakerOptions)
+        {
+            if (option.Id == preferred)
+                isVendorStocked = option.VendorStocked;
+        }
+
+        if (isVendorStocked &&
+            _cmVendor.TryTakeStockedItem(coords, ent.Comp.SmartFridgeRange, preferred, out var vendorBeaker) &&
+            _solution.TryGetSolution(vendorBeaker, "beaker", out var vendorSolnEnt, out var vendorSolution))
+        {
+            BottleInto(ent, bufferEnt, vendorBeaker, vendorSolnEnt.Value, vendorSolution, remaining);
+            _smartFridge.TransferToNearby(coords, ent.Comp.SmartFridgeRange, vendorBeaker);
+            return;
+        }
+
+        FlushIntoFreshVial(ent, bufferEnt, coords, remaining);
+    }
+
+    private void FlushIntoAutoBeaker(Entity<RMCTuringDispenserComponent> ent, Entity<SolutionComponent> bufferEnt, EntityCoordinates coords, FixedPoint2 remaining)
+    {
+        if (_smartFridge.TryGetEmptyContainer(coords, ent.Comp.SmartFridgeRange, remaining, out var existing) &&
+            _solution.TryGetSolution(existing, "beaker", out var existingSolnEnt, out var existingSolution))
+        {
+            BottleInto(ent, bufferEnt, existing, existingSolnEnt.Value, existingSolution, remaining);
+            return;
+        }
+
+        var best = BeakerOptions[^1];
+        foreach (var option in BeakerOptions)
+        {
+            if (option.MaxVol >= remaining)
+            {
+                best = option;
+                break;
+            }
+        }
+
+        FlushIntoPreferredBeaker(ent, bufferEnt, coords, remaining, best.Id);
+    }
+
+    private void FlushIntoFreshVial(Entity<RMCTuringDispenserComponent> ent, Entity<SolutionComponent> bufferEnt, EntityCoordinates coords, FixedPoint2 remaining)
+    {
+        var vial = Spawn(VialPrototype, coords);
+        if (!_solution.TryGetSolution(vial, "beaker", out var vialSolnEnt, out var vialSolution))
+        {
+            QueueDel(vial);
+            _solution.SplitSolution(bufferEnt, FixedPoint2.Min(FixedPoint2.New(30), remaining));
+            return;
+        }
+
+        BottleInto(ent, bufferEnt, vial, vialSolnEnt.Value, vialSolution, remaining);
+        _smartFridge.TransferToNearby(coords, ent.Comp.SmartFridgeRange, vial);
+    }
+
+    private void BottleInto(Entity<RMCTuringDispenserComponent> ent, Entity<SolutionComponent> bufferEnt, EntityUid container, Entity<SolutionComponent> solnEnt, Solution solution, FixedPoint2 remaining)
+    {
+        var amount = FixedPoint2.Min(remaining, solution.AvailableVolume);
+        var split = _solution.SplitSolution(bufferEnt, amount);
+        _solution.TryAddSolution(solnEnt, split);
+        ent.Comp.FlushedContainers.Add(container);
+
+        var baseName = MetaData(container).EntityPrototype?.Name ?? "vial";
+        if (split.Contents.Count == 1 && _rmcReagent.TryIndex(split.Contents[0].Reagent.Prototype, out var reagentProto))
+            _metaData.SetEntityName(container, $"{baseName} ({reagentProto.LocalizedName})");
+        else if (split.Contents.Count > 1)
+            _metaData.SetEntityName(container, $"{baseName} (mixed)");
     }
 
     private bool TryGetTargetSolution(Entity<RMCTuringDispenserComponent> ent, out Entity<SolutionComponent>? solnEnt, out Solution? solution)
@@ -406,17 +506,8 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         ent.Comp.Status = status;
         Dirty(ent);
         _appearance.SetData(ent, TuringDispenserVisuals.Status, status);
-        DispenserUpdated(ent);
     }
 
-    protected virtual void DispenserUpdated(Entity<RMCTuringDispenserComponent> ent)
-    {
-    }
-
-    /// <summary>
-    /// Exposes the dispenser's internal buffer solution to <c>SharedRMCCentrifugeSystem</c> when it's tethered
-    /// and pulling directly from this dispenser instead of a beaker.
-    /// </summary>
     public bool TryGetBufferSolution(Entity<RMCTuringDispenserComponent> ent, out Entity<SolutionComponent>? solnEnt, out Solution? solution)
     {
         return _solution.TryGetSolution(ent.Owner, ent.Comp.BufferSolution, out solnEnt, out solution);
@@ -460,6 +551,11 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         if (comp.Status is TuringDispenserStatus.Idle or TuringDispenserStatus.Finished or TuringDispenserStatus.Stuck)
             return;
 
+        if (time < comp.NextProcess)
+            return;
+
+        comp.NextProcess = time + comp.ProcessEvery;
+
         if (!TryGetTargetSolution(ent, out var targetSolnEnt, out var targetSolution))
         {
             SetStatus(ent, TuringDispenserStatus.Finished);
@@ -467,7 +563,8 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
         }
 
         var guard = 0;
-        while (guard++ < 64)
+        var maxSteps = Math.Max(1, comp.MemoryProgram.Count + comp.BoxProgram.Count);
+        while (guard++ < maxSteps)
         {
             if (comp.Cycle >= comp.CycleLimit)
             {
@@ -506,12 +603,24 @@ public abstract class SharedRMCTuringDispenserSystem : EntitySystem
             }
 
             var fulfilled = FixedPoint2.Zero;
-            if (comp.SmartLink &&
-                _smartFridge.TryDrainStock(Transform(ent).Coordinates, comp.SmartFridgeRange, entry.Reagent, amount, out var drained) &&
-                drained > FixedPoint2.Zero)
+            if (comp.SmartLink)
             {
-                _solution.TryAddReagent(targetSolnEnt!.Value, entry.Reagent, drained);
-                fulfilled = drained;
+                var coords = Transform(ent).Coordinates;
+
+                if (_smartFridge.TryDrainStock(coords, comp.SmartFridgeRange, entry.Reagent, amount, out var drained, comp.FlushedContainers) &&
+                    drained > FixedPoint2.Zero)
+                {
+                    _solution.TryAddReagent(targetSolnEnt!.Value, entry.Reagent, drained);
+                    fulfilled += drained;
+                }
+
+                if (fulfilled < amount &&
+                    _cmRefillable.TryDrainRefiller(coords, comp.SmartFridgeRange, entry.Reagent, amount - fulfilled, out var refilled) &&
+                    refilled > FixedPoint2.Zero)
+                {
+                    _solution.TryAddReagent(targetSolnEnt!.Value, entry.Reagent, refilled);
+                    fulfilled += refilled;
+                }
             }
 
             if (fulfilled < amount)

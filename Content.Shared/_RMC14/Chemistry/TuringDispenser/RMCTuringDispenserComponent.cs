@@ -26,6 +26,12 @@ public sealed partial class RMCTuringDispenserComponent : Component
     public TimeSpan NextRecharge;
 
     [DataField, AutoNetworkedField]
+    public TimeSpan ProcessEvery = TimeSpan.FromSeconds(1.5);
+
+    [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, AutoPausedField]
+    public TimeSpan NextProcess;
+
+    [DataField, AutoNetworkedField]
     public FixedPoint2 CostPerUnit = 0.1;
 
     [DataField, AutoNetworkedField]
@@ -93,4 +99,9 @@ public sealed partial class RMCTuringDispenserComponent : Component
 
     [DataField, AutoNetworkedField]
     public float CentrifugeRange = 20;
+
+    [DataField, AutoNetworkedField]
+    public EntProtoId? PreferredBeaker;
+
+    public HashSet<EntityUid> FlushedContainers = new();
 }

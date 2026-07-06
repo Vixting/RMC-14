@@ -4,13 +4,12 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client._RMC14.Chemistry.Centrifuge;
 
-public sealed class RMCCentrifugeUISystem : SharedRMCCentrifugeSystem
+public sealed class RMCCentrifugeUISystem : EntitySystem
 {
     [Dependency] private readonly RMCUserInterfaceSystem _rmcUI = default!;
 
     public override void Initialize()
     {
-        base.Initialize();
         SubscribeLocalEvent<RMCCentrifugeComponent, AfterAutoHandleStateEvent>(OnAfterState);
     }
 

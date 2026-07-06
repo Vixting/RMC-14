@@ -77,3 +77,9 @@ public sealed class RMCTuringDispenserToggleSmartLinkBuiMsg : BoundUserInterface
 
 [Serializable, NetSerializable]
 public sealed class RMCTuringDispenserToggleOutputModeBuiMsg : BoundUserInterfaceMessage;
+
+[Serializable, NetSerializable]
+public sealed class RMCTuringDispenserSetPreferredBeakerBuiMsg(EntProtoId? beaker) : BoundUserInterfaceMessage
+{
+    public readonly EntProtoId? Beaker = beaker;
+}

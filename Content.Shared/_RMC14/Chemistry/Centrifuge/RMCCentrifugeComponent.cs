@@ -1,3 +1,4 @@
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
@@ -36,4 +37,10 @@ public sealed partial class RMCCentrifugeComponent : Component
 
     [DataField, AutoNetworkedField]
     public TimeSpan SpinDuration = TimeSpan.FromSeconds(4);
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier? RequestRunSound = new SoundPathSpecifier("/Audio/Machines/twobeep.ogg");
+
+    [DataField, AutoNetworkedField]
+    public SoundSpecifier? SpinSound = new SoundPathSpecifier("/Audio/Machines/spinning.ogg");
 }

@@ -1,11 +1,14 @@
+using System.Linq;
 using System.Numerics;
 using Content.Client._RMC14.UserInterface;
 using Content.Client.Chemistry.Containers.EntitySystems;
 using Content.Client.Resources;
 using Content.Client.UserInterface.ControlExtensions;
 using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared._RMC14.Chemistry.SmartFridge;
 using Content.Shared._RMC14.Chemistry.TuringDispenser;
 using Content.Shared._RMC14.UserInterface;
+using Content.Shared._RMC14.Vendors;
 using Content.Shared.FixedPoint;
 using JetBrains.Annotations;
 using Robust.Client.GameObjects;
@@ -13,7 +16,9 @@ using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._RMC14.Chemistry.TuringDispenser;
 
@@ -37,7 +42,6 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
     private const string StopIcon = "/Textures/_RMC14/Interface/Icons/stop.svg.192dpi.png";
     private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/stop-white.svg.192dpi.png";
 
-    // Matches RMCVial's SolutionContainerManager maxVol.
     private const float VialMaxVolume = 30f;
 
     private static readonly Color HeaderColor = Color.FromHex("#12141A");
@@ -46,16 +50,21 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
     private static readonly Color TanColor = Color.FromHex("#ffb950");
     private static readonly Color OrangeColor = Color.FromHex("#C99A29");
     private static readonly Color RedColor = Color.FromHex("#8B2020");
+    private static readonly Color DarkRowColor = Color.FromHex("#22262F");
 
+    private readonly SharedCMAutomatedVendorSystem _cmVendor;
     private readonly ContainerSystem _container;
+    private readonly IPrototypeManager _prototype;
     private readonly IResourceCache _resourceCache;
     private readonly RMCReagentSystem _rmcReagent;
+    private readonly SharedRMCSmartFridgeSystem _smartFridge;
     private readonly SolutionContainerSystem _solution;
     private readonly Font _boldItalicFont;
 
     private RMCTuringDispenserWindow? _window;
     private FloatSpinBox? _multiplierSpinBox;
     private FloatSpinBox? _cyclesSpinBox;
+    private readonly List<RMCTuringDispenserBeakerRow> _beakerRows = new();
 
     private IconHandle? _autoRunIcon;
     private Label? _autoRunLabel;
@@ -64,9 +73,12 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
 
     public RMCTuringDispenserBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
+        _cmVendor = EntMan.System<SharedCMAutomatedVendorSystem>();
         _container = EntMan.System<ContainerSystem>();
+        _prototype = IoCManager.Resolve<IPrototypeManager>();
         _resourceCache = IoCManager.Resolve<IResourceCache>();
         _rmcReagent = EntMan.System<RMCReagentSystem>();
+        _smartFridge = EntMan.System<SharedRMCSmartFridgeSystem>();
         _solution = EntMan.System<SolutionContainerSystem>();
         _boldItalicFont = _resourceCache.GetFont("/Fonts/NotoSans/NotoSans-BoldItalic.ttf", 12);
     }
@@ -78,8 +90,36 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
 
         Header(_window.ControlsHeader);
         Header(_window.SettingsHeader);
+        Header(_window.BeakerSelectorHeader);
         Header(_window.MemoryHeader);
         Header(_window.BoxHeader);
+
+        var autoRow = new RMCTuringDispenserBeakerRow { Id = null };
+        autoRow.Icon.Texture = _resourceCache.GetTexture(CycleIcon);
+        autoRow.NameLabel.Text = "Auto (best fit)";
+        autoRow.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserSetPreferredBeakerBuiMsg(null));
+        _window.BeakerSelectorContainer.AddChild(autoRow);
+        _beakerRows.Add(autoRow);
+
+        foreach (var (id, maxVol, _) in SharedRMCTuringDispenserSystem.BeakerOptions)
+        {
+            var row = new RMCTuringDispenserBeakerRow { Id = id };
+
+            var name = id.Id;
+            if (_prototype.TryIndex(id, out var entityProto))
+            {
+                name = entityProto.Name;
+                var textures = SpriteComponent.GetPrototypeTextures(entityProto, _resourceCache).Select(o => o.Default).ToList();
+                if (textures.Count > 0)
+                    row.Icon.Texture = textures[0];
+            }
+
+            row.NameLabel.Text = $"{name} ({maxVol}u)";
+            row.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserSetPreferredBeakerBuiMsg(id));
+
+            _window.BeakerSelectorContainer.AddChild(row);
+            _beakerRows.Add(row);
+        }
 
         _window.EnergyBar.ForegroundStyleBoxOverride = Flat(GreenColor);
 
@@ -114,7 +154,7 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
         _window.SmartLinkButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserToggleSmartLinkBuiMsg());
         _window.OutputModeButton.OnPressed += _ => SendPredictedMessage(new RMCTuringDispenserToggleOutputModeBuiMsg());
 
-        FixedPoint2 initialMultiplier = EntMan.TryGetComponent(Owner, out RMCTuringDispenserComponent? comp) ? comp.Multiplier : FixedPoint2.New(1);
+        var initialMultiplier = EntMan.TryGetComponent(Owner, out RMCTuringDispenserComponent? comp) ? comp.Multiplier : FixedPoint2.New(1);
         var multiplier = initialMultiplier.Float();
         _multiplierSpinBox = UIExtensions.CreateDialSpinBox(multiplier,
             args => SendPredictedMessage(new RMCTuringDispenserSetMultiplierBuiMsg(FixedPoint2.New(args.Value))));
@@ -151,6 +191,8 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
             _ => ("Status: IDLE", TanColor),
         };
         Row(_window.StatusPanel, _window.StatusLabel, statusText, statusColor, _boldItalicFont);
+
+        UpdateBeakerRows(comp);
 
         UpdateProgramRows(_window.MemoryProgramContainer, _window.MemoryEmptyPanel, _window.MemoryEmptyLabel, comp.MemoryProgram);
         UpdateProgramRows(_window.BoxProgramContainer, _window.BoxEmptyPanel, _window.BoxEmptyLabel, comp.BoxProgram);
@@ -203,6 +245,38 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
 
         if (_cyclesSpinBox != null)
             _cyclesSpinBox.Value = comp.CycleLimit;
+    }
+
+    private void UpdateBeakerRows(RMCTuringDispenserComponent comp)
+    {
+        var coords = EntMan.GetComponent<TransformComponent>(Owner).Coordinates;
+
+        foreach (var row in _beakerRows)
+        {
+            if (row.Id is { } id)
+            {
+                var vendorStocked = SharedRMCTuringDispenserSystem.BeakerOptions.First(o => o.Id == id).VendorStocked;
+
+                if (!vendorStocked)
+                {
+                    row.StockLabel.Text = "∞";
+                }
+                else
+                {
+                    var stock = _smartFridge.GetEmptyContainerCount(coords, comp.SmartFridgeRange, id) +
+                                _cmVendor.GetStockedAmount(coords, comp.SmartFridgeRange, id);
+                    row.StockLabel.Text = $"x{stock}";
+                }
+            }
+            else
+            {
+                row.StockLabel.Text = string.Empty;
+            }
+
+            var selected = row.Id == comp.PreferredBeaker;
+            row.StyleBoxOverride = Flat(selected ? GreenColor : DarkRowColor);
+            row.ModulateSelfOverride = Color.White;
+        }
     }
 
     private void UpdateProgramRows(BoxContainer container, Control emptyPanel, Label emptyLabel, List<TuringProgramEntry> program)
@@ -274,10 +348,6 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
         return IconHandled(button, texturePath, whiteTexturePath, text).Label;
     }
 
-    /// <summary>
-    /// Builds a left-aligned icon+label row inside a button, and wires hover so the icon swaps to its
-    /// white variant while the mouse is over the button.
-    /// </summary>
     private IconHandle IconHandled(Button button, string texturePath, string whiteTexturePath, string text)
     {
         button.Text = null;
@@ -329,10 +399,6 @@ public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
         };
     }
 
-    /// <summary>
-    /// Tracks a button icon's normal and hover (white) texture paths explicitly, so hover and dynamic
-    /// icon changes (e.g. Autorun's rotate/stop swap) both resolve to the correct texture.
-    /// </summary>
     private sealed class IconHandle
     {
         private readonly IResourceCache _resourceCache;

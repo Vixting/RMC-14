@@ -72,7 +72,12 @@
                     <PanelContainer Name="BoxEmptyPanel" Access="Public" Margin="0 5 0 0">
                         <Label Name="BoxEmptyLabel" Access="Public" Text="No box loaded!" Margin="6 1" />
                     </PanelContainer>
-                    <BoxContainer Name="BoxProgramContainer" Access="Public" Orientation="Vertical" Margin="0 5 0 0" />
+                    <BoxContainer Name="BoxProgramContainer" Access="Public" Orientation="Vertical" Margin="0 5 0 8" />
+
+                    <PanelContainer Name="BeakerSelectorHeader" Access="Public">
+                        <Label Text="Output Beaker" FontColorOverride="#FFFFFF" Margin="6 2" />
+                    </PanelContainer>
+                    <BoxContainer Name="BeakerSelectorContainer" Access="Public" Orientation="Vertical" Margin="0 5 0 0" />
                 </BoxContainer>
             </BoxContainer>
         </ScrollContainer>
