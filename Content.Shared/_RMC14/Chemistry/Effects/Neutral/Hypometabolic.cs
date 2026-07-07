@@ -16,7 +16,12 @@ public sealed partial class Hypometabolic : RMCChemicalEffect
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
-        return "Slows plant growth cycle.";
+        return "Slows plant growth cycle. In mobs, this chemical takes longer to metabolize, spreading its effects out over more time.";
+    }
+
+    protected override void ReagentBoost(EntityEffectReagentArgs args, ref float boost)
+    {
+        boost -= Potency * 0.26f;
     }
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
