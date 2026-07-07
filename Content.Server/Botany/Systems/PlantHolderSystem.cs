@@ -402,7 +402,6 @@ public sealed class PlantHolderSystem : EntitySystem
                 return;
             }
 
-            // Decay MetabolismAdjust back toward zero each cycle.
             if (component.MetabolismAdjust > 0)
                 component.MetabolismAdjust = MathF.Max(0f, component.MetabolismAdjust - 5f);
             else if (component.MetabolismAdjust < 0)
@@ -620,7 +619,6 @@ public sealed class PlantHolderSystem : EntitySystem
         {
             if (component.Seed.Carnivorous > 0)
             {
-                // Carnivorous plants eat pests instead of being harmed by them.
                 component.PestLevel -= HydroponicsSpeedMultiplier;
                 component.Health += HydroponicsSpeedMultiplier * 0.5f;
             }
@@ -638,7 +636,6 @@ public sealed class PlantHolderSystem : EntitySystem
         {
             if (component.Seed.Parasite)
             {
-                // Parasitic plants gain health from weeds.
                 component.Health += HydroponicsSpeedMultiplier * 0.5f;
             }
             else if (component.WeedLevel >= component.Seed.WeedTolerance)

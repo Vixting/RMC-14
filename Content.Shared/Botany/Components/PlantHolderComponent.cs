@@ -152,4 +152,11 @@ public sealed partial class PlantHolderComponent : Component
     /// </summary>
     [DataField]
     public float PotencyCounter;
+
+    /// <summary>
+    ///     Accumulates from Photosensitive/Crystallization reagent properties. When it hits 100,
+    ///     has a 50% chance to make the seed's harvest repeatable.
+    /// </summary>
+    [DataField]
+    public float RepeatHarvestCounter;
 }

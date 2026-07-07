@@ -37,7 +37,6 @@ public sealed class MutationSystem : EntitySystem
         public const string MutateSpecies = "Mutate Species";
     }
 
-    // CM13 mutation slot names in order (indices match CM13's 1-16 numbering)
     private static readonly string[] MutationSlots =
     [
         Slot.PlantCancer,
@@ -59,7 +58,7 @@ public sealed class MutationSystem : EntitySystem
     ];
 
     /// <summary>
-    ///     Port of CM13's datum/seed/mutate(). Applies 1-3 random mutations filtered by MutationController.
+    ///     Applies 1-3 random mutations filtered by MutationController.
     ///     MutationController slots are reset to 0 after each call (unless strongly suppressed at &lt;= -3).
     /// </summary>
     public void MutateSeed(EntityUid plantHolder, ref SeedData seed, float severity)
@@ -73,7 +72,6 @@ public sealed class MutationSystem : EntitySystem
         if (seed.Immutable)
             return;
 
-        // Severity maps to a degree 1-3 used to scale mutation magnitude.
         var degree = severity switch
         {
             <= 8f => 1,
@@ -83,13 +81,9 @@ public sealed class MutationSystem : EntitySystem
 
         var controller = seed.MutationController;
 
-        // Build candidate list:
-        // - superAllowed: slots set > 0 by peutic reagents → these take priority
-        // - normalAllowed: slots at 0 (default) or -1 (mildly suppressed) → only used if no super
         var superAllowed = new List<string>();
         var normalAllowed = new List<string>();
 
-        // Species mutation is only allowed at degree >= 2
         for (var i = 0; i < MutationSlots.Length; i++)
         {
             var slotName = MutationSlots[i];
@@ -113,7 +107,7 @@ public sealed class MutationSystem : EntitySystem
             return;
         }
 
-        var totalMutations = _robustRandom.Next(1, 1 + degree + 1); // rand(1, 1+degree)
+        var totalMutations = _robustRandom.Next(1, 1 + degree + 1);
 
         for (var i = 0; i < totalMutations; i++)
         {
@@ -130,7 +124,6 @@ public sealed class MutationSystem : EntitySystem
 
     private void ResetController(SeedData seed)
     {
-        // CM13: reset all slots > -3 back to 0 after each mutation cycle.
         foreach (var key in seed.MutationController.Keys.ToList())
         {
             if (seed.MutationController[key] > -3f)

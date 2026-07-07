@@ -1,0 +1,23 @@
+using Content.Shared.Botany.Components;
+using Content.Shared.EntityEffects;
+using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
+
+namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
+
+public sealed partial class Nephropeutic : RMCChemicalEffect
+{
+    protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
+    {
+        return "Treats kidney damage. Forces tolerance mutations to occur in plants.";
+    }
+
+    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        EnableMutationSlot(plant, "Light Tolerance", 1f);
+        EnableMutationSlot(plant, "Weed Tolerance", 1f);
+        EnableMutationSlot(plant, "Toxin Tolerance", 1f);
+    }
+
+    // TODO RMC14: mob effect - heal kidney organ damage, damages kidneys on overdose, tox damage on critical overdose
+}

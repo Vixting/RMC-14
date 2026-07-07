@@ -85,6 +85,34 @@ public abstract partial class RMCChemicalEffect : EntityEffect
     {
     }
 
+    protected static void SuppressMutationSlot(PlantHolderComponent plant, string slot, float value)
+    {
+        if (plant.Seed is not { } seed)
+            return;
+
+        if (seed.MutationController.GetValueOrDefault(slot, 0f) <= value)
+            return;
+
+        if (!seed.Unique)
+            plant.Seed = seed = seed.Clone();
+
+        seed.MutationController[slot] = value;
+    }
+
+    protected static void EnableMutationSlot(PlantHolderComponent plant, string slot, float value)
+    {
+        if (plant.Seed is not { } seed)
+            return;
+
+        if (seed.MutationController.GetValueOrDefault(slot, 0f) >= value)
+            return;
+
+        if (!seed.Unique)
+            plant.Seed = seed = seed.Clone();
+
+        seed.MutationController[slot] = value;
+    }
+
     protected virtual void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
     }
