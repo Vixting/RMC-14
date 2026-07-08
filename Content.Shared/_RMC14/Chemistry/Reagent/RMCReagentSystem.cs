@@ -16,16 +16,40 @@ public sealed class RMCReagentSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<PrototypesReloadedEventArgs>(OnPrototypesReloaded);
-        ReloadPrototypes();
+        ReloadAllPrototypes();
     }
 
     private void OnPrototypesReloaded(PrototypesReloadedEventArgs ev)
     {
-        if (ev.WasModified<ReagentPrototype>())
-            ReloadPrototypes();
+        if (!ev.WasModified<ReagentPrototype>())
+            return;
+
+        var dict = new Dictionary<string, Reagent>(_reagents);
+
+        if (ev.Removed != null && ev.Removed.TryGetValue(typeof(ReagentPrototype), out var removed))
+        {
+            foreach (var id in removed)
+                dict.Remove(id);
+        }
+
+        if (ev.ByType.TryGetValue(typeof(ReagentPrototype), out var changeSet))
+        {
+            foreach (var (id, prototype) in changeSet.Modified)
+            {
+                if (prototype is not ReagentPrototype reagentProto)
+                    continue;
+
+                object? reagentObj = new Reagent();
+                _serialization.CopyTo(reagentProto, ref reagentObj);
+                if (reagentObj is Reagent reagent)
+                    dict[id] = reagent;
+            }
+        }
+
+        _reagents = dict.ToFrozenDictionary();
     }
 
-    private void ReloadPrototypes()
+    private void ReloadAllPrototypes()
     {
         var dict = new Dictionary<string, Reagent>();
         foreach (var reagentProto in _prototypes.EnumeratePrototypes<ReagentPrototype>())

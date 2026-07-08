@@ -5,10 +5,25 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Chemistry.Reagent;
 
+public enum ChemClass : byte
+{
+    None,
+    Basic,
+    Common,
+    Uncommon,
+    Rare,
+    Special,
+    Ultra,
+    Hydro,
+}
+
 public partial class ReagentPrototype
 {
     [DataField]
     public bool Unknown;
+
+    [DataField]
+    public ChemClass ChemClass = ChemClass.None;
 
     [DataField]
     public FixedPoint2? Overdose;
