@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Taken from cmss13 at https://github.com/cmss13-devs/cmss13/blob/master/icons/obj/structures/machinery/science_machines_64x32.dmi",
+  "size": {
+    "x": 64,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "xeno_analyzer"
+    },
+    {
+      "name": "xeno_analyzer_off"
+    },
+    {
+      "name": "xeno_analyzer_broken"
+    },
+    {
+      "name": "xeno_analyzer_broken_organ"
+    },
+    {
+      "name": "xeno_analyzer_on_moving",
+      "delays": [
+        [2.5, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+      ]
+    },
+    {
+      "name": "xeno_analyzer_organ_on",
+      "delays": [
+        [0.1, 0.1]
+      ]
+    },
+    {
+      "name": "xeno_analyzer_printing",
+      "delays": [
+        [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 2.5]
+      ]
+    }
+  ]
+}

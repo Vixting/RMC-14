@@ -1,0 +1,72 @@
+- type: entity
+  id: RMCChemSynthesizer
+  name: Chemical Synthesizer
+  description: A machine that procedurally synthesizes an unstable, unidentified compound with unpredictable properties. Ejects a bottle of the result and a matching recipe once known.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.40
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: Corrodible
+    timeToApply: 4
+    structure: true
+  - type: Damageable
+    damageContainer: StructuralMarine
+    damageModifierSet: null
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Sprite
+    sprite: _RMC14/Structures/Machines/Science/centrifuge.rsi
+    layers:
+    - state: on_closed
+    snapCardinals: true
+  - type: Appearance
+  - type: ApcPowerReceiver
+    powerLoad: 500
+    needsPower: true
+  - type: RMCPowerReceiver
+    idleLoad: 20
+    activeLoad: 500
+    channel: Equipment
+  - type: ActivatableUIRequiresPower
+  - type: RMCChemSynthesizer
+  - type: UserInterface
+    interfaces:
+      enum.RMCChemSynthesizerUi.Key:
+        type: RMCChemSynthesizerBui
+  - type: ActivatableUI
+    key: enum.RMCChemSynthesizerUi.Key
+  - type: RequiresSkill
+    skills:
+      RMCSkillResearch: 1
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+  - type: ActivatableUIBlacklist
+    blacklist:
+      components:
+      - Xeno

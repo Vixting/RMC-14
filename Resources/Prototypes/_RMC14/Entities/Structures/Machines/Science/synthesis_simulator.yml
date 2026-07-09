@@ -1,0 +1,168 @@
+- type: entity
+  id: RMCChemistryResearch
+  name: chemistry research data
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: RMCChemistryResearch
+
+- type: entity
+  parent: CMBaseStructure
+  id: RMCResearchComputer
+  name: research data terminal
+  description: A terminal for accessing chemistry research data - manage synthesis contracts, review chemical analyses, publish findings, and broker a clearance level increase.
+  components:
+  - type: WallMount
+    arc: 360
+  - type: Transform
+    anchored: false
+  - type: Physics
+    bodyType: Static
+    canCollide: false
+  - type: Sprite
+    drawdepth: SmallObjects
+    sprite: _RMC14/Structures/Machines/computer.rsi
+    layers:
+    - map: ["base"]
+      state: "research0"
+    - map: ["enum.PowerDeviceVisualLayers.Powered"]
+      state: "research"
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerDeviceVisuals.Powered:
+        enum.PowerDeviceVisualLayers.Powered:
+          True: { visible: true }
+          False: { visible: false }
+  - type: Appearance
+  - type: ApcPowerReceiver
+    powerLoad: 250
+    needsPower: true
+  - type: RMCPowerReceiver
+    idleLoad: 600
+    activeLoad: 600
+    channel: Equipment
+  - type: ActivatableUIRequiresPower
+  - type: Clickable
+  - type: Corrodible
+    isCorrodible: false
+  - type: InteractionOutline
+  - type: RMCResearchComputer
+  - type: UserInterface
+    interfaces:
+      enum.RMCResearchComputerUi.Key:
+        type: RMCResearchComputerBui
+  - type: ActivatableUI
+    key: enum.RMCResearchComputerUi.Key
+  - type: RequiresSkill
+    skills:
+      RMCSkillResearch: 1
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+  - type: ActivatableUIBlacklist
+    blacklist:
+      components:
+      - Xeno
+
+- type: entity
+  id: RMCSynthesisSimulator
+  name: Synthesis Simulator
+  description: This computer uses advanced algorithms to perform simulations of reagent properties, for the purpose of calculating the synthesis required to make a new variant.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.40
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: Corrodible
+    timeToApply: 4
+    structure: true
+  - type: Damageable
+    damageContainer: StructuralMarine
+    damageModifierSet: null
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Sprite
+    sprite: _RMC14/Structures/Machines/Science/modifier.rsi
+    layers:
+    - map: ["base"]
+      state: "modifier_off"
+    - map: ["enum.PowerDeviceVisualLayers.Powered"]
+      state: "modifier"
+    snapCardinals: true
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerDeviceVisuals.Powered:
+        enum.PowerDeviceVisualLayers.Powered:
+          True: { visible: true }
+          False: { visible: false }
+      enum.RMCSynthesisSimulatorVisuals.State:
+        enum.PowerDeviceVisualLayers.Powered:
+          Idle: { state: modifier }
+          Running: { state: modifier_running }
+          Ready: { state: modifier_ready }
+  - type: ApcPowerReceiver
+    powerLoad: 500
+    needsPower: true
+  - type: RMCPowerReceiver
+    idleLoad: 20
+    activeLoad: 500
+    channel: Equipment
+  - type: ActivatableUIRequiresPower
+  - type: RMCSynthesisSimulator
+  - type: ItemSlots
+    slots:
+      synthesis_simulator_target_slot:
+        name: Target
+        whitelist:
+          components:
+          - RMCChemResearchReport
+      synthesis_simulator_reference_slot:
+        name: Reference
+        whitelist:
+          components:
+          - RMCChemResearchReport
+  - type: ContainerContainer
+    containers:
+      synthesis_simulator_target_slot: !type:ContainerSlot
+      synthesis_simulator_reference_slot: !type:ContainerSlot
+  - type: UserInterface
+    interfaces:
+      enum.RMCSynthesisSimulatorUi.Key:
+        type: RMCSynthesisSimulatorBui
+  - type: ActivatableUI
+    key: enum.RMCSynthesisSimulatorUi.Key
+  - type: RequiresSkill
+    skills:
+      RMCSkillResearch: 1
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+  - type: ActivatableUIBlacklist
+    blacklist:
+      components:
+      - Xeno

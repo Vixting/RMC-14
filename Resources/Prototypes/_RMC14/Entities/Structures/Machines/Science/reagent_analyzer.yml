@@ -1,0 +1,80 @@
+- type: entity
+  id: RMCReagentAnalyzer
+  name: XRF scanner
+  description: A spectrometer that bombards a sample in high energy radiation to detect emitted fluorescent x-ray patterns, identifying its chemical composition.
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Transform
+  - type: Physics
+    bodyType: Static
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.40
+        density: 190
+        mask:
+        - MachineMask
+        layer:
+        - MachineLayer
+  - type: Corrodible
+    timeToApply: 4
+    structure: true
+  - type: Damageable
+    damageContainer: StructuralMarine
+    damageModifierSet: null
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalBreak
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Sprite
+    sprite: _RMC14/Structures/Machines/Science/reagent_analyzer.rsi
+    layers:
+    - state: base
+      map: ["status"]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.RMCReagentAnalyzerVisuals.State:
+        status:
+          Idle: { state: base }
+          Processing: { state: processing }
+          Finished: { state: finished }
+          Failed: { state: failed }
+  - type: ApcPowerReceiver
+    powerLoad: 5000
+    needsPower: true
+  - type: RMCPowerReceiver
+    idleLoad: 20
+    activeLoad: 5000
+    channel: Equipment
+  - type: RMCReagentAnalyzer
+  - type: ItemSlots
+    slots:
+      reagent_analyzer_sample_slot:
+        name: Sample
+        whitelist:
+          tags:
+          - GlassBeaker
+          - ChemDispensable
+  - type: ContainerContainer
+    containers:
+      reagent_analyzer_sample_slot: !type:ContainerSlot
+  - type: RequiresSkill
+    skills:
+      RMCSkillResearch: 1
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
