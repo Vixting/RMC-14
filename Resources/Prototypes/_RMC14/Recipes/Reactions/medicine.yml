@@ -233,3 +233,87 @@
       amount: 1
   products:
     RMCLipozine: 3
+
+- type: reaction
+  id: RMCTramadol
+  reactants:
+    CMInaprovaline:
+      amount: 1
+    RMCEthanol:
+      amount: 1
+    RMCOxygen:
+      amount: 1
+  products:
+    RMCTramadol: 3
+
+- type: reaction
+  id: RMCOxycodone
+  reactants:
+    RMCEthanol:
+      amount: 1
+    RMCTramadol:
+      amount: 1
+    RMCPhoron:
+      amount: 1
+      catalyst: true
+  products:
+    RMCOxycodone: 1
+
+- type: reaction
+  id: RMCPeridaxon
+  reactants:
+    CMBicaridine:
+      amount: 2
+    CMClonexadone:
+      amount: 2
+    RMCPhoron:
+      amount: 5
+      catalyst: true
+  products:
+    RMCPeridaxon: 2
+
+- type: reaction
+  id: RMCRyetalyn
+  reactants:
+    CMArithrazine:
+      amount: 1
+    RMCCarbon:
+      amount: 1
+  products:
+    RMCRyetalyn: 2
+
+- type: reaction
+  id: RMCParacetamol
+  reactants:
+    RMCTramadol:
+      amount: 1
+    RMCNitrogen:
+      amount: 1
+    Water:
+      amount: 1
+  products:
+    RMCParacetamol: 3
+
+- type: reaction
+  id: RMCSterilizine
+  reactants:
+    RMCEthanol:
+      amount: 1
+    CMDylovene:
+      amount: 1
+    RMCChlorine:
+      amount: 1
+  products:
+    RMCSterilizine: 3
+
+- type: reaction
+  id: RMCAlkysine
+  reactants:
+    RMCChlorine:
+      amount: 1
+    RMCNitrogen:
+      amount: 1
+    CMDylovene:
+      amount: 1
+  products:
+    RMCAlkysine: 2

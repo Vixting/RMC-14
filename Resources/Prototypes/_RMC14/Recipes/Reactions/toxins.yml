@@ -9,3 +9,149 @@
       amount: 1
   products:
     RMCLexorin: 3
+
+- type: reaction
+  id: RMCUnstableMutagen
+  reactants:
+    RMCRadium:
+      amount: 1
+    RMCPhosphorus:
+      amount: 1
+    RMCChlorine:
+      amount: 1
+  products:
+    RMCUnstableMutagen: 3
+
+- type: reaction
+  id: RMCDinitroaniline
+  reactants:
+    RMCAmmonia:
+      amount: 1
+    SulfuricAcid:
+      amount: 1
+    RMCNitrogen:
+      amount: 1
+  products:
+    RMCDinitroaniline: 3
+
+- type: reaction
+  id: RMCPotassiumChloride
+  reactants:
+    TableSalt:
+      amount: 1
+    RMCPotassium:
+      amount: 1
+  products:
+    RMCPotassiumChloride: 2
+
+- type: reaction
+  id: RMCPotassiumChlorophoride
+  reactants:
+    RMCPotassiumChloride:
+      amount: 1
+    RMCPhoron:
+      amount: 1
+    RMCChloralhydrate:
+      amount: 1
+  products:
+    RMCPotassiumChlorophoride: 4
+
+- type: reaction
+  id: RMCPotassiumPhorosulfate
+  reactants:
+    RMCPotassiumChlorophoride:
+      amount: 1
+    SulfuricAcid:
+      amount: 4
+  products:
+    RMCPotassiumPhorosulfate: 1
+
+- type: reaction
+  id: RMCIronSulfate
+  reactants:
+    RMCIron:
+      amount: 1
+    SulfuricAcid:
+      amount: 5
+  products:
+    RMCIronSulfate: 1
+
+- type: reaction
+  id: RMCIronPhorideSulfate
+  reactants:
+    RMCIronSulfate:
+      amount: 3
+    RMCPhoron:
+      amount: 1
+  products:
+    RMCIronPhorideSulfate: 1
+
+- type: reaction
+  id: RMCCopperSulfate
+  reactants:
+    RMCCopper:
+      amount: 2
+    SulfuricAcid:
+      amount: 5
+  products:
+    RMCCopperSulfate: 1
+
+- type: reaction
+  id: RMCFormaldehyde
+  reactants:
+    RMCMethane:
+      amount: 1
+    RMCOxygen:
+      amount: 1
+    RMCPhoron:
+      amount: 1
+    RMCSilver:
+      amount: 5
+      catalyst: true
+  products:
+    RMCFormaldehyde: 3
+
+- type: reaction
+  id: RMCParaformaldehyde
+  reactants:
+    RMCFormaldehyde:
+      amount: 1
+    FrostOil:
+      amount: 1
+  products:
+    RMCParaformaldehyde: 1
+
+- type: reaction
+  id: RMCPhenolFormaldehydeResin
+  reactants:
+    RMCFormaldehyde:
+      amount: 2
+    Phenol:
+      amount: 1
+    RMCMethane:
+      amount: 5
+      catalyst: true
+  products:
+    RMCPhenolFormaldehydeResin: 3
+
+- type: reaction
+  id: RMCPolytrinicAcid
+  reactants:
+    SulfuricAcid:
+      amount: 1
+    RMCChlorine:
+      amount: 1
+    RMCPotassium:
+      amount: 1
+  products:
+    RMCPolytrinicAcid: 3
+
+- type: reaction
+  id: RMCSoporific
+  reactants:
+    RMCSugar:
+      amount: 4
+    RMCChloralhydrate:
+      amount: 1
+  products:
+    RMCSoporific: 5

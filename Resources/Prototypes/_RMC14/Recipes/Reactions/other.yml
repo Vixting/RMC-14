@@ -39,3 +39,135 @@
       amount: 1
   products:
     RMCVirusFood: 3
+
+- type: reaction
+  id: RMCAmmonia
+  reactants:
+    RMCHydrogen:
+      amount: 3
+    RMCNitrogen:
+      amount: 1
+  products:
+    RMCAmmonia: 3
+
+- type: reaction
+  id: RMCThermite
+  reactants:
+    RMCAluminum:
+      amount: 1
+    RMCIron:
+      amount: 1
+    RMCOxygen:
+      amount: 1
+  products:
+    RMCThermite: 3
+
+- type: reaction
+  id: RMCSpaceCleaner
+  reactants:
+    RMCAmmonia:
+      amount: 1
+    Water:
+      amount: 1
+    TableSalt:
+      amount: 1
+  products:
+    RMCSpaceCleaner: 2
+
+- type: reaction
+  id: RMCCryptobiolin
+  reactants:
+    RMCPotassium:
+      amount: 1
+    RMCOxygen:
+      amount: 1
+    RMCSugar:
+      amount: 1
+  products:
+    RMCCryptobiolin: 3
+
+- type: reaction
+  id: RMCImpedrezene
+  reactants:
+    RMCMercury:
+      amount: 1
+    RMCOxygen:
+      amount: 1
+    RMCSugar:
+      amount: 1
+  products:
+    RMCImpedrezene: 2
+
+- type: reaction
+  id: RMCFluorosurfactant
+  reactants:
+    RMCFluorine:
+      amount: 2
+    RMCCarbon:
+      amount: 2
+    SulfuricAcid:
+      amount: 1
+  products:
+    RMCFluorosurfactant: 5
+
+- type: reaction
+  id: RMCFoamingAgent
+  reactants:
+    RMCLithium:
+      amount: 1
+    RMCHydrogen:
+      amount: 1
+  products:
+    RMCFoamingAgent: 1
+
+- type: reaction
+  id: RMCStabilizedMetallicFoam
+  reactants:
+    RMCFluorosurfactant:
+      amount: 1
+    RMCIron:
+      amount: 1
+    SulfuricAcid:
+      amount: 1
+  products:
+    RMCStabilizedMetallicFoam: 1
+
+- type: reaction
+  id: RMCDiethylamine
+  reactants:
+    RMCAmmonia:
+      amount: 1
+    RMCEthanol:
+      amount: 1
+  products:
+    RMCDiethylamine: 2
+
+- type: reaction
+  id: RMCHexamine
+  reactants:
+    RMCAmmonia:
+      amount: 2
+    RMCFormaldehyde:
+      amount: 3
+  products:
+    RMCHexamine: 3
+
+- type: reaction
+  id: RMCGlycerol
+  reactants:
+    RMCCornOil:
+      amount: 3
+    SulfuricAcid:
+      amount: 1
+  products:
+    RMCGlycerol: 1
+
+- type: reaction
+  id: RMCSleen
+  reactants:
+    RMCOxycodone:
+      amount: 1
+    CMSodaBobdaLime:
+      amount: 1
+  products:
+    RMCSleen: 2
