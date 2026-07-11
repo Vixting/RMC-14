@@ -19,7 +19,6 @@ public sealed class RainbowOverlay : Overlay
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IEntitySystemManager _sysMan = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
     private readonly SharedStatusEffectsSystem _statusEffects = default!;
 
     public override OverlaySpace Space => OverlaySpace.WorldSpace;
@@ -27,15 +26,14 @@ public sealed class RainbowOverlay : Overlay
     private readonly ShaderInstance _rainbowShader;
 
     public float Intoxication = 0.0f;
-    public float TimeTicker = 0.0f;
     public float Phase = 0.0f;
 
-    private const float VisualThreshold = 10.0f;
-    private const float PowerDivisor = 250.0f;
+    private const float FadeInSeconds = 1.0f;
+    private const float FadeOutSeconds = 1.5f;
     private float _timeScale = 0.0f;
     private float _warpScale = 0.0f;
 
-    private float EffectScale => Math.Clamp((Intoxication - VisualThreshold) / PowerDivisor, 0.0f, 1.0f);
+    private float EffectScale => Math.Clamp(Intoxication, 0.0f, 1.0f);
 
     public RainbowOverlay()
     {
@@ -60,21 +58,13 @@ public sealed class RainbowOverlay : Overlay
         if (playerEntity == null)
             return;
 
-        if (!_statusEffects.TryGetEffectsEndTimeWithComp<SeeingRainbowsStatusEffectComponent>(playerEntity, out var endTime))
-            return;
+        //RMC Make this not take ages to fade in/out
+        var active = _statusEffects.TryGetEffectsEndTimeWithComp<SeeingRainbowsStatusEffectComponent>(playerEntity, out _);
 
-        endTime ??= TimeSpan.MaxValue;
-        var timeLeft = (float)(endTime - _timing.CurTime).Value.TotalSeconds;
-
-        TimeTicker += args.DeltaSeconds;
-        if (timeLeft - TimeTicker > timeLeft / 16f)
-        {
-            Intoxication += (timeLeft - Intoxication) * args.DeltaSeconds / 16f;
-        }
+        if (active)
+            Intoxication = MathF.Min(Intoxication + args.DeltaSeconds / FadeInSeconds, 1.0f);
         else
-        {
-            Intoxication -= Intoxication / (timeLeft - TimeTicker) * args.DeltaSeconds;
-        }
+            Intoxication = MathF.Max(Intoxication - args.DeltaSeconds / FadeOutSeconds, 0.0f);
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)

@@ -45,6 +45,53 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
     private readonly Dictionary<string, string> _originalIds = new();
     private readonly Dictionary<string, ReactionIndicator> _reactionIndicators = new();
 
+    // legendary/ciphering recipes are rolled fresh once per round
+    private static readonly string[] LegendaryPropertyIds = ["Hypergenetic", "Boosting", "Regulating", "Optimized"];
+    private const string CipheringId = "Ciphering";
+    private const string EncryptedId = "Encrypted";
+    private readonly Dictionary<string, List<string>> _legendaryCombines = new();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        RollLegendaryCombines();
+    }
+
+    // LEGENDARY_COMBINE_PROPERTIES = 3 random properties per legendary, drawn from the same
+    // pool PickProperties uses. Ciphering is a separate case sharing the mechanism: 2 random
+    // properties plus a hardcoded 3rd slot of Encrypted
+    private void RollLegendaryCombines()
+    {
+        var pool = _prototype.EnumeratePrototypes<ChemGeneratorPropertyPrototype>()
+            .Where(p => !p.Flags.HasFlag(ChemPropertyType.Disabled))
+            .Select(p => p.ID)
+            .ToList();
+
+        if (pool.Count == 0)
+            return;
+
+        foreach (var legendary in LegendaryPropertyIds)
+        {
+            var available = new List<string>(pool);
+            var pieces = new List<string>();
+            for (var i = 0; i < 3 && available.Count > 0; i++)
+                pieces.Add(_random.PickAndTake(available));
+
+            _legendaryCombines[legendary] = pieces;
+        }
+
+        var cipherAvailable = new List<string>(pool);
+        var cipherPieces = new List<string>();
+        for (var i = 0; i < 2 && cipherAvailable.Count > 0; i++)
+            cipherPieces.Add(_random.PickAndTake(cipherAvailable));
+        cipherPieces.Add(EncryptedId);
+
+        _legendaryCombines[CipheringId] = cipherPieces;
+    }
+
+    public bool TryGetLegendaryRecipe(string propertyId, [NotNullWhen(true)] out List<string>? pieces) =>
+        _legendaryCombines.TryGetValue(propertyId, out pieces);
+
     // tracked for the life of the round so low tier chems don't keep
     // rolling the same property, until every property in that category has appeared at least once.
     private readonly Dictionary<ChemPropertyCategory, HashSet<string>> _generatedProperties = new()
@@ -427,26 +474,21 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
     // generator ingredients, with a small flat chance of a Special tier (xeno) reagent instead -
     // Special is never included in RollIngredientPool's own tier table, same as cms C1-C6
     // tiers excluding its separate xenogenic bonus roll.
+    // 4% to get special RMCXenogeneticCatalyst (not implemented fully yet)
     private const float VialSpecialChance = 0.04f;
+    private static readonly ProtoId<ReagentPrototype> XenogeneticCatalyst = "RMCXenogeneticCatalyst";
 
-    public string RollRandomKnownReagent(int tier)
+    public string RollRandomKnownReagent()
     {
         if (_random.Prob(VialSpecialChance))
-        {
-            var special = _prototype.EnumeratePrototypes<ReagentPrototype>()
-                .Where(r => !r.Abstract && !r.Unknown && r.ChemClass == ChemClass.Special)
-                .Select(r => r.ID)
-                .ToList();
-            if (special.Count > 0)
-                return _random.Pick(special);
-        }
+            return XenogeneticCatalyst.Id;
 
-        var pools = BuildClassPools();
-        var pool = RollIngredientPool(pools, tier);
-        if (pool.Count == 0)
-            pool = pools.Where(p => p.Key != ChemClass.None).SelectMany(p => p.Value).Distinct().ToList();
+        var special = _prototype.EnumeratePrototypes<ReagentPrototype>()
+            .Where(r => !r.Abstract && !r.Unknown && r.ChemClass == ChemClass.Special && r.ID != XenogeneticCatalyst.Id)
+            .Select(r => r.ID)
+            .ToList();
 
-        return pool.Count > 0 ? _random.Pick(pool) : string.Empty;
+        return special.Count > 0 ? _random.Pick(special) : string.Empty;
     }
 
     // cms reroll_chemicals() uses its own, simpler tier table for the contract ingredient hint -
@@ -589,8 +631,11 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
                     sb.AppendLine("      catalyst: true");
             }
 
+            // forces this reagents own recipe to always yield a flat 3
+            // units regardless of ingredient cost, rather than the usual 1
+            var yield = properties.Any(p => p.Property.ID == "Optimized") ? 3 : 1;
             sb.AppendLine("  products:");
-            sb.AppendLine($"    {id}: 1");
+            sb.AppendLine($"    {id}: {yield}");
 
             if (indicator != ReactionIndicator.Calm)
             {
@@ -818,7 +863,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
             }
             else
             {
-                foreach (var (comboId, pieces) in ChemPropertyRelations.Combines)
+                foreach (var (comboId, pieces) in ChemPropertyRelations.Combines.Concat(_legendaryCombines))
                 {
                     if (!pieces.Contains(propertyId) || !pieces.Contains(existing.ID))
                         continue;
