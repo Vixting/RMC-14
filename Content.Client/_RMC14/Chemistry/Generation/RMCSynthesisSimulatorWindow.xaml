@@ -1,0 +1,86 @@
+<controls:RMCSynthesisSimulatorWindow
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._RMC14.Chemistry.Generation"
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    Title="Chemical Simulator" MinSize="680 560">
+    <PanelContainer>
+        <PanelContainer.PanelOverride>
+            <graphics:StyleBoxFlat BackgroundColor="#181C24" />
+        </PanelContainer.PanelOverride>
+        <BoxContainer Orientation="Vertical" Margin="4">
+            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                <BoxContainer Orientation="Vertical" MinWidth="320" Margin="0 0 12 0">
+                    <PanelContainer Name="CreditsPanel" Access="Public" HorizontalExpand="True">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#12141A" BorderColor="#B33A3A" BorderThickness="2" />
+                        </PanelContainer.PanelOverride>
+                        <ProgressBar Name="CreditsBar" Access="Public" MinHeight="24" Margin="4" HorizontalExpand="True">
+                            <Label Name="CreditsLabel" Access="Public" Align="Right" FontColorOverride="#FFFFFF" Margin="0 0 6 0" />
+                        </ProgressBar>
+                    </PanelContainer>
+
+                    <PanelContainer Margin="0 4 0 0" VerticalExpand="True">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#12141A" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Orientation="Vertical" Margin="6">
+                            <Label Name="StatusLabel" Access="Public" FontColorOverride="#FFFFFF" />
+                            <Label Name="CostLabel" Access="Public" FontColorOverride="#C7CCD6" />
+                            <Label Name="TargetNameLabel" Access="Public" FontColorOverride="#C7CCD6" />
+                            <Label Name="ReferenceNameLabel" Access="Public" FontColorOverride="#C7CCD6" />
+                            <Label Name="OverdoseLabel" Access="Public" FontColorOverride="#C7CCD6" />
+                            <Label Name="ClearanceLabel" Access="Public" FontColorOverride="#C7CCD6" />
+                        </BoxContainer>
+                    </PanelContainer>
+                </BoxContainer>
+
+                <Control HorizontalExpand="True" />
+
+                <GridContainer Columns="2" HSeparationOverride="10" VSeparationOverride="10">
+                    <BoxContainer Name="SimulateCancelSlot" Access="Public" MinSize="170 32" MaxSize="170 32">
+                        <Button Name="SimulateButton" Access="Public" Text="SIMULATE" MinSize="170 32" MaxSize="170 32" HorizontalExpand="True" ClipText="True" />
+                        <Button Name="CancelButton" Access="Public" Text="CANCEL" MinSize="170 32" MaxSize="170 32" HorizontalExpand="True" ClipText="True" Visible="False" />
+                    </BoxContainer>
+                    <Button Name="SuppressButton" Access="Public" Text="SUPPRESS" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                    <Button Name="EjectTargetButton" Access="Public" Text="EJECT TARGET" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                    <Button Name="AmplifyButton" Access="Public" Text="AMPLIFY" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                    <Button Name="EjectReferenceButton" Access="Public" Text="EJECT REFERENCE" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                    <Button Name="AddButton" Access="Public" Text="ADD" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                    <Button Name="OverrideButton" Access="Public" Text="OVERRIDE" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                    <Button Name="RelateButton" Access="Public" Text="RELATE" MinSize="170 32" MaxSize="170 32" ClipText="True" />
+                </GridContainer>
+            </BoxContainer>
+
+            <PanelContainer Name="TargetPropertiesPanel" Access="Public" Margin="0 0 0 4">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#12141A" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <Label Text="Target properties" FontColorOverride="#FFFFFF" />
+                    <BoxContainer Name="TargetPropertiesBox" Access="Public" Orientation="Vertical" Margin="0 4 0 0" />
+                </BoxContainer>
+            </PanelContainer>
+
+            <PanelContainer Name="ReferencePropertiesPanel" Access="Public" Margin="0 0 0 4">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#12141A" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <Label Text="Reference properties" FontColorOverride="#FFFFFF" />
+                    <BoxContainer Name="ReferencePropertiesBox" Access="Public" Orientation="Vertical" Margin="0 4 0 0" />
+                </BoxContainer>
+            </PanelContainer>
+
+            <PanelContainer Name="RecipePickerPanel" Access="Public" Visible="False" Margin="0 4 0 0">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#12141A" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <Label Text="Pick a recipe:" FontColorOverride="#FFFFFF" />
+                    <BoxContainer Name="RecipeCandidatesBox" Access="Public" Orientation="Vertical" Margin="0 4 0 0" />
+                    <Button Name="FinalizeButton" Access="Public" Text="Finalize" Disabled="True" Margin="0 4 0 0" />
+                </BoxContainer>
+            </PanelContainer>
+        </BoxContainer>
+    </PanelContainer>
+</controls:RMCSynthesisSimulatorWindow>

@@ -6,6 +6,7 @@ using Content.Client.Message;
 using Content.Client.UserInterface.ControlExtensions;
 using Content.Shared._RMC14.Atmos;
 using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared._RMC14.Weapons.Ranged.Flamer;
 using Content.Shared.Body.Prototypes;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
@@ -206,14 +207,15 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
 
         // RMC14
         #region Flammability
-        if (reagent.Intensity > 0 && reagent.Duration > 0 && reagent.Radius > 0)
+        var fireStats = _systemManager.GetEntitySystem<SharedRMCFlamerSystem>().GetFireStats(reagent);
+        if (fireStats.Intensity > 0 && fireStats.Duration > 0 && fireStats.Radius > 0)
         {
             FlammabilityDescriptionContainer.Children.Clear();
             var descriptionLabel = new RichTextLabel();
             var descMsg = new FormattedMessage();
-            descMsg.AddMarkupOrThrow(Loc.GetString("rmc-flamer-guidebook-description-base", ("intensity", reagent.Intensity), ("duration", reagent.Duration)));
+            descMsg.AddMarkupOrThrow(Loc.GetString("rmc-flamer-guidebook-description-base", ("intensity", fireStats.Intensity), ("duration", fireStats.Duration)));
             descMsg.PushNewline();
-            descMsg.AddMarkupOrThrow(Loc.GetString("rmc-flamer-guidebook-description-radius", ("radius", reagent.Radius), ("spread", reagent.FireSpread)));
+            descMsg.AddMarkupOrThrow(Loc.GetString("rmc-flamer-guidebook-description-radius", ("radius", fireStats.Radius), ("spread", reagent.FireSpread)));
 
             if (_prototype.TryIndex<EntityPrototype>(reagent.FireEntity, out var fire))
             {

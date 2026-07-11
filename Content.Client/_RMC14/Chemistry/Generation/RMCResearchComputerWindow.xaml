@@ -1,0 +1,121 @@
+<controls:RMCResearchComputerWindow
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._RMC14.Chemistry.Generation"
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    Title="Research Terminal" MinSize="900 760">
+    <PanelContainer>
+        <PanelContainer.PanelOverride>
+            <graphics:StyleBoxFlat BackgroundColor="#221801" />
+        </PanelContainer.PanelOverride>
+        <BoxContainer Orientation="Vertical" Margin="4">
+            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                <Label Name="ClearanceLabel" Access="Public" HorizontalExpand="True" VerticalAlignment="Center" FontColorOverride="#FAC000" />
+                <Button Name="ReprintContractButton" Access="Public" MinSize="170 32" MaxSize="170 32" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                    <Button.StyleBoxOverride>
+                        <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
+                    </Button.StyleBoxOverride>
+                </Button>
+                <Button Name="BrokerClearanceButton" Access="Public" MinSize="170 32" MaxSize="170 32" Margin="4 0 0 0" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                    <Button.StyleBoxOverride>
+                        <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
+                    </Button.StyleBoxOverride>
+                </Button>
+            </BoxContainer>
+
+            <BoxContainer Name="TabBar" Access="Public" Orientation="Horizontal" Margin="0 0 0 2" />
+
+            <TabContainer Name="Tabs" Access="Public" TabsVisible="False" VerticalExpand="True" HorizontalExpand="True">
+                <BoxContainer Name="ManageResearchTab" Access="Public" Orientation="Vertical">
+                    <PanelContainer Margin="0 0 0 4">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                        </PanelContainer.PanelOverride>
+                        <Label Name="CreditsLabel" Access="Public" Margin="6 4" FontColorOverride="#FAC000" />
+                    </PanelContainer>
+
+                    <PanelContainer VerticalExpand="True">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Orientation="Vertical" Margin="6">
+                            <Label Text="Chemical Contracts" FontColorOverride="#FAC000" />
+                            <ProgressBar Name="ContractCooldownBar" Access="Public" MinHeight="20" Margin="0 4 0 4">
+                                <ProgressBar.BackgroundStyleBoxOverride>
+                                    <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                                </ProgressBar.BackgroundStyleBoxOverride>
+                                <ProgressBar.ForegroundStyleBoxOverride>
+                                    <graphics:StyleBoxFlat BackgroundColor="#C5780E" />
+                                </ProgressBar.ForegroundStyleBoxOverride>
+                                <Label Name="ContractCooldownLabel" Access="Public" HorizontalAlignment="Center" VerticalAlignment="Center" FontColorOverride="#FAC000" />
+                            </ProgressBar>
+                            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                                <BoxContainer Name="ContractsBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
+                            </ScrollContainer>
+                        </BoxContainer>
+                    </PanelContainer>
+                </BoxContainer>
+
+                <BoxContainer Name="ViewChemicalsTab" Access="Public" Orientation="Vertical">
+                    <Button Name="HideOldReportsButton" Access="Public" ToggleMode="True" Text="Hide Old Reports" Margin="0 0 0 4" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                        <Button.StyleBoxOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#8A6800" BorderThickness="2" />
+                        </Button.StyleBoxOverride>
+                    </Button>
+                    <PanelContainer VerticalExpand="True">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Orientation="Vertical" Margin="6">
+                            <BoxContainer Orientation="Horizontal" SeparationOverride="4" Margin="0 0 0 4">
+                                <Button Name="DocumentsSortTimeButton" Access="Public" Text="Scan Time" MinWidth="100" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                                    <Button.StyleBoxOverride>
+                                        <graphics:StyleBoxFlat BackgroundColor="Transparent" />
+                                    </Button.StyleBoxOverride>
+                                </Button>
+                                <Label Text="Type" MinWidth="140" FontColorOverride="#FAC000" />
+                                <Button Name="DocumentsSortCompoundButton" Access="Public" Text="Compound" HorizontalExpand="True" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                                    <Button.StyleBoxOverride>
+                                        <graphics:StyleBoxFlat BackgroundColor="Transparent" />
+                                    </Button.StyleBoxOverride>
+                                </Button>
+                                <Label Text="Actions" FontColorOverride="#FAC000" />
+                            </BoxContainer>
+                            <Label Name="DocumentsEmptyLabel" Access="Public" Text="ERROR: no chemicals have been detected." FontColorOverride="#C69214" Visible="False" />
+                            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                                <BoxContainer Name="DocumentsBox" Access="Public" Orientation="Vertical" SeparationOverride="2" />
+                            </ScrollContainer>
+                        </BoxContainer>
+                    </PanelContainer>
+                </BoxContainer>
+
+                <BoxContainer Name="PublishedMaterialTab" Access="Public" Orientation="Vertical">
+                    <PanelContainer VerticalExpand="True">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Orientation="Vertical" Margin="6">
+                            <BoxContainer Orientation="Horizontal" SeparationOverride="4" Margin="0 0 0 4">
+                                <Button Name="PublishedSortTimeButton" Access="Public" Text="Published" MinWidth="100" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                                    <Button.StyleBoxOverride>
+                                        <graphics:StyleBoxFlat BackgroundColor="Transparent" />
+                                    </Button.StyleBoxOverride>
+                                </Button>
+                                <Label Text="Type" MinWidth="140" FontColorOverride="#FAC000" />
+                                <Button Name="PublishedSortCompoundButton" Access="Public" Text="Compound" HorizontalExpand="True" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                                    <Button.StyleBoxOverride>
+                                        <graphics:StyleBoxFlat BackgroundColor="Transparent" />
+                                    </Button.StyleBoxOverride>
+                                </Button>
+                                <Label Text="Actions" FontColorOverride="#FAC000" />
+                            </BoxContainer>
+                            <Label Name="PublishedEmptyLabel" Access="Public" Text="ERROR: no chemicals have been detected." FontColorOverride="#C69214" Visible="False" />
+                            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                                <BoxContainer Name="PublishedBox" Access="Public" Orientation="Vertical" SeparationOverride="2" />
+                            </ScrollContainer>
+                        </BoxContainer>
+                    </PanelContainer>
+                </BoxContainer>
+            </TabContainer>
+        </BoxContainer>
+    </PanelContainer>
+</controls:RMCResearchComputerWindow>
