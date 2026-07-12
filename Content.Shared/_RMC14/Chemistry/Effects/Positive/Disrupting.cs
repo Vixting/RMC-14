@@ -18,6 +18,6 @@ public sealed partial class Disrupting : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var stun = args.EntityManager.System<SharedStunSystem>();
-        stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds((float) potency), true);
+        stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds((float) potency * 0.1), true);
     }
 }

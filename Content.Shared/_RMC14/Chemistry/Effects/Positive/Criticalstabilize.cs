@@ -1,3 +1,5 @@
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -31,6 +33,10 @@ public sealed partial class Criticalstabilize : RMCChemicalEffect
         damage.DamageDict[AsphyxiationType] = -potency * 0.1f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
-        // TODO RMC14: suppress bleeding while critical
+        if (args.EntityManager.TryGetComponent<BloodstreamComponent>(args.TargetEntity, out var bloodstream))
+        {
+            var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
+            bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), -(float) potency);
+        }
     }
 }

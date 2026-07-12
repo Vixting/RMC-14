@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Xenonids.Parasite;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -15,7 +16,14 @@ public sealed partial class Antiparasitic : RMCChemicalEffect
         return "Antimicrobial property specifically targeting parasitic pathogens, disrupting their growth and potentially killing them.";
     }
 
-    // TODO RMC14: mob effect - damages/kills an implanted xeno embryo
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (!args.EntityManager.TryGetComponent<VictimInfectedComponent>(args.TargetEntity, out var infected))
+            return;
+
+        var parasiteSystem = args.EntityManager.System<SharedXenoParasiteSystem>();
+        parasiteSystem.DelayBurst((args.TargetEntity, infected), TimeSpan.FromSeconds((double) potency));
+    }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
@@ -27,7 +35,9 @@ public sealed partial class Antiparasitic : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 2f;
+        damage.DamageDict[PoisonType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
+
+        args.EntityManager.RemoveComponent<VictimInfectedComponent>(args.TargetEntity);
     }
 }

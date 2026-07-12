@@ -1,5 +1,7 @@
 using Content.Shared.Botany;
 using Content.Shared.Botany.Components;
+using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Popups;
@@ -10,9 +12,18 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Crystallization : RMCChemicalEffect
 {
+    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
+
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Not safe to administer. Hardens the root structure of plants, improving survivability during repeat harvests.";
+    }
+
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var damage = new DamageSpecifier();
+        damage.DamageDict[BluntType] = potency * 0.5f;
+        damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -45,5 +56,5 @@ public sealed partial class Crystallization : RMCChemicalEffect
         popup.PopupEntity(Loc.GetString("plant-repeat-harvest-shimmer", ("name", Loc.GetString(seed.DisplayName))), args.TargetEntity);
     }
 
-    // TODO RMC14: mob effect - brute damage and liver organ damage
+    // TODO RMC14: mob effect - liver organ damage
 }
