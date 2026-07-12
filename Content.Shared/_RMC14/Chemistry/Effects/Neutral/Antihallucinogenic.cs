@@ -36,7 +36,6 @@ public sealed partial class Antihallucinogenic : RMCChemicalEffect
 
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
         status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds(PotencyPerSecond * -10)); // SeeingRainbows is M.druggy in CM13
-        // TODO RMC14 Hallucination
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

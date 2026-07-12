@@ -1,4 +1,6 @@
+using Content.Shared._RMC14.Body;
 using Content.Shared.Botany.Components;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
@@ -27,7 +29,18 @@ public sealed partial class Excreting : RMCChemicalEffect
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
-        return "Causes the plant to secrete excess growth hormones, gradually increasing potency.";
+        return "Causes the plant to secrete excess growth hormones, gradually increasing potency.\n" +
+               "On mobs, purges other chemicals from the bloodstream.";
+    }
+
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var bloodstream = args.EntityManager.System<SharedRMCBloodstreamSystem>();
+        if (!bloodstream.TryGetChemicalSolution(args.TargetEntity, out var solutionEnt, out _))
+            return;
+
+        var solutionContainer = args.EntityManager.System<SharedSolutionContainerSystem>();
+        solutionContainer.RemoveEachReagent(solutionEnt, Potency);
     }
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)

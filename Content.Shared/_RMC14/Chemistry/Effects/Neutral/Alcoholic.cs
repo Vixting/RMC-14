@@ -30,8 +30,8 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         drunk.TryApplyDrunkenness(args.TargetEntity, (float) potency * 4f);
 
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.25f;
-        damage.DamageDict[AsphyxiationType] = potency * 0.5f;
+        damage.DamageDict[PoisonType] = potency * 0.5f;
+        damage.DamageDict[AsphyxiationType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
         var random = IoCManager.Resolve<IRobustRandom>();
@@ -48,8 +48,8 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         drunk.TryApplyDrunkenness(args.TargetEntity, (float) potency * 8f);
 
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
-        damage.DamageDict[AsphyxiationType] = potency;
+        damage.DamageDict[PoisonType] = potency;
+        damage.DamageDict[AsphyxiationType] = potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
         // TODO RMC14: mob effect - liver organ damage

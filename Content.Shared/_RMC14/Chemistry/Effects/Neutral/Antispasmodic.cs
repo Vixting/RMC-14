@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Movement;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -17,17 +18,33 @@ public sealed partial class Antispasmodic : RMCChemicalEffect
         return "Relaxes smooth muscles and treats muscle spasms. High concentrations can cause respiratory failure and cardiac arrest.";
     }
 
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var penalty = 1f - (float) potency * 0.1f;
+        var speed = args.EntityManager.System<TemporarySpeedModifiersSystem>();
+        var modifiers = new List<TemporarySpeedModifierSet> { new(TimeSpan.FromSeconds(2), penalty, penalty) };
+        speed.ModifySpeed(args.TargetEntity, modifiers);
+    }
+
+    protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var penalty = 1f - (float) potency * 0.2f;
+        var speed = args.EntityManager.System<TemporarySpeedModifiersSystem>();
+        var modifiers = new List<TemporarySpeedModifierSet> { new(TimeSpan.FromSeconds(2), penalty, penalty) };
+        speed.ModifySpeed(args.TargetEntity, modifiers);
+    }
+
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (random.Prob(0.25f))
+        if (random.Prob(0.3f * (float) potency))
         {
             var stun = args.EntityManager.System<SharedStunSystem>();
             stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds((float) potency), true);
         }
 
         var damage = new DamageSpecifier();
-        damage.DamageDict[AsphyxiationType] = potency * 0.5f;
+        damage.DamageDict[AsphyxiationType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
         // TODO RMC14: mob effect - heart organ damage

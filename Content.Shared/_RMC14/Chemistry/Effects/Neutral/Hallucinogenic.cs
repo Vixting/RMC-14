@@ -24,7 +24,7 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency));
+        status.TryAddStatusEffectDuration(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency));
 
         if ((float) potency > 1f)
         {
@@ -36,7 +36,7 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds(10));
+        status.TryAddStatusEffectDuration(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds(10));
 
         var jitter = args.EntityManager.System<SharedJitteringSystem>();
         jitter.DoJitter(args.TargetEntity, TimeSpan.FromSeconds(2), false);
@@ -47,7 +47,7 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
+        damage.DamageDict[PoisonType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
         var stun = args.EntityManager.System<SharedStunSystem>();

@@ -21,7 +21,7 @@ public sealed partial class Hypermetabolic : RMCChemicalEffect
 
     protected override void ReagentBoost(EntityEffectReagentArgs args, ref float boost)
     {
-        boost += Potency * 0.35f;
+        boost += Potency * 0.25f;
     }
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)

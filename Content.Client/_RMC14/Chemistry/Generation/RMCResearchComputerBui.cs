@@ -42,8 +42,11 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IResourceCache _resourceCache = default!;
 
+    private const int XAccessCost = 5;
+
     private RMCResearchComputerWindow? _window;
     private Label? _brokerClearanceLabel;
+    private Label? _requestXAccessLabel;
     private readonly List<TabButtonControl> _tabButtons = new();
     private Font _boldFont = default!;
     private Font _smallFont = default!;
@@ -78,12 +81,14 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         Logger.DebugS("research-computer", $"Open: AmberBright={AmberBright}, AmberDim={AmberDim}, AmberBlack={AmberBlack}");
 
         _brokerClearanceLabel = Icon(_window.BrokerClearanceButton, GearIcon, GearIconWhite, "Broker Clearance");
+        _requestXAccessLabel = Icon(_window.RequestXAccessButton, GearIcon, GearIconWhite, "Request 5X Access");
         Icon(_window.ReprintContractButton, RepeatIcon, RepeatIconWhite, "Reprint Last Contract");
 
         LogButtonStyle("BrokerClearanceButton", _window.BrokerClearanceButton);
         LogButtonStyle("ReprintContractButton", _window.ReprintContractButton);
 
         _window.BrokerClearanceButton.OnPressed += _ => OnBrokerClearancePressed();
+        _window.RequestXAccessButton.OnPressed += _ => OnRequestXAccessPressed();
         _window.ReprintContractButton.OnPressed += _ => SendPredictedMessage(new RMCResearchComputerReprintContractBuiMsg());
         _window.HideOldReportsButton.OnPressed += _ => Refresh();
         _window.HideOldReportsButton.Label.FontColorOverride = AmberBright;
@@ -309,6 +314,19 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             SetPurchasableStyle(_window.BrokerClearanceButton, cost <= credits);
         }
 
+        if (research.ReachedXAccess)
+        {
+            _requestXAccessLabel!.Text = "5X Access Granted";
+            _window.RequestXAccessButton.Disabled = true;
+            SetPurchasableStyle(_window.RequestXAccessButton, false);
+        }
+        else
+        {
+            _requestXAccessLabel!.Text = $"Request 5X Access ({XAccessCost}CR)";
+            _window.RequestXAccessButton.Disabled = XAccessCost > credits;
+            SetPurchasableStyle(_window.RequestXAccessButton, XAccessCost <= credits);
+        }
+
         var duration = research.PickedThisCycle ? TimeSpan.FromMinutes(6) : TimeSpan.FromMinutes(3);
         _window.CycleStart = research.NextReroll - duration;
         _window.CycleEnd = research.NextReroll;
@@ -338,6 +356,24 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         confirm.AcceptButton.OnPressed += _ =>
         {
             SendPredictedMessage(new RMCResearchComputerBrokerClearanceBuiMsg());
+            confirm.Close();
+        };
+        confirm.DenyButton.OnPressed += _ => confirm.Close();
+        confirm.OpenCentered();
+    }
+
+    private void OnRequestXAccessPressed()
+    {
+        var confirm = new ConfirmationWindow();
+        confirm.Setup(
+            "Request 5X Access",
+            $"Are you sure you want to spend {XAccessCost} research credits to request 5X clearance access?",
+            "Confirm",
+            "Cancel"
+        );
+        confirm.AcceptButton.OnPressed += _ =>
+        {
+            SendPredictedMessage(new RMCResearchComputerRequestXAccessBuiMsg());
             confirm.Close();
         };
         confirm.DenyButton.OnPressed += _ => confirm.Close();
