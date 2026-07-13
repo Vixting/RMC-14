@@ -1,92 +1,72 @@
 <DefaultWindow
     xmlns="https://spacestation14.io"
-    MinSize="420 220">
-    <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    MinSize="420 300">
+    <PanelContainer>
+        <PanelContainer.PanelOverride>
+            <graphics:StyleBoxFlat BackgroundColor="#181C24" />
+        </PanelContainer.PanelOverride>
+        <ScrollContainer HScrollEnabled="False" VScrollEnabled="True">
+            <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
 
-        <PanelContainer StyleClasses="Inset" Margin="0 0 0 4">
-            <BoxContainer Orientation="Vertical" Margin="4">
-
-                <BoxContainer Orientation="Horizontal">
-                    <Label Text="{Loc rmc-centrifuge-seed-label}"
-                           StyleClasses="LabelKeyText"
-                           VerticalAlignment="Center"
-                           MinWidth="84" />
+                <PanelContainer Name="SeedHeader" Access="Public">
+                    <Label Text="{Loc rmc-centrifuge-seed-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                </PanelContainer>
+                <BoxContainer Orientation="Horizontal" Margin="0 3 0 0" VerticalAlignment="Center">
                     <SpriteView Name="SeedSpriteView"
                                 SetSize="28 28"
                                 OverrideDirection="South"
                                 Stretch="Fit"
                                 VerticalAlignment="Center"
-                                Margin="2 0 4 0" />
-                    <Label Name="SeedStatusLabel"
-                           HorizontalExpand="True"
-                           VerticalAlignment="Center"
-                           Margin="0 0 4 0" />
-                    <Button Name="EjectSeedButton"
-                            Text="{Loc rmc-centrifuge-eject-seed}"
-                            StyleClasses="OpenRight" />
-                    <Button Name="ProcessSeedButton"
-                            Text="{Loc rmc-centrifuge-process-seed}"
-                            StyleClasses="OpenLeft" />
+                                Margin="0 0 4 0" />
+                    <PanelContainer Name="SeedStatusPanel" Access="Public" HorizontalExpand="True">
+                        <Label Name="SeedStatusLabel" Access="Public" Margin="6 1" />
+                    </PanelContainer>
+                </BoxContainer>
+                <BoxContainer Orientation="Horizontal" Margin="0 3 0 8">
+                    <Button Name="EjectSeedButton" HorizontalExpand="True" />
+                    <Button Name="ProcessSeedButton" HorizontalExpand="True" />
                 </BoxContainer>
 
-                <BoxContainer Orientation="Horizontal" Margin="0 2 0 0">
-                    <Label Text="{Loc rmc-centrifuge-genome-label}"
-                           StyleClasses="LabelKeyText"
-                           VerticalAlignment="Center"
-                           MinWidth="84" />
-                    <Label Name="GenomeNameLabel"
-                           StyleClasses="LabelSubText"
-                           HorizontalExpand="True"
-                           VerticalAlignment="Center"
-                           Margin="4 0" />
-                    <Button Name="ClearBufferButton"
-                            Text="{Loc rmc-centrifuge-clear-buffer}"
-                            StyleClasses="ButtonSquare" />
+                <PanelContainer Name="GenomeHeader" Access="Public">
+                    <Label Text="{Loc rmc-centrifuge-genome-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                </PanelContainer>
+                <PanelContainer Name="GenomeStatusPanel" Access="Public" Margin="0 3 0 0">
+                    <Label Name="GenomeNameLabel" Access="Public" Margin="6 1" />
+                </PanelContainer>
+                <ProgressBar Name="DegradationBar"
+                             Access="Public"
+                             HorizontalExpand="True"
+                             MaxValue="1"
+                             MinHeight="16"
+                             Margin="0 3 0 0">
+                    <Label Name="DegradationLabel" Access="Public" Margin="6 0" FontColorOverride="#000000" />
+                </ProgressBar>
+                <Button Name="ClearBufferButton"
+                        HorizontalExpand="True"
+                        Margin="0 3 0 8" />
+
+                <PanelContainer Name="DiscHeader" Access="Public">
+                    <Label Text="{Loc rmc-centrifuge-disc-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                </PanelContainer>
+                <BoxContainer Orientation="Horizontal" Margin="0 3 0 8">
+                    <PanelContainer Name="DiscStatusPanel" Access="Public" HorizontalExpand="True">
+                        <Label Name="DiscStatusLabel" Access="Public" Margin="6 1" />
+                    </PanelContainer>
+                    <Button Name="EjectDiscButton" />
                 </BoxContainer>
 
-                <BoxContainer Orientation="Horizontal" Margin="0 2 0 0">
-                    <ProgressBar Name="DegradationBar"
-                                 HorizontalExpand="True"
-                                 MaxValue="1"
-                                 SetHeight="16"
-                                 VerticalAlignment="Center">
-                        <Label Name="DegradationLabel"
-                               Margin="4 0"
-                               VerticalAlignment="Center" />
-                    </ProgressBar>
-                </BoxContainer>
-
-                <BoxContainer Orientation="Horizontal" Margin="0 2 0 0">
-                    <Label Text="{Loc rmc-centrifuge-disc-label}"
-                           StyleClasses="LabelKeyText"
-                           VerticalAlignment="Center"
-                           MinWidth="84" />
-                    <Label Name="DiscStatusLabel"
-                           HorizontalExpand="True"
-                           VerticalAlignment="Center"
-                           Margin="4 0" />
-                    <Button Name="EjectDiscButton"
-                            Text="{Loc rmc-centrifuge-eject-disc}"
-                            StyleClasses="ButtonSquare" />
+                <BoxContainer Name="GenesSection" Orientation="Vertical" VerticalExpand="True">
+                    <PanelContainer Name="GenesHeader" Access="Public">
+                        <Label Text="{Loc rmc-centrifuge-genes-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                    </PanelContainer>
+                    <BoxContainer Name="GeneButtonsContainer"
+                                  Orientation="Vertical"
+                                  HorizontalExpand="True"
+                                  Margin="0 3 0 0" />
                 </BoxContainer>
 
             </BoxContainer>
-        </PanelContainer>
-
-        <BoxContainer Name="GenesSection" Orientation="Vertical" VerticalExpand="True">
-            <PanelContainer StyleClasses="Inset" VerticalExpand="True">
-                <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
-                    <Label Text="{Loc rmc-centrifuge-genes-header}"
-                           StyleClasses="LabelKeyText"
-                           Margin="0 0 0 2" />
-                    <ScrollContainer HScrollEnabled="False" VerticalExpand="True" MinHeight="80">
-                        <BoxContainer Name="GeneButtonsContainer"
-                                      Orientation="Vertical"
-                                      HorizontalExpand="True" />
-                    </ScrollContainer>
-                </BoxContainer>
-            </PanelContainer>
-        </BoxContainer>
-
-    </BoxContainer>
+        </ScrollContainer>
+    </PanelContainer>
 </DefaultWindow>

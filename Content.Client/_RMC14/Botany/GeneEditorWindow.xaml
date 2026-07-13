@@ -1,68 +1,64 @@
 <DefaultWindow
     xmlns="https://spacestation14.io"
-    MinSize="340 300">
-    <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    MinSize="340 340">
+    <PanelContainer>
+        <PanelContainer.PanelOverride>
+            <graphics:StyleBoxFlat BackgroundColor="#181C24" />
+        </PanelContainer.PanelOverride>
+        <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
 
-        <PanelContainer StyleClasses="Inset" Margin="0 0 0 4" VerticalExpand="True">
-            <BoxContainer Orientation="Vertical" Margin="4">
-                <BoxContainer Orientation="Horizontal">
-                    <Label Text="{Loc rmc-gene-editor-disc-header}"
-                           StyleClasses="LabelKeyText"
-                           HorizontalExpand="True" />
-                    <Label Name="DiscStatusLabel"
-                           VerticalAlignment="Center" />
-                </BoxContainer>
-                <Label Name="DiscSourceLabel"
-                       StyleClasses="LabelSubText"
-                       Margin="0 2 0 0" />
-                <ScrollContainer HScrollEnabled="False"
-                                 VerticalExpand="True"
-                                 MinHeight="80"
-                                 Margin="0 2 0 0">
-                    <BoxContainer Name="DiscGenesContainer" Orientation="Vertical" />
-                </ScrollContainer>
+            <PanelContainer Name="DiscHeader" Access="Public">
+                <Label Text="{Loc rmc-gene-editor-disc-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+            </PanelContainer>
+            <PanelContainer Name="DiscStatusPanel" Access="Public" Margin="0 3 0 0">
+                <Label Name="DiscStatusLabel" Access="Public" Margin="6 1" />
+            </PanelContainer>
+            <Label Name="DiscSourceLabel"
+                   StyleClasses="LabelSubText"
+                   Margin="0 3 0 0" />
+            <ScrollContainer HScrollEnabled="False"
+                             VerticalExpand="True"
+                             MinHeight="80"
+                             Margin="0 2 0 6">
+                <BoxContainer Name="DiscGenesContainer" Orientation="Vertical" />
+            </ScrollContainer>
+
+            <PanelContainer Name="SeedHeader" Access="Public">
+                <Label Text="{Loc rmc-gene-editor-seed-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+            </PanelContainer>
+            <BoxContainer Orientation="Horizontal" Margin="0 3 0 0" VerticalAlignment="Center">
+                <SpriteView Name="SeedSpriteView"
+                            SetSize="28 28"
+                            OverrideDirection="South"
+                            Stretch="Fit"
+                            VerticalAlignment="Center"
+                            Margin="0 0 4 0" />
+                <PanelContainer Name="SeedStatusPanel" Access="Public" HorizontalExpand="True">
+                    <Label Name="SeedStatusLabel" Access="Public" Margin="6 1" />
+                </PanelContainer>
             </BoxContainer>
-        </PanelContainer>
+            <ProgressBar Name="EditCountBar"
+                         Access="Public"
+                         HorizontalExpand="True"
+                         MaxValue="1"
+                         MinHeight="16"
+                         Margin="0 3 0 0">
+                <Label Name="EditCountLabel"
+                       Access="Public"
+                       Margin="6 0"
+                       FontColorOverride="#000000" />
+            </ProgressBar>
 
-        <PanelContainer StyleClasses="Inset" Margin="0 0 0 4">
-            <BoxContainer Orientation="Vertical" Margin="4">
-                <BoxContainer Orientation="Horizontal">
-                    <Label Text="{Loc rmc-gene-editor-seed-header}"
-                           StyleClasses="LabelKeyText"
-                           HorizontalExpand="True" />
-                    <SpriteView Name="SeedSpriteView"
-                                SetSize="28 28"
-                                OverrideDirection="South"
-                                Stretch="Fit"
-                                VerticalAlignment="Center"
-                                Margin="0 0 4 0" />
-                    <Label Name="SeedStatusLabel"
-                           VerticalAlignment="Center" />
-                </BoxContainer>
-                <BoxContainer Orientation="Horizontal" Margin="0 2 0 0" VerticalAlignment="Center">
-                    <ProgressBar Name="EditCountBar"
-                                 HorizontalExpand="True"
-                                 MaxValue="1"
-                                 SetHeight="16"
-                                 VerticalAlignment="Center">
-                        <Label Name="EditCountLabel"
-                               Margin="4 0"
-                               VerticalAlignment="Center" />
-                    </ProgressBar>
-                </BoxContainer>
+            <BoxContainer Orientation="Horizontal" Margin="0 6 0 0">
+                <Button Name="ApplyButton"
+                        HorizontalExpand="True"
+                        StyleClasses="OpenRight" />
+                <Button Name="EjectButton"
+                        HorizontalExpand="True"
+                        StyleClasses="OpenLeft" />
             </BoxContainer>
-        </PanelContainer>
 
-        <BoxContainer Orientation="Horizontal">
-            <Button Name="ApplyButton"
-                    Text="{Loc rmc-gene-editor-apply-button}"
-                    HorizontalExpand="True"
-                    StyleClasses="OpenRight" />
-            <Button Name="EjectButton"
-                    Text="{Loc rmc-gene-editor-eject-button}"
-                    HorizontalExpand="True"
-                    StyleClasses="OpenLeft" />
         </BoxContainer>
-
-    </BoxContainer>
+    </PanelContainer>
 </DefaultWindow>
