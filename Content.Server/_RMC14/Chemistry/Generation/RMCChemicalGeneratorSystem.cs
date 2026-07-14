@@ -45,6 +45,8 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
     private readonly Dictionary<string, string> _originalIds = new();
     private readonly Dictionary<string, ReactionIndicator> _reactionIndicators = new();
 
+    private readonly Dictionary<string, ProtoId<ReagentPrototype>> _simulationResults = new();
+
     // legendary/ciphering recipes are rolled fresh once per round
     private static readonly string[] LegendaryPropertyIds = ["Hypergenetic", "Boosting", "Regulating", "Optimized"];
     private const string CipheringId = "Ciphering";
@@ -59,7 +61,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
 
     // LEGENDARY_COMBINE_PROPERTIES = 3 random properties per legendary, drawn from the same
     // pool PickProperties uses. Ciphering is a separate case sharing the mechanism: 2 random
-    // properties plus a hardcoded 3rd slot of Encrypted
+    // properties plus a hardcoded 3rd slot of encrypted
     private void RollLegendaryCombines()
     {
         var pool = _prototype.EnumeratePrototypes<ChemGeneratorPropertyPrototype>()
@@ -144,6 +146,33 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         "tine", "thol", "tic", "um", "vene", "vone", "x", "xene", "xin", "xine", "zene", "zine", "zone",
     ];
 
+    private void BroadcastGenerated(
+        string id,
+        string name,
+        string color,
+        string physicalDesc,
+        List<(ChemGeneratorPropertyPrototype Property, int Level)> properties,
+        int overdose,
+        int criticalOverdose,
+        List<(string Id, int Amount, bool Catalyst)> ingredients,
+        ChemClass chemClass,
+        ReactionIndicator indicator)
+    {
+        var data = new RMCGeneratedReagentData(
+            id,
+            name,
+            color,
+            physicalDesc,
+            properties.Select(p => new ChemReportProperty { PropertyId = p.Property.ID, Level = p.Level }).ToList(),
+            overdose,
+            criticalOverdose,
+            ingredients.Select(i => new RecipeCandidateIngredient { Id = i.Id, Amount = i.Amount, Catalyst = i.Catalyst }).ToList(),
+            chemClass,
+            indicator);
+
+        _protoSync.Broadcast(data);
+    }
+
     public ProtoId<ReagentPrototype> GenerateReagent(int tier)
     {
         tier = Math.Clamp(tier, 1, 3);
@@ -160,8 +189,9 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var physicalDesc = _random.Pick(PhysicalDescriptions);
         var indicator = RollReactionIndicator();
 
-        var yaml = BuildYaml(id, name, color, physicalDesc, properties, overdose, criticalOverdose, ingredients, ChemClass.Special, indicator);
-        _protoSync.Broadcast(yaml);
+        BroadcastGenerated(id, name, color, physicalDesc, properties, overdose, criticalOverdose, ingredients, ChemClass.Special, indicator);
+        AppendToClassPoolCache(ChemClass.Special, id);
+        CacheRecipeReactants(id, ingredients);
         _generatedTiers[id] = tier;
         _reactionIndicators[id] = indicator;
 
@@ -188,8 +218,9 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var physicalDesc = _random.Pick(PhysicalDescriptions);
         var indicator = RollReactionIndicator();
 
-        var yaml = BuildYaml(id, name, color, physicalDesc, properties, finalOverdose, finalCriticalOverdose, ingredients, ChemClass.Special, indicator);
-        _protoSync.Broadcast(yaml);
+        BroadcastGenerated(id, name, color, physicalDesc, properties, finalOverdose, finalCriticalOverdose, ingredients, ChemClass.Special, indicator);
+        AppendToClassPoolCache(ChemClass.Special, id);
+        CacheRecipeReactants(id, ingredients);
         _generatedTiers[id] = tier;
         _reactionIndicators[id] = indicator;
 
@@ -226,8 +257,9 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var ingredients = PickRecipeIngredients(tier, id, forcedFirst);
         var indicator = RollReactionIndicator();
 
-        var yaml = BuildYaml(id, stats.Name, stats.Color, stats.PhysicalDesc, stats.Properties, stats.Overdose, stats.CriticalOverdose, ingredients, ChemClass.Special, indicator);
-        _protoSync.Broadcast(yaml);
+        BroadcastGenerated(id, stats.Name, stats.Color, stats.PhysicalDesc, stats.Properties, stats.Overdose, stats.CriticalOverdose, ingredients, ChemClass.Special, indicator);
+        AppendToClassPoolCache(ChemClass.Special, id);
+        CacheRecipeReactants(id, ingredients);
         _generatedTiers[id] = tier;
         _reactionIndicators[id] = indicator;
 
@@ -248,15 +280,19 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         };
     }
 
+    private HashSet<string>? _generatedNameCache;
+
     private string GenerateName()
     {
-        var existing = _prototype.EnumeratePrototypes<ReagentPrototype>().Select(r => r.LocalizedName).ToHashSet();
+        _generatedNameCache ??= _prototype.EnumeratePrototypes<ReagentPrototype>().Select(r => r.LocalizedName).ToHashSet();
+
         string name;
         do
         {
             name = _random.Pick(Prefix) + _random.Pick(WordRoot) + _random.Pick(Suffix);
-        } while (existing.Contains(name));
+        } while (_generatedNameCache.Contains(name));
 
+        _generatedNameCache.Add(name);
         return name;
     }
 
@@ -287,10 +323,15 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var pool = _prototype.EnumeratePrototypes<ChemGeneratorPropertyPrototype>()
             .Where(p => !p.Flags.HasFlag(ChemPropertyType.Disabled))
             .ToList();
-        var positive = pool.Where(p => p.Category == ChemPropertyCategory.Positive).ToList();
-        var negative = pool.Where(p => p.Category == ChemPropertyCategory.Negative).ToList();
-        var neutral = pool.Where(p => p.Category == ChemPropertyCategory.Neutral).ToList();
+
+        // mutually exclusive if/else chain keyed on rarity -
+        // a rare  property only ever lands in the rare pool, never in the ordinary
+        // positive/negative/neutral pools, so it's only reachable via the forced first property
+        // mechanism below rather than leaking into normal weighted category rolls too
         var rarePool = pool.Where(p => p.Rarity == ChemPropertyRarity.Rare).ToList();
+        var positive = pool.Where(p => p.Category == ChemPropertyCategory.Positive && p.Rarity != ChemPropertyRarity.Rare).ToList();
+        var negative = pool.Where(p => p.Category == ChemPropertyCategory.Negative && p.Rarity != ChemPropertyRarity.Rare).ToList();
+        var neutral = pool.Where(p => p.Category == ChemPropertyCategory.Neutral && p.Rarity != ChemPropertyRarity.Rare).ToList();
 
         var propertiesBuff = _random.Next(3, 5);
         if (tier == 2)
@@ -441,20 +482,45 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         };
     }
 
-    private Dictionary<ChemClass, List<string>> BuildClassPools(params string[] exclude)
+    // Jank asf but idk what else to do
+    private Dictionary<ChemClass, List<string>>? _classPoolCache;
+
+    private Dictionary<ChemClass, List<string>> GetClassPools()
     {
+        if (_classPoolCache != null)
+            return _classPoolCache;
+
         var pools = new Dictionary<ChemClass, List<string>>();
         foreach (ChemClass c in Enum.GetValues<ChemClass>())
             pools[c] = new List<string>();
 
-        var excludeSet = exclude.ToHashSet();
         foreach (var r in _prototype.EnumeratePrototypes<ReagentPrototype>())
         {
-            if (r.Abstract || r.Unknown || excludeSet.Contains(r.ID))
+            if (r.Abstract || r.Unknown)
                 continue;
 
             pools[r.ChemClass].Add(r.ID);
         }
+
+        _classPoolCache = pools;
+        return pools;
+    }
+
+    private void AppendToClassPoolCache(ChemClass chemClass, string id)
+    {
+        _classPoolCache?[chemClass].Add(id);
+    }
+
+    private Dictionary<ChemClass, List<string>> BuildClassPools(params string[] exclude)
+    {
+        var cached = GetClassPools();
+        if (exclude.Length == 0)
+            return cached;
+
+        var excludeSet = exclude.ToHashSet();
+        var pools = new Dictionary<ChemClass, List<string>>();
+        foreach (var (chemClass, ids) in cached)
+            pools[chemClass] = ids.Where(id => !excludeSet.Contains(id)).ToList();
 
         return pools;
     }
@@ -483,10 +549,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         if (_random.Prob(VialSpecialChance))
             return XenogeneticCatalyst.Id;
 
-        var special = _prototype.EnumeratePrototypes<ReagentPrototype>()
-            .Where(r => !r.Abstract && !r.Unknown && r.ChemClass == ChemClass.Special && r.ID != XenogeneticCatalyst.Id)
-            .Select(r => r.ID)
-            .ToList();
+        var special = GetClassPools()[ChemClass.Special].Where(id => id != XenogeneticCatalyst.Id).ToList();
 
         return special.Count > 0 ? _random.Pick(special) : string.Empty;
     }
@@ -578,75 +641,6 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         "shiny", "powdery",
     ];
 
-    private static string BuildYaml(
-        string id,
-        string name,
-        string color,
-        string physicalDesc,
-        List<(ChemGeneratorPropertyPrototype Property, int Level)> properties,
-        int overdose,
-        int criticalOverdose,
-        List<(string Id, int Amount, bool Catalyst)> ingredients,
-        ChemClass chemClass,
-        ReactionIndicator indicator = ReactionIndicator.Calm)
-    {
-        var sb = new StringBuilder();
-
-        sb.AppendLine("- type: reagent");
-        sb.AppendLine($"  id: {id}");
-        sb.AppendLine($"  name: \"{name}\"");
-        sb.AppendLine($"  desc: \"A procedurally synthesized compound with unpredictable properties.\"");
-        sb.AppendLine($"  physicalDesc: reagent-physical-desc-{physicalDesc}");
-        sb.AppendLine($"  color: \"{color}\"");
-        sb.AppendLine($"  chemClass: {chemClass}");
-        sb.AppendLine("  unknown: true");
-        sb.AppendLine("  fireEntity: RMCTileFireGenerated");
-        sb.AppendLine($"  overdose: {overdose}");
-        sb.AppendLine($"  criticalOverdose: {criticalOverdose}");
-
-        if (properties.Any(p => p.Property.ID is "Defibrillating" or "Neurocryogenic"))
-            sb.AppendLine("  worksOnTheDead: true");
-
-        sb.AppendLine("  metabolisms:");
-        sb.AppendLine("    Poison:");
-        sb.AppendLine("      metabolismRate: 0.1");
-        sb.AppendLine("      effects:");
-        foreach (var (property, level) in properties)
-        {
-            sb.AppendLine($"      - !type:{property.ID}");
-            sb.AppendLine($"        potency: {level}");
-        }
-
-        if (ingredients.Count > 0)
-        {
-            sb.AppendLine();
-            sb.AppendLine("- type: reaction");
-            sb.AppendLine($"  id: {id}Recipe");
-            sb.AppendLine("  reactants:");
-            foreach (var (ingredientId, amount, catalyst) in ingredients)
-            {
-                sb.AppendLine($"    {ingredientId}:");
-                sb.AppendLine($"      amount: {amount}");
-                if (catalyst)
-                    sb.AppendLine("      catalyst: true");
-            }
-
-            // forces this reagents own recipe to always yield a flat 3
-            // units regardless of ingredient cost, rather than the usual 1
-            var yield = properties.Any(p => p.Property.ID == "Optimized") ? 3 : 1;
-            sb.AppendLine("  products:");
-            sb.AppendLine($"    {id}: {yield}");
-
-            if (indicator != ReactionIndicator.Calm)
-            {
-                sb.AppendLine("  effects:");
-                sb.AppendLine("  - !type:RMCReactionIndicatorEffect");
-                sb.AppendLine($"    indicator: {indicator}");
-            }
-        }
-
-        return sb.ToString();
-    }
 
     public List<(ChemGeneratorPropertyPrototype Property, int Level)> GetProperties(Reagent reagent)
     {
@@ -670,7 +664,16 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
 
     public EntityUid PrintReport(EntityCoordinates coords, ProtoId<ReagentPrototype> reagentId, Reagent reagent, int sampleNumber = 0, string? category = null, bool simulatorReport = false)
     {
-        var properties = GetProperties(reagent);
+        var isGenerated = IsGenerated(reagentId);
+
+        var hasTier = TryGetGeneratedTier(reagentId, out var tier);
+        var tierClassified = isGenerated && hasTier && !_research.HasSufficientClearance(tier);
+
+        var xClassified = !isGenerated && reagent.ChemClass >= ChemClass.Special && !_research.HasXAccess();
+
+        var classified = tierClassified || xClassified;
+
+        var properties = classified ? new List<(ChemGeneratorPropertyPrototype Property, int Level)>() : GetProperties(reagent);
         var report = Spawn(ReportProto, coords);
 
         var comp = EnsureComp<RMCChemResearchReportComponent>(report);
@@ -678,8 +681,8 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         comp.Properties = properties.Select(p => new ChemReportProperty { PropertyId = p.Property.ID, Level = p.Level }).ToList();
         comp.Overdose = (int) (reagent.Overdose ?? FixedPoint2.Zero);
         comp.CriticalOverdose = (int) (reagent.CriticalOverdose ?? FixedPoint2.Zero);
-        comp.Completed = true;
-        comp.IsGenerated = IsGenerated(reagentId);
+        comp.Completed = !classified;
+        comp.IsGenerated = isGenerated;
         Dirty(report, comp);
 
         _metaData.SetEntityName(report, Loc.GetString("rmc-chem-research-report-name", ("name", reagent.LocalizedName)));
@@ -692,6 +695,36 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
 
         sb.AppendLine();
         sb.AppendLine($"[bold][head=3]Result for {reagent.LocalizedName}[/head][/bold]");
+
+        if (classified)
+        {
+            sb.AppendLine();
+            if (tierClassified)
+            {
+                sb.AppendLine($"[bold]CLASSIFIED: Clearance Level {tier} Required[/bold]");
+                sb.AppendLine();
+                sb.AppendLine("Formula and composition data withheld pending clearance elevation.");
+            }
+            else
+            {
+                sb.AppendLine("[bold]CLASSIFIED: 5X Clearance Required[/bold]");
+                sb.AppendLine();
+                sb.AppendLine("This sample's molecular structure exceeds standard clearance parameters. Elevated access is required to view its properties.");
+            }
+            sb.AppendLine();
+            RMCChemPaperFormat.AppendFooter(sb, simulatorReport
+                ? "This report was automatically printed by the Synthesis Simulator."
+                : "This report was automatically printed by the A-XRF Scanner.");
+            _paper.SetContent(report, RMCChemPaperFormat.Wrap(sb));
+
+            if (category != null)
+            {
+                var classifiedTitle = sampleNumber > 0 ? $"{sampleNumber} - {reagent.LocalizedName}" : reagent.LocalizedName;
+                _research.SaveDocument(category, report, classifiedTitle);
+            }
+
+            return report;
+        }
 
         sb.AppendLine();
         sb.AppendLine($"ID: {reagent.LocalizedName}");
@@ -948,15 +981,75 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         }
     }
 
-    public (List<(string Id, int Amount, bool Catalyst)> Ingredients, string? NewIngredientId) RollRecipeCandidate(string baseReagentId, int tier, string newId)
+    private readonly Dictionary<string, List<(string Id, int Amount, bool Catalyst)>> _recipeReactantsCache = new();
+
+    private void CacheRecipeReactants(string reagentId, List<(string Id, int Amount, bool Catalyst)> ingredients)
     {
+        if (ingredients.Count > 0)
+            _recipeReactantsCache[reagentId] = ingredients;
+    }
+
+    public bool HasExistingRecipe(string reagentId) => TryGetRecipeReactants(reagentId, out _);
+
+    public bool TryGetRecipeReactants(string reagentId, out List<(string Id, int Amount, bool Catalyst)> reactants)
+    {
+        if (_recipeReactantsCache.TryGetValue(reagentId, out var cached))
+        {
+            reactants = cached;
+            return true;
+        }
+
         var existing = _prototype.EnumeratePrototypes<ReactionPrototype>()
-            .FirstOrDefault(r => r.Products.ContainsKey(baseReagentId));
+            .FirstOrDefault(r => r.Products.ContainsKey(reagentId));
 
         if (existing == null || existing.Reactants.Count == 0)
-            return (PickRecipeIngredients(tier, newId), null);
+        {
+            reactants = new();
+            return false;
+        }
 
-        var reactants = existing.Reactants.Select(kv => (Id: kv.Key, Amount: (int) kv.Value.Amount, kv.Value.Catalyst)).ToList();
+        reactants = existing.Reactants.Select(kv => (Id: kv.Key, Amount: (int) kv.Value.Amount, kv.Value.Catalyst)).ToList();
+        return true;
+    }
+
+    public bool IsDuplicateRecipe(List<(string Id, int Amount, bool Catalyst)> a, List<(string Id, int Amount, bool Catalyst)> b)
+    {
+        if (a.Count != b.Count)
+            return false;
+
+        var aKeys = a.Select(x => $"{x.Id}:{x.Amount}:{x.Catalyst}").OrderBy(x => x, StringComparer.Ordinal);
+        var bKeys = b.Select(x => $"{x.Id}:{x.Amount}:{x.Catalyst}").OrderBy(x => x, StringComparer.Ordinal);
+        return aKeys.SequenceEqual(bKeys);
+    }
+
+    public string ComputeSimulationSignature(List<(ChemGeneratorPropertyPrototype Property, int Level)> properties, int overdose)
+    {
+        var sorted = properties
+            .OrderBy(p => p.Property.ID, StringComparer.Ordinal)
+            .Select(p => $"{p.Property.ID}:{p.Level}");
+        return string.Join("|", sorted) + $"#{overdose}";
+    }
+
+    public bool TryGetSimulationResult(string signature, out ProtoId<ReagentPrototype> reagentId) =>
+        _simulationResults.TryGetValue(signature, out reagentId);
+
+    public void RegisterSimulationResult(string signature, ProtoId<ReagentPrototype> reagentId) =>
+        _simulationResults[signature] = reagentId;
+
+    public (List<(string Id, int Amount, bool Catalyst)> Ingredients, string? NewIngredientId) RollRecipeCandidate(string baseReagentId, int tier, string newId)
+    {
+        if (!_recipeReactantsCache.TryGetValue(baseReagentId, out var cachedReactants))
+        {
+            var existing = _prototype.EnumeratePrototypes<ReactionPrototype>()
+                .FirstOrDefault(r => r.Products.ContainsKey(baseReagentId));
+
+            if (existing == null || existing.Reactants.Count == 0)
+                return (PickRecipeIngredients(tier, newId), null);
+
+            cachedReactants = existing.Reactants.Select(kv => (Id: kv.Key, Amount: (int) kv.Value.Amount, kv.Value.Catalyst)).ToList();
+        }
+
+        var reactants = new List<(string Id, int Amount, bool Catalyst)>(cachedReactants);
 
         var swapTier = Math.Max(tier - 1, 1);
         var pools = BuildClassPools([newId, ..reactants.Select(x => x.Id)]);
@@ -1012,8 +1105,9 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var physicalDesc = _random.Pick(PhysicalDescriptions);
         var indicator = RollReactionIndicator();
 
-        var yaml = BuildYaml(id, name, color, physicalDesc, newProperties, newOverdose, criticalOverdose, ingredients, ChemClass.Rare, indicator);
-        _protoSync.Broadcast(yaml);
+        BroadcastGenerated(id, name, color, physicalDesc, newProperties, newOverdose, criticalOverdose, ingredients, ChemClass.Rare, indicator);
+        AppendToClassPoolCache(ChemClass.Rare, id);
+        CacheRecipeReactants(id, ingredients);
         _generatedTiers[id] = tier;
         _originalIds[id] = baseReagent.ID;
         _reactionIndicators[id] = indicator;

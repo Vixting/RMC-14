@@ -19,7 +19,7 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
         var comp = ent.Comp;
         comp.Simulating = false;
 
-        if (!TryGetSlotReport(ent, comp.TargetSlotId, out _, out var targetReport))
+        if (!TryGetSlotReport(ent, comp.TargetSlotId, out var targetItem, out var targetReport))
         {
             Dirty(ent);
             UpdateAppearance(ent);
@@ -70,19 +70,71 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
                 break;
         }
 
-        var overdose = targetReport.Overdose;
+        var overdose = Math.Max(targetReport.Overdose, 1);
         if (comp.Mode != SynthesisMode.Add)
             overdose = overdose <= 5 ? Math.Max(overdose - 1, 1) : Math.Max(overdose - 5, 5);
 
+        var signature = _generator.ComputeSimulationSignature(properties, overdose);
+        if (_generator.TryGetSimulationResult(signature, out var existingId) && _rmcReagent.TryIndex(existingId, out var existingReagent))
+        {
+            comp.RecipeCandidates = null;
+            comp.PendingProperties = null;
+            comp.PendingNewIngredientIds = null;
+            comp.PendingSignature = null;
+            Dirty(ent);
+            UpdateAppearance(ent);
+            _generator.PrintReport(Transform(ent).Coordinates, existingId, existingReagent, category: "Synthesis Simulations", simulatorReport: true);
+            _audio.PlayPvs(comp.FinishSound, ent);
+            return;
+        }
+
         var tier = _generator.TryGetGeneratedTier(targetReport.ReagentId, out var t) ? t : 1;
+
+        var hasExistingRecipe = _generator.TryGetRecipeReactants(targetReport.ReagentId.Id, out var existingReactants);
+        var candidateCount = hasExistingRecipe ? 3 : 1;
 
         var candidates = new List<List<RecipeCandidateIngredient>>();
         var newIngredientIds = new List<string?>();
-        for (var i = 0; i < 3; i++)
+
+        for (var i = 0; i < candidateCount; i++)
         {
-            var (ingredients, newIngredientId) = _generator.RollRecipeCandidate(targetReport.ReagentId, tier, targetReport.ReagentId.Id);
+            var ingredients = new List<(string Id, int Amount, bool Catalyst)>();
+            string? newIngredientId = null;
+
+            // retries up to 8 times to avoid rolling a duplicate rcipe
+            for (var attempt = 0; attempt < 8; attempt++)
+            {
+                (ingredients, newIngredientId) = _generator.RollRecipeCandidate(targetReport.ReagentId, tier, targetReport.ReagentId.Id);
+
+                var duplicatesExisting = hasExistingRecipe && _generator.IsDuplicateRecipe(ingredients, existingReactants);
+                var duplicatesCandidate = candidates.Any(c => _generator.IsDuplicateRecipe(ingredients, c.Select(x => (x.Id, x.Amount, x.Catalyst)).ToList()));
+
+                if (!duplicatesExisting && !duplicatesCandidate)
+                    break;
+            }
+
+            if (ingredients.Count == 0)
+                continue;
+
             candidates.Add(ingredients.Select(c => new RecipeCandidateIngredient { Id = c.Id, Amount = c.Amount, Catalyst = c.Catalyst }).ToList());
             newIngredientIds.Add(newIngredientId);
+        }
+
+        if (candidates.Count == 0)
+        {
+            QueueDel(targetItem);
+            if (TryGetSlotReport(ent, comp.ReferenceSlotId, out var referenceItem, out _))
+                QueueDel(referenceItem);
+
+            comp.SimulationFailed = true;
+            comp.RecipeCandidates = null;
+            comp.PendingProperties = null;
+            comp.PendingNewIngredientIds = null;
+            comp.PendingSignature = null;
+            Dirty(ent);
+            UpdateAppearance(ent);
+            _audio.PlayPvs("/Audio/_RMC14/Machines/buzz_two.ogg", ent);
+            return;
         }
 
         comp.PendingProperties = properties.Select(p => new ChemReportProperty { PropertyId = p.Property.ID, Level = p.Level }).ToList();
@@ -90,8 +142,16 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
         comp.PendingTier = tier;
         comp.RecipeCandidates = candidates;
         comp.PendingNewIngredientIds = newIngredientIds;
-        comp.Picking = true;
+        comp.PendingSignature = signature;
         Dirty(ent);
+
+        if (!hasExistingRecipe)
+        {
+            FinalizeSimulation(ent, 0);
+            return;
+        }
+
+        comp.Picking = true;
         UpdateAppearance(ent);
 
         _audio.PlayPvs(comp.FinishSound, ent);
@@ -110,6 +170,8 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
         {
             comp.RecipeCandidates = null;
             comp.PendingProperties = null;
+            comp.PendingNewIngredientIds = null;
+            comp.PendingSignature = null;
             Dirty(ent);
             UpdateAppearance(ent);
             return;
@@ -126,6 +188,9 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
 
         var baseReagent = _rmcReagent.Index(targetReport.ReagentId);
         var variantId = _generator.GenerateVariant(baseReagent, properties, comp.PendingTier, ingredients, comp.PendingOverdose);
+
+        if (comp.PendingSignature is { } signature)
+            _generator.RegisterSimulationResult(signature, variantId);
 
         var cost = GetCost(ent);
         _research.TrySpendCredits(cost);
@@ -148,6 +213,7 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
         comp.RecipeCandidates = null;
         comp.PendingProperties = null;
         comp.PendingNewIngredientIds = null;
+        comp.PendingSignature = null;
         Dirty(ent);
         UpdateAppearance(ent);
 
