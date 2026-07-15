@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using Content.Shared._RMC14.Movement;
 using Content.Shared.ActionBlocker;
 using Content.Shared.CCVar;
 using Content.Shared.Friction;
@@ -227,6 +228,11 @@ public abstract partial class SharedMoverController : VirtualController
 
             wishDir = AssertValidWish(mover, walkSpeed, sprintSpeed);
 
+            // RMC14
+            var confusedEv = new ConfusedMovementEvent(wishDir);
+            RaiseLocalEvent(uid, ref confusedEv);
+            wishDir = confusedEv.WishDir;
+
             var ev = new CanWeightlessMoveEvent(uid);
             RaiseLocalEvent(uid, ref ev, true);
 
@@ -273,6 +279,11 @@ public abstract partial class SharedMoverController : VirtualController
                 walkSpeed = sprintSpeed;
 
             wishDir = AssertValidWish(mover, walkSpeed, sprintSpeed);
+
+            // RMC14
+            var confusedEv = new ConfusedMovementEvent(wishDir);
+            RaiseLocalEvent(uid, ref confusedEv);
+            wishDir = confusedEv.WishDir;
 
             if (wishDir != Vector2.Zero)
             {

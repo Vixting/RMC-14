@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using Content.Server.GameTicking.Events;
 using Content.Server.Radio.EntitySystems;
 using Content.Shared._RMC14.Chemistry.Generation;
 using Content.Shared._RMC14.Chemistry.Reagent;
@@ -26,6 +27,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
     [Dependency] private readonly IntelSystem _intel = default!;
     [Dependency] private readonly PaperSystem _paper = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
     [Dependency] private readonly RadioSystem _radio = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -47,6 +49,17 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
     private static readonly TimeSpan ContractRerollPicked = TimeSpan.FromMinutes(6);
 
     private readonly Dictionary<int, ContractStats> _contractStats = new();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<RoundStartingEvent>(OnRoundStarting);
+    }
+
+    private void OnRoundStarting(RoundStartingEvent ev)
+    {
+        EnsureResearch();
+    }
 
     public override void Update(float frameTime)
     {
@@ -73,8 +86,30 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         _pvsOverride.AddGlobalOverride(id);
         Log.Debug($"EnsureResearch: no existing singleton found, spawned {ToPrettyString(id)} with PVS global override");
         RerollContracts(ent);
+        SeedStaticPendingChemicals();
 
         return ent;
+    }
+
+    private void SeedStaticPendingChemicals()
+    {
+        var total = 0;
+        var seeded = 0;
+        foreach (var reagent in _prototype.EnumeratePrototypes<ReagentPrototype>())
+        {
+            total++;
+            if (reagent.ChemClass < ChemClass.Special)
+                continue;
+
+            if (_generator.IsGenerated(reagent.ID))
+                continue;
+
+            Log.Debug($"SeedStaticPendingChemicals: seeding {reagent.ID} (\"{reagent.LocalizedName}\", ChemClass={reagent.ChemClass})");
+            _intel.AddPendingChemical(reagent.ID, reagent.LocalizedName);
+            seeded++;
+        }
+
+        Log.Debug($"SeedStaticPendingChemicals: seeded {seeded} static chemicals out of {total} total reagent prototypes");
     }
 
     public bool TryGetResearch([NotNullWhen(true)] out Entity<RMCChemistryResearchComponent>? research)
@@ -113,6 +148,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
             _ => FixedPoint2.New(0.3),
         };
         _intel.AddAnalyzedChemical(points);
+        _intel.RemovePendingChemical(reagentId);
     }
 
     public bool TrySpendCredits(int cost)
@@ -283,7 +319,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         var computers = EntityQueryEnumerator<RMCResearchComputerComponent>();
         while (computers.MoveNext(out var computerId, out _))
         {
-            _popup.PopupEntity(Loc.GetString("rmc-research-computer-contracts-updated"), computerId, PopupType.Medium);
+            _popup.PopupEntity("Chemical contracts have been updated!", computerId, PopupType.Medium);
             _audio.PlayPvs("/Audio/Machines/twobeep.ogg", computerId);
         }
     }
@@ -491,7 +527,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
 
         var message = $"Chemical Advisory: {name} has been identified. Notable properties: {properties}.";
         _radio.SendRadioMessage(computer, message, MedicalAdvisoryChannel, computer);
-        _popup.PopupEntity(Loc.GetString("rmc-research-computer-announce-sent"), computer, actor);
+        _popup.PopupEntity("The terminal transmits a chemical advisory to the medical channel.", computer, actor);
 
         research.Comp.NextAnnounceAt = _timing.CurTime + AnnounceCooldown;
         Dirty(research);

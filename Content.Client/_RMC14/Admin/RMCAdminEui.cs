@@ -150,7 +150,8 @@ public sealed class RMCAdminEui : BaseEui
 
     private void OnCreateHiveEntered(LineEditEventArgs args)
     {
-        var msg = new RMCAdminCreateHiveMsg(args.Text);
+        var color = _createHiveWindow?.HiveColor.Color ?? Color.White;
+        var msg = new RMCAdminCreateHiveMsg(args.Text, color);
         SendMessage(msg);
         _createHiveWindow?.Close();
     }

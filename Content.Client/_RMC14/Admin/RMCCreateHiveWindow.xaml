@@ -2,6 +2,9 @@
     xmlns="https://spacestation14.io"
     xmlns:cc="clr-namespace:Content.Client._RMC14.Admin"
     Title="{Loc rmc-ui-create-hive-title}"
-    MinSize="200 50">
-    <LineEdit Name="HiveName" Access="Public" />
+    MinSize="200 220">
+    <BoxContainer Orientation="Vertical">
+        <LineEdit Name="HiveName" Access="Public" />
+        <ColorSelectorSliders Name="HiveColor" Access="Public" />
+    </BoxContainer>
 </cc:RMCCreateHiveWindow>
