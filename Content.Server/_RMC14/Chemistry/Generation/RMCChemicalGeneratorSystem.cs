@@ -3,8 +3,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Content.Shared._RMC14.Chemistry.Effects;
+using Content.Shared._RMC14.Chemistry.Effects.Positive;
+using Content.Shared._RMC14.Chemistry.Effects.Special;
 using Content.Shared._RMC14.Chemistry.Generation;
 using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared._RMC14.Intel;
 using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.FixedPoint;
@@ -30,6 +33,7 @@ public sealed record ContractStats(
 
 public sealed class RMCChemicalGeneratorSystem : EntitySystem
 {
+    [Dependency] private readonly IntelSystem _intel = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly PaperSystem _paper = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
@@ -171,6 +175,26 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
             indicator);
 
         _protoSync.Broadcast(data);
+
+        if (chemClass >= ChemClass.Special)
+            _intel.AddPendingChemical(id, name);
+    }
+
+    private static bool IsWhiteHot(List<(ChemGeneratorPropertyPrototype Property, int Level)> properties)
+    {
+        var intensity = 0f;
+        foreach (var (property, level) in properties)
+        {
+            intensity += property.Effect switch
+            {
+                Intensity => level,
+                Fueling => -3f * level,
+                Oxidizing => 7f * level,
+                _ => 0f,
+            };
+        }
+
+        return intensity >= 50f;
     }
 
     public ProtoId<ReagentPrototype> GenerateReagent(int tier)
@@ -182,6 +206,8 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var color = $"#{_random.Next(0, 256):X2}{_random.Next(0, 256):X2}{_random.Next(0, 256):X2}";
 
         var properties = PickProperties(tier);
+        if (IsWhiteHot(properties))
+            color = "#FFFFFF";
 
         var (overdose, criticalOverdose) = RollOverdose(tier);
 
@@ -209,6 +235,8 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var name = GenerateName();
         var id = $"RMCGenerated{++_generatedCount}{name.Replace(" ", "")}";
         var color = $"#{_random.Next(0, 256):X2}{_random.Next(0, 256):X2}{_random.Next(0, 256):X2}";
+        if (IsWhiteHot(properties))
+            color = "#FFFFFF";
 
         var (rolledOverdose, rolledCriticalOverdose) = RollOverdose(tier);
         var finalOverdose = overdose ?? rolledOverdose;
@@ -234,6 +262,9 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var name = GenerateName();
         var color = $"#{_random.Next(0, 256):X2}{_random.Next(0, 256):X2}{_random.Next(0, 256):X2}";
         var properties = PickProperties(tier);
+        if (IsWhiteHot(properties))
+            color = "#FFFFFF";
+
         var (overdose, criticalOverdose) = RollOverdose(tier);
         var physicalDesc = _random.Pick(PhysicalDescriptions);
 
@@ -685,7 +716,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         comp.IsGenerated = isGenerated;
         Dirty(report, comp);
 
-        _metaData.SetEntityName(report, Loc.GetString("rmc-chem-research-report-name", ("name", reagent.LocalizedName)));
+        _metaData.SetEntityName(report, $"research report ({reagent.LocalizedName})");
 
         var sb = new StringBuilder();
         if (simulatorReport)
@@ -852,14 +883,14 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         }
     }
 
-    public EntityUid PrintErrorReport(EntityCoordinates coords, string reasonLocId, int sampleNumber = 0, params (string, object)[] args)
+    public EntityUid PrintErrorReport(EntityCoordinates coords, string reason, int sampleNumber = 0)
     {
         var report = Spawn(ReportProto, coords);
         var comp = EnsureComp<RMCChemResearchReportComponent>(report);
         comp.Completed = false;
         Dirty(report, comp);
 
-        _metaData.SetEntityName(report, Loc.GetString("rmc-chem-research-report-error-name"));
+        _metaData.SetEntityName(report, "research report (ERROR)");
 
         var sb = new StringBuilder();
         RMCChemPaperFormat.AppendHeader(sb, "Official Weston-Yamada Document", "Reagent Analysis Print");
@@ -871,7 +902,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
             : "Result: Analysis failed.");
         sb.AppendLine();
         sb.AppendLine("Reason for error:");
-        sb.AppendLine($"[italic]{Loc.GetString(reasonLocId, args)}[/italic]");
+        sb.AppendLine($"[italic]{reason}[/italic]");
         sb.AppendLine();
         RMCChemPaperFormat.AppendFooter(sb, "This report was automatically printed by the A-XRF Scanner.");
 

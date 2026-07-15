@@ -42,7 +42,7 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
 
         if (!this.IsPowered(ent, EntityManager))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-research-computer-no-power"), args.User);
+            _popup.PopupCursor("This terminal has no power!", args.User);
             return;
         }
 
@@ -50,7 +50,7 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
         {
             _research.ForceRerollContracts();
             QueueDel(args.Used);
-            _popup.PopupCursor(Loc.GetString("rmc-research-computer-reroll-disk-used"), args.User);
+            _popup.PopupCursor("The terminal accepts the disk, and rerolls the contract chemicals.", args.User);
             _audio.PlayPvs("/Audio/Machines/twobeep.ogg", ent);
             args.Handled = true;
             return;
@@ -60,7 +60,7 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
         {
             _research.AddCredits(grant.Grant);
             QueueDel(args.Used);
-            _popup.PopupCursor(Loc.GetString("rmc-research-computer-grant-redeemed", ("credits", grant.Grant)), args.User);
+            _popup.PopupCursor($"Research grant redeemed for {grant.Grant} credits.", args.User);
             _audio.PlayPvs("/Audio/Machines/twobeep.ogg", ent);
             args.Handled = true;
             return;
@@ -69,7 +69,7 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
         if (!_research.TrySaveManualScan(args.Used, Transform(ent).Coordinates))
             return;
 
-        _popup.PopupCursor(Loc.GetString("rmc-research-computer-scan-filed"), args.User);
+        _popup.PopupCursor("The terminal scans the document and files it under Manual Scans.", args.User);
         args.Handled = true;
     }
 

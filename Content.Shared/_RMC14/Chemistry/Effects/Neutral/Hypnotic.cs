@@ -32,7 +32,7 @@ public sealed partial class Hypnotic : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[AsphyxiationType] = potency;
+        damage.DamageDict[AsphyxiationType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

@@ -1,4 +1,5 @@
 using Content.Server.Body.Systems;
+using Content.Shared._RMC14.Xenonids.Blood;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
@@ -387,6 +388,12 @@ public sealed class InjectorSystem : SharedInjectorSystem
     private void DrawFromBlood(Entity<InjectorComponent> injector, Entity<BloodstreamComponent> target,
         Entity<SolutionComponent> injectorSolution, FixedPoint2 transferAmount, EntityUid user)
     {
+        if (TryComp<XenoPlasmaBloodComponent>(target.Owner, out var plasmaBlood))
+        {
+            DrawFromXenoBlood(injector, target, injectorSolution, transferAmount, user, plasmaBlood);
+            return;
+        }
+
         var drawAmount = (float) transferAmount;
 
         if (SolutionContainers.ResolveSolution(target.Owner, target.Comp.ChemicalSolutionName,
@@ -406,6 +413,44 @@ public sealed class InjectorSystem : SharedInjectorSystem
 
         Popup.PopupEntity(Loc.GetString("injector-component-draw-success-message",
             ("amount", transferAmount),
+            ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
+
+        Dirty(injector);
+        AfterDraw(injector, target);
+    }
+
+    private void DrawFromXenoBlood(Entity<InjectorComponent> injector, Entity<BloodstreamComponent> target,
+        Entity<SolutionComponent> injectorSolution, FixedPoint2 transferAmount, EntityUid user,
+        XenoPlasmaBloodComponent plasmaBlood)
+    {
+        if (!SolutionContainers.ResolveSolution(target.Owner, target.Comp.BloodSolutionName, ref target.Comp.BloodSolution))
+            return;
+
+        var bloodSolution = target.Comp.BloodSolution.Value;
+        var drawAmount = FixedPoint2.Min(transferAmount, bloodSolution.Comp.Solution.Volume);
+        if (drawAmount <= FixedPoint2.Zero)
+        {
+            Popup.PopupEntity(
+                Loc.GetString("injector-component-target-is-empty-message",
+                    ("target", Identity.Entity(target, EntityManager))),
+                injector.Owner, user);
+            return;
+        }
+
+        var shares = plasmaBlood.PlasmaTypes.Count + 1;
+        var perShare = drawAmount / shares;
+
+        SolutionContainers.RemoveReagent(bloodSolution, target.Comp.BloodReagent, drawAmount);
+
+        var mix = new Solution();
+        mix.AddReagent(target.Comp.BloodReagent, perShare);
+        foreach (var plasma in plasmaBlood.PlasmaTypes)
+            mix.AddReagent(plasma, perShare);
+
+        SolutionContainers.TryAddSolution(injectorSolution, mix);
+
+        Popup.PopupEntity(Loc.GetString("injector-component-draw-success-message",
+            ("amount", drawAmount),
             ("target", Identity.Entity(target, EntityManager))), injector.Owner, user);
 
         Dirty(injector);

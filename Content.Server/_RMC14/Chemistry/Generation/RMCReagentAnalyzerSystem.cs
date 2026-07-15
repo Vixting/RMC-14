@@ -29,7 +29,7 @@ public sealed class RMCReagentAnalyzerSystem : SharedRMCReagentAnalyzerSystem
         catch (Exception e)
         {
             Log.Error($"Error analyzing reagent sample on {ToPrettyString(ent)}: {e}");
-            Fail(ent, "rmc-reagent-analyzer-empty");
+            Fail(ent, "The analyzer beeps: SAMPLE EMPTY.");
         }
     }
 
@@ -42,30 +42,30 @@ public sealed class RMCReagentAnalyzerSystem : SharedRMCReagentAnalyzerSystem
             !_solution.TryGetMixableSolution(sampleUid, out _, out var solution) ||
             solution.Contents.Count == 0)
         {
-            Fail(ent, "rmc-reagent-analyzer-empty");
+            Fail(ent, "The analyzer beeps: SAMPLE EMPTY.");
             return;
         }
 
         if (solution.Contents.Count > 1)
         {
-            Fail(ent, "rmc-reagent-analyzer-contaminated");
+            Fail(ent, "The analyzer beeps: SAMPLE CONTAMINATED. A pure sample is required for analysis.");
             return;
         }
 
         if (solution.Volume < comp.RequiredVolume)
         {
-            Fail(ent, "rmc-reagent-analyzer-insufficient", ("required", comp.RequiredVolume));
+            Fail(ent, $"The analyzer beeps: SAMPLE SIZE INSUFFICIENT. A sample size of {comp.RequiredVolume} units is required for analysis.");
             return;
         }
 
         var reagentId = solution.Contents[0].Reagent.Prototype;
         if (!_rmcReagent.TryIndex(reagentId, out var reagent))
         {
-            Fail(ent, "rmc-reagent-analyzer-empty");
+            Fail(ent, "The analyzer beeps: SAMPLE EMPTY.");
             return;
         }
 
-        _metaData.SetEntityName(sampleUid, Loc.GetString("rmc-reagent-analyzer-identified-container", ("name", reagent.LocalizedName)));
+        _metaData.SetEntityName(sampleUid, $"vial ({reagent.LocalizedName})");
 
         comp.VisualState = RMCReagentAnalyzerVisualState.Finished;
         Dirty(ent);
@@ -81,14 +81,14 @@ public sealed class RMCReagentAnalyzerSystem : SharedRMCReagentAnalyzerSystem
         }
     }
 
-    private void Fail(Entity<RMCReagentAnalyzerComponent> ent, string locId, params (string, object)[] args)
+    private void Fail(Entity<RMCReagentAnalyzerComponent> ent, string reason)
     {
         var comp = ent.Comp;
         comp.VisualState = RMCReagentAnalyzerVisualState.Failed;
         Dirty(ent);
         UpdateAppearance(ent);
 
-        _generator.PrintErrorReport(Transform(ent).Coordinates, locId, comp.SampleNumber++, args);
+        _generator.PrintErrorReport(Transform(ent).Coordinates, reason, comp.SampleNumber++);
         _audio.PlayPvs(comp.FinishSound, ent);
     }
 }

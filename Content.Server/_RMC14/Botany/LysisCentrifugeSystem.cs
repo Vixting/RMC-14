@@ -194,12 +194,6 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        if (disc.Genes.Count >= 1)
-        {
-            _popup.PopupCursor("The disc already contains a gene sequence.", args.Actor);
-            return;
-        }
-
         var geneType = args.GeneType;
         if (disc.Genes.Any(g => g.Type == geneType))
         {
@@ -295,7 +289,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
                 onDiscTypes.Contains(t)))
             .ToList();
         comp.HasDisc = disc != null;
-        comp.DiscFull = disc != null && disc.Genes.Count >= 1;
+        comp.DiscFull = disc != null && onDiscTypes.Count >= Enum.GetValues<PlantGeneType>().Length;
         comp.HasSeed = seedEnt != null;
         comp.SeedPacketName = seedEnt != null ? Name(seedEnt.Value) : null;
         comp.SeedEntityNet = seedEnt != null ? GetNetEntity(seedEnt.Value) : null;

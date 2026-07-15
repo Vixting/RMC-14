@@ -37,7 +37,6 @@ public sealed class ViewIntelObjectivesBui(EntityUid owner, Enum uiKey) : BoundU
         _window.UploadDataLabel.Text = Loc.GetString("rmc-ui-intel-progress", ("current", tree.UploadData.Current), ("total", tree.UploadData.Total));
         _window.RetrieveItemsLabel.Text = Loc.GetString("rmc-ui-intel-progress", ("current", tree.RetrieveItems.Current), ("total", tree.RetrieveItems.Total));
         _window.MiscellaneousLabel.Text = Loc.GetString("rmc-ui-intel-progress", ("current", tree.Miscellaneous.Current), ("total", tree.Miscellaneous.Total));
-        // _window.AnalyzeChemicalsLabel.Text = Loc.GetString("rmc-ui-intel-infinite-progress", ("current", tree.AnalyzeChemicals));
         _window.RescueSurvivorsLabel.Text = Loc.GetString("rmc-ui-intel-infinite-progress", ("current", tree.RescueSurvivors));
         _window.RecoverCorpsesLabel.Text = Loc.GetString("rmc-ui-intel-infinite-progress", ("current", tree.RecoverCorpses));
         _window.ColonyCommunicationsLabel.Text = Loc.GetString("rmc-ui-intel-colony-status", ("online", tree.ColonyCommunications));
@@ -46,6 +45,8 @@ public sealed class ViewIntelObjectivesBui(EntityUid owner, Enum uiKey) : BoundU
         _allClueRows.Clear();
         if (_window.CluesSearchBar != null)
             _window.CluesSearchBar.Text = string.Empty;
+
+        PopulateChemicalsTab(comp.Tree.PendingChemicals.Values);
 
         _window.CluesContainer.DisposeAllChildren();
         if (comp.PersonalClues.Count > 0)
@@ -128,6 +129,30 @@ public sealed class ViewIntelObjectivesBui(EntityUid owner, Enum uiKey) : BoundU
             i++;
         }
         return result.ToString();
+    }
+
+    private void PopulateChemicalsTab(IEnumerable<string> pendingChemicals)
+    {
+        if (_window is not { IsOpen: true })
+            return;
+
+        _window.ChemicalsContainer.DisposeAllChildren();
+
+        var names = pendingChemicals.OrderBy(n => n.ToLowerInvariant()).ToList();
+        if (names.Count == 0)
+        {
+            _window.ChemicalsContainer.AddChild(new RichTextLabel
+            {
+                Text = Loc.GetString("rmc-intel-chemicals-pending-empty"),
+            });
+            return;
+        }
+
+        foreach (var name in names)
+        {
+            var (row, _) = BuildClueRow(name);
+            _window.ChemicalsContainer.AddChild(row);
+        }
     }
 
     private void AddClueTab(string category, IEnumerable<string> clues)

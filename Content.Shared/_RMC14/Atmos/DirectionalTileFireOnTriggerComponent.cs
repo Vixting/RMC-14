@@ -1,3 +1,4 @@
+using Content.Shared.Chemistry.Reagent;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -70,4 +71,12 @@ public sealed partial class DirectionalTileFireOnTriggerComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public bool OffsetForward;
+
+    /// <summary>
+    /// fuel reagent this fire represents. If set effective range/intensity/duration are
+    /// read from <see cref="Content.Shared._RMC14.Weapons.Ranged.Flamer.SharedRMCFlamerSystem.GetFireStats"/>
+    /// instead of <see cref="Range"/>/<see cref="Intensity"/>/<see cref="Duration"/>.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public ProtoId<ReagentPrototype>? Reagent;
 }

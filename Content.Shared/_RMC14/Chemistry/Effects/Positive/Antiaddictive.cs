@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Chemistry.Addiction;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -19,18 +20,22 @@ public sealed partial class Antiaddictive : RMCChemicalEffect
         return "Stops all bodily cravings towards addictive chemical substances.";
     }
 
-    // TODO RMC14: mob effect - cures addiction
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var addiction = args.EntityManager.System<RMCAddictionSystem>();
+        addiction.TryReduceAddictions(args.TargetEntity, (float) potency);
+    }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        damage.DamageDict[PoisonType] = potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency));
+        status.TryAddStatusEffectDuration(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency));
     }
 }

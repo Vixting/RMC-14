@@ -21,7 +21,7 @@ public sealed class RMCFlammableSystem : SharedRMCFlammableSystem
 
         var hadBypassComponent = HasComp<RMCFireBypassActiveComponent>(flammable);
 
-        var stacks = flammable.Comp.FireStacks + duration;
+        var stacks = MathF.Min(flammable.Comp.FireStacks + duration, duration);
         if (maxStacks != null && stacks > maxStacks)
             stacks = maxStacks.Value;
 

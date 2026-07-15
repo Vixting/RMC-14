@@ -48,10 +48,10 @@ public sealed partial class Ketogenic : RMCChemicalEffect
         var entityManager = args.EntityManager;
         var target = args.TargetEntity;
         var hungerSystem = entityManager.System<HungerSystem>();
-        hungerSystem.ModifyHunger(target, PotencyPerSecond * -5);
+        hungerSystem.ModifyHunger(target, PotencyPerSecond * -10);
 
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        damage.DamageDict[PoisonType] = potency * 2f;
         damageable.TryChangeDamage(target, damage, true, interruptsDoAfters: false);
 
         var random = IoCManager.Resolve<IRobustRandom>();

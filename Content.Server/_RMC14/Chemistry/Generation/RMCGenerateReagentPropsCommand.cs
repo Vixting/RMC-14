@@ -21,12 +21,22 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     public string Command => "rmcgeneratereagentprops";
-    public string Description => "Generates a new reagent with an exact, caller-specified set of properties, prints details, and spawns a filled bottle.";
-    public string Help => "rmcgeneratereagentprops <tier 1-3> <Property:Level> [Property:Level ...]";
+    public string Description => "Generates a new reagent with an exact, caller-specified set of properties, prints details, and spawns a filled container sized for the given volume.";
+    public string Help => "rmcgeneratereagentprops <tier 1-3> <volume 1-1000> <Property:Level> [Property:Level ...]";
+
+    private static readonly (int MaxVolume, EntProtoId Container, string Solution)[] Containers =
+    {
+        (30, "RMCVial", "beaker"),
+        (60, "CMBeaker", "beaker"),
+        (120, "CMBeakerLarge", "beaker"),
+        (300, "RMCBeakerHighCapacity", "beaker"),
+        (500, "RMCReagentJug", "beaker"),
+        (1000, "RMCTankReagentEmpty", "tank"),
+    };
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        if (args.Length < 2)
+        if (args.Length < 3)
         {
             shell.WriteError(Help);
             return;
@@ -38,8 +48,14 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
             return;
         }
 
+        if (!int.TryParse(args[1], out var volume) || volume < 1 || volume > Containers[^1].MaxVolume)
+        {
+            shell.WriteError($"Volume must be a number 1-{Containers[^1].MaxVolume}.");
+            return;
+        }
+
         var properties = new List<(ChemGeneratorPropertyPrototype Property, int Level)>();
-        for (var i = 1; i < args.Length; i++)
+        for (var i = 2; i < args.Length; i++)
         {
             var split = args[i].Split(':');
             if (split.Length != 2 || !int.TryParse(split[1], out var level))
@@ -107,20 +123,21 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
 
         if (!coords.IsValid(_entity))
         {
-            shell.WriteLine("No attached entity to spawn a bottle at - skipping bottle spawn.");
+            shell.WriteLine("No attached entity to spawn a container at - skipping container spawn.");
             return;
         }
 
+        var (_, container, solutionName) = Array.Find(Containers, c => volume <= c.MaxVolume);
         var solution = _entitySystems.GetEntitySystem<SharedSolutionContainerSystem>();
-        var vial = _entity.SpawnEntity("RMCVial", coords);
-        if (solution.TryGetSolution(vial, "beaker", out var soln, out _))
+        var spawned = _entity.SpawnEntity(container, coords);
+        if (solution.TryGetSolution(spawned, solutionName, out var soln, out _))
         {
-            solution.TryAddReagent(soln.Value, reagentId, FixedPoint2.New(30));
-            shell.WriteLine($"Spawned a vial of {reagentId}.");
+            solution.TryAddReagent(soln.Value, reagentId, FixedPoint2.New(volume));
+            shell.WriteLine($"Spawned a {container} with {volume}u of {reagentId}.");
         }
         else
         {
-            shell.WriteError("Spawned vial but could not find its solution to fill.");
+            shell.WriteError($"Spawned {container} but could not find its solution to fill.");
         }
     }
 
@@ -129,7 +146,10 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
         if (args.Length == 1)
             return CompletionResult.FromHint("<tier 1-3>");
 
-        var used = args.Skip(1).Select(a => a.Split(':')[0]).ToHashSet();
+        if (args.Length == 2)
+            return CompletionResult.FromHint($"<volume 1-{Containers[^1].MaxVolume}>");
+
+        var used = args.Skip(2).Select(a => a.Split(':')[0]).ToHashSet();
         var options = _prototype.EnumeratePrototypes<ChemGeneratorPropertyPrototype>()
             .Where(p => !used.Contains(p.ID))
             .Select(p => new CompletionOption(p.ID, p.Category.ToString()))

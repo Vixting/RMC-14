@@ -33,7 +33,7 @@ public sealed partial class Neuroinhibiting : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
+        damage.DamageDict[PoisonType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

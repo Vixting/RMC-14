@@ -22,7 +22,7 @@ public sealed partial class Transformative : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var heal = HealAmount * (float) potency;
+        var heal = HealAmount * (float) potency * 2f;
         var damage = new DamageSpecifier();
         damage.DamageDict[BluntType] = -heal;
         damage.DamageDict[HeatType] = -heal;
@@ -40,7 +40,7 @@ public sealed partial class Transformative : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = HealAmount * (float) potency;
+        damage.DamageDict[PoisonType] = HealAmount * (float) potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

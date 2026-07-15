@@ -80,20 +80,20 @@ public sealed class RMCReactionIndicatorEffectSystem : EntitySystem
         {
             case ReactionIndicator.Glowing:
                 Spawn(GlowProto, coords);
-                _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-glowing"), uid, PopupType.Medium);
+                _popup.PopupEntity("The reaction starts to glow!", uid, PopupType.Medium);
                 break;
             case ReactionIndicator.Fire:
                 HandleFire(uid, coords, reagentArgs);
                 break;
             case ReactionIndicator.Smoking:
                 Spawn(SmokeProto, coords);
-                _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-smoking"), uid, PopupType.Medium);
+                _popup.PopupEntity("The reaction gives off heavy fumes!", uid, PopupType.Medium);
                 break;
             case ReactionIndicator.Endothermic:
                 var lockout = EnsureComp<RMCEndothermicLockoutComponent>(uid);
                 lockout.LockedUntil = _timing.CurTime + EndothermicDuration;
                 Dirty(uid, lockout);
-                _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-endothermic"), uid, PopupType.Medium);
+                _popup.PopupEntity("The reaction slows and cools!", uid, PopupType.Medium);
                 break;
             case ReactionIndicator.Bubbling:
                 HandleBubbling(uid, coords, reagentArgs);
@@ -107,12 +107,12 @@ public sealed class RMCReactionIndicatorEffectSystem : EntitySystem
         // was just created, the mix boils & settles instead of igniting
         if (args.Source is { } source && source.GetTotalPrototypeQuantity(WaterReagent) >= args.Quantity)
         {
-            _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-fire-quenched"), uid, PopupType.Medium);
+            _popup.PopupEntity("The reaction begins to boil before settling down.", uid, PopupType.Medium);
             return;
         }
 
         _flammable.SpawnFireDiamond(FireProto, coords, 1);
-        _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-fire"), uid, PopupType.MediumCaution);
+        _popup.PopupEntity("The reaction starts to smoke before a small combustion!", uid, PopupType.MediumCaution);
     }
 
     private void HandleBubbling(EntityUid uid, EntityCoordinates coords, EntityEffectReagentArgs args)
@@ -121,7 +121,7 @@ public sealed class RMCReactionIndicatorEffectSystem : EntitySystem
             return;
 
         _audio.PlayPvs(BubblingSound, uid);
-        _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-bubbling"), uid, PopupType.MediumCaution);
+        _popup.PopupEntity("The solution begins to bubble aggressively!", uid, PopupType.MediumCaution);
 
         if (args.Source is not { } source || source.Volume <= FixedPoint2.Zero)
             return;
@@ -139,13 +139,13 @@ public sealed class RMCReactionIndicatorEffectSystem : EntitySystem
 
             if (_random.Prob(Math.Min(armorEv.Bio * 2, 100) / 100f))
             {
-                _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-bubbling-blocked"), mob.Owner, mob.Owner);
+                _popup.PopupEntity("Your gear protects you from a chunk of foam and bubbles!", mob.Owner, mob.Owner);
                 continue;
             }
 
             var splash = source.SplitSolution(FixedPoint2.Min(FixedPoint2.New(5), source.Volume));
             _reactive.DoEntityReaction(mob.Owner, splash, ReactionMethod.Touch);
-            _popup.PopupEntity(Loc.GetString("rmc-reaction-indicator-bubbling-splash"), mob.Owner, mob.Owner, PopupType.LargeCaution);
+            _popup.PopupEntity("Chemicals splash on you!", mob.Owner, mob.Owner, PopupType.LargeCaution);
             _audio.PlayPvs(SplashSound, mob.Owner);
 
             if (ContainsCorrosive(splash))
