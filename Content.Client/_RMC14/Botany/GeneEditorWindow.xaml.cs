@@ -29,8 +29,8 @@ public sealed partial class GeneEditorWindow : DefaultWindow
         BotanyUiStyle.Header(SeedHeader);
         EditCountBar.ForegroundStyleBoxOverride = BotanyUiStyle.Flat(BotanyUiStyle.GreenColor);
 
-        BotanyUiStyle.IconButton(resourceCache, ApplyButton, RadiationIcon, RadiationIconWhite, Loc.GetString("rmc-gene-editor-apply-button"));
-        BotanyUiStyle.IconButton(resourceCache, EjectButton, EjectIcon, EjectIconWhite, Loc.GetString("rmc-gene-editor-eject-button"));
+        BotanyUiStyle.IconButton(resourceCache, ApplyButton, RadiationIcon, RadiationIconWhite, "Apply Genes");
+        BotanyUiStyle.IconButton(resourceCache, EjectButton, EjectIcon, EjectIconWhite, "Eject All");
 
         ApplyButton.OnPressed += _ => _bui?.Apply();
         EjectButton.OnPressed += _ => _bui?.Eject();
@@ -44,13 +44,13 @@ public sealed partial class GeneEditorWindow : DefaultWindow
     public void UpdateState(GeneEditorComponent comp)
     {
         if (comp.HasDisc)
-            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, Loc.GetString("rmc-gene-editor-disc-present"), BotanyUiStyle.GreenColor);
+            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, "[Disc loaded]", BotanyUiStyle.GreenColor);
         else
-            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, Loc.GetString("rmc-gene-editor-no-disc"), BotanyUiStyle.RedColor);
+            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, "[No disc loaded]", BotanyUiStyle.RedColor);
 
         if (comp.HasDisc && comp.DiscSource != null)
         {
-            DiscSourceLabel.Text = Loc.GetString("rmc-gene-editor-disc-source", ("source", comp.DiscSource));
+            DiscSourceLabel.Text = $"Source: {comp.DiscSource}";
             DiscSourceLabel.Visible = true;
         }
         else
@@ -65,7 +65,7 @@ public sealed partial class GeneEditorWindow : DefaultWindow
             {
                 DiscGenesContainer.AddChild(new Label
                 {
-                    Text = Loc.GetString("rmc-gene-editor-disc-no-genes"),
+                    Text = "No genes stored on disc.",
                     StyleClasses = { "LabelSubText" },
                 });
             }
@@ -75,7 +75,7 @@ public sealed partial class GeneEditorWindow : DefaultWindow
                 {
                     DiscGenesContainer.AddChild(new Label
                     {
-                        Text = Loc.GetString("rmc-gene-editor-gene-entry", ("gene", label)),
+                        Text = $"• {label}",
                     });
                 }
             }
@@ -89,9 +89,7 @@ public sealed partial class GeneEditorWindow : DefaultWindow
 
         if (comp.HasSeed)
         {
-            var seedText = comp.SeedName != null
-                ? Loc.GetString("rmc-gene-editor-seed-present", ("name", comp.SeedName))
-                : Loc.GetString("rmc-gene-editor-seed-present-unknown");
+            var seedText = comp.SeedName ?? "[Unknown seed]";
             BotanyUiStyle.StatusRow(SeedStatusPanel, SeedStatusLabel, seedText, BotanyUiStyle.GreenColor);
 
             var ratio = comp.MaxEditCount > 0
@@ -99,13 +97,11 @@ public sealed partial class GeneEditorWindow : DefaultWindow
                 : 0f;
             EditCountBar.Value = ratio;
             EditCountBar.ForegroundStyleBoxOverride = BotanyUiStyle.Flat(ratio >= 1f ? BotanyUiStyle.RedColor : BotanyUiStyle.GreenColor);
-            EditCountLabel.Text = Loc.GetString("rmc-gene-editor-edit-count-value",
-                ("current", comp.SeedEditCount),
-                ("max", comp.MaxEditCount));
+            EditCountLabel.Text = $"{comp.SeedEditCount}/{comp.MaxEditCount}";
         }
         else
         {
-            BotanyUiStyle.StatusRow(SeedStatusPanel, SeedStatusLabel, Loc.GetString("rmc-gene-editor-no-seed"), BotanyUiStyle.RedColor);
+            BotanyUiStyle.StatusRow(SeedStatusPanel, SeedStatusLabel, "[No seed loaded]", BotanyUiStyle.RedColor);
             EditCountBar.Value = 0f;
             EditCountBar.ForegroundStyleBoxOverride = BotanyUiStyle.Flat(BotanyUiStyle.GreenColor);
             EditCountLabel.Text = string.Empty;

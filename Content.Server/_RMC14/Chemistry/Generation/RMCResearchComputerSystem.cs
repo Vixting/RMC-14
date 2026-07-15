@@ -7,7 +7,6 @@ using Content.Shared.Popups;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Random;
 
 namespace Content.Server._RMC14.Chemistry.Generation;
 
@@ -15,7 +14,6 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly RMCChemistryResearchSystem _research = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
@@ -58,12 +56,11 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
             return;
         }
 
-        if (HasComp<IntelChemGrantPaperComponent>(args.Used))
+        if (TryComp<IntelChemGrantPaperComponent>(args.Used, out var grant))
         {
-            var amount = _random.Next(2, 5);
-            _research.AddCredits(amount);
+            _research.AddCredits(grant.Grant);
             QueueDel(args.Used);
-            _popup.PopupCursor($"Research grant redeemed for {amount} credits.", args.User);
+            _popup.PopupCursor(Loc.GetString("rmc-research-computer-grant-redeemed", ("credits", grant.Grant)), args.User);
             _audio.PlayPvs("/Audio/Machines/twobeep.ogg", ent);
             args.Handled = true;
             return;

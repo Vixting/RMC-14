@@ -10,7 +10,7 @@
             <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
 
                 <PanelContainer Name="SeedHeader" Access="Public">
-                    <Label Text="{Loc rmc-centrifuge-seed-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                    <Label Text="SEED PACKET" FontColorOverride="#FFFFFF" Margin="6 2" />
                 </PanelContainer>
                 <BoxContainer Orientation="Horizontal" Margin="0 3 0 0" VerticalAlignment="Center">
                     <SpriteView Name="SeedSpriteView"
@@ -29,7 +29,7 @@
                 </BoxContainer>
 
                 <PanelContainer Name="GenomeHeader" Access="Public">
-                    <Label Text="{Loc rmc-centrifuge-genome-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                    <Label Text="GENOME BUFFER" FontColorOverride="#FFFFFF" Margin="6 2" />
                 </PanelContainer>
                 <PanelContainer Name="GenomeStatusPanel" Access="Public" Margin="0 3 0 0">
                     <Label Name="GenomeNameLabel" Access="Public" Margin="6 1" />
@@ -47,7 +47,7 @@
                         Margin="0 3 0 8" />
 
                 <PanelContainer Name="DiscHeader" Access="Public">
-                    <Label Text="{Loc rmc-centrifuge-disc-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                    <Label Text="DATA DISC" FontColorOverride="#FFFFFF" Margin="6 2" />
                 </PanelContainer>
                 <BoxContainer Orientation="Horizontal" Margin="0 3 0 8">
                     <PanelContainer Name="DiscStatusPanel" Access="Public" HorizontalExpand="True">
@@ -58,7 +58,7 @@
 
                 <BoxContainer Name="GenesSection" Orientation="Vertical" VerticalExpand="True">
                     <PanelContainer Name="GenesHeader" Access="Public">
-                        <Label Text="{Loc rmc-centrifuge-genes-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                        <Label Text="GENE SEQUENCES" FontColorOverride="#FFFFFF" Margin="6 2" />
                     </PanelContainer>
                     <BoxContainer Name="GeneButtonsContainer"
                                   Orientation="Vertical"

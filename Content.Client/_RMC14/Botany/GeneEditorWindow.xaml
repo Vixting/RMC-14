@@ -9,7 +9,7 @@
         <BoxContainer Orientation="Vertical" Margin="4" VerticalExpand="True">
 
             <PanelContainer Name="DiscHeader" Access="Public">
-                <Label Text="{Loc rmc-gene-editor-disc-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                <Label Text="FLORA DATA DISC" FontColorOverride="#FFFFFF" Margin="6 2" />
             </PanelContainer>
             <PanelContainer Name="DiscStatusPanel" Access="Public" Margin="0 3 0 0">
                 <Label Name="DiscStatusLabel" Access="Public" Margin="6 1" />
@@ -25,7 +25,7 @@
             </ScrollContainer>
 
             <PanelContainer Name="SeedHeader" Access="Public">
-                <Label Text="{Loc rmc-gene-editor-seed-header}" FontColorOverride="#FFFFFF" Margin="6 2" />
+                <Label Text="TARGET SEED" FontColorOverride="#FFFFFF" Margin="6 2" />
             </PanelContainer>
             <BoxContainer Orientation="Horizontal" Margin="0 3 0 0" VerticalAlignment="Center">
                 <SpriteView Name="SeedSpriteView"

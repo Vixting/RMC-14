@@ -51,7 +51,7 @@ public sealed class GeneEditorSystem : EntitySystem
     {
         if (!this.IsPowered(ent, EntityManager))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-no-power"), args.User);
+            _popup.PopupCursor("The delivery system has no power.", args.User);
             return;
         }
 
@@ -59,7 +59,7 @@ public sealed class GeneEditorSystem : EntitySystem
         {
             if (ent.Comp.DiscSlot.ContainedEntity != null)
             {
-                _popup.PopupCursor(Loc.GetString("rmc-gene-editor-disc-already-loaded"), args.User);
+                _popup.PopupCursor("A disc is already loaded. Eject it first.", args.User);
                 return;
             }
 
@@ -75,13 +75,13 @@ public sealed class GeneEditorSystem : EntitySystem
         {
             if (ent.Comp.DiscSlot.ContainedEntity == null)
             {
-                _popup.PopupCursor(Loc.GetString("rmc-gene-editor-load-disc-first"), args.User);
+                _popup.PopupCursor("Load a flora data disc first.", args.User);
                 return;
             }
 
             if (ent.Comp.SeedSlot.ContainedEntity != null)
             {
-                _popup.PopupCursor(Loc.GetString("rmc-gene-editor-seed-already-loaded"), args.User);
+                _popup.PopupCursor("A seed packet is already loaded. Eject it first.", args.User);
                 return;
             }
 
@@ -120,7 +120,7 @@ public sealed class GeneEditorSystem : EntitySystem
         {
             args.Verbs.Add(new AlternativeVerb
             {
-                Text = Loc.GetString("rmc-gene-editor-apply-verb"),
+                Text = "Apply genes",
                 Priority = 2,
                 Act = () => ApplyGenes(ent, user),
             });
@@ -130,7 +130,7 @@ public sealed class GeneEditorSystem : EntitySystem
         {
             args.Verbs.Add(new AlternativeVerb
             {
-                Text = Loc.GetString("rmc-gene-editor-eject-verb"),
+                Text = "Eject contents",
                 Priority = 1,
                 Act = () => EjectAll(ent, user),
             });
@@ -141,7 +141,7 @@ public sealed class GeneEditorSystem : EntitySystem
     {
         if (!this.IsPowered(ent, EntityManager))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-no-power"), user);
+            _popup.PopupCursor("The delivery system has no power.", user);
             return;
         }
 
@@ -154,19 +154,19 @@ public sealed class GeneEditorSystem : EntitySystem
 
         if (!TryComp(discEnt, out FloraDataDiscComponent? disc) || disc.Genes.Count == 0)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-disc-empty"), user);
+            _popup.PopupCursor("The loaded disc has no genes to apply.", user);
             return;
         }
 
         if (!TryComp(seedEnt, out SeedComponent? seedComp) || !_botany.TryGetSeed(seedComp, out var seed))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-no-seed-data"), user);
+            _popup.PopupCursor("This seed packet contains no genetic data.", user);
             return;
         }
 
         if (seed.GeneEditCount >= comp.MaxEditCount)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-seed-ruined"), user);
+            _popup.PopupCursor("This seed has been modified too many times and can no longer accept genetic changes.", user);
             EjectAll(ent, user);
             return;
         }
@@ -197,7 +197,7 @@ public sealed class GeneEditorSystem : EntitySystem
             seed.GeneEditCount = comp.MaxEditCount + 1;
             seed.Viable = false;
             _audio.PlayPvs(comp.FailSound, ent);
-            _popup.PopupCursor(Loc.GetString("rmc-gene-editor-failed"), user);
+            _popup.PopupCursor("[color=red]Gene delivery failed! The seed is ruined.[/color]", user);
         }
         else
         {

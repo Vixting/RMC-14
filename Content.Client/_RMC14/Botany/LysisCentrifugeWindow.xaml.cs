@@ -38,10 +38,10 @@ public sealed partial class LysisCentrifugeWindow : DefaultWindow
         BotanyUiStyle.Header(GenesHeader);
         DegradationBar.ForegroundStyleBoxOverride = BotanyUiStyle.Flat(BotanyUiStyle.GreenColor);
 
-        BotanyUiStyle.IconButton(_resourceCache, EjectSeedButton, EjectIcon, EjectIconWhite, Loc.GetString("rmc-centrifuge-eject-seed"));
-        BotanyUiStyle.IconButton(_resourceCache, ProcessSeedButton, ProcessIcon, ProcessIconWhite, Loc.GetString("rmc-centrifuge-process-seed"));
-        BotanyUiStyle.IconButton(_resourceCache, ClearBufferButton, TrashIcon, TrashIconWhite, Loc.GetString("rmc-centrifuge-clear-buffer"));
-        BotanyUiStyle.IconButton(_resourceCache, EjectDiscButton, EjectIcon, EjectIconWhite, Loc.GetString("rmc-centrifuge-eject-disc"));
+        BotanyUiStyle.IconButton(_resourceCache, EjectSeedButton, EjectIcon, EjectIconWhite, "Eject Seed");
+        BotanyUiStyle.IconButton(_resourceCache, ProcessSeedButton, ProcessIcon, ProcessIconWhite, "Process Genome");
+        BotanyUiStyle.IconButton(_resourceCache, ClearBufferButton, TrashIcon, TrashIconWhite, "Clear Buffer");
+        BotanyUiStyle.IconButton(_resourceCache, EjectDiscButton, EjectIcon, EjectIconWhite, "Eject Disc");
 
         ProcessSeedButton.OnPressed += _ => _bui?.ProcessSeed();
         EjectSeedButton.OnPressed += _ => _bui?.EjectSeed();
@@ -64,12 +64,12 @@ public sealed partial class LysisCentrifugeWindow : DefaultWindow
 
         if (comp.HasSeed)
         {
-            var seedText = comp.SeedPacketName ?? Loc.GetString("rmc-centrifuge-seed-loaded");
+            var seedText = comp.SeedPacketName ?? "[Seed inserted]";
             BotanyUiStyle.StatusRow(SeedStatusPanel, SeedStatusLabel, seedText, BotanyUiStyle.GreenColor);
         }
         else
         {
-            BotanyUiStyle.StatusRow(SeedStatusPanel, SeedStatusLabel, Loc.GetString("rmc-centrifuge-no-seed"), BotanyUiStyle.RedColor);
+            BotanyUiStyle.StatusRow(SeedStatusPanel, SeedStatusLabel, "[No seed loaded]", BotanyUiStyle.RedColor);
         }
 
         BotanyUiStyle.SetButtonEnabled(EjectSeedButton, comp.HasSeed);
@@ -87,14 +87,12 @@ public sealed partial class LysisCentrifugeWindow : DefaultWindow
             BotanyUiStyle.StatusRow(GenomeStatusPanel, GenomeNameLabel, comp.GenomeName!, color);
             DegradationBar.Value = ratio;
             DegradationBar.ForegroundStyleBoxOverride = BotanyUiStyle.Flat(color);
-            DegradationLabel.Text = Loc.GetString("rmc-centrifuge-degradation-value",
-                ("current", comp.Degradation),
-                ("max", comp.MaxDegradation));
+            DegradationLabel.Text = $"{comp.Degradation}/{comp.MaxDegradation}";
             BotanyUiStyle.SetButtonEnabled(ClearBufferButton, true);
         }
         else
         {
-            BotanyUiStyle.StatusRow(GenomeStatusPanel, GenomeNameLabel, Loc.GetString("rmc-centrifuge-no-genome"), BotanyUiStyle.RedColor);
+            BotanyUiStyle.StatusRow(GenomeStatusPanel, GenomeNameLabel, "[No genome loaded]", BotanyUiStyle.RedColor);
             DegradationBar.Value = 0f;
             DegradationBar.ForegroundStyleBoxOverride = BotanyUiStyle.Flat(BotanyUiStyle.GreenColor);
             DegradationLabel.Text = string.Empty;
@@ -102,9 +100,9 @@ public sealed partial class LysisCentrifugeWindow : DefaultWindow
         }
 
         if (comp.HasDisc)
-            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, Loc.GetString("rmc-centrifuge-disc-loaded"), BotanyUiStyle.GreenColor);
+            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, "[Disc inserted]", BotanyUiStyle.GreenColor);
         else
-            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, Loc.GetString("rmc-centrifuge-disc-empty"), BotanyUiStyle.RedColor);
+            BotanyUiStyle.StatusRow(DiscStatusPanel, DiscStatusLabel, "[No disc]", BotanyUiStyle.RedColor);
 
         BotanyUiStyle.SetButtonEnabled(EjectDiscButton, comp.HasDisc);
 
@@ -123,12 +121,11 @@ public sealed partial class LysisCentrifugeWindow : DefaultWindow
                 Margin = new Thickness(0, 1),
             };
 
-            var key = slot.GeneType.ToString().ToLower();
-            var typeName = Loc.GetString($"rmc-gene-type-{key}");
-            var typeDesc = Loc.GetString($"rmc-gene-type-{key}-desc");
+            var typeName = slot.GeneType.GetLabel();
+            var typeDesc = slot.GeneType.GetDescription();
             var labelText = slot.AlreadyOnDisc
-                ? Loc.GetString("rmc-centrifuge-gene-label-copied", ("code", slot.ObfuscatedCode), ("type", typeName))
-                : Loc.GetString("rmc-centrifuge-gene-label", ("code", slot.ObfuscatedCode), ("type", typeName));
+                ? $"{slot.ObfuscatedCode} - {typeName}: ✓"
+                : $"{slot.ObfuscatedCode} - {typeName}:";
 
             var label = new Label
             {
@@ -142,12 +139,12 @@ public sealed partial class LysisCentrifugeWindow : DefaultWindow
             var btnEnabled = comp.HasDisc && !slot.AlreadyOnDisc && !comp.DiscFull;
             string? btnTooltip = null;
             if (slot.AlreadyOnDisc)
-                btnTooltip = Loc.GetString("rmc-centrifuge-gene-already-copied");
+                btnTooltip = "This gene sequence is already on the disc.";
             else if (comp.DiscFull)
-                btnTooltip = Loc.GetString("rmc-centrifuge-disc-full");
+                btnTooltip = "Disc already contains a gene sequence.";
 
             var btn = new Button { ToolTip = btnTooltip };
-            BotanyUiStyle.IconButton(_resourceCache, btn, ExtractIcon, ExtractIconWhite, Loc.GetString("rmc-centrifuge-extract-gene"));
+            BotanyUiStyle.IconButton(_resourceCache, btn, ExtractIcon, ExtractIconWhite, "Extract gene");
             BotanyUiStyle.SetButtonEnabled(btn, btnEnabled);
             btn.OnPressed += _ => _bui?.ExtractGene(geneType);
 

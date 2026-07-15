@@ -130,6 +130,6 @@ public sealed class PlantGene
 
     public string GetLabel()
     {
-        return DisplayLabel ?? Loc.GetString($"rmc-gene-type-{Type.ToString().ToLower()}");
+        return DisplayLabel ?? Type.GetLabel();
     }
 }

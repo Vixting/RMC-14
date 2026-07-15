@@ -16,7 +16,7 @@ public sealed class GeneEditorBui(EntityUid owner, Enum uiKey) : BoundUserInterf
         base.Open();
 
         _window = this.CreateWindow<GeneEditorWindow>();
-        _window.Title = Loc.GetString("rmc-gene-editor-window-title");
+        _window.Title = "Bioballistic Delivery System";
         _window.SetBui(this);
 
         if (IoCManager.Resolve<IEntityManager>().TryGetComponent(Owner, out GeneEditorComponent? comp))

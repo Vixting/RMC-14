@@ -45,7 +45,7 @@ public sealed class RMCPlantHolderSystem : EntitySystem
 
         args.Verbs.Add(new ActivationVerb
         {
-            Text = Loc.GetString("rmc-tray-flush-verb"),
+            Text = "Flush tray",
             Priority = -1,
             Act = () => FlushTray(ent, user),
         });
@@ -57,7 +57,7 @@ public sealed class RMCPlantHolderSystem : EntitySystem
 
         if (comp.WaterLevel <= 0 && comp.NutritionLevel <= 0 && comp.Toxins <= 0)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-tray-flush-empty"), user);
+            _popup.PopupCursor("The tray is already empty.", user);
             return;
         }
 
@@ -69,7 +69,7 @@ public sealed class RMCPlantHolderSystem : EntitySystem
             _solution.RemoveAllSolution(comp.SoilSolution.Value);
 
         _plantHolder.CheckLevelSanity(ent);
-        _popup.PopupCursor(Loc.GetString("rmc-tray-flush-success"), user);
+        _popup.PopupCursor("You flush the tray, draining the soil solution.", user);
     }
 
     private void OnUpgradeInteract(Entity<RMCAutoHarvestUpgradeComponent> ent, ref AfterInteractEvent args)
@@ -84,12 +84,12 @@ public sealed class RMCPlantHolderSystem : EntitySystem
 
         if (HasComp<RMCAutoHarvestComponent>(args.Target))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-auto-harvest-already-installed"), args.User);
+            _popup.PopupCursor("An auto-harvester is already installed.", args.User);
             return;
         }
 
         AddComp<RMCAutoHarvestComponent>(args.Target.Value);
         QueueDel(ent);
-        _popup.PopupCursor(Loc.GetString("rmc-auto-harvest-installed"), args.User);
+        _popup.PopupCursor("Auto-harvester installed.", args.User);
     }
 }

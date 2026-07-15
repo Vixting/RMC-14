@@ -25,16 +25,16 @@ public sealed class FloraDataDiscSystem : EntitySystem
         {
             if (ent.Comp.Genes.Count == 0)
             {
-                args.PushMarkup(Loc.GetString("rmc-flora-disc-empty"));
+                args.PushMarkup("The disc is blank.");
                 return;
             }
 
             if (ent.Comp.GeneSource != null)
-                args.PushMarkup(Loc.GetString("rmc-flora-disc-source", ("source", ent.Comp.GeneSource)));
+                args.PushMarkup($"Gene source: {ent.Comp.GeneSource}");
 
             foreach (var gene in ent.Comp.Genes)
             {
-                args.PushMarkup(Loc.GetString("rmc-flora-disc-gene-entry", ("gene", gene.GetLabel())));
+                args.PushMarkup($"• [color=cyan]{gene.GetLabel()}[/color]");
             }
         }
     }
@@ -51,7 +51,7 @@ public sealed class FloraDataDiscSystem : EntitySystem
         var uid = ent.Owner;
         args.Verbs.Add(new ActivationVerb
         {
-            Text = Loc.GetString("rmc-flora-disc-wipe-verb"),
+            Text = "Wipe disc",
             Act = () => WipeDisc(uid, ent.Comp, user),
         });
     }
@@ -60,7 +60,7 @@ public sealed class FloraDataDiscSystem : EntitySystem
     {
         comp.Genes.Clear();
         comp.GeneSource = null;
-        _popup.PopupEntity(Loc.GetString("rmc-flora-disc-wiped"), uid, user);
+        _popup.PopupEntity("You wipe the disc clean.", uid, user);
         _audio.PlayPvs("/Audio/Machines/twobeep.ogg", uid);
     }
 }

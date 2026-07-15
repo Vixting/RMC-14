@@ -58,7 +58,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
     {
         if (!this.IsPowered(ent, EntityManager))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-power"), args.User);
+            _popup.PopupCursor("The centrifuge has no power.", args.User);
             return;
         }
 
@@ -66,7 +66,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         {
             if (ent.Comp.DiscSlot.ContainedEntity != null)
             {
-                _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-disc-already-loaded"), args.User);
+                _popup.PopupCursor("A disc is already loaded. Eject it first via the interface.", args.User);
                 return;
             }
 
@@ -82,19 +82,19 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         {
             if (!_botany.TryGetSeed(seedComp, out var seed))
             {
-                _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-seed-data"), args.User);
+                _popup.PopupCursor("This seed packet contains no genetic data.", args.User);
                 return;
             }
 
             if (seed.Seedless)
             {
-                _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-seedless"), args.User);
+                _popup.PopupCursor("This plant is seedless — its genome cannot be extracted.", args.User);
                 return;
             }
 
             if (ent.Comp.SeedSlot.ContainedEntity != null)
             {
-                _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-seed-already-inserted"), args.User);
+                _popup.PopupCursor("A seed packet is already loaded. Eject it first.", args.User);
                 return;
             }
 
@@ -117,25 +117,25 @@ public sealed class LysisCentrifugeSystem : EntitySystem
 
         if (!this.IsPowered(ent, EntityManager))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-power"), args.Actor);
+            _popup.PopupCursor("The centrifuge has no power.", args.Actor);
             return;
         }
 
         if (comp.SeedSlot.ContainedEntity is not { } seedEnt)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-seed-inserted"), args.Actor);
+            _popup.PopupCursor("No seed packet is loaded.", args.Actor);
             return;
         }
 
         if (comp.GenomeName != null)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-already-loaded"), args.Actor);
+            _popup.PopupCursor("A genome is already loaded. Clear the buffer first.", args.Actor);
             return;
         }
 
         if (!TryComp(seedEnt, out SeedComponent? seedComp) || !_botany.TryGetSeed(seedComp, out var seed))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-seed-data"), args.Actor);
+            _popup.PopupCursor("This seed packet contains no genetic data.", args.Actor);
             _container.Remove(seedEnt, comp.SeedSlot);
             UpdateState(ent);
             return;
@@ -169,19 +169,19 @@ public sealed class LysisCentrifugeSystem : EntitySystem
 
         if (!this.IsPowered(ent, EntityManager))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-power"), args.Actor);
+            _popup.PopupCursor("The centrifuge has no power.", args.Actor);
             return;
         }
 
         if (!TryComp(ent, out LysisCentrifugeServerComponent? server) || server.LoadedSeed == null)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-genome"), args.Actor);
+            _popup.PopupCursor("No genome is loaded. Insert a seed packet first.", args.Actor);
             return;
         }
 
         if (comp.Degradation >= comp.MaxDegradation)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-degraded"), args.Actor);
+            _popup.PopupCursor("Buffer fully degraded. Genome wiped.", args.Actor);
             WipeBuffer(comp, server);
             UpdateState(ent);
             return;
@@ -190,20 +190,20 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         var discEnt = comp.DiscSlot.ContainedEntity;
         if (discEnt == null || !TryComp(discEnt, out FloraDataDiscComponent? disc))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-no-disc"), args.Actor);
+            _popup.PopupCursor("No disc loaded. Insert a flora data disc first.", args.Actor);
             return;
         }
 
         if (disc.Genes.Count >= 1)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-disc-full"), args.Actor);
+            _popup.PopupCursor("The disc already contains a gene sequence.", args.Actor);
             return;
         }
 
         var geneType = args.GeneType;
         if (disc.Genes.Any(g => g.Type == geneType))
         {
-            _popup.PopupCursor(Loc.GetString("rmc-lysis-centrifuge-disc-has-gene"), args.Actor);
+            _popup.PopupCursor("This sequence is already stored on the disc.", args.Actor);
             return;
         }
 
@@ -262,13 +262,13 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         var user = args.User;
         args.Verbs.Add(new ActivationVerb
         {
-            Text = Loc.GetString("rmc-lysis-centrifuge-clear-verb"),
+            Text = "Clear buffer",
             Act = () =>
             {
                 if (!TryComp(ent, out LysisCentrifugeServerComponent? server))
                     return;
                 WipeBuffer(ent.Comp, server);
-                _popup.PopupEntity(Loc.GetString("rmc-lysis-centrifuge-cleared"), ent, user);
+                _popup.PopupEntity("Genetic buffer cleared.", ent, user);
                 UpdateState(ent);
             },
         });

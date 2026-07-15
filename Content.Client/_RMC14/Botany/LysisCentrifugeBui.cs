@@ -16,7 +16,7 @@ public sealed class LysisCentrifugeBui(EntityUid owner, Enum uiKey) : BoundUserI
         base.Open();
 
         _window = this.CreateWindow<LysisCentrifugeWindow>();
-        _window.Title = Loc.GetString("rmc-centrifuge-window-title");
+        _window.Title = "Lysis Isolation Centrifuge";
         _window.SetBui(this);
 
         if (IoCManager.Resolve<IEntityManager>().TryGetComponent(Owner, out LysisCentrifugeComponent? comp))

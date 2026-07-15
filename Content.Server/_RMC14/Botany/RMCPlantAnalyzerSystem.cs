@@ -53,22 +53,15 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         var name = Loc.GetString(seed.DisplayName);
         var harvest = seed.HarvestRepeat switch
         {
-            HarvestType.Repeat => Loc.GetString("rmc-plant-analyzer-harvest-repeat"),
-            HarvestType.SelfHarvest => Loc.GetString("rmc-plant-analyzer-harvest-self"),
-            _ => Loc.GetString("rmc-plant-analyzer-harvest-none"),
+            HarvestType.Repeat => "Repeating",
+            HarvestType.SelfHarvest => "Self-harvesting",
+            _ => "No repeat",
         };
 
-        var msg = Loc.GetString("rmc-plant-analyzer-seed-info",
-            ("name", name),
-            ("endurance", (int)seed.Endurance),
-            ("yield", seed.Yield),
-            ("lifespan", (int)seed.Lifespan),
-            ("maturation", (int)seed.Maturation),
-            ("production", (int)seed.Production),
-            ("potency", (int)seed.Potency),
-            ("harvest", harvest),
-            ("seedless", seed.Seedless),
-            ("viable", seed.Viable));
+        var msg = $"[color=green]{name}[/color]\n" +
+            $"Endurance: {(int)seed.Endurance}  Yield: {seed.Yield}  Potency: {(int)seed.Potency}\n" +
+            $"Lifespan: {(int)seed.Lifespan}  Maturation: {(int)seed.Maturation}  Production: {(int)seed.Production}\n" +
+            $"Harvest: {harvest}  Seedless: {seed.Seedless}  Viable: {seed.Viable}";
 
         _popup.PopupCursor(msg, user, PopupType.Large);
 
@@ -79,7 +72,7 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
     {
         if (holder.Seed == null)
         {
-            _popup.PopupCursor(Loc.GetString("rmc-plant-analyzer-empty-tray"), user);
+            _popup.PopupCursor("The tray is empty.", user);
             return;
         }
 
@@ -87,28 +80,17 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         var name = Loc.GetString(seed.DisplayName);
         var harvest = seed.HarvestRepeat switch
         {
-            HarvestType.Repeat => Loc.GetString("rmc-plant-analyzer-harvest-repeat"),
-            HarvestType.SelfHarvest => Loc.GetString("rmc-plant-analyzer-harvest-self"),
-            _ => Loc.GetString("rmc-plant-analyzer-harvest-none"),
+            HarvestType.Repeat => "Repeating",
+            HarvestType.SelfHarvest => "Self-harvesting",
+            _ => "No repeat",
         };
 
-        var msg = Loc.GetString("rmc-plant-analyzer-tray-info",
-            ("name", name),
-            ("health", (int)holder.Health),
-            ("endurance", (int)seed.Endurance),
-            ("water", (int)holder.WaterLevel),
-            ("nutrition", (int)holder.NutritionLevel),
-            ("pest", (int)holder.PestLevel),
-            ("weed", (int)holder.WeedLevel),
-            ("toxin", (int)holder.Toxins),
-            ("yield", seed.Yield),
-            ("lifespan", (int)seed.Lifespan),
-            ("maturation", (int)seed.Maturation),
-            ("production", (int)seed.Production),
-            ("potency", (int)seed.Potency),
-            ("harvest", harvest),
-            ("seedless", seed.Seedless),
-            ("viable", seed.Viable));
+        var msg = $"[color=green]{name}[/color]\n" +
+            $"Health: {(int)holder.Health}/{(int)seed.Endurance}  Water: {(int)holder.WaterLevel}  Nutrition: {(int)holder.NutritionLevel}\n" +
+            $"Pest: {(int)holder.PestLevel}  Weed: {(int)holder.WeedLevel}  Toxin: {(int)holder.Toxins}\n" +
+            $"Yield: {seed.Yield}  Potency: {(int)seed.Potency}  Lifespan: {(int)seed.Lifespan}\n" +
+            $"Maturation: {(int)seed.Maturation}  Production: {(int)seed.Production}\n" +
+            $"Harvest: {harvest}  Seedless: {seed.Seedless}  Viable: {seed.Viable}";
 
         _popup.PopupCursor(msg, user, PopupType.Large);
 
@@ -118,9 +100,7 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
     private void ShowProduceInfo(EntityUid user, SeedData seed)
     {
         var name = Loc.GetString(seed.DisplayName);
-        var msg = Loc.GetString("rmc-plant-analyzer-produce-info",
-            ("name", name),
-            ("potency", (int)seed.Potency));
+        var msg = $"[color=green]{name}[/color]\nPotency: {(int)seed.Potency}";
 
         _popup.PopupCursor(msg, user, PopupType.Large);
 
@@ -135,14 +115,10 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         var chemLines = new List<string>();
         foreach (var (reagentId, qty) in seed.Chemicals)
         {
-            chemLines.Add(Loc.GetString("rmc-plant-analyzer-chem-entry",
-                ("reagent", reagentId),
-                ("min", qty.Min),
-                ("max", qty.Max)));
+            chemLines.Add($"• {reagentId} ({qty.Min}–{qty.Max} units)");
         }
 
-        var chemMsg = Loc.GetString("rmc-plant-analyzer-chemicals",
-            ("chemicals", string.Join("\n", chemLines)));
+        var chemMsg = $"Chemicals:\n{string.Join("\n", chemLines)}";
         _popup.PopupCursor(chemMsg, user, PopupType.Large);
     }
 }
