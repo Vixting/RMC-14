@@ -148,7 +148,7 @@ public sealed class XenoTunnelSystem : EntitySystem
 
     private void OnExamine(Entity<XenoTunnelComponent> xenoTunnel, ref ExaminedEvent args)
     {
-        if (!HasComp<XenoComponent>(args.Examiner) || !_hive.FromSameHive(args.Examiner, xenoTunnel.Owner))
+        if (!HasComp<XenoComponent>(args.Examiner) || !_hive.FromSameHiveOrAlly(args.Examiner, xenoTunnel.Owner))
         {
             LocId message = "rmc-xeno-construction-tunnel-examine-not-xeno-empty";
 
@@ -609,7 +609,7 @@ public sealed class XenoTunnelSystem : EntitySystem
             Impact = LogImpact.Low,
         };
 
-        if (_hive.FromSameHive(xenoTunnel.Owner, uid) && HasComp<TunnelRenamerComponent>(uid))
+        if (_hive.FromSameHiveOrAlly(xenoTunnel.Owner, uid) && HasComp<TunnelRenamerComponent>(uid))
         {
             args.Verbs.Add(renameTunnelVerb);
         }

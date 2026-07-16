@@ -39,7 +39,7 @@ public abstract class SharedXenoResinHoleSystem : EntitySystem
 
 	private void OnXenoResinHoleAttacked(Entity<XenoResinHoleComponent> resinHole, ref GettingAttackedAttemptEvent args)
 	{
-		if (_hive.FromSameHive(args.Attacker, resinHole.Owner) && resinHole.Comp.TrapPrototype != null)
+		if (_hive.FromSameHiveOrAlly(args.Attacker, resinHole.Owner) && resinHole.Comp.TrapPrototype != null)
 			args.Cancelled = true;
 	}
 

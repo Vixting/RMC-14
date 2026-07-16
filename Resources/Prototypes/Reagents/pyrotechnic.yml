@@ -170,7 +170,9 @@
       metabolismRate: 0.1
       effects:
       - !type:Toxic
-        potency: 1 # </RMC14>
+        potency: 1
+      - !type:Explosive
+        potency: 0.0045 # </RMC14>
 
 - type: reagent
   id: Fluorosurfactant

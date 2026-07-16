@@ -1,0 +1,125 @@
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeAutodocInternalBleeding
+  category: Machinery
+  kind: AutodocInternalBleeding
+  cost: 30
+  requiredClearance: 1
+  name: AutoDoc - Internal Bleeding Treatment
+  description: Unlocks automated treatment of internal bleeding on every AutoDoc unit.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeAutodocBrokenBone
+  category: Machinery
+  kind: AutodocBrokenBone
+  cost: 30
+  requiredClearance: 1
+  name: AutoDoc - Broken Bone Treatment
+  description: Unlocks automated treatment of broken bones on every AutoDoc unit.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeAutodocOrganDamage
+  category: Machinery
+  kind: AutodocOrganDamage
+  cost: 45
+  requiredClearance: 2
+  name: AutoDoc - Organ Damage Treatment
+  description: Unlocks automated treatment of organ damage on every AutoDoc unit.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeAutodocLarvaExtraction
+  category: Machinery
+  kind: AutodocLarvaExtraction
+  cost: 60
+  requiredClearance: 3
+  name: AutoDoc - Larva Extraction
+  description: Unlocks automated larva extraction on every AutoDoc unit.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeIncineratorTankCapacity
+  category: Machinery
+  kind: IncineratorTankCapacity
+  cost: 40
+  requiredClearance: 2
+  name: Incinerator Tank Capacity
+  description: Increases the capacity of incinerator unit fuel tanks.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeSmokeTankCapacity
+  category: Machinery
+  kind: SmokeTankCapacity
+  cost: 40
+  requiredClearance: 2
+  name: Smoke Tank Capacity
+  description: Increases the capacity of smoke grenade launcher tanks.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeResearchContractReroll
+  category: Machinery
+  kind: ResearchContractReroll
+  cost: 15
+  requiredClearance: 1
+  name: Research Contract Reroll
+  description: Immediately rerolls the current chemistry research contracts. Repeatable.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeLaserScalpelTier2
+  category: Items
+  kind: LaserScalpelTier2
+  cost: 25
+  requiredClearance: 2
+  name: Improved Laser Scalpel Access
+  description: Authorizes use of the improved laser scalpel for harvesting higher-tier xenomorph specimens.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeLaserScalpelTier3
+  category: Items
+  kind: LaserScalpelTier3
+  cost: 50
+  requiredClearance: 3
+  name: Advanced Laser Scalpel Access
+  description: Authorizes use of the advanced laser scalpel for harvesting Queen-tier xenomorph specimens.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeCoagulatorPlate
+  category: Armor
+  kind: CoagulatorPlate
+  cost: 35
+  requiredClearance: 2
+  name: Coagulator Plate
+  description: Authorizes use of the coagulator research plate, which suppresses bleeding while worn.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeEmergencyInjectorPlate
+  category: Armor
+  kind: EmergencyInjectorPlate
+  cost: 45
+  requiredClearance: 2
+  name: Emergency-Injector Plate
+  description: Authorizes use of the emergency-injector research plate, which auto-injects a stabilizing chemical when the wearer enters critical condition.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeCeramicPlate
+  category: Armor
+  kind: CeramicPlate
+  cost: 40
+  requiredClearance: 2
+  name: Ceramic Plate
+  description: Authorizes use of the ceramic research plate, which adds flat armor while worn.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeAntiDecayPlate
+  category: Armor
+  kind: AntiDecayPlate
+  cost: 45
+  requiredClearance: 3
+  name: Anti-Decay Plate
+  description: Authorizes use of the anti-decay research plate, which reduces acid damage while worn.
+
+- type: rmcBiomassUpgrade
+  id: RMCBiomassUpgradeSplintUnlock
+  category: Armor
+  kind: SplintUnlock
+  cost: 20
+  requiredClearance: 1
+  name: Splints
+  description: Not yet implemented.

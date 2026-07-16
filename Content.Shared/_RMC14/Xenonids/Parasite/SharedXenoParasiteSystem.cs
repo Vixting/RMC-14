@@ -536,6 +536,14 @@ public abstract partial class SharedXenoParasiteSystem : EntitySystem
             return false;
         }
 
+        if (_hive.FromSameHiveOrAlly(parasite.Owner, victim))
+        {
+            if (popup)
+                _popup.PopupClient(Loc.GetString("rmc-xeno-failed-cant-infect", ("target", victim)), victim, user, PopupType.MediumCaution);
+
+            return false;
+        }
+
         if (!force
             && !HasComp<XenoNestedComponent>(victim)
             && TryComp(victim, out StandingStateComponent? standing)
@@ -1056,6 +1064,12 @@ public abstract partial class SharedXenoParasiteSystem : EntitySystem
     public void SetBurstDelay(Entity<VictimInfectedComponent> burst, TimeSpan time)
     {
         burst.Comp.BurstAt = _timing.CurTime + time;
+        Dirty(burst);
+    }
+
+    public void DelayBurst(Entity<VictimInfectedComponent> burst, TimeSpan time)
+    {
+        burst.Comp.BurstAt += time;
         Dirty(burst);
     }
 

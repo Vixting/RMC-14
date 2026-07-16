@@ -171,3 +171,13 @@
       amount: 1
   products:
     RMCSleen: 2
+
+- type: reaction
+  id: RMCAntiNeurotoxin
+  reactants:
+    RMCNeurotoxinPlasma:
+      amount: 1
+    Dylovene:
+      amount: 1
+  products:
+    RMCAntiNeurotoxin: 1
