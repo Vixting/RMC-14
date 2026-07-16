@@ -1,0 +1,39 @@
+<controls:RMCBiomassAnalyzerWindow
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._RMC14.Xenonids.Biomass"
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    Title="Biomass Analyzer" MinSize="700 600">
+    <PanelContainer>
+        <PanelContainer.PanelOverride>
+            <graphics:StyleBoxFlat BackgroundColor="#0A1F0A" />
+        </PanelContainer.PanelOverride>
+        <BoxContainer Orientation="Vertical" Margin="4">
+            <PanelContainer Margin="0 0 0 4">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#0A1F0A" BorderColor="#3FBF3F" BorderThickness="1" />
+                </PanelContainer.PanelOverride>
+                <Label Name="PointsLabel" Access="Public" Margin="6 4" FontColorOverride="#3FBF3F" />
+            </PanelContainer>
+
+            <BoxContainer Name="TabBar" Access="Public" Orientation="Horizontal" Margin="0 0 0 2" />
+
+            <TabContainer Name="Tabs" Access="Public" TabsVisible="False" VerticalExpand="True" HorizontalExpand="True">
+                <BoxContainer Name="MachineryTab" Access="Public" Orientation="Vertical">
+                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                        <BoxContainer Name="MachineryBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
+                    </ScrollContainer>
+                </BoxContainer>
+                <BoxContainer Name="ItemsTab" Access="Public" Orientation="Vertical">
+                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                        <BoxContainer Name="ItemsBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
+                    </ScrollContainer>
+                </BoxContainer>
+                <BoxContainer Name="ArmorTab" Access="Public" Orientation="Vertical">
+                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                        <BoxContainer Name="ArmorBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
+                    </ScrollContainer>
+                </BoxContainer>
+            </TabContainer>
+        </BoxContainer>
+    </PanelContainer>
+</controls:RMCBiomassAnalyzerWindow>

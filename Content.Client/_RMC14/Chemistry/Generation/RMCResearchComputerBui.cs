@@ -58,8 +58,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         Compound,
     }
 
-    // cmss13 defaults to sorting by time; toggling the same header flips direction, clicking the other
-    // column switches to it. Each tab keeps its own sort state, matching separate CompoundTable instances.
     private SortColumn _documentsSort = SortColumn.Time;
     private bool _documentsSortAscending;
     private SortColumn _publishedSort = SortColumn.Time;

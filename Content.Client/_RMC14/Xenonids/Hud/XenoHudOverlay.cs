@@ -6,6 +6,7 @@ using Content.Shared._RMC14.Shields;
 using Content.Shared._RMC14.Stealth;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Energy;
+using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.HiveTeam;
 using Content.Shared._RMC14.Xenonids.Maturing;
 using Content.Shared._RMC14.Xenonids.Parasite;
@@ -46,6 +47,7 @@ public sealed class XenoHudOverlay : Overlay
 
     private readonly ContainerSystem _container;
     private readonly CMHealthIconsSystem _healthIcons;
+    private readonly SharedXenoHiveSystem _hive;
     private readonly MobStateSystem _mobState;
     private readonly MobThresholdSystem _mobThresholds;
     private readonly SpriteSystem _sprite;
@@ -80,6 +82,7 @@ public sealed class XenoHudOverlay : Overlay
 
         _container = _entity.System<ContainerSystem>();
         _healthIcons = _entity.System<CMHealthIconsSystem>();
+        _hive = _entity.System<SharedXenoHiveSystem>();
         _mobState = _entity.System<MobStateSystem>();
         _mobThresholds = _entity.System<MobThresholdSystem>();
         _sprite = _entity.System<SpriteSystem>();
@@ -191,6 +194,11 @@ public sealed class XenoHudOverlay : Overlay
     private void DrawBars(in OverlayDrawArgs args, Matrix3x2 scaleMatrix, Matrix3x2 rotationMatrix)
     {
         var handle = args.WorldHandle;
+
+        var localEntity = _players.LocalEntity;
+        var canSeeAllHives = localEntity == null ||
+            (_entity.TryGetComponent(localEntity, out GhostComponent? ghost) && ghost.CanGhostInteract);
+
         var xenos = _entity.AllEntityQueryEnumerator<XenoComponent, SpriteComponent, TransformComponent>();
         while (xenos.MoveNext(out var uid, out var xeno, out var sprite, out var xform))
         {
@@ -198,6 +206,9 @@ public sealed class XenoHudOverlay : Overlay
                 continue;
 
             if (_container.IsEntityOrParentInContainer(uid, xform: xform))
+                continue;
+
+            if (!canSeeAllHives && uid != localEntity && localEntity is { } local && !_hive.FromSameHiveOrAlly(local, uid))
                 continue;
 
             var bounds = sprite.Bounds;

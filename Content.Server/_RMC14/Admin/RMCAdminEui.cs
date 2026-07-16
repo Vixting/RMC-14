@@ -260,6 +260,7 @@ public sealed class RMCAdminEui : BaseEui
             case RMCAdminCreateHiveMsg createHive:
             {
                 var hive = _hive.CreateHive(createHive.Name);
+                _hive.SetColor((hive, _entities.GetComponent<HiveComponent>(hive)), createHive.Color);
                 // automatically set the xeno's hive to the one you just created
                 if (_entities.TryGetEntity(_target, out var target))
                     _hive.SetHive(target.Value, hive);
