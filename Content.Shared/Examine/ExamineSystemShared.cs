@@ -7,6 +7,7 @@ using Content.Shared.Ghost;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Vehicle.Components;
 using JetBrains.Annotations;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
@@ -117,7 +118,15 @@ namespace Content.Shared.Examine
             if (!examinerComp.CheckInRangeUnOccluded)
                 return true;
 
-            if (Comp<TransformComponent>(examiner).MapID != target.MapId) 
+            var examinerOrigin = examiner;
+            if (TryComp<EyeComponent>(examiner, out var operatorEye) &&
+                operatorEye.Target is { } eyeTarget &&
+                HasComp<VehicleComponent>(eyeTarget))
+            {
+                examinerOrigin = eyeTarget;
+            }
+
+            if (Comp<TransformComponent>(examinerOrigin).MapID != target.MapId)
             {
                 if (!HasComp<OverwatchWatchingComponent>(examiner) && !HasComp<XenoWatchingComponent>(examiner))
                     return false;
@@ -141,7 +150,7 @@ namespace Content.Shared.Examine
                         GetExaminerRange(overwatched),
                         predicate: predicate,
                         ignoreInsideBlocker: true);
-                } 
+                }
                 else if (TryComp<XenoWatchingComponent>(examiner, out var watcher) && watcher.Watching is { } watched)
                 {
                     return InRangeUnOccluded(
@@ -153,7 +162,7 @@ namespace Content.Shared.Examine
                 }
 
                 return InRangeUnOccluded(
-                    examiner,
+                    examinerOrigin,
                     examined.Value,
                     GetExaminerRange(examiner),
                     predicate: predicate,
@@ -162,7 +171,7 @@ namespace Content.Shared.Examine
             else
             {
                 return InRangeUnOccluded(
-                    examiner,
+                    examinerOrigin,
                     target,
                     GetExaminerRange(examiner),
                     predicate: predicate,
