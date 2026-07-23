@@ -1,3 +1,5 @@
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
 using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
@@ -19,5 +21,12 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
         plant.MutationMod += (float) potency;
     }
 
-    // TODO RMC14 mob hemorrhaging effect
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (!args.EntityManager.TryGetComponent<BloodstreamComponent>(args.TargetEntity, out var bloodstream))
+            return;
+
+        var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
+        bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), (float) potency);
+    }
 }
