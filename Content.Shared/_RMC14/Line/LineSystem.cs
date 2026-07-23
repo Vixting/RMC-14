@@ -12,6 +12,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Network;
 using Robust.Shared.Physics;
+using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
@@ -31,7 +32,6 @@ public sealed class LineSystem : EntitySystem
 
     private static readonly ProtoId<TagPrototype> StructureTag = "Structure";
     private static readonly ProtoId<TagPrototype> WallTag = "Wall";
-    private static readonly ProtoId<TagPrototype> WindowFrameTag = "WindowFrame";
     private static readonly float MaxBeamDistance = 500;
 
     private EntityQuery<BarricadeComponent> _barricadeQuery;
@@ -157,7 +157,15 @@ public sealed class LineSystem : EntitySystem
             var blockCount = 0;
             foreach (var entity in results)
             {
+                // RMC
+                if (ignoreBarricades && _barricadeQuery.HasComp(entity))
+                    continue;
+
                 if (!_tag.HasAnyTag(entity, StructureTag, WallTag))
+                    continue;
+
+                // RMC
+                if (ignoreBarricades && !IsHardBlocker(entity))
                     continue;
 
                 blockCount++;
@@ -204,7 +212,7 @@ public sealed class LineSystem : EntitySystem
             }
             else if (_tag.HasAnyTag(uid.Value, StructureTag, WallTag))
             {
-                if (ignoreBarricades && _tag.HasTag(uid.Value, WindowFrameTag))
+                if (ignoreBarricades && !IsHardBlocker(uid.Value)) //RMC
                     continue;
 
                 blocker = uid.Value;
@@ -213,6 +221,16 @@ public sealed class LineSystem : EntitySystem
         }
 
         return false;
+    }
+
+    // RMC
+    private bool IsHardBlocker(EntityUid uid)
+    {
+        if (_tag.HasTag(uid, WallTag))
+            return true;
+
+        return TryComp(uid, out PhysicsComponent? physics) &&
+               (physics.CollisionLayer & (int)CollisionGroup.WallLayer) == (int)CollisionGroup.WallLayer;
     }
 
     //RMC Beam code
