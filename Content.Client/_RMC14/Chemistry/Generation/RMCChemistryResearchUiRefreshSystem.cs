@@ -10,6 +10,7 @@ public sealed class RMCChemistryResearchUiRefreshSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<RMCChemistryResearchComponent, AfterAutoHandleStateEvent>(OnResearchState);
+        SubscribeLocalEvent<RMCSynthesisSimulatorComponent, AfterAutoHandleStateEvent>(OnSimulatorState);
     }
 
     private void OnResearchState(Entity<RMCChemistryResearchComponent> ent, ref AfterAutoHandleStateEvent args)
@@ -25,5 +26,10 @@ public sealed class RMCChemistryResearchUiRefreshSystem : EntitySystem
         {
             _rmcUI.RefreshUIs<RMCSynthesisSimulatorBui>(uid);
         }
+    }
+
+    private void OnSimulatorState(Entity<RMCSynthesisSimulatorComponent> ent, ref AfterAutoHandleStateEvent args)
+    {
+        _rmcUI.RefreshUIs<RMCSynthesisSimulatorBui>(ent.Owner);
     }
 }

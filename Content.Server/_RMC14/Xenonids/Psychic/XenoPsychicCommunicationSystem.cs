@@ -263,7 +263,7 @@ public sealed class XenoPsychicCommunicationSystem : EntitySystem
         if (!HasComp<XenoComponent>(watched) ||
             !HasComp<ActorComponent>(watched) ||
             _mobState.IsDead(watched) ||
-            !_hive.FromSameHive(queen.Owner, watched))
+            !_hive.FromSameHiveOrAlly(queen.Owner, watched))
         {
             _popup.PopupEntity(Loc.GetString("rmc-xeno-psychic-target-invalid"), queen, queen, PopupType.MediumCaution);
             return false;
@@ -378,7 +378,7 @@ public sealed class XenoPsychicCommunicationSystem : EntitySystem
 
     private bool IsSameHiveXeno(Entity<XenoPsychicCommunicationComponent> queen, EntityUid target)
     {
-        return HasComp<XenoComponent>(target) && _hive.FromSameHive(queen.Owner, target);
+        return HasComp<XenoComponent>(target) && _hive.FromSameHiveOrAlly(queen.Owner, target);
     }
 
     private object QueenTargetName(Entity<XenoPsychicCommunicationComponent> queen, EntityUid target)

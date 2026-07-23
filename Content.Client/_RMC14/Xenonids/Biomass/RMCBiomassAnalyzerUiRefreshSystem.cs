@@ -10,6 +10,7 @@ public sealed class RMCBiomassAnalyzerUiRefreshSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<RMCBiomassAnalyzerComponent, AfterAutoHandleStateEvent>(OnAnalyzerState);
+        SubscribeLocalEvent<RMCBiomassAnalyzerMachineComponent, AfterAutoHandleStateEvent>(OnMachineState);
     }
 
     private void OnAnalyzerState(Entity<RMCBiomassAnalyzerComponent> ent, ref AfterAutoHandleStateEvent args)
@@ -19,5 +20,10 @@ public sealed class RMCBiomassAnalyzerUiRefreshSystem : EntitySystem
         {
             _rmcUI.RefreshUIs<RMCBiomassAnalyzerBui>(uid);
         }
+    }
+
+    private void OnMachineState(Entity<RMCBiomassAnalyzerMachineComponent> ent, ref AfterAutoHandleStateEvent args)
+    {
+        _rmcUI.RefreshUIs<RMCBiomassAnalyzerBui>(ent.Owner);
     }
 }

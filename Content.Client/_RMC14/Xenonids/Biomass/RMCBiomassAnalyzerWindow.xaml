@@ -2,38 +2,95 @@
     xmlns="https://spacestation14.io"
     xmlns:controls="clr-namespace:Content.Client._RMC14.Xenonids.Biomass"
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-    Title="Biomass Analyzer" MinSize="700 600">
+    Title="Biomass Analyzer" MinSize="900 760">
     <PanelContainer>
         <PanelContainer.PanelOverride>
-            <graphics:StyleBoxFlat BackgroundColor="#0A1F0A" />
+            <graphics:StyleBoxFlat BackgroundColor="#221801" />
         </PanelContainer.PanelOverride>
         <BoxContainer Orientation="Vertical" Margin="4">
             <PanelContainer Margin="0 0 0 4">
                 <PanelContainer.PanelOverride>
-                    <graphics:StyleBoxFlat BackgroundColor="#0A1F0A" BorderColor="#3FBF3F" BorderThickness="1" />
+                    <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
                 </PanelContainer.PanelOverride>
-                <Label Name="PointsLabel" Access="Public" Margin="6 4" FontColorOverride="#3FBF3F" />
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                        <Button Name="EjectOrganButton" Access="Public" HorizontalAlignment="Left" MinSize="170 32" MaxSize="170 32" Margin="0 0 8 0" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                            <Button.StyleBoxOverride>
+                                <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
+                            </Button.StyleBoxOverride>
+                        </Button>
+                        <Button Name="ProcessOrganButton" Access="Public" HorizontalAlignment="Left" MinSize="170 32" MaxSize="170 32" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                            <Button.StyleBoxOverride>
+                                <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
+                            </Button.StyleBoxOverride>
+                        </Button>
+                    </BoxContainer>
+                    <PanelContainer>
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                        </PanelContainer.PanelOverride>
+                        <Label Name="PointsLabel" Access="Public" Margin="6 4" FontColorOverride="#FAC000" />
+                    </PanelContainer>
+                </BoxContainer>
             </PanelContainer>
 
-            <BoxContainer Name="TabBar" Access="Public" Orientation="Horizontal" Margin="0 0 0 2" />
+            <PanelContainer Margin="0 0 0 4">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <Label Text="Biological Material" FontColorOverride="#FAC000" Margin="0 0 0 4" />
+                    <Label Name="OrganStatusLabel" Access="Public" />
+                </BoxContainer>
+            </PanelContainer>
 
-            <TabContainer Name="Tabs" Access="Public" TabsVisible="False" VerticalExpand="True" HorizontalExpand="True">
-                <BoxContainer Name="MachineryTab" Access="Public" Orientation="Vertical">
-                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
-                        <BoxContainer Name="MachineryBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
-                    </ScrollContainer>
+            <PanelContainer Margin="0 0 0 4">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                        <Button Name="QueueExpandButton" Access="Public" Text="&#9654;" MinSize="24 24" MaxSize="24 24" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                            <Button.StyleBoxOverride>
+                                <graphics:StyleBoxFlat BackgroundColor="Transparent" />
+                            </Button.StyleBoxOverride>
+                        </Button>
+                        <Label Text="Process Queue" HorizontalExpand="True" VerticalAlignment="Center" Margin="4 0 0 0" FontColorOverride="#FAC000" />
+                        <Button Name="ToggleQueueButton" Access="Public" MinSize="90 28" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                            <Button.StyleBoxOverride>
+                                <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
+                            </Button.StyleBoxOverride>
+                        </Button>
+                    </BoxContainer>
+                    <BoxContainer Name="QueueContent" Access="Public" Orientation="Vertical" Visible="False">
+                        <Label Name="QueueEmptyLabel" Access="Public" Text="Queue is empty." FontColorOverride="#8A6800" />
+                        <ScrollContainer MaxHeight="140" HScrollEnabled="False">
+                            <BoxContainer Name="QueueBox" Access="Public" Orientation="Vertical" SeparationOverride="2" />
+                        </ScrollContainer>
+                    </BoxContainer>
                 </BoxContainer>
-                <BoxContainer Name="ItemsTab" Access="Public" Orientation="Vertical">
-                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
-                        <BoxContainer Name="ItemsBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
-                    </ScrollContainer>
-                </BoxContainer>
-                <BoxContainer Name="ArmorTab" Access="Public" Orientation="Vertical">
-                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
-                        <BoxContainer Name="ArmorBox" Access="Public" Orientation="Vertical" SeparationOverride="6" />
-                    </ScrollContainer>
-                </BoxContainer>
-            </TabContainer>
+            </PanelContainer>
+
+            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                <Label Text="Select Technology to print:" VerticalAlignment="Center" Margin="0 0 6 0" FontColorOverride="#FAC000" />
+                <controls:RMCBiomassCategoryOptionButton Name="CategoryBox" Access="Public" HorizontalAlignment="Left" MinWidth="150" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
+                    <controls:RMCBiomassCategoryOptionButton.StyleBoxOverride>
+                        <graphics:StyleBoxFlat BackgroundColor="#221801" BorderColor="#FAC000" BorderThickness="1" ContentMarginLeftOverride="6" ContentMarginRightOverride="6" ContentMarginTopOverride="1" ContentMarginBottomOverride="1" />
+                    </controls:RMCBiomassCategoryOptionButton.StyleBoxOverride>
+                </controls:RMCBiomassCategoryOptionButton>
+            </BoxContainer>
+
+            <BoxContainer Orientation="Horizontal" SeparationOverride="4" Margin="0 0 0 2">
+                <Label Text="Upgrade" MinWidth="200" FontColorOverride="#FAC000" />
+                <Control MinWidth="1" />
+                <Label Text="Details" HorizontalExpand="True" FontColorOverride="#FAC000" />
+                <Control MinWidth="1" />
+                <Label Text="Print" MinWidth="140" FontColorOverride="#FAC000" />
+            </BoxContainer>
+
+            <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                <BoxContainer Name="UpgradesBox" Access="Public" Orientation="Vertical" SeparationOverride="2" />
+            </ScrollContainer>
         </BoxContainer>
     </PanelContainer>
 </controls:RMCBiomassAnalyzerWindow>

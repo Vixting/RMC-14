@@ -20,11 +20,6 @@
                         <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
                     </Button.StyleBoxOverride>
                 </Button>
-                <Button Name="RequestXAccessButton" Access="Public" MinSize="170 32" MaxSize="170 32" Margin="4 0 0 0" Modulate="#FFFFFF" ModulateSelfOverride="#FFFFFF">
-                    <Button.StyleBoxOverride>
-                        <graphics:StyleBoxFlat BackgroundColor="#FAC000" BorderColor="#8A6800" BorderThickness="2" />
-                    </Button.StyleBoxOverride>
-                </Button>
             </BoxContainer>
 
             <BoxContainer Name="TabBar" Access="Public" Orientation="Horizontal" Margin="0 0 0 2" />

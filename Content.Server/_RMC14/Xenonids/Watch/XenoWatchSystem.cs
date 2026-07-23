@@ -137,7 +137,7 @@ public sealed class XenoWatchSystem : SharedXenoWatchSystem
         if (watcher.Owner == toWatch.Owner)
             return;
 
-        if (!_hive.FromSameHive((watcher, watcher.Comp1), toWatch))
+        if (!_hive.FromSameHiveOrAlly((watcher, watcher.Comp1), toWatch))
             return;
 
         if (!Resolve(watcher, ref watcher.Comp2, false))

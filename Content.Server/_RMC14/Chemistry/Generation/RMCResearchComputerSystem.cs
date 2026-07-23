@@ -7,6 +7,7 @@ using Content.Shared.Popups;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.GameObjects;
 
 namespace Content.Server._RMC14.Chemistry.Generation;
 
@@ -15,6 +16,7 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly RMCChemistryResearchSystem _research = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
 
     public override void Initialize()
@@ -101,6 +103,7 @@ public sealed class RMCResearchComputerSystem : SharedRMCResearchComputerSystem
         if (GetEntity(netEntity) is not { Valid: true } report)
             return;
 
+        _transform.SetCoordinates(report, Transform(ent).Coordinates);
         _ui.OpenUi(report, PaperComponent.PaperUiKey.Key, actor);
     }
 

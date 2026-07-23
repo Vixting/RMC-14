@@ -70,9 +70,7 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
                 break;
         }
 
-        var overdose = Math.Max(targetReport.Overdose, 1);
-        if (comp.Mode != SynthesisMode.Add)
-            overdose = overdose <= 5 ? Math.Max(overdose - 1, 1) : Math.Max(overdose - 5, 5);
+        var overdose = GetPredictedOverdose(ent)!.Value;
 
         var signature = _generator.ComputeSimulationSignature(properties, overdose);
         if (_generator.TryGetSimulationResult(signature, out var existingId) && _rmcReagent.TryIndex(existingId, out var existingReagent))

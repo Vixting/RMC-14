@@ -46,7 +46,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 
     private RMCResearchComputerWindow? _window;
     private Label? _brokerClearanceLabel;
-    private Label? _requestXAccessLabel;
     private readonly List<TabButtonControl> _tabButtons = new();
     private Font _boldFont = default!;
     private Font _smallFont = default!;
@@ -79,14 +78,18 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         Logger.DebugS("research-computer", $"Open: AmberBright={AmberBright}, AmberDim={AmberDim}, AmberBlack={AmberBlack}");
 
         _brokerClearanceLabel = Icon(_window.BrokerClearanceButton, GearIcon, GearIconWhite, "Broker Clearance");
-        _requestXAccessLabel = Icon(_window.RequestXAccessButton, GearIcon, GearIconWhite, "Request 5X Access");
-        Icon(_window.ReprintContractButton, RepeatIcon, RepeatIconWhite, "Reprint Last Contract");
+        Icon(_window.ReprintContractButton, RepeatIcon, RepeatIconWhite, "Reprint");
 
         LogButtonStyle("BrokerClearanceButton", _window.BrokerClearanceButton);
         LogButtonStyle("ReprintContractButton", _window.ReprintContractButton);
 
-        _window.BrokerClearanceButton.OnPressed += _ => OnBrokerClearancePressed();
-        _window.RequestXAccessButton.OnPressed += _ => OnRequestXAccessPressed();
+        _window.BrokerClearanceButton.OnPressed += _ =>
+        {
+            if (TryGetResearch(out var research) && research.ClearanceLevel >= MaxClearanceLevel)
+                OnRequestXAccessPressed();
+            else
+                OnBrokerClearancePressed();
+        };
         _window.ReprintContractButton.OnPressed += _ => SendPredictedMessage(new RMCResearchComputerReprintContractBuiMsg());
         _window.HideOldReportsButton.OnPressed += _ => Refresh();
         _window.HideOldReportsButton.Label.FontColorOverride = AmberBright;
@@ -298,31 +301,24 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 
         _window.ReprintContractButton.Disabled = research.LastPickedContract is null;
 
-        if (clearance >= MaxClearanceLevel)
-        {
-            _brokerClearanceLabel!.Text = "Max Clearance Reached";
-            _window.BrokerClearanceButton.Disabled = true;
-            SetPurchasableStyle(_window.BrokerClearanceButton, false);
-        }
-        else
+        if (clearance < MaxClearanceLevel)
         {
             var cost = Math.Max(ResearchLevelIncreaseMultiplier * clearance + 1, 1);
             _brokerClearanceLabel!.Text = $"Improve ({cost}CR)";
             _window.BrokerClearanceButton.Disabled = cost > credits;
             SetPurchasableStyle(_window.BrokerClearanceButton, cost <= credits);
         }
-
-        if (research.ReachedXAccess)
+        else if (!research.ReachedXAccess)
         {
-            _requestXAccessLabel!.Text = "5X Access Granted";
-            _window.RequestXAccessButton.Disabled = true;
-            SetPurchasableStyle(_window.RequestXAccessButton, false);
+            _brokerClearanceLabel!.Text = $"Request 5X Access ({XAccessCost}CR)";
+            _window.BrokerClearanceButton.Disabled = XAccessCost > credits;
+            SetPurchasableStyle(_window.BrokerClearanceButton, XAccessCost <= credits);
         }
         else
         {
-            _requestXAccessLabel!.Text = $"Request 5X Access ({XAccessCost}CR)";
-            _window.RequestXAccessButton.Disabled = XAccessCost > credits;
-            SetPurchasableStyle(_window.RequestXAccessButton, XAccessCost <= credits);
+            _brokerClearanceLabel!.Text = "5X Access Granted";
+            _window.BrokerClearanceButton.Disabled = true;
+            SetPurchasableStyle(_window.BrokerClearanceButton, false);
         }
 
         var duration = research.PickedThisCycle ? TimeSpan.FromMinutes(6) : TimeSpan.FromMinutes(3);

@@ -241,6 +241,9 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         if (research.Comp.ReachedXAccess)
             return false;
 
+        if (research.Comp.ClearanceLevel < MaxClearanceLevel)
+            return false;
+
         if (!TrySpendCredits(XAccessCost))
             return false;
 
