@@ -98,9 +98,10 @@ public sealed class RMCAdminChangeHiveMsg(Hive hive) : EuiMessageBase
 }
 
 [Serializable, NetSerializable]
-public sealed class RMCAdminCreateHiveMsg(string name) : EuiMessageBase
+public sealed class RMCAdminCreateHiveMsg(string name, Color color) : EuiMessageBase
 {
     public readonly string Name = name;
+    public readonly Color Color = color;
 }
 
 [Serializable, NetSerializable]

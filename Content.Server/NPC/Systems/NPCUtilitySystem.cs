@@ -18,6 +18,7 @@ using Content.Shared._RMC14.Xenonids.Construction.EggMorpher;
 using Content.Shared._RMC14.Xenonids.Construction.Nest;
 using Content.Shared._RMC14.Xenonids.Construction.ResinHole;
 using Content.Shared._RMC14.Xenonids.Egg;
+using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.Parasite;
 using Content.Shared.Atmos.Components;
 using Content.Shared._RMC14.Sentry;
@@ -73,6 +74,7 @@ public sealed class NPCUtilitySystem : EntitySystem
     [Dependency] private readonly TurretTargetSettingsSystem _turretTargetSettings = default!;
     [Dependency] private readonly RMCInteractionSystem _rmcInteraction = default!;
     [Dependency] private readonly StandingStateSystem _standing = default!;
+    [Dependency] private readonly SharedXenoHiveSystem _xenoHive = default!;
 
     private EntityQuery<PuddleComponent> _puddleQuery;
     private EntityQuery<TransformComponent> _xformQuery;
@@ -434,6 +436,9 @@ public sealed class NPCUtilitySystem : EntitySystem
             }
             case TargetInfectableCon:
             {
+                if (_xenoHive.FromSameHiveOrAlly(owner, targetUid))
+                    return 0f;
+
                 return TryComp<InfectableComponent>(targetUid, out var infectable)
                         && !infectable.BeingInfected
                         && !HasComp<VictimInfectedComponent>(targetUid) ? 1f : 0f;

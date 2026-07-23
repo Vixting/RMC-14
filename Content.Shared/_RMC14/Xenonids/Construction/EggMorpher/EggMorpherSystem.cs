@@ -162,7 +162,7 @@ public sealed partial class EggMorpherSystem : EntitySystem
     {
         var (ent, comp) = eggMorpher;
         var user = args.User;
-        if (_hive.FromSameHive(user, ent))
+        if (_hive.FromSameHiveOrAlly(user, ent))
         {
             var changeReserveVerb = new ActivationVerb()
             {

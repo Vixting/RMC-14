@@ -341,6 +341,11 @@ public sealed class CMArmorSystem : EntitySystem
         var immuneToAP = TryComp<CMArmorComponent>(ent, out var armorComp) && armorComp.ImmuneToAP;
         if (HasComp<XenoComponent>(ent))
         {
+            // XVX_ARMOR_EFFECTIVEMULT: a xeno targets own armor is only 25% as effective
+            // when the attacker is also a xeno
+            if (args.Origin is { } attacker && HasComp<XenoComponent>(attacker))
+                ev.ArmorModifier *= XenoSystem.XENO_ARMOR_EFFECTIVE_MULT;
+
             ev.XenoArmor = (int)(ev.XenoArmor * ev.ArmorModifier);
             if (!immuneToAP)
                 ev.XenoArmor -= armorPiercing;

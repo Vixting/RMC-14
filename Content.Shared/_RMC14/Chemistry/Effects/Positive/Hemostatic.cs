@@ -1,3 +1,5 @@
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -17,7 +19,14 @@ public sealed partial class Hemostatic : RMCChemicalEffect
         return "Vastly improves the blood's natural ability to coagulate and stop bleeding. Overdosing causes extreme blood clotting, resulting in severe tissue damage.";
     }
 
-    // TODO RMC14: mob effect - suppresses bleeding
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (!args.EntityManager.TryGetComponent<BloodstreamComponent>(args.TargetEntity, out var bloodstream))
+            return;
+
+        var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
+        bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), -(float) potency);
+    }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

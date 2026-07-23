@@ -57,7 +57,7 @@ public sealed class SharedDeployedTrapsSystem : EntitySystem
 
     private void OnStepTriggerAttempt(Entity<XenoDeployedTrapsComponent> trap, ref StepTriggerAttemptEvent args)
     {
-        args.Continue = !_hive.FromSameHive(args.Tripper, trap.Owner)
+        args.Continue = !_hive.FromSameHiveOrAlly(args.Tripper, trap.Owner)
                         && !_mobState.IsDead(args.Tripper)
                         && (HasComp<XenoComponent>(args.Tripper) || HasComp<MarineComponent>(args.Tripper));
     }

@@ -9,6 +9,7 @@ using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared._RMC14.Body;
+using Content.Shared._RMC14.Movement;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -66,14 +67,18 @@ public sealed partial class Hemogenic : RMCChemicalEffect
         var rmcBloodstreamSystem = entityManager.System<SharedRMCBloodstreamSystem>();
         var shouldApplyDamage = ActualPotency > 3 &&
                                 rmcBloodstreamSystem.TryGetBloodSolution(target, out var bloodSolution) &&
-                                bloodSolution.Volume > 570; // TODO RMC14 Also check if they're not a Yautja.
+                                bloodSolution.Volume > bloodSolution.MaxVolume; // TODO RMC14 Also check if they're not a Yautja.
         if (!shouldApplyDamage)
             return;
         var damage = new DamageSpecifier();
         damage.DamageDict[BluntType] = potency;
         damage.DamageDict[AsphyxiationType] = potency * 2;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
-        // TODO RMC14 M.reagent_move_delay_modifier += potency
+
+        var penalty = MathF.Max(1f - (float) potency * 0.05f, 0.1f);
+        var speed = entityManager.System<TemporarySpeedModifiersSystem>();
+        var modifiers = new List<TemporarySpeedModifierSet> { new(TimeSpan.FromSeconds(2), penalty, penalty) };
+        speed.ModifySpeed(target, modifiers);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

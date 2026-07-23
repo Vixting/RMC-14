@@ -55,7 +55,7 @@ public sealed class PlasmaTreeSystem : EntitySystem
         var possibleTargets = new List<EntityUid>();
         foreach (var nearbyEntity in nearbyEntities)
         {
-            if (!_hive.FromSameHive(ent, nearbyEntity) ||
+            if (!_hive.FromSameHiveOrAlly(ent, nearbyEntity) ||
                 !HasComp<XenoComponent>(nearbyEntity) ||
                 !HasComp<XenoRestingComponent>(nearbyEntity) ||
                 !TryComp<XenoPlasmaComponent>(nearbyEntity, out var plasmaComp) ||
