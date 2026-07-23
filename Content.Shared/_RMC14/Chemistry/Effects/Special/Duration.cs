@@ -1,3 +1,4 @@
+using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Special;
@@ -9,5 +10,6 @@ public sealed partial class Duration : RMCChemicalEffect
         return "Controls the duration of a chemical fire, using unknown means.";
     }
 
-    // TODO RMC14: modifies spilled chemical fire burn duration
+    public float DurationDelta => Potency;
+    public FixedPoint2 DurationModDelta => 0.1f * Potency;
 }

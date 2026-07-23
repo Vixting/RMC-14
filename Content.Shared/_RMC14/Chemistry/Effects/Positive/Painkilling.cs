@@ -25,18 +25,18 @@ public sealed partial class Painkilling : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency * 0.5f));
+        status.TryAddStatusEffectDuration(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency * 0.5f));
 
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.25f;
+        damage.DamageDict[PoisonType] = potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
-        damage.DamageDict[AsphyxiationType] = potency * 0.3f;
+        damage.DamageDict[PoisonType] = potency * 2f;
+        damage.DamageDict[AsphyxiationType] = 1.5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
         // TODO RMC14: mob effect - liver organ damage

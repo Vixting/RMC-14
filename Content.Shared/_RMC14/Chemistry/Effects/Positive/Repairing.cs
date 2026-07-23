@@ -24,8 +24,8 @@ public sealed partial class Repairing : RMCChemicalEffect
             return;
 
         var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = -potency * 0.5f;
-        damage.DamageDict[HeatType] = -potency * 0.5f;
+        damage.DamageDict[BluntType] = -potency * 2f;
+        damage.DamageDict[HeatType] = -potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
@@ -39,7 +39,7 @@ public sealed partial class Repairing : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 2f;
+        damage.DamageDict[PoisonType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

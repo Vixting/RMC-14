@@ -25,7 +25,7 @@ public sealed partial class Oxygenating : RMCChemicalEffect
             : $"Heals [color=green]{PotencyPerSecond}[/color] airloss damage and removes [color=green]{PotencyPerSecond}[/color] Lexorin from the bloodstream.";
 
         return $"{healing}\n" +
-               $"Overdoses cause [color=red]{PotencyPerSecond * 0.5}[/color] toxin damage.\n" +
+               $"Overdoses cause [color=red]{PotencyPerSecond * 0.25}[/color] toxin damage.\n" +
                $"Critical overdoses cause [color=red]{PotencyPerSecond}[/color] brute and [color=red]{PotencyPerSecond * 2}[/color] toxin damage";
     }
 
@@ -43,7 +43,7 @@ public sealed partial class Oxygenating : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
+        damage.DamageDict[PoisonType] = potency * 0.25f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

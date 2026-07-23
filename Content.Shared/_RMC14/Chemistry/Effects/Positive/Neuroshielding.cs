@@ -20,7 +20,7 @@ public sealed partial class Neuroshielding : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
+        damage.DamageDict[PoisonType] = potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

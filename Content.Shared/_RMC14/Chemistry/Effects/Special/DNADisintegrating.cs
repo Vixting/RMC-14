@@ -18,9 +18,12 @@ public sealed partial class DNADisintegrating : RMCChemicalEffect
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[CellularType] = potency * 2f;
+        damage.DamageDict[CellularType] = potency * 10f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
-    // TODO RMC14: infects the victim with a xeno transformation disease at high cellular damage
+    // TODO RMC14: cm's real mechanic 5 stage disesa
+    // close dmg >= 190 triggers disease
+    // stage 2-4 flavour text, throat / skin discomfort, limb dmg, paralysis, hearing hive whipsers
+    // stage 5 apply tox dmg, 40%/tick to gib body part & become T1 xeno
 }
