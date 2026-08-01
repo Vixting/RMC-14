@@ -51,10 +51,10 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         if (reagentArgs.Source != null)
             totalQuantity = reagentArgs.Source.GetTotalPrototypeQuantity(reagent.ID);
 
-        if (reagent.Overdose != null && totalQuantity >= reagent.Overdose)
+        if (reagent.Overdose != null && totalQuantity >= reagent.Overdose && !IsRegulated(reagentArgs))
             TickOverdose(damageable, scaledPotency, reagentArgs);
 
-        if (reagent.CriticalOverdose != null && totalQuantity >= reagent.CriticalOverdose)
+        if (reagent.CriticalOverdose != null && totalQuantity >= reagent.CriticalOverdose && !IsRegulated(reagentArgs))
             TickCriticalOverdose(damageable, scaledPotency, reagentArgs);
     }
 
@@ -75,6 +75,23 @@ public abstract partial class RMCChemicalEffect : EntityEffect
             }
         }
         return boost;
+    }
+
+    private static bool IsRegulated(EntityEffectReagentArgs args)
+    {
+        if (args.Reagent?.Metabolisms == null)
+            return false;
+
+        foreach (var (_, entry) in args.Reagent.Metabolisms)
+        {
+            foreach (var effect in entry.Effects)
+            {
+                if (effect is Special.Regulating)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     protected virtual void ReagentBoost(EntityEffectReagentArgs args, ref float boost)

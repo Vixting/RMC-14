@@ -397,7 +397,9 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
             printColumn.AddChild(bulkRow);
 
             row.AddChild(NameLabel);
+            row.AddChild(MakeDivider());
             row.AddChild(detailsBox);
+            row.AddChild(MakeDivider());
             row.AddChild(printColumn);
 
             AddChild(row);
@@ -406,6 +408,16 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
             Print2Button.OnPressed += _ => OnPrint?.Invoke(UpgradeId, 2);
             Print5Button.OnPressed += _ => OnPrint?.Invoke(UpgradeId, 5);
             Print10Button.OnPressed += _ => OnPrint?.Invoke(UpgradeId, 10);
+        }
+
+        private static Control MakeDivider()
+        {
+            return new PanelContainer
+            {
+                MinWidth = 1,
+                VerticalExpand = true,
+                PanelOverride = new StyleBoxFlat { BackgroundColor = AmberDim },
+            };
         }
 
         private static Button MakeBulkButton(string text)

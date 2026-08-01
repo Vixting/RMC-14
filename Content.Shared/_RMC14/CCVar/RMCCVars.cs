@@ -408,6 +408,9 @@ public sealed partial class RMCCVars : CVars
     public static readonly CVarDef<int> RMCIntelVialBoxes =
         CVarDef.Create("rmc.intel_vial_boxes", 20, CVar.REPLICATED | CVar.SERVER);
 
+    public static readonly CVarDef<int> RMCIntelChemGrantPapers =
+        CVarDef.Create("rmc.intel_chem_grant_papers", 15, CVar.REPLICATED | CVar.SERVER);
+
     public static readonly CVarDef<float> RMCIntelMaxProcessTimeMilliseconds =
         CVarDef.Create("rmc.intel_max_process_time_milliseconds", 2f, CVar.REPLICATED | CVar.SERVER);
 
