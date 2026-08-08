@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Movement;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -15,7 +16,15 @@ public sealed partial class Musclestimulating : RMCChemicalEffect
         return "Stimulates neuromuscular junctions, increasing muscle contraction force and carry weight. High doses may exhaust the cardiac muscles.";
     }
 
-    // TODO RMC14: mob effect - move speed boost, heart organ damage on overdose
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var boost = 1f + (float) PotencyPerSecond * 0.05f;
+        var speed = args.EntityManager.System<TemporarySpeedModifiersSystem>();
+        var modifiers = new List<TemporarySpeedModifierSet> { new(TimeSpan.FromSeconds(2), boost, boost) };
+        speed.ModifySpeed(args.TargetEntity, modifiers);
+    }
+
+    // TODO RMC14: mob effect - heart organ damage on overdose
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

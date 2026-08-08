@@ -17,7 +17,7 @@ public sealed partial class Neogenetic : RMCChemicalEffect
     {
         var healing = PotencyPerSecond;
         if (ActualPotency > 2)
-            healing += PotencyPerSecond * 0.5f;
+            healing += PotencyPerSecond * 0.25f;
 
         return $"Heals [color=green]{healing}[/color] brute damage.\n" +
                $"Overdoses cause [color=red]{PotencyPerSecond}[/color] burn damage.\n" +
@@ -32,7 +32,7 @@ public sealed partial class Neogenetic : RMCChemicalEffect
         damageable.TryChangeDamage(args.TargetEntity, healing, true, interruptsDoAfters: false);
         if (ActualPotency > 2)
         {
-            healing = rmcDamageable.DistributeHealingCached(args.TargetEntity, BruteGroup, potency * 0.5f);
+            healing = rmcDamageable.DistributeHealingCached(args.TargetEntity, BruteGroup, potency * 0.25f);
             damageable.TryChangeDamage(args.TargetEntity, healing, true, interruptsDoAfters: false);
         }
     }

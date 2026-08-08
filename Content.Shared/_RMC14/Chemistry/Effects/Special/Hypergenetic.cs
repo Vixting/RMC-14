@@ -28,15 +28,15 @@ public sealed partial class Hypergenetic : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[CellularType] = potency;
+        damage.DamageDict[CellularType] = potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 1.5f;
-        damage.DamageDict[HeatType] = potency * 1.5f;
+        damage.DamageDict[BluntType] = potency * 3f;
+        damage.DamageDict[HeatType] = potency * 3f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }
