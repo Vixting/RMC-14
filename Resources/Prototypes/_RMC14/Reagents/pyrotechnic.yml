@@ -1,7 +1,7 @@
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
   id: RMCPhoron
+  chemClass: Rare
   name: reagent-name-rmcphoron
   desc: reagent-desc-rmcphoron
   physicalDesc: reagent-physical-desc-shiny
@@ -38,13 +38,26 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#ffb300"
-  intensity: 27
-  duration: 38
-  radius: 2
-  intensityMod: 0.45
-  durationMod: 0.75
-  radiusMod: 0.06
   fireEntity: RMCTileFireNapalmBase
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Oxidizing
+        potency: 6
+      - !type:Fueling
+        potency: 7
+      - !type:Flowing
+        potency: 1
+  reactiveEffects:
+    Flammable:
+      methods: [ Touch ]
+      effects:
+      - !type:FlammableReaction
+      - !type:Oxidizing
+        potency: 6
+      - !type:Fueling
+        potency: 7
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -54,13 +67,20 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#f8e3b2"
-  intensity: 15
-  duration: 50
-  radius: 5
   intensityMod: -1.5
   durationMod: -5
   radiusMod: -0.5
   fireEntity: RMCTileFireStickyNapalm
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 15
+      - !type:Duration
+        potency: 50
+      - !type:Radius
+        potency: 5
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -70,13 +90,20 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#c51c1c"
-  intensity: 45
-  duration: 10
-  radius: 5
   intensityMod: -4.5
   durationMod: -1
   radiusMod: -0.5
   fireEntity: RMCTileFireHCNapalm
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 45
+      - !type:Duration
+        potency: 10
+      - !type:Radius
+        potency: 5
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -86,9 +113,16 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#DD9B00"
-  intensity: 30
-  duration: 20
-  radius: 5
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 30
+      - !type:Duration
+        potency: 20
+      - !type:Radius
+        potency: 5
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -98,9 +132,16 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#DD9B00"
-  intensity: 30
-  duration: 20
-  radius: 7
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 30
+      - !type:Duration
+        potency: 20
+      - !type:Radius
+        potency: 7
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -110,10 +151,17 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#00dd00"
-  intensity: 15
-  duration: 50
-  radius: 7
   fireEntity: RMCTileFireGreen
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 15
+      - !type:Duration
+        potency: 50
+      - !type:Radius
+        potency: 7
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -123,10 +171,17 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#00b8ff"
-  intensity: 40
-  duration: 40
-  radius: 6
   fireEntity: RMCTileFireBlue
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 40
+      - !type:Duration
+        potency: 40
+      - !type:Radius
+        potency: 6
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -136,11 +191,18 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#00dd00"
-  intensity: 15
-  duration: 50
-  radius: 6
   fireEntity: RMCTileFireGreen
   fireSpread: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 15
+      - !type:Duration
+        potency: 50
+      - !type:Radius
+        potency: 6
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -150,10 +212,18 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#800080"
-  intensity: 15
-  duration: 50
-  radius: 6
   fireEntity: RMCTileFireNapalmE
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 15
+      - !type:Duration
+        potency: 50
+      - !type:Radius
+        potency: 6
+      - !type:FirePenetrating {}
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -163,10 +233,18 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#641dd6"
-  intensity: 40
-  duration: 40
-  radius: 6
   fireEntity: RMCTileFireNapalmEX
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 40
+      - !type:Duration
+        potency: 40
+      - !type:Radius
+        potency: 6
+      - !type:FirePenetrating {}
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
@@ -176,14 +254,23 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#ffe49c"
-  intensity: 50
-  duration: 30
-  radius: 6
   fireEntity: RMCTileFireR189
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 50
+      - !type:Duration
+        potency: 30
+      - !type:Radius
+        potency: 6
+      - !type:FirePenetrating {}
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
   id: RMCCLF3
+  chemClass: Uncommon
   name: reagent-name-rmcclf3
   desc: reagent-desc-rmcclf3
   physicalDesc: reagent-physical-desc-shiny
@@ -195,7 +282,6 @@
   intensityMod: 1.8
   durationMod: -0.9
   radiusMod: -0.09
-  # TODO RMC14: IGNITING = 1
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -204,10 +290,20 @@
         potency: 6
       - !type:Toxic
         potency: 6
+      - !type:Igniting
+        potency: 1
+  reactiveEffects:
+    Flammable:
+      methods: [ Touch ]
+      effects:
+      - !type:FlammableReaction
+      - !type:Oxidizing
+        potency: 9
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
   id: RMCMethane
+  chemClass: Common
   name: reagent-name-rmcmethane
   desc: reagent-desc-rmcmethane
   physicalDesc: reagent-physical-desc-shiny

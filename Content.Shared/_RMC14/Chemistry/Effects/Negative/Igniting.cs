@@ -20,6 +20,15 @@ public sealed partial class Igniting : RMCChemicalEffect
             return;
 
         var flammableSystem = args.EntityManager.System<SharedRMCFlammableSystem>();
-        flammableSystem.Ignite((args.TargetEntity, flammable), (int) potency, 10, null);
+
+        // cm13 igniting/process(): every tick while metabolizing, raises fire stacks by at least
+        // potency*30 (additive doubles existing stacks if already higher) & ignites
+        var boost = MathF.Max(flammable.FireStacks, (float) potency * 30f);
+        flammableSystem.AdjustStacks((args.TargetEntity, flammable), boost);
+        flammableSystem.Ignite((args.TargetEntity, flammable), (int) potency, (int) boost, null);
+
+        // mob ignite color
+        if (args.Reagent is { } reagent)
+            flammableSystem.ChangeBurnColor(args.TargetEntity, reagent.SubstanceColor);
     }
 }

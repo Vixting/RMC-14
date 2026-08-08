@@ -1,6 +1,7 @@
 - type: reagent
   parent: [ CMReagent, SpaceDrugs ]
   id: RMCSpaceDrugs
+  chemClass: Uncommon
   name: reagent-name-rmcspacedrugs
   desc: reagent-desc-rmcspacedrugs
   physicalDesc: reagent-physical-desc-syrupy
