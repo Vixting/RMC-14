@@ -5,7 +5,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects;
 
-public sealed partial class ConvertToReagent : EntityEffect
+public sealed partial class ConvertToReagent : RMCEntityEffect
 {
     [DataField(required: true)]
     public ProtoId<ReagentPrototype> TargetReagent;

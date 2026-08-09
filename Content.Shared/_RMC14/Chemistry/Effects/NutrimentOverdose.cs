@@ -7,7 +7,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects;
 
-public sealed partial class NutrimentOverdose : EntityEffect
+public sealed partial class NutrimentOverdose : RMCEntityEffect
 {
     // Do NOT inherit from RMCChemicalEffect to avoid triggering overdose on Neogenetic and Hemogenic.
     [DataField]
