@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects;
 
-public sealed partial class RemoveDamage : RMCEntityEffect
+public sealed partial class RemoveDamage : EntityEffect
 {
     [DataField(required: true)]
     [JsonPropertyName("group")]

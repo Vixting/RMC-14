@@ -9,7 +9,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects;
 
-public sealed partial class EqualHealthChange : RMCEntityEffect
+public sealed partial class EqualHealthChange : EntityEffect
 {
     [DataField(required: true)]
     [JsonPropertyName("damage")]

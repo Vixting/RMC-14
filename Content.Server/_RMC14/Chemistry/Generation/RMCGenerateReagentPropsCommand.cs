@@ -105,12 +105,12 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
         }
 
         var recipe = _prototype.EnumeratePrototypes<ReactionPrototype>()
-            .FirstOrDefault(r => r.Products.ContainsKey(reagentId));
+            .FirstOrDefault(r => r.Products.ContainsKey(reagentId.Id));
         if (recipe != null)
         {
             shell.WriteLine("  Recipe:");
             foreach (var (reactantId, reactant) in recipe.Reactants)
-                shell.WriteLine($"    - {reactantId} x{reactant.Amount}");
+                shell.WriteLine($"    - {reactantId} x{reactant.Amount}{(reactant.Catalyst ? " (catalyst)" : "")}");
         }
         else
         {
