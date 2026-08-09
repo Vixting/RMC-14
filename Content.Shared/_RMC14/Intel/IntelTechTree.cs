@@ -30,6 +30,9 @@ public sealed partial class IntelTechTree
     public int AnalyzeChemicals;
 
     [DataField]
+    public Dictionary<string, string> PendingChemicals = new();
+
+    [DataField]
     public int RescueSurvivors;
 
     [DataField]
