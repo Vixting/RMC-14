@@ -102,3 +102,6 @@
     ventCrawlIcon: sentinel
   - type: RMCActionOrder
     id: CMXenoSentinel
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCNeurotoxinPlasma

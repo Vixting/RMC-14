@@ -1,0 +1,13 @@
+- type: entity
+  id: RMCChemGlow
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: PointLight
+    enabled: true
+    radius: 2
+    energy: 5
+    color: "#7FE787"
+  - type: LightFade
+    duration: 2
+  - type: TimedDespawn
+    lifetime: 2

@@ -108,6 +108,9 @@
     name: cm-job-name-xeno-drone
   - type: RMCSurgeryXenoHeart
     item: RMCOrganXenoHeartT1
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCPurplePlasma
 
 - type: entity
   parent: CMXenoDroneBase

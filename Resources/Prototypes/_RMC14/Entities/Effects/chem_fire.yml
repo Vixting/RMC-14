@@ -1,0 +1,23 @@
+- type: entity
+  parent: RMCTileFire
+  id: RMCChemFire
+  components:
+  - type: RMCIgniteOnCollide
+    intensity: 3
+    duration: 3
+    maxStacks: 3
+    tileDamage:
+      types:
+        Heat: 0.5
+    burnColor: "#EE6515"
+  - type: DamageOnCollide
+    damageDead: false
+    fire: true
+    damage:
+      types:
+        Heat: 5
+    ignoreResistances: false
+  - type: TileFire
+    id: RMCChemFire
+    extinguishInstantly: true
+    duration: 3

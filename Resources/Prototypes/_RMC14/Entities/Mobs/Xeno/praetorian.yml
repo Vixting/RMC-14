@@ -118,6 +118,10 @@
     name: cm-job-name-xeno-praetorian
   - type: RMCSurgeryXenoHeart
     item: RMCOrganXenoHeartT3
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCPheromonePlasma
+    - RMCNeurotoxinPlasma
 
 - type: entity
   parent: CMXenoPraetorianBase

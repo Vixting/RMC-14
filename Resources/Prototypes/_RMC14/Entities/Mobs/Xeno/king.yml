@@ -196,3 +196,8 @@
   - type: XenoToggleChargingKnockback
     enabled: false
   - type: XenoToggleChargingStop
+  - type: Bloodstream
+    bloodReagent: RMCXenoBloodRoyal
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCChitinPlasma

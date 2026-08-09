@@ -289,6 +289,14 @@
     components:
     - type: Gibbable
     - type: CanBeLarvaQueued
+  - type: Bloodstream
+    bloodReagent: RMCXenoBloodRoyal
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCRoyalPlasma
+    - RMCChitinPlasma
+    - RMCPheromonePlasma
+    - RMCNeurotoxinPlasma
 
 - type: entity
   parent: RMCXenoQueenBase

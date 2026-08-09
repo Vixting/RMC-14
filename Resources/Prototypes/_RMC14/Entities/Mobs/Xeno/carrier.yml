@@ -106,6 +106,9 @@
     name: cm-job-name-xeno-carrier
   - type: RMCSurgeryXenoHeart
     item: RMCOrganXenoHeartT2
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCPurplePlasma
 
 - type: entity
   parent: RMCXenoCarrierBase
@@ -208,6 +211,9 @@
     distance: 2.5
   - type: XenoGenerateEggs
   - type: XenoEggSustainer
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCEggPlasma
   - type: XenoHidden
   - type: RMCActionOrder
     id: RMCXenoCarrierEggsac

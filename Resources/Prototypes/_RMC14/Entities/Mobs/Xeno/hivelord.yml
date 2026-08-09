@@ -96,6 +96,10 @@
     value: 0.2
   - type: RMCSurgeryXenoHeart
     item: RMCOrganXenoHeartT2
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCPurplePlasma
+    - RMCPheromonePlasma
 
 - type: entity
   parent: CMXenoHivelordBase
@@ -281,6 +285,10 @@
   - type: XenoPheromones
     pheromonesMultiplier: 3.5
     pheroSuffix: designer
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCNutrientPlasma
+    - RMCPheromonePlasma
   - type: Tackle
     max: 4
     chance: 0.45

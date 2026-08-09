@@ -1,0 +1,7 @@
+- type: entity
+  parent: RMCSmokeExplosionProof
+  id: RMCChemSmoke
+  components:
+  - type: EvenSmoke
+    spawn: RMCChemSmoke
+    range: 1

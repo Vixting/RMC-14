@@ -5,3 +5,53 @@
   components:
   - type: Hive
     lateJoinGainLarva: true
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveCorrupted
+  name: corrupted hive
+  components:
+  - type: Hive
+    color: "#80FF80"
+  - type: HiveSlot
+    position: 2
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveAlpha
+  name: alpha hive
+  components:
+  - type: Hive
+    color: "#FF4040"
+  - type: HiveSlot
+    position: 3
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveBravo
+  name: bravo hive
+  components:
+  - type: Hive
+    color: "#FFFF80"
+  - type: HiveSlot
+    position: 4
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveCharlie
+  name: charlie hive
+  components:
+  - type: Hive
+    color: "#BB40FF"
+  - type: HiveSlot
+    position: 5
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveDelta
+  name: delta hive
+  components:
+  - type: Hive
+    color: "#8080FF"
+  - type: HiveSlot
+    position: 6

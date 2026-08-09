@@ -164,6 +164,9 @@
     name: cm-job-name-xeno-boiler
   - type: RMCActionOrder
     id: CMXenoBoiler
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCNeurotoxinPlasma
 
     #CMXenoBoiler
 - type: entity

@@ -20,6 +20,8 @@
     size: Tiny
   - type: Sprite
     state: heart_t1
+  - type: RMCBiomassOrgan
+    value: 10
 
 - type: entity
   parent: RMCOrganXenoHeart
@@ -29,6 +31,8 @@
     size: Small
   - type: Sprite
     state: heart_t2
+  - type: RMCBiomassOrgan
+    value: 20
 
 - type: entity
   parent: RMCOrganXenoHeart
@@ -38,6 +42,8 @@
     size: Normal
   - type: Sprite
     state: heart_t3
+  - type: RMCBiomassOrgan
+    value: 35
 
 - type: entity
   parent: RMCOrganXenoHeart
@@ -48,3 +54,5 @@
   - type: Sprite
     state: heart_t3
     scale: 1.25, 1.25
+  - type: RMCBiomassOrgan
+    value: 75

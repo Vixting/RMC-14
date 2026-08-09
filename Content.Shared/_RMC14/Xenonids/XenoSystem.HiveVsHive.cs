@@ -12,6 +12,7 @@ public sealed partial class XenoSystem : EntitySystem
     public const float XENO_DEBUFF_MULT = 1.25f;
     public const float XENO_ACID_DAMAGE_MULT = 2.625f;
     public const float XENO_PROJECTILE_DAMAGE_MULT = 2.625f;
+    public const float XENO_ARMOR_EFFECTIVE_MULT = 0.25f;
 
     public DamageSpecifier TryApplyXenoSlashDamageMultiplier(EntityUid target, DamageSpecifier baseDamage)
     {

@@ -1,0 +1,677 @@
+
+# Negative
+- type: chemGeneratorProperty
+  id: Toxic
+  code: TXC
+  effect: !type:Toxic {}
+  description: "Poisonous substance which causes harm on contact with or through absorption by organic tissue, resulting in bad health, severe illness, or plant death."
+  category: Negative
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Corrosive
+  code: CRS
+  effect: !type:Corrosive {}
+  description: "Damages or destroys other substances on contact through a chemical reaction. Causes chemical burns on contact with living tissue. Reduces pest and weed populations."
+  category: Negative
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Biocidic
+  code: BCD
+  effect: !type:Biocidic {}
+  description: "Ruptures cell membranes on contact, destroying most types of organic tissue. Reduces pest and weed populations."
+  category: Negative
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Hemorrhaging
+  code: HMR
+  effect: !type:Hemorrhaging {}
+  description: "Ruptures endothelial cells making up blood vessels, causing blood to escape from the circulatory system. Persistent mutagen to plants."
+  category: Negative
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Carcinogenic
+  code: CRG
+  effect: !type:Carcinogenic {}
+  description: "Penetrates the cell nucleus causing direct damage to the deoxyribonucleic acid in cells resulting in cancer, abnormal cell proliferation, and mutation in plants. In extreme cases causing hyperactive apoptosis, potentially atrophy."
+  category: Negative
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Hypoxemic
+  code: HPX
+  effect: !type:Hypoxemic {}
+  description: "Reacts with hemoglobin in red blood cells preventing oxygen from being absorbed, resulting in hypoxemia."
+  category: Negative
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Hemolytic
+  code: HML
+  effect: !type:Hemolytic {}
+  description: "Causes intravascular hemolysis, resulting in the destruction of erythrocytes (red blood cells) in the bloodstream. This can result in Hemoglobinemia, where a high concentration of hemoglobin is released into the blood plasma."
+  category: Negative
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Igniting
+  code: IGT
+  effect: !type:Igniting {}
+  description: "The chemical appears capable of self-igniting on contact with most materials."
+  category: Negative
+  rarity: Rare
+  value: -3
+  maxLevel: 3
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Neuropathic
+  code: NPT
+  effect: !type:Neuropathic {}
+  description: "Activates the somatosensory system causing neuropathic pain all over the body. Unlike nociceptive pain, this is not caused to any tissue damage and is solely perceptive."
+  category: Negative
+  rarity: Uncommon
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Intravenous
+  code: INV
+  effect: !type:Intravenous {}
+  description: "Due to chemical composition, this chemical can only be administered intravenously."
+  category: Negative
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Addictive
+  code: ADT
+  effect: !type:Addictive {}
+  description: "Causes addiction. Higher potency results in a higher chance of causing an addiction when metabolized."
+  category: Negative
+  rarity: Rare
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Hemositic
+  code: HST
+  effect: !type:Hemositic {}
+  description: "The chemical shows parasitic behavior towards live erythrocytes (red blood cells) in order to produce more of itself."
+  category: Negative
+  value: -2
+  flags: [ Anomalous, Disabled ]
+
+# Neutral
+- type: chemGeneratorProperty
+  id: Excreting
+  code: EXT
+  effect: !type:Excreting {}
+  description: "Excretes all chemicals contained in the blood stream by using the kidneys to turn it into urine. Upregulates chemical production in plants."
+  category: Neutral
+  value: 0
+
+- type: chemGeneratorProperty
+  id: Nutritious
+  code: NTR
+  effect: !type:Nutritious {}
+  description: "The compound can be used as, or be broken into, nutrition for cell metabolism."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Trichogenic
+  code: TRI
+  effect: !type:Trichogenic {}
+  description: "Accelerates cell division in the hair follicles resulting in random and excessive hair growth. Found to increase yields in plants."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Hypometabolic
+  code: OMB
+  effect: !type:Hypometabolic {}
+  description: "Takes longer for this chemical to metabolize, resulting in it being in the bloodstream for more time per unit. Slows down metabolism of plants."
+  category: Neutral
+  value: 0
+
+- type: chemGeneratorProperty
+  id: Hypermetabolic
+  code: EMB
+  effect: !type:Hypermetabolic {}
+  description: "Takes less time for this chemical to metabolize, resulting in it being in the bloodstream for less time per unit. Accelerates plant growth."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Antihallucinogenic
+  code: AHL
+  effect: !type:Antihallucinogenic {}
+  description: "Stabilizes perceptive abnormalities such as hallucinations caused by mindbreaker toxin."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Thermostabilizing
+  code: TSL
+  effect: !type:Thermostabilizing {}
+  description: "Causes a mix of endothermic and exothermic reactions in the bloodstream in order to stabilize internal body temperature."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Focusing
+  code: FCS
+  effect: !type:Focusing {}
+  description: "Removes common alcoholic substances from the bloodstream and increases focus."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Ketogenic
+  code: KTG
+  effect: !type:Ketogenic {}
+  description: "Activates ketosis causing the liver to rapidly burn fatty acids and alcohols in the body, resulting in weight loss. Can cause ketoacidosis in high concentrations, resulting in a buildup of acids and lowered pH levels in the blood."
+  category: Neutral
+  value: 0
+
+- type: chemGeneratorProperty
+  id: Alcoholic
+  code: AOL
+  effect: !type:Alcoholic {}
+  description: "Binds to glutamate neurotransmitters and gamma aminobutyric acid (GABA), slowing brain functions response to stimuli. This effect is also known as intoxication."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Hallucinogenic
+  code: HLG
+  effect: !type:Hallucinogenic {}
+  description: "Causes perception-like experiences that occur without an external stimulus, which are vivid and clear, with the full force and impact of normal perceptions, though not under voluntary control."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Antispasmodic
+  code: ASP
+  effect: !type:Antispasmodic {}
+  description: "Relaxes smooth muscles and treats muscle spasms by blocking the neurotransmitter acetylcholine. High concentrations can cause respiratory failure and cardiac arrest."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Hyperthermic
+  code: HPR
+  effect: !type:Hyperthermic {}
+  description: "Causes an exothermic reaction when metabolized in the body, increasing internal body temperature. Warning: this can ignite chemicals on reaction."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Hypothermic
+  code: HPO
+  effect: !type:Hypothermic {}
+  description: "Causes an endothermic reaction when metabolized in the body, decreasing internal body temperature."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Psychostimulating
+  code: PST
+  effect: !type:Psychostimulating {}
+  description: "Stimulates psychological functions causing increased awareness, focus and anti-depressing effects."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Hypnotic
+  code: HYP
+  effect: !type:Hypnotic {}
+  description: "Causes the body to release melatonin resulting in increased sleepiness."
+  category: Neutral
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Transformative
+  code: TRF
+  effect: !type:Transformative {}
+  description: "Mends damaged tissue, in the process creating a small amount of weak toxin as a byproduct, which then seeps into the bloodstream and damages the recipient."
+  category: Neutral
+  rarity: Uncommon
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Unknown
+  code: UNK
+  effect: !type:Unknown {}
+  category: Neutral
+  value: -1
+  flags: [ Anomalous, Unadjustable ]
+
+- type: chemGeneratorProperty
+  id: Cryometabolizing
+  code: CMB
+  effect: !type:Cryometabolizing {}
+  description: "The chemical is passively metabolized with no other effects in temperatures above 170 kelvin. Below however, the chemical will metabolize with increased effect."
+  category: Neutral
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Thanatometabolizing
+  code: TMB
+  effect: !type:Thanatometabolizing {}
+  description: "This chemical requires either low oxygen levels or low bloodflow to function. The potency of this property will affect the efficiency of other properties."
+  category: Neutral
+  rarity: Rare
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Neuroinhibiting
+  code: NIH
+  effect: !type:Neuroinhibiting {}
+  description: "Inhibits neurological processes in the brain such to sight, hearing and speech which can result in various associated disabilities. Restoration will require surgery."
+  category: Neutral
+  rarity: Uncommon
+  value: -1
+  maxLevel: 7
+
+- type: chemGeneratorProperty
+  id: Atrichogenic
+  code: ATR
+  effect: !type:Atrichogenic {}
+  description: "Damages the hair follicles in the skin to disrupt the hair growth cycle, causing extreme alopecia, also referred to as baldness."
+  category: Neutral
+  rarity: Uncommon
+  value: 0
+  maxLevel: 2
+
+- type: chemGeneratorProperty
+  id: Allergenic
+  code: ALG
+  effect: !type:Allergenic {}
+  description: "Creates a hyperactive immune response in the body, resulting in irritation."
+  category: Neutral
+  rarity: Uncommon
+  value: 0
+
+- type: chemGeneratorProperty
+  id: Euphoric
+  code: EPH
+  effect: !type:Euphoric {}
+  description: "Causes the release of endorphin hormones resulting intense excitement and happiness."
+  category: Neutral
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Emetic
+  code: EME
+  effect: !type:Emetic {}
+  description: "Acts on the enteric nervous system to induce emesis, the forceful emptying of the stomach."
+  category: Neutral
+  rarity: Uncommon
+  value: -1
+
+- type: chemGeneratorProperty
+  id: Hyperthrottling
+  code: HTR
+  effect: !type:Hyperthrottling {}
+  description: "Causes the brain to operate at several thousand times the normal speed. For some reason, this allows one to understand all languages spoken before them, even without knowing the language."
+  category: Neutral
+  rarity: Rare
+  value: 3
+
+- type: chemGeneratorProperty
+  id: Viscous
+  code: VIS
+  effect: !type:Viscous {}
+  description: "The chemical is thick and gooey due to high surface tension. It will not spread very far when spilled. This would decrease the radius of a chemical fire."
+  category: Neutral
+  value: 0
+
+# Positive
+- type: chemGeneratorProperty
+  id: Antitoxic
+  code: ATX
+  effect: !type:Antitoxic {}
+  description: "Absorbs and neutralizes toxic chemicals in the bloodstream and xylem sap, allowing them to be excreted safely."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Anticorrosive
+  code: ACR
+  effect: !type:Anticorrosive {}
+  description: "Accelerates cell division around corroded areas in order to replace the lost tissue. Plant damage rapidly healed. Excessive use can trigger apoptosis."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Neogenetic
+  code: NGN
+  effect: !type:Neogenetic {}
+  description: "Regenerates ruptured membranes resulting in the repair of damaged organic tissue. High concentrations can corrode the cell membranes."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Hemogenic
+  code: HMG
+  effect: !type:Hemogenic {}
+  description: "Increases the production of erythrocytes (red blood cells) in the bonemarrow, leading to polycythemia, an elevated volume of erythrocytes in the blood."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Oxygenating
+  code: OXG
+  effect: !type:Oxygenating {}
+  description: "Treats oxygen deprivation by improving the ability of erythrocytes to absorb oxygen and increases oxygen intake."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Anticarcinogenic
+  code: ACG
+  effect: !type:Anticarcinogenic {}
+  description: "Fixes genetic damage in cells that have been exposed carcinogens."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Photosensitive
+  code: PTS
+  effect: !type:Photosensitive {}
+  description: "Reacts with any amount of light. Can be useful to create light-sensitive objects. Not safe to administer. Supercharges photosynthesis, treated plants are able to be harvested repeatedly."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Crystallization
+  code: CRL
+  effect: !type:Crystallization {}
+  description: "The chemical structure of the chemical forms itself in a lens. passing light wider, while also keeping focus. Not safe to administer. Hardens root structure of plants, improving survivability during repeat harvests."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Aiding
+  code: AID
+  effect: !type:Aiding {}
+  description: "Fixes genetic defects, disfigurements, disabilities. In plants removes compounds modifying yield and mutation."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Neurocryogenic
+  code: NRC
+  effect: !type:Neurocryogenic {}
+  description: "Causes a temporal freeze of all neurological processes and cellular respirations in the brain. This allows the brain to be preserved for long periods of time."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Criticalstabilize
+  code: CTS
+  effect: !type:Criticalstabilize {}
+  description: "Stabilizes critical damage and bleeding."
+  category: Positive
+  rarity: Uncommon
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Electrogenetic
+  code: EGN
+  effect: !type:Electrogenetic {}
+  description: "Stimulates cardiac muscles when exposed to electric shock and provides general healing. Useful in restarting the heart in combination with a defibrillator."
+  category: Positive
+  rarity: Uncommon
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Disrupting
+  code: DSR
+  effect: !type:Disrupting {}
+  description: "Disrupts certain neurological processes related to communication in animals."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Neutralizing
+  code: NEU
+  effect: !type:Neutralizing {}
+  description: "Neutralizes certain reactive chemicals and plasmas on contact. Unsafe to administer intravenously."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Cardiostabilizing
+  code: CSL
+  effect: !type:Cardiostabilizing {}
+  description: "Stabilizes the cardiac cycle when under shock."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Hemostatic
+  code: HSC
+  effect: !type:Hemostatic {}
+  description: "Vastly improves the blood's natural ability to coagulate and stop bleeding by heightening platelet production and effectiveness. Overdosing will cause extreme blood clotting, resulting in severe tissue damage."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Repairing
+  code: REP
+  effect: !type:Repairing {}
+  description: "Repairs inorganic materials such as barricades and synthetics by the use of REDACTED property of REDACTED element."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Musclestimulating
+  code: MST
+  effect: !type:Musclestimulating {}
+  description: "Stimulates neuromuscular junctions increasing the force of muscle contractions, resulting in increased strength, this provides increase in carry weight increase at zero cost of speed. High doses might exhaust the cardiac muscles."
+  category: Positive
+  rarity: Rare
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Painkilling
+  code: PNK
+  effect: !type:Painkilling {}
+  description: "Binds to opioid receptors in the brain and spinal cord reducing the amount of pain signals being sent to the brain."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Bonemending
+  code: BNM
+  effect: !type:Bonemending {}
+  description: "Rapidly increases the production of osteoblasts and chondroblasts while also accelerating the process of endochondral ossification. This allows broken bone tissue to be re-woven and restored quickly if the bone is correctly positioned. Overdosing may result in the bone structure growing abnormally and can have adverse effects on the skeletal structure."
+  category: Positive
+  rarity: Rare
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Fluxing
+  code: FLX
+  effect: !type:Fluxing {}
+  description: "Liquefies large crystalline and metallic structures the body and allows them to migrate to and be excreted through the skin."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Antiparasitic
+  code: APS
+  effect: !type:Antiparasitic {}
+  description: "Antimicrobial property specifically targeting parasitic pathogens in the body disrupting their growth and potentially killing them."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Defibrillating
+  code: DFB
+  effect: !type:Defibrillating {}
+  description: "Causes an electrochemical reaction in the cardiac muscles, forcing the heart to continue pumping. May cause irregular heart rhythms."
+  category: Positive
+  rarity: Rare
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Hyperdensificating
+  code: HDN
+  effect: !type:Hyperdensificating {}
+  description: "Causes the muscles and bones to become super dense, providing superior resistance towards the bones fracturing."
+  category: Positive
+  rarity: Rare
+  value: 3
+  maxLevel: 1
+
+- type: chemGeneratorProperty
+  id: Neuroshielding
+  code: NRS
+  effect: !type:Neuroshielding {}
+  description: "Protects the brain from neurological damage caused by toxins."
+  category: Positive
+  rarity: Rare
+  value: 2
+  maxLevel: 1
+
+- type: chemGeneratorProperty
+  id: Antiaddictive
+  code: AAD
+  effect: !type:Antiaddictive {}
+  description: "Stops all bodily cravings towards addictive chemical substances."
+  category: Positive
+  rarity: Rare
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Fueling
+  code: FUL
+  effect: !type:Fueling {}
+  description: "The chemical can be burned as a fuel, expanding the burn time of a chemical fire. However, this also slightly lowers heat intensity."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Oxidizing
+  code: OXI
+  effect: !type:Oxidizing {}
+  description: "The chemical is oxidizing, increasing the intensity of chemical fires. However, the fuel is also burned slightly faster because of it."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Flowing
+  code: FLW
+  effect: !type:Flowing {}
+  description: "The chemical is the opposite of viscous, and it tends to spill everywhere. This could probably be used to expand the radius of a chemical fire."
+  category: Positive
+  value: 2
+
+- type: chemGeneratorProperty
+  id: Explosive
+  code: EXP
+  effect: !type:Explosive {}
+  description: "The chemical is highly explosive. Do not ignite. Careful when handling, sensitivity is based off the OD threshold, which can lead to spontaneous detonation."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: FirePenetrating
+  code: PTR
+  effect: !type:FirePenetrating {}
+  description: "Gives the chemical a unique, anomalous combustion chemistry, causing the flame to react with flame-resistant material and obliterate through it."
+  category: Positive
+  rarity: Rare
+  value: 3
+  maxLevel: 1
+
+- type: chemGeneratorProperty
+  id: Hypergenetic
+  code: HGN
+  effect: !type:Hypergenetic {}
+  description: "Regenerates all types of cell membranes mending damage in all organs and limbs."
+  category: Positive
+  rarity: Rare
+  value: 2
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Boosting
+  code: BST
+  effect: !type:Boosting {}
+  description: "Boosts the potency of all other properties in this chemical when inside the body by 0.5 levels for every level that this property has."
+  category: Positive
+  rarity: Rare
+  value: 5
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Regulating
+  code: REG
+  effect: !type:Regulating {}
+  description: "The chemical regulates its metabolization and can never cause an overdose."
+  category: Positive
+  rarity: Rare
+  value: 6
+  maxLevel: 1
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Optimized
+  code: OPM
+  effect: !type:Optimized {}
+  description: "Chemical molecule is structured differently, resulting in a more efficient and easy synthesis process."
+  category: Positive
+  rarity: Rare
+  value: 3
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Ciphering
+  code: CIP
+  effect: !type:Ciphering {}
+  description: "This extremely complex chemical structure represents some kind of biological cipher."
+  category: Positive
+  rarity: Rare
+  value: 16
+  maxLevel: 6
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Encrypted
+  code: ENC
+  effect: !type:Encrypted {}
+  description: "This extremely complex chemical structure contains a cipher that appears to be missing a few parts to complete the process."
+  category: Positive
+  value: 1
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Nervestimulating
+  code: NST
+  effect: !type:Nervestimulating {}
+  description: "Increases neuron communication speed across synapses resulting in improved reaction time, awareness and muscular control. Excessive muscular control loss causes the reagent to bind to nociceptors more aggressively than usual."
+  category: Positive
+  value: 4
+  flags: [ Disabled ]
+
+- type: chemGeneratorProperty
+  id: Organstabilize
+  code: OGS
+  effect: !type:Organstabilize {}
+  description: "Stabilizes internal organ damage, stopping internal damage symptoms."
+  category: Positive
+  value: 1
+  flags: [ Disabled ]

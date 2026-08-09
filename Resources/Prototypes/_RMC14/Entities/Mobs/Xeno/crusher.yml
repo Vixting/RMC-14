@@ -110,6 +110,9 @@
     name: cm-job-name-xeno-crusher
   - type: RMCSurgeryXenoHeart
     item: RMCOrganXenoHeartT3
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCChitinPlasma
 
 - type: entity
   parent: CMXenoCrusherBase

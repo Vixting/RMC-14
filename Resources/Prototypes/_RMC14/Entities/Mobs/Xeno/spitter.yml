@@ -120,3 +120,6 @@
     ventCrawlIcon: spitter
   - type: RMCActionOrder
     id: CMXenoSpitter
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCNeurotoxinPlasma

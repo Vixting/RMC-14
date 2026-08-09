@@ -131,3 +131,6 @@
     ventCrawlIcon: burrower
   - type: RMCActionOrder
     id: CMXenoBurrower
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCPurplePlasma

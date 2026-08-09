@@ -98,6 +98,9 @@
     name: cm-job-name-xeno-lurker
   - type: RMCSurgeryXenoHeart
     item: RMCOrganXenoHeartT2
+  - type: XenoPlasmaBlood
+    plasmaTypes:
+    - RMCCatecholaminePlasma
 
 - type: entity
   parent:
