@@ -1,4 +1,5 @@
-﻿using Robust.Shared.Audio;
+﻿using Content.Shared.Chemistry.Reagent;
+using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -22,4 +23,13 @@ public sealed partial class TileFireOnTriggerComponent : Component
 
     [DataField, AutoNetworkedField]
     public int? Duration;
+
+    [DataField, AutoNetworkedField]
+    public bool FirePenetrating;
+
+    [DataField, AutoNetworkedField]
+    public ProtoId<ReagentPrototype>? Reagent;
+
+    [DataField, AutoNetworkedField]
+    public Color? FireColor;
 }

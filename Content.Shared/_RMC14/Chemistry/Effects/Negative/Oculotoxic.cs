@@ -1,5 +1,7 @@
 using Content.Shared.Botany.Components;
+using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
+using Content.Shared.Eye.Blinding.Systems;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
 
@@ -20,5 +22,11 @@ public sealed partial class Oculotoxic : RMCChemicalEffect
         SuppressMutationSlot(plant, "Flowers", suppress);
     }
 
-    // TODO RMC14: mob effect - damage eyes organ, blindness on overdose, brain damage on critical overdose
+    // TODO RMC14: mob effect - damage eyes organ
+    // TODO RMC14: mob effect - brain damage on critical overdose
+
+    protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        args.EntityManager.System<BlindableSystem>().AdjustEyeDamage(args.TargetEntity, 8);
+    }
 }

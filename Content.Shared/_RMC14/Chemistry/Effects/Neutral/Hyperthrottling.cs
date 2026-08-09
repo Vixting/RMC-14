@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Movement;
 using Content.Shared._RMC14.Stun;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -22,8 +23,13 @@ public sealed partial class Hyperthrottling : RMCChemicalEffect
         var dazed = args.EntityManager.System<RMCDazedSystem>();
         dazed.TryDaze(args.TargetEntity, TimeSpan.FromSeconds(1), false);
 
-        // TODO RMC14: mob effect - understand all spoken languages, movement speed penalty
+        var penalty = 1f - (float) PotencyPerSecond * 0.05f;
+        var speed = args.EntityManager.System<TemporarySpeedModifiersSystem>();
+        var modifiers = new List<TemporarySpeedModifierSet> { new(TimeSpan.FromSeconds(2), penalty, penalty) };
+        speed.ModifySpeed(args.TargetEntity, modifiers);
     }
+
+    // TODO RMC14: mob effect - understand all spoken languages
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
