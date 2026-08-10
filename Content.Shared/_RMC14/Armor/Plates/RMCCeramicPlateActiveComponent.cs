@@ -4,8 +4,8 @@ namespace Content.Shared._RMC14.Armor.Plates;
 
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 [Access(typeof(RMCArmorPlateSystem))]
-public sealed partial class RMCAntiDecayPlateActiveComponent : Component
+public sealed partial class RMCCeramicPlateActiveComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public TimeSpan BonusTime = TimeSpan.FromMinutes(4);
+    public EntityUid? Plate;
 }

@@ -1,4 +1,5 @@
 using Content.Server.Power.EntitySystems;
+using Content.Shared._RMC14.Armor.Plates;
 using Content.Shared._RMC14.Xenonids.Biomass;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
@@ -37,6 +38,22 @@ public sealed class RMCBiomassAnalyzerMachineSystem : SharedRMCBiomassAnalyzerSy
     {
         if (args.Handled)
             return;
+
+        if (TryComp<RMCEmergencyInjectorPlateComponent>(args.Used, out var recyclable) && recyclable.RecyclableValue > 0)
+        {
+            if (!this.IsPowered(ent, EntityManager))
+            {
+                _popup.PopupCursor("This machine has no power!", args.User);
+                return;
+            }
+
+            args.Handled = true;
+            _biomass.AddPoints(recyclable.RecyclableValue);
+            _popup.PopupCursor($"You recycle the plate for {recyclable.RecyclableValue} biomass points.", args.User);
+            _audio.PlayPvs("/Audio/Machines/twobeep.ogg", ent);
+            QueueDel(args.Used);
+            return;
+        }
 
         if (!TryComp<RMCBiomassOrganComponent>(args.Used, out var organ))
             return;
@@ -174,7 +191,8 @@ public sealed class RMCBiomassAnalyzerMachineSystem : SharedRMCBiomassAnalyzerSy
         if (!ent.Comp.QueueProcessing)
         {
             ent.Comp.QueueProcessing = true;
-            ent.Comp.NextQueueItemAt = null;
+            // Delay the first item like the rest so queued entries are actually visible before printing.
+            ent.Comp.NextQueueItemAt = Timing.CurTime + QueuePrintDelay;
         }
 
         Dirty(ent);

@@ -89,6 +89,6 @@ public sealed class RMCReagentAnalyzerSystem : SharedRMCReagentAnalyzerSystem
         UpdateAppearance(ent);
 
         _generator.PrintErrorReport(Transform(ent).Coordinates, reason, comp.SampleNumber++);
-        _audio.PlayPvs(comp.FinishSound, ent);
+        _audio.PlayPvs(comp.FailSound, ent);
     }
 }

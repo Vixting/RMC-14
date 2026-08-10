@@ -31,9 +31,9 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
     private const string CancelIcon = "/Textures/_RMC14/Interface/Icons/square-minus.svg.192dpi.png";
     private const string CancelIconWhite = "/Textures/_RMC14/Interface/Icons/square-minus-white.svg.192dpi.png";
 
-    private static readonly Color Amber = Color.FromHex("#FAC000");
+    private static readonly Color Amber = Color.FromHex("#FFD21A");
     private static readonly Color AmberDim = Color.FromHex("#8A6800");
-    private static readonly Color AmberBlack = Color.FromHex("#221801");
+    private static readonly Color AmberBlack = Color.FromHex("#150E00");
 
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
@@ -63,12 +63,6 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
         _window.EjectOrganButton.OnPressed += _ => SendPredictedMessage(new RMCBiomassAnalyzerEjectOrganBuiMsg());
         _window.ProcessOrganButton.OnPressed += _ => SendPredictedMessage(new RMCBiomassAnalyzerToggleAutoProcessBuiMsg());
         _window.ToggleQueueButton.OnPressed += _ => SendPredictedMessage(new RMCBiomassAnalyzerToggleQueueBuiMsg());
-
-        _window.QueueExpandButton.OnPressed += _ =>
-        {
-            _window.QueueContent.Visible = !_window.QueueContent.Visible;
-            _window.QueueExpandButton.Text = _window.QueueContent.Visible ? "▼" : "▶";
-        };
 
         Refresh();
     }
@@ -157,30 +151,20 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
 
         _window!.QueueEmptyLabel.Visible = machine.PrintQueue.Count == 0;
 
+        _window.QueueBox.DisposeAllChildren();
+
         var index = 0;
         foreach (var upgradeId in machine.PrintQueue)
         {
-            QueueEntryControl entry;
-            if (index < _window.QueueBox.ChildCount && _window.QueueBox.GetChild(index) is QueueEntryControl existing)
-            {
-                entry = existing;
-            }
-            else
-            {
-                entry = new QueueEntryControl();
-                _window.QueueBox.AddChild(entry);
-            }
-
-            entry.Index = index;
+            var entry = new QueueEntryControl { Index = index };
             entry.NameLabel.Text = _prototype.TryIndex<RMCBiomassUpgradePrototype>(upgradeId, out var upgrade)
                 ? upgrade.Name
                 : upgradeId;
             entry.OnCancel = i => SendPredictedMessage(new RMCBiomassAnalyzerRemoveFromQueueBuiMsg(i));
 
+            _window.QueueBox.AddChild(entry);
             index++;
         }
-
-        _window.QueueBox.RemoveChildrenAfter(index);
     }
 
     private void PopulateCategory(RMCBiomassAnalyzerComponent analyzer, int clearance)
@@ -220,10 +204,15 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
 
             row.PrintButtonLabel.Text = $"Print ({cost})";
 
-            row.PrintButton.Disabled = !clearanceMet;
-            row.Print2Button.Disabled = !clearanceMet;
-            row.Print5Button.Disabled = !clearanceMet;
-            row.Print10Button.Disabled = !clearanceMet;
+            var tint = clearanceMet ? Color.White : new Color(1f, 1f, 1f, 0.5f);
+            row.PrintButton.Disabled = false;
+            row.PrintButton.Modulate = tint;
+            row.Print2Button.Disabled = false;
+            row.Print2Button.Modulate = tint;
+            row.Print5Button.Disabled = false;
+            row.Print5Button.Modulate = tint;
+            row.Print10Button.Disabled = false;
+            row.Print10Button.Modulate = tint;
 
             row.UpgradeId = upgrade.ID;
             row.OnPrint = (id, amount) => SendPredictedMessage(new RMCBiomassAnalyzerEnqueuePrintBuiMsg(id, amount));
@@ -315,33 +304,46 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
         }
     }
 
-    private sealed class QueueEntryControl : BoxContainer
+    private sealed class QueueEntryControl : Button
     {
         public readonly Label NameLabel;
-        public readonly Button CancelButton;
 
         public int Index;
         public Action<int>? OnCancel;
 
         public QueueEntryControl()
         {
-            Orientation = LayoutOrientation.Horizontal;
             HorizontalExpand = true;
+            Modulate = Color.White;
+            ModulateSelfOverride = Color.White;
+            StyleBoxOverride = new StyleBoxFlat { BackgroundColor = AmberBlack, BorderColor = AmberDim, BorderThickness = new Thickness(2) };
+            ToolTip = "Click to cancel this print job.";
+            Text = null;
+
+            var row = new BoxContainer
+            {
+                Orientation = BoxContainer.LayoutOrientation.Horizontal,
+                HorizontalExpand = true,
+                SeparationOverride = 6,
+                Margin = new Thickness(4, 2),
+            };
 
             NameLabel = new Label { HorizontalExpand = true, FontColorOverride = Amber };
-            CancelButton = new Button
+
+            var cancelIcon = new TextureRect
             {
-                MinSize = new Vector2(90, 24),
-                Modulate = Color.White,
-                ModulateSelfOverride = Color.White,
-                StyleBoxOverride = new StyleBoxFlat { BackgroundColor = AmberBlack, BorderColor = AmberDim, BorderThickness = new Thickness(2) },
+                Stretch = TextureRect.StretchMode.KeepAspectCentered,
+                SetSize = new Vector2(14, 14),
+                VerticalAlignment = Control.VAlignment.Center,
+                Modulate = Amber,
+                Texture = IoCManager.Resolve<IResourceCache>().GetTexture(CancelIcon),
             };
-            Icon(CancelButton, CancelIcon, CancelIconWhite, "Cancel");
 
-            AddChild(NameLabel);
-            AddChild(CancelButton);
+            row.AddChild(NameLabel);
+            row.AddChild(cancelIcon);
+            AddChild(row);
 
-            CancelButton.OnPressed += _ => OnCancel?.Invoke(Index);
+            OnPressed += _ => OnCancel?.Invoke(Index);
         }
     }
 
@@ -362,16 +364,22 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
         public UpgradeRow()
         {
             HorizontalExpand = true;
-            PanelOverride = new StyleBoxFlat { BackgroundColor = AmberBlack, BorderColor = AmberDim, BorderThickness = new Thickness(0, 0, 0, 1) };
+            PanelOverride = new StyleBoxFlat { BackgroundColor = AmberBlack, BorderColor = AmberDim, BorderThickness = new Thickness(0, 0, 0, 2) };
 
             var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, Margin = new Thickness(4), SeparationOverride = 4 };
 
-            NameLabel = new Label { MinWidth = 200, FontColorOverride = Amber };
+            NameLabel = new Label { MinWidth = 330, MaxWidth = 330, ClipText = true, FontColorOverride = Amber };
 
             var detailsBox = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, HorizontalExpand = true };
             ClearanceLabel = new Label { FontColorOverride = Amber };
+            var clearanceUnderline = new PanelContainer
+            {
+                HorizontalAlignment = Control.HAlignment.Left,
+                PanelOverride = new StyleBoxFlat { BackgroundColor = Color.Transparent, BorderColor = Amber, BorderThickness = new Thickness(0, 0, 0, 2) },
+            };
+            clearanceUnderline.AddChild(ClearanceLabel);
             TrendLabel = new Label { FontColorOverride = AmberDim };
-            detailsBox.AddChild(ClearanceLabel);
+            detailsBox.AddChild(clearanceUnderline);
             detailsBox.AddChild(TrendLabel);
 
             var printColumn = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, MinWidth = 140 };
@@ -414,7 +422,7 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
         {
             return new PanelContainer
             {
-                MinWidth = 1,
+                MinWidth = 2,
                 VerticalExpand = true,
                 PanelOverride = new StyleBoxFlat { BackgroundColor = AmberDim },
             };

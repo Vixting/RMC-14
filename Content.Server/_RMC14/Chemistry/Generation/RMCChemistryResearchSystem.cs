@@ -42,7 +42,8 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
 
     private const int ResearchLevelIncreaseMultiplier = 3;
     public const int TechtreeLevelMultiplier = 2;
-    public const int MaxClearanceLevel = 5;
+    // level 6 == "5X" access
+    public const int MaxClearanceLevel = 6;
 
     public const int ContractSlotCount = 3;
     private static readonly TimeSpan ContractRerollNotPicked = TimeSpan.FromMinutes(3);
