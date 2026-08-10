@@ -13,14 +13,14 @@ namespace Content.Client._RMC14.Botany;
 [GenerateTypedNameReferences]
 public sealed partial class LysisCentrifugeWindow : DefaultWindow
 {
-    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
-    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
-    private const string ProcessIcon = "/Textures/_RMC14/Interface/Icons/arrows-rotate.svg.192dpi.png";
-    private const string ProcessIconWhite = "/Textures/_RMC14/Interface/Icons/arrows-rotate-white.svg.192dpi.png";
-    private const string TrashIcon = "/Textures/_RMC14/Interface/Icons/trash.svg.192dpi.png";
-    private const string TrashIconWhite = "/Textures/_RMC14/Interface/Icons/trash-white.svg.192dpi.png";
-    private const string ExtractIcon = "/Textures/_RMC14/Interface/Icons/square-plus.svg.192dpi.png";
-    private const string ExtractIconWhite = "/Textures/_RMC14/Interface/Icons/square-plus-white.svg.192dpi.png";
+    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/dark/eject.svg.192dpi.png";
+    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/white/eject.svg.192dpi.png";
+    private const string ProcessIcon = "/Textures/_RMC14/Interface/Icons/dark/arrows-rotate.svg.192dpi.png";
+    private const string ProcessIconWhite = "/Textures/_RMC14/Interface/Icons/white/arrows-rotate.svg.192dpi.png";
+    private const string TrashIcon = "/Textures/_RMC14/Interface/Icons/dark/trash.svg.192dpi.png";
+    private const string TrashIconWhite = "/Textures/_RMC14/Interface/Icons/white/trash.svg.192dpi.png";
+    private const string ExtractIcon = "/Textures/_RMC14/Interface/Icons/dark/square-plus.svg.192dpi.png";
+    private const string ExtractIconWhite = "/Textures/_RMC14/Interface/Icons/white/square-plus.svg.192dpi.png";
 
     private readonly IResourceCache _resourceCache;
 

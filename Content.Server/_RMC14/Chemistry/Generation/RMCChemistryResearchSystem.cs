@@ -350,7 +350,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         var notes = Spawn(ContractNotesProto, spawnAt);
         _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, stats.Properties, slot.Tier, research.Comp.ClearanceLevel));
         _audio.PlayPvs("/Audio/_RMC14/Machines/fax.ogg", notes);
-        research.Comp.LastPickedContract = GetNetEntity(notes);
+        research.Comp.LastPickedContractReagent = reagentId.Id;
 
         Dirty(research);
         return true;
@@ -359,15 +359,22 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
     public bool TryReprintContract(EntityCoordinates spawnAt)
     {
         var research = EnsureResearch();
-        if (research.Comp.LastPickedContract is not { } netEntity ||
-            GetEntity(netEntity) is not { Valid: true } original ||
-            !TryComp(original, out PaperComponent? originalPaper))
+        if (string.IsNullOrEmpty(research.Comp.LastPickedContractReagent))
+            return false;
+
+        var reagentId = research.Comp.LastPickedContractReagent;
+        if (!_rmcReagent.TryIndex(reagentId, out var reagent) ||
+            !_generator.TryGetRecipeReactants(reagentId, out var ingredients))
         {
             return false;
         }
 
+        var properties = _generator.GetProperties(reagent);
+        var tier = _generator.TryGetGeneratedTier(reagentId, out var t) ? t : 1;
+
         var notes = Spawn(ContractNotesProto, spawnAt);
-        _paper.SetContent(notes, originalPaper.Content);
+        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, properties, tier, research.Comp.ClearanceLevel));
+        _audio.PlayPvs("/Audio/_RMC14/Machines/fax.ogg", notes);
 
         return true;
     }

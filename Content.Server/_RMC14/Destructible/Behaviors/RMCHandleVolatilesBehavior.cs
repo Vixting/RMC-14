@@ -87,10 +87,12 @@ public sealed partial class RMCHandleVolatilesBehavior : IThresholdBehavior
         }
         explosivePower *= fillFraction;
 
+        const float powerToIntensity = 40f;
+
         var hasStructural = system.EntityManager.TryGetComponent(owner, out ExplosiveComponent? structuralExplosive);
         if (hasStructural)
         {
-            var totalIntensity = structuralExplosive!.TotalIntensity * fillFraction + explosivePower * 20f;
+            var totalIntensity = structuralExplosive!.TotalIntensity * fillFraction + explosivePower * powerToIntensity;
             system.ExplosionSystem.TriggerExplosive(owner, structuralExplosive, false, totalIntensity, user: cause);
         }
         else if (explosivePower > 0)
@@ -98,7 +100,7 @@ public sealed partial class RMCHandleVolatilesBehavior : IThresholdBehavior
             system.EntityManager.EnsureComponent<CMExplosionEffectComponent>(owner);
             system.EntityManager.EnsureComponent<RMCScorchEffectComponent>(owner);
 
-            var totalIntensity = explosivePower * 20f;
+            var totalIntensity = explosivePower * powerToIntensity;
             var mapCoordinates = system.EntityManager.System<SharedTransformSystem>().ToMapCoordinates(coordinates);
             system.ExplosionSystem.QueueExplosion(mapCoordinates, "RMC", totalIntensity, 1f, MathF.Min(totalIntensity, 30f), cause);
 

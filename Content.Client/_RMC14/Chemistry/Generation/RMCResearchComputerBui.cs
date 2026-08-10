@@ -47,6 +47,7 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
     private static readonly Color AmberDim = Color.FromHex("#C69214");
     private static readonly Color AmberBlack = Color.FromHex("#221801");
     private static readonly Color AmberBorder = Color.FromHex("#8A6800");
+    private static readonly Color AmberWashed = Color.FromHex("#7A6A2E");
 
     private const int ResearchLevelIncreaseMultiplier = 3;
     private const int MaxClearanceLevel = 5;
@@ -154,12 +155,12 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         compoundButton.Text = column == SortColumn.Compound ? $"Compound {arrow}" : "Compound";
     }
 
-    private static void SetPurchasableStyle(Button button, bool canAfford)
+    private static void SetPurchasableStyle(Button button, bool canAfford, Color? disabledColor = null)
     {
         if (button.StyleBoxOverride is not StyleBoxFlat box)
             return;
 
-        box.BackgroundColor = canAfford ? AmberBright : Color.Transparent;
+        box.BackgroundColor = canAfford ? AmberBright : disabledColor ?? Color.Transparent;
     }
 
     private void BuildTabBar()
@@ -306,26 +307,26 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         _window.ClearanceLabel.Text = $"CLEARANCE LEVEL {clearance}";
         _window.CreditsLabel.Text = $"Credits available: {credits}";
 
-        _window.ReprintContractButton.Disabled = research.LastPickedContract is null;
+        _window.ReprintContractButton.Disabled = string.IsNullOrEmpty(research.LastPickedContractReagent);
 
         if (clearance < MaxClearanceLevel)
         {
             var cost = Math.Max(ResearchLevelIncreaseMultiplier * clearance + 1, 1);
             _brokerClearanceLabel!.Text = $"Improve ({cost}CR)";
             _window.BrokerClearanceButton.Disabled = cost > credits;
-            SetPurchasableStyle(_window.BrokerClearanceButton, cost <= credits);
+            SetPurchasableStyle(_window.BrokerClearanceButton, cost <= credits, AmberWashed);
         }
         else if (!research.ReachedXAccess)
         {
             _brokerClearanceLabel!.Text = $"Request 5X Access ({XAccessCost}CR)";
             _window.BrokerClearanceButton.Disabled = XAccessCost > credits;
-            SetPurchasableStyle(_window.BrokerClearanceButton, XAccessCost <= credits);
+            SetPurchasableStyle(_window.BrokerClearanceButton, XAccessCost <= credits, AmberWashed);
         }
         else
         {
             _brokerClearanceLabel!.Text = "5X Access Granted";
             _window.BrokerClearanceButton.Disabled = true;
-            SetPurchasableStyle(_window.BrokerClearanceButton, false);
+            SetPurchasableStyle(_window.BrokerClearanceButton, false, AmberWashed);
         }
 
         var duration = research.PickedThisCycle ? TimeSpan.FromMinutes(6) : TimeSpan.FromMinutes(3);

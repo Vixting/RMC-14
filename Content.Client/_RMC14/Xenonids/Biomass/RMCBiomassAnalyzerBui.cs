@@ -18,18 +18,27 @@ namespace Content.Client._RMC14.Xenonids.Biomass;
 [UsedImplicitly]
 public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
 {
-    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
-    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
-    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/flask.svg.192dpi.png";
-    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/flask-white.svg.192dpi.png";
-    private const string PlayIcon = "/Textures/_RMC14/Interface/Icons/play.svg.192dpi.png";
-    private const string PlayIconWhite = "/Textures/_RMC14/Interface/Icons/play-white.svg.192dpi.png";
-    private const string StopIcon = "/Textures/_RMC14/Interface/Icons/stop.svg.192dpi.png";
-    private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/stop-white.svg.192dpi.png";
-    private const string PrintIcon = "/Textures/_RMC14/Interface/Icons/print.svg.192dpi.png";
-    private const string PrintIconWhite = "/Textures/_RMC14/Interface/Icons/print-white.svg.192dpi.png";
-    private const string CancelIcon = "/Textures/_RMC14/Interface/Icons/square-minus.svg.192dpi.png";
-    private const string CancelIconWhite = "/Textures/_RMC14/Interface/Icons/square-minus-white.svg.192dpi.png";
+    private const string IconDir = "/Textures/_RMC14/Interface/Icons/";
+
+    // Base (dark), -white (hover), and -yellow (on dark backgrounds) variants, grouped per icon.
+    private const string CancelIcon = IconDir + "dark/square-minus.svg.192dpi.png";
+    private const string CancelIconWhite = IconDir + "white/square-minus.svg.192dpi.png";
+    private const string CancelIconYellow = IconDir + "yellow/square-minus.svg.192dpi.png";
+
+    private const string EjectIcon = IconDir + "dark/eject.svg.192dpi.png";
+    private const string EjectIconWhite = IconDir + "white/eject.svg.192dpi.png";
+
+    private const string FlaskIcon = IconDir + "dark/flask.svg.192dpi.png";
+    private const string FlaskIconWhite = IconDir + "white/flask.svg.192dpi.png";
+
+    private const string PlayIcon = IconDir + "dark/play.svg.192dpi.png";
+    private const string PlayIconWhite = IconDir + "white/play.svg.192dpi.png";
+
+    private const string PrintIcon = IconDir + "dark/print.svg.192dpi.png";
+    private const string PrintIconWhite = IconDir + "white/print.svg.192dpi.png";
+
+    private const string StopIcon = IconDir + "dark/stop.svg.192dpi.png";
+    private const string StopIconWhite = IconDir + "white/stop.svg.192dpi.png";
 
     private static readonly Color Amber = Color.FromHex("#FFD21A");
     private static readonly Color AmberDim = Color.FromHex("#8A6800");
@@ -330,18 +339,22 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
 
             NameLabel = new Label { HorizontalExpand = true, FontColorOverride = Amber };
 
+            var cache = IoCManager.Resolve<IResourceCache>();
             var cancelIcon = new TextureRect
             {
                 Stretch = TextureRect.StretchMode.KeepAspectCentered,
                 SetSize = new Vector2(14, 14),
                 VerticalAlignment = Control.VAlignment.Center,
-                Modulate = Amber,
-                Texture = IoCManager.Resolve<IResourceCache>().GetTexture(CancelIcon),
+                ModulateSelfOverride = Color.White,
+                Texture = cache.GetTexture(CancelIconYellow),
             };
 
             row.AddChild(NameLabel);
             row.AddChild(cancelIcon);
             AddChild(row);
+
+            OnMouseEntered += _ => cancelIcon.Texture = cache.GetTexture(CancelIconWhite);
+            OnMouseExited += _ => cancelIcon.Texture = cache.GetTexture(CancelIconYellow);
 
             OnPressed += _ => OnCancel?.Invoke(Index);
         }

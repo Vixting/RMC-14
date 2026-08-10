@@ -12,10 +12,10 @@ namespace Content.Client._RMC14.Botany;
 [GenerateTypedNameReferences]
 public sealed partial class GeneEditorWindow : DefaultWindow
 {
-    private const string RadiationIcon = "/Textures/_RMC14/Interface/Icons/radiation.svg.192dpi.png";
-    private const string RadiationIconWhite = "/Textures/_RMC14/Interface/Icons/radiation-white.svg.192dpi.png";
-    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
-    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
+    private const string RadiationIcon = "/Textures/_RMC14/Interface/Icons/dark/radiation.svg.192dpi.png";
+    private const string RadiationIconWhite = "/Textures/_RMC14/Interface/Icons/white/radiation.svg.192dpi.png";
+    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/dark/eject.svg.192dpi.png";
+    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/white/eject.svg.192dpi.png";
 
     private GeneEditorBui? _bui;
 

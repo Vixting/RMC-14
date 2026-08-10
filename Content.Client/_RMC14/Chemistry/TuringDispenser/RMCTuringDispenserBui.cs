@@ -25,22 +25,22 @@ namespace Content.Client._RMC14.Chemistry.TuringDispenser;
 [UsedImplicitly]
 public sealed class RMCTuringDispenserBui : BoundUserInterface, IRefreshableBui
 {
-    private const string TrashIcon = "/Textures/_RMC14/Interface/Icons/trash.svg.192dpi.png";
-    private const string TrashIconWhite = "/Textures/_RMC14/Interface/Icons/trash-white.svg.192dpi.png";
-    private const string PlayIcon = "/Textures/_RMC14/Interface/Icons/play.svg.192dpi.png";
-    private const string PlayIconWhite = "/Textures/_RMC14/Interface/Icons/play-white.svg.192dpi.png";
-    private const string SaveIcon = "/Textures/_RMC14/Interface/Icons/floppy-disk.svg.192dpi.png";
-    private const string SaveIconWhite = "/Textures/_RMC14/Interface/Icons/floppy-disk-white.svg.192dpi.png";
-    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
-    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
-    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/flask.svg.192dpi.png";
-    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/flask-white.svg.192dpi.png";
-    private const string LinkIcon = "/Textures/_RMC14/Interface/Icons/link.svg.192dpi.png";
-    private const string LinkIconWhite = "/Textures/_RMC14/Interface/Icons/link-white.svg.192dpi.png";
-    private const string CycleIcon = "/Textures/_RMC14/Interface/Icons/arrows-rotate.svg.192dpi.png";
-    private const string CycleIconWhite = "/Textures/_RMC14/Interface/Icons/arrows-rotate-white.svg.192dpi.png";
-    private const string StopIcon = "/Textures/_RMC14/Interface/Icons/stop.svg.192dpi.png";
-    private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/stop-white.svg.192dpi.png";
+    private const string TrashIcon = "/Textures/_RMC14/Interface/Icons/dark/trash.svg.192dpi.png";
+    private const string TrashIconWhite = "/Textures/_RMC14/Interface/Icons/white/trash.svg.192dpi.png";
+    private const string PlayIcon = "/Textures/_RMC14/Interface/Icons/dark/play.svg.192dpi.png";
+    private const string PlayIconWhite = "/Textures/_RMC14/Interface/Icons/white/play.svg.192dpi.png";
+    private const string SaveIcon = "/Textures/_RMC14/Interface/Icons/dark/floppy-disk.svg.192dpi.png";
+    private const string SaveIconWhite = "/Textures/_RMC14/Interface/Icons/white/floppy-disk.svg.192dpi.png";
+    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/dark/eject.svg.192dpi.png";
+    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/white/eject.svg.192dpi.png";
+    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/dark/flask.svg.192dpi.png";
+    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/white/flask.svg.192dpi.png";
+    private const string LinkIcon = "/Textures/_RMC14/Interface/Icons/dark/link.svg.192dpi.png";
+    private const string LinkIconWhite = "/Textures/_RMC14/Interface/Icons/white/link.svg.192dpi.png";
+    private const string CycleIcon = "/Textures/_RMC14/Interface/Icons/dark/arrows-rotate.svg.192dpi.png";
+    private const string CycleIconWhite = "/Textures/_RMC14/Interface/Icons/white/arrows-rotate.svg.192dpi.png";
+    private const string StopIcon = "/Textures/_RMC14/Interface/Icons/dark/stop.svg.192dpi.png";
+    private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/white/stop.svg.192dpi.png";
 
     private const float VialMaxVolume = 30f;
 

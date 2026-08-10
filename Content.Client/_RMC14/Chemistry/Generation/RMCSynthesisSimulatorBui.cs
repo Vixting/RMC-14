@@ -20,22 +20,22 @@ namespace Content.Client._RMC14.Chemistry.Generation;
 [UsedImplicitly]
 public sealed class RMCSynthesisSimulatorBui : BoundUserInterface, IRefreshableBui
 {
-    private const string RadiationIcon = "/Textures/_RMC14/Interface/Icons/radiation.svg.192dpi.png";
-    private const string RadiationIconWhite = "/Textures/_RMC14/Interface/Icons/radiation-white.svg.192dpi.png";
-    private const string StopIcon = "/Textures/_RMC14/Interface/Icons/stop.svg.192dpi.png";
-    private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/stop-white.svg.192dpi.png";
-    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
-    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
-    private const string SquarePlusIcon = "/Textures/_RMC14/Interface/Icons/square-plus.svg.192dpi.png";
-    private const string SquarePlusIconWhite = "/Textures/_RMC14/Interface/Icons/square-plus-white.svg.192dpi.png";
-    private const string SquareMinusIcon = "/Textures/_RMC14/Interface/Icons/square-minus.svg.192dpi.png";
-    private const string SquareMinusIconWhite = "/Textures/_RMC14/Interface/Icons/square-minus-white.svg.192dpi.png";
-    private const string ArrowRightIcon = "/Textures/_RMC14/Interface/Icons/arrow-right-long.svg.192dpi.png";
-    private const string ArrowRightIconWhite = "/Textures/_RMC14/Interface/Icons/arrow-right-long-white.svg.192dpi.png";
-    private const string RepeatIcon = "/Textures/_RMC14/Interface/Icons/arrows-rotate.svg.192dpi.png";
-    private const string RepeatIconWhite = "/Textures/_RMC14/Interface/Icons/arrows-rotate-white.svg.192dpi.png";
-    private const string ServerIcon = "/Textures/_RMC14/Interface/Icons/server.svg.192dpi.png";
-    private const string ServerIconWhite = "/Textures/_RMC14/Interface/Icons/server-white.svg.192dpi.png";
+    private const string RadiationIcon = "/Textures/_RMC14/Interface/Icons/dark/radiation.svg.192dpi.png";
+    private const string RadiationIconWhite = "/Textures/_RMC14/Interface/Icons/white/radiation.svg.192dpi.png";
+    private const string StopIcon = "/Textures/_RMC14/Interface/Icons/dark/stop.svg.192dpi.png";
+    private const string StopIconWhite = "/Textures/_RMC14/Interface/Icons/white/stop.svg.192dpi.png";
+    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/dark/eject.svg.192dpi.png";
+    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/white/eject.svg.192dpi.png";
+    private const string SquarePlusIcon = "/Textures/_RMC14/Interface/Icons/dark/square-plus.svg.192dpi.png";
+    private const string SquarePlusIconWhite = "/Textures/_RMC14/Interface/Icons/white/square-plus.svg.192dpi.png";
+    private const string SquareMinusIcon = "/Textures/_RMC14/Interface/Icons/dark/square-minus.svg.192dpi.png";
+    private const string SquareMinusIconWhite = "/Textures/_RMC14/Interface/Icons/white/square-minus.svg.192dpi.png";
+    private const string ArrowRightIcon = "/Textures/_RMC14/Interface/Icons/dark/arrow-right-long.svg.192dpi.png";
+    private const string ArrowRightIconWhite = "/Textures/_RMC14/Interface/Icons/white/arrow-right-long.svg.192dpi.png";
+    private const string RepeatIcon = "/Textures/_RMC14/Interface/Icons/dark/arrows-rotate.svg.192dpi.png";
+    private const string RepeatIconWhite = "/Textures/_RMC14/Interface/Icons/white/arrows-rotate.svg.192dpi.png";
+    private const string ServerIcon = "/Textures/_RMC14/Interface/Icons/dark/server.svg.192dpi.png";
+    private const string ServerIconWhite = "/Textures/_RMC14/Interface/Icons/white/server.svg.192dpi.png";
 
     private static readonly Color ModeColor = Color.FromHex("#d3bd9a");
     private static readonly Color ActionColor = Color.FromHex("#d6d6d6");

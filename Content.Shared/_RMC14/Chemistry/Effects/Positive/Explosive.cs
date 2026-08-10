@@ -16,7 +16,7 @@ public sealed partial class Explosive : RMCChemicalEffect
         return "Highly explosive. Do not ignite. Sensitivity is based on the overdose threshold, which can lead to spontaneous detonation.";
     }
 
-    public float PowerDelta => 2f * Potency;
+    public float PowerDelta => Potency;
 
     // I think in cm it blows you up but just dmg for now
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

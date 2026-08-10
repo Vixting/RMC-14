@@ -15,14 +15,14 @@ namespace Content.Client._RMC14.Chemistry.Centrifuge;
 [UsedImplicitly]
 public sealed class RMCCentrifugeBui : BoundUserInterface, IRefreshableBui
 {
-    private const string CycleIcon = "/Textures/_RMC14/Interface/Icons/arrows-rotate.svg.192dpi.png";
-    private const string CycleIconWhite = "/Textures/_RMC14/Interface/Icons/arrows-rotate-white.svg.192dpi.png";
-    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/flask.svg.192dpi.png";
-    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/flask-white.svg.192dpi.png";
-    private const string LinkIcon = "/Textures/_RMC14/Interface/Icons/link.svg.192dpi.png";
-    private const string LinkIconWhite = "/Textures/_RMC14/Interface/Icons/link-white.svg.192dpi.png";
-    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/eject.svg.192dpi.png";
-    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/eject-white.svg.192dpi.png";
+    private const string CycleIcon = "/Textures/_RMC14/Interface/Icons/dark/arrows-rotate.svg.192dpi.png";
+    private const string CycleIconWhite = "/Textures/_RMC14/Interface/Icons/white/arrows-rotate.svg.192dpi.png";
+    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/dark/flask.svg.192dpi.png";
+    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/white/flask.svg.192dpi.png";
+    private const string LinkIcon = "/Textures/_RMC14/Interface/Icons/dark/link.svg.192dpi.png";
+    private const string LinkIconWhite = "/Textures/_RMC14/Interface/Icons/white/link.svg.192dpi.png";
+    private const string EjectIcon = "/Textures/_RMC14/Interface/Icons/dark/eject.svg.192dpi.png";
+    private const string EjectIconWhite = "/Textures/_RMC14/Interface/Icons/white/eject.svg.192dpi.png";
 
     private static readonly Color HeaderColor = Color.FromHex("#12141A");
     private static readonly Color TanColor = Color.FromHex("#ffb950");

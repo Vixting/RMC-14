@@ -622,6 +622,60 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
 
     private List<(string Id, int Amount, bool Catalyst)> PickRecipeIngredients(int tier, string generatedId, string? forcedFirst = null)
     {
+        List<(string Id, int Amount, bool Catalyst)> recipe = new();
+        for (var attempt = 0; attempt < 10; attempt++)
+        {
+            recipe = RollRecipeIngredientsOnce(tier, generatedId, forcedFirst);
+            if (recipe.Count == 0)
+                continue;
+
+            if (!IsAllMedical(recipe) && !DuplicatesExistingReaction(recipe))
+                return recipe;
+        }
+
+        return recipe;
+    }
+
+    private bool IsAllMedical(List<(string Id, int Amount, bool Catalyst)> recipe)
+    {
+        var any = false;
+        foreach (var (id, _, catalyst) in recipe)
+        {
+            if (catalyst)
+                continue;
+
+            any = true;
+            if (!_rmcReagent.TryIndex(id, out var reagent) || !reagent.Medical)
+                return false;
+        }
+
+        return any;
+    }
+
+    private bool DuplicatesExistingReaction(List<(string Id, int Amount, bool Catalyst)> recipe)
+    {
+        var reagents = recipe.Where(i => !i.Catalyst).Select(i => i.Id).ToHashSet();
+        if (reagents.Count == 0)
+            return false;
+
+        foreach (var reaction in _prototype.EnumeratePrototypes<ReactionPrototype>())
+        {
+            if (reagents.All(r => reaction.Reactants.ContainsKey(r)))
+                return true;
+        }
+
+        foreach (var (_, cached) in _recipeReactantsCache)
+        {
+            var existing = cached.Where(i => !i.Catalyst).Select(i => i.Id).ToHashSet();
+            if (reagents.All(r => existing.Contains(r)))
+                return true;
+        }
+
+        return false;
+    }
+
+    private List<(string Id, int Amount, bool Catalyst)> RollRecipeIngredientsOnce(int tier, string generatedId, string? forcedFirst = null)
+    {
         var pools = BuildClassPools(generatedId);
         var allPool = pools.Where(p => p.Key != ChemClass.None).SelectMany(p => p.Value).Distinct().ToList();
         var used = new HashSet<string>();
