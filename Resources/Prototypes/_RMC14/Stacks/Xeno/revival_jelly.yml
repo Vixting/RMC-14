@@ -1,0 +1,6 @@
+- type: stack
+  id: RMCRevivalJelly
+  name: revival jelly
+  icon: { sprite: /Textures/_RMC14/Objects/Xeno/Marine_Research.rsi, state: royal_jelly }
+  spawn: RMCRevivalJelly
+  maxCount: 9

@@ -1,4 +1,31 @@
-﻿reagent-name-cmdylovene = Dylovene
+﻿reagent-name-rmctramadol = Tramadol
+reagent-desc-rmctramadol = A centrally acting analgesic. Used to treat both acute and chronic pain of moderate to moderately severe intensity. Generally considered a medicinal drug with a low potential for dependence relative to morphine.
+
+reagent-name-rmcoxycodone = Oxycodone
+reagent-desc-rmcoxycodone = An opioid agonist with addiction potential similar to that of morphine. Approved for the treatment of patients with moderate to severe pain who are expected to need continuous opioids for an extended period of time.
+
+reagent-name-rmcperidaxon = Peridaxon
+reagent-desc-rmcperidaxon = Prevents symptoms caused by damaged internal organs while in the bloodstream, but does not fix the organ damage. Recommended for patients awaiting internal organ surgery.
+
+reagent-name-rmcryetalyn = Ryetalyn
+reagent-desc-rmcryetalyn = Repairs genetic and ocular defects, mutations, and abnormalities through a catalytic process.
+
+reagent-name-rmcparacetamol = Paracetamol
+reagent-desc-rmcparacetamol = A moderate, long lasting painkiller that has been commonly available for decades. Capable of both analgesic and antipyretic activity but no anti-inflammatory action.
+
+reagent-name-rmcsterilizine = Sterilizine
+reagent-desc-rmcsterilizine = A sterilizer used to clean wounds in preparation for surgery. Its use has mostly been outclassed by the cheaper alternative of space cleaner.
+
+reagent-name-rmcalkysine = Alkysine
+reagent-desc-rmcalkysine = A drug used to lessen and heal the damage to neurological tissue after a catastrophic injury.
+
+reagent-name-rmcneuraline = Neuraline
+reagent-desc-rmcneuraline = A chemical cocktail tailored to enhance or dampen specific neural processes.
+
+reagent-name-rmcstimulant = Stimulant
+reagent-desc-rmcstimulant = A highly potent, long lasting combination CNS and muscle stimulant.
+
+reagent-name-cmdylovene = Dylovene
 reagent-desc-cmdylovene = General use anti-toxin, that neutralizes most toxins in the bloodstream. Commonly used in many advanced chemicals. Can be used as a mild anti-hallucinogen and to reduce tiredness.
 
 reagent-name-cmethylredoxrazine = Ethylredoxrazine

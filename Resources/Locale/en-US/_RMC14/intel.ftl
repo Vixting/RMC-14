@@ -1,4 +1,8 @@
 ﻿rmc-intel-suffix = {$baseName} ({$number})
+rmc-intel-chem-grant-paper = Weston-Yamada Research Grant
+    Dear valued researcher. Weston-Yamada has taken high interest in your recent scientific progress. To further support your work we have sent you this research grant of {$credits} credits. Please scan at your local Weston-Yamada research data terminal to receive the benefits.
+
+    - Weston-Yamada
 rmc-intel-unlocked = {$baseName} ({$unlocked})
 rmc-intel-label-name = {$baseName} {$label}
 rmc-intel-label-name-parenthetical = {$baseName} ({$label})
@@ -13,6 +17,8 @@ rmc-intel-data = Data
 rmc-intel-retrieve = Retrieve
 rmc-intel-misc = Miscellaneous
 rmc-intel-personal = Personal Clues
+rmc-intel-chemicals-pending = Analyze Chemicals
+rmc-intel-chemicals-pending-empty = No chemicals currently need analysis.
 
 rmc-intel-data-disk-uploaded = {$baseName} (uploaded)
 rmc-intel-color-red = [color=#eb4034]red[/color]
@@ -84,11 +90,11 @@ rmc-ui-intel-header = [bold]Marine Tech Tree Objectives[/bold]
 rmc-ui-intel-tech-points = [bold]Tech Points[/bold]
 rmc-ui-intel-tier = [bold]Tier[/bold]
 rmc-ui-intel-objectives = [bold]Objectives[/bold]
+rmc-ui-intel-objectives-tab = Objectives
 rmc-ui-intel-documents = [color=#5B88B0]Documents:[/color]
 rmc-ui-intel-upload-data = [color=#5B88B0]Upload data:[/color]
 rmc-ui-intel-retrieve-items = [color=#5B88B0]Retrieve items:[/color]
 rmc-ui-intel-miscellaneous = [color=#5B88B0]Miscellaneous:[/color]
-rmc-ui-intel-analyze-chemicals = [color=#5B88B0]Analyze chemicals:[/color]
 rmc-ui-intel-rescue-survivors = [color=#5B88B0]Rescue survivors:[/color]
 rmc-ui-intel-recover-corpses = [color=#5B88B0]Recover corpses:[/color]
 rmc-ui-intel-colony-comms = [color=#5B88B0]Colony communications:[/color]
