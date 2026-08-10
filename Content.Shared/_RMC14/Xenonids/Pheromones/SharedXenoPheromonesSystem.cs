@@ -4,6 +4,7 @@ using Content.Shared._RMC14.Atmos;
 using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Pulling;
 using Content.Shared._RMC14.Xenonids.CriticalGrace;
+using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.Plasma;
 using Content.Shared._RMC14.Xenonids.Stab;
 using Content.Shared._RMC14.Xenonids.Weeds;
@@ -32,6 +33,7 @@ public abstract class SharedXenoPheromonesSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
+    [Dependency] private readonly SharedXenoHiveSystem _hive = default!;
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
@@ -385,7 +387,7 @@ public abstract class SharedXenoPheromonesSystem : EntitySystem
 
         for (var i = 0; i < _pheromonesJob.Pheromones.Count; i++)
         {
-            var (_, active, pheromones, _) = _pheromonesJob.Pheromones[i];
+            var (source, active, pheromones, _) = _pheromonesJob.Pheromones[i];
             var receivers = _pheromonesJob.Receivers[i].Receivers;
 
             switch (active.Pheromones)
@@ -397,6 +399,9 @@ public abstract class SharedXenoPheromonesSystem : EntitySystem
                             continue;
 
                         if (receiver.Comp.IgnorePheromones == XenoPheromones.Recovery)
+                            continue;
+
+                        if (!_hive.FromSameHiveOrAlly(source, receiver.Owner))
                             continue;
 
                         oldRecovery.Remove(receiver);
@@ -416,6 +421,9 @@ public abstract class SharedXenoPheromonesSystem : EntitySystem
                         if (receiver.Comp.IgnorePheromones == XenoPheromones.Warding)
                             continue;
 
+                        if (!_hive.FromSameHiveOrAlly(source, receiver.Owner))
+                            continue;
+
                         oldWarding.Remove(receiver);
                         var warding = EnsureComp<XenoWardingPheromonesComponent>(receiver);
                         AssignMaxMultiplier(ref warding.Multiplier, pheromones.PheromonesMultiplier);
@@ -431,6 +439,9 @@ public abstract class SharedXenoPheromonesSystem : EntitySystem
                             continue;
 
                         if (receiver.Comp.IgnorePheromones == XenoPheromones.Frenzy)
+                            continue;
+
+                        if (!_hive.FromSameHiveOrAlly(source, receiver.Owner))
                             continue;
 
                         oldFrenzy.Remove(receiver);

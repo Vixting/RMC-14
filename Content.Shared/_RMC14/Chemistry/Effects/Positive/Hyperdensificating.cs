@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Movement;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -17,10 +18,18 @@ public sealed partial class Hyperdensificating : RMCChemicalEffect
 
     // TODO RMC14: mob effect - fracture resistance
 
+    protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var penalty = MathF.Max(1f - (float) potency * 0.2f, 0.1f);
+        var speed = args.EntityManager.System<TemporarySpeedModifiersSystem>();
+        var modifiers = new List<TemporarySpeedModifierSet> { new(TimeSpan.FromSeconds(2), penalty, penalty) };
+        speed.ModifySpeed(args.TargetEntity, modifiers);
+    }
+
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 1.5f;
+        damage.DamageDict[BluntType] = potency * 3f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }
