@@ -47,6 +47,10 @@ public sealed class PlantGene
     public Color? ProductColor;
     public bool? HasFlowers;
     public string? FlowerIcon;
+    public Color? FlowerColor;
+    public bool? Bioluminescent;
+    public Color? BioluminescentColor;
+    public float? BioluminescentRadius;
 
     public static PlantGene FromSeed(SeedData seed, PlantGeneType type)
     {
@@ -94,6 +98,10 @@ public sealed class PlantGene
                 gene.ProductColor = seed.ProductColor;
                 gene.HasFlowers = seed.Flowers;
                 gene.FlowerIcon = seed.FlowerIcon;
+                gene.FlowerColor = seed.FlowerColor;
+                gene.Bioluminescent = seed.Bioluminescent;
+                gene.BioluminescentColor = seed.BioluminescentColor;
+                gene.BioluminescentRadius = seed.BioluminescentRadius;
                 break;
         }
         return gene;
@@ -190,6 +198,13 @@ public sealed class PlantGene
                 if (HasFlowers is { } hasFlowers)
                     seed.Flowers = hasFlowers;
                 seed.FlowerIcon = FlowerIcon;
+                seed.FlowerColor = FlowerColor;
+                if (Bioluminescent is { } bioluminescent)
+                    seed.Bioluminescent = bioluminescent;
+                if (BioluminescentColor is { } bioluminescentColor)
+                    seed.BioluminescentColor = bioluminescentColor;
+                if (BioluminescentRadius is { } bioluminescentRadius)
+                    seed.BioluminescentRadius = bioluminescentRadius;
                 break;
         }
     }

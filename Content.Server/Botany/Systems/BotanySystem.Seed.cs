@@ -183,6 +183,9 @@ public sealed partial class BotanySystem : EntitySystem
 
             _appearance.SetData(entity, ProduceVisuals.Potency, proto.Potency);
 
+            if (proto.ProductColor is { } productColor)
+                _appearance.SetData(entity, ProduceVisuals.Color, productColor);
+
             if (proto.Mysterious)
             {
                 var metaData = MetaData(entity);

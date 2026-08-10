@@ -17,6 +17,14 @@ public sealed class MutationSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
+    // cmss13's bioluminescence palette (seed_datums.dm).
+    private static readonly Color[] BioluminescentColors =
+    [
+        Color.FromHex("#FF0000"), Color.FromHex("#FF7F00"), Color.FromHex("#FFFF00"),
+        Color.FromHex("#00FF00"), Color.FromHex("#0000FF"), Color.FromHex("#4B0082"),
+        Color.FromHex("#8F00FF"),
+    ];
+
     private static class Slot
     {
         public const string PlantCancer = "Plant Cancer";
@@ -207,11 +215,13 @@ public sealed class MutationSystem : EntitySystem
                 break;
 
             case Slot.Bioluminescence:
-                // Visual effect — no RS14 implementation yet; stub only.
+                seed.Bioluminescent = !seed.Bioluminescent;
+                if (seed.Bioluminescent)
+                    seed.BioluminescentColor = _robustRandom.Pick(BioluminescentColors);
                 break;
 
             case Slot.Flowers:
-                // Visual effect — no RS14 implementation yet; stub only.
+                seed.Flowers = !seed.Flowers;
                 break;
 
             case Slot.NewChems:

@@ -65,6 +65,7 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
 
         _popup.PopupCursor(msg, user, PopupType.Large);
 
+        ShowTraits(user, seed);
         ShowChemicals(user, seed);
     }
 
@@ -94,6 +95,7 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
 
         _popup.PopupCursor(msg, user, PopupType.Large);
 
+        ShowTraits(user, seed);
         ShowChemicals(user, seed);
     }
 
@@ -105,6 +107,62 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         _popup.PopupCursor(msg, user, PopupType.Large);
 
         ShowChemicals(user, seed);
+    }
+
+    private void ShowTraits(EntityUid user, SeedData seed)
+    {
+        var lines = new List<string>();
+
+        if (seed.LightTolerance > 10)
+            lines.Add("It is well adapted to a range of light levels.");
+        else if (seed.LightTolerance < 3)
+            lines.Add("It is very sensitive to light level shifts.");
+
+        if (seed.ToxinsTolerance < 3)
+            lines.Add("It is highly sensitive to toxins.");
+        else if (seed.ToxinsTolerance > 6)
+            lines.Add("It is remarkably resistant to toxins.");
+
+        if (seed.PestTolerance < 3)
+            lines.Add("It is highly sensitive to pests.");
+        else if (seed.PestTolerance > 6)
+            lines.Add("It is remarkably resistant to pests.");
+
+        if (seed.WeedTolerance < 3)
+            lines.Add("It is highly sensitive to weeds.");
+        else if (seed.WeedTolerance > 6)
+            lines.Add("It is remarkably resistant to weeds.");
+
+        switch (seed.Carnivorous)
+        {
+            case 1:
+                lines.Add("It is carnivorous and will eat tray pests for sustenance.");
+                break;
+            case 2:
+                lines.Add("It is carnivorous and poses a significant threat to living things around it.");
+                break;
+        }
+
+        if (seed.Parasite)
+            lines.Add("It is capable of parasitizing and gaining sustenance from tray weeds.");
+
+        if (seed.AlterTemperature != 0)
+            lines.Add($"It will periodically alter the local temperature by {seed.AlterTemperature} degrees Kelvin.");
+
+        if (seed.Bioluminescent)
+            lines.Add($"It is [color={seed.BioluminescentColor.ToHexNoAlpha()}]bio-luminescent[/color].");
+
+        if (seed.Flowers)
+        {
+            lines.Add(seed.FlowerColor is { } flowerColor
+                ? $"It has [color={flowerColor.ToHexNoAlpha()}]flowers[/color]."
+                : "It has flowers.");
+        }
+
+        if (lines.Count == 0)
+            return;
+
+        _popup.PopupCursor(string.Join("\n", lines), user, PopupType.Large);
     }
 
     private void ShowChemicals(EntityUid user, SeedData seed)
