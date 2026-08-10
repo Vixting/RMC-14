@@ -10,7 +10,6 @@ using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using Robust.Shared.Log;
 using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
 
@@ -19,16 +18,30 @@ namespace Content.Client._RMC14.Chemistry.Generation;
 [UsedImplicitly]
 public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 {
-    private const string GearIcon = "/Textures/_RMC14/Interface/Icons/gear.svg.192dpi.png";
-    private const string GearIconWhite = "/Textures/_RMC14/Interface/Icons/gear-white.svg.192dpi.png";
-    private const string RepeatIcon = "/Textures/_RMC14/Interface/Icons/arrows-rotate.svg.192dpi.png";
-    private const string RepeatIconWhite = "/Textures/_RMC14/Interface/Icons/arrows-rotate-white.svg.192dpi.png";
-    private const string FlaskIcon = "/Textures/_RMC14/Interface/Icons/flask.svg.192dpi.png";
-    private const string FlaskIconWhite = "/Textures/_RMC14/Interface/Icons/flask-white.svg.192dpi.png";
-    private const string BookIcon = "/Textures/_RMC14/Interface/Icons/book.svg.192dpi.png";
-    private const string BookIconWhite = "/Textures/_RMC14/Interface/Icons/book-white.svg.192dpi.png";
-    private const string PrintIcon = "/Textures/_RMC14/Interface/Icons/print.svg.192dpi.png";
-    private const string AnnounceIcon = "/Textures/_RMC14/Interface/Icons/radiation.svg.192dpi.png";
+    private const string IconDir = "/Textures/_RMC14/Interface/Icons/";
+
+    // Base (dark), -white (hover), and -yellow (inactive/disabled) variants, grouped per icon.
+    private const string AnnounceIcon = IconDir + "dark/radiation.svg.192dpi.png";
+    private const string AnnounceIconWhite = IconDir + "white/radiation.svg.192dpi.png";
+
+    private const string BookIcon = IconDir + "dark/book.svg.192dpi.png";
+    private const string BookIconWhite = IconDir + "white/book.svg.192dpi.png";
+    private const string BookIconYellow = IconDir + "yellow/book.svg.192dpi.png";
+
+    private const string FlaskIcon = IconDir + "dark/flask.svg.192dpi.png";
+    private const string FlaskIconWhite = IconDir + "white/flask.svg.192dpi.png";
+    private const string FlaskIconYellow = IconDir + "yellow/flask.svg.192dpi.png";
+
+    private const string GearIcon = IconDir + "dark/gear.svg.192dpi.png";
+    private const string GearIconWhite = IconDir + "white/gear.svg.192dpi.png";
+    private const string GearIconYellow = IconDir + "yellow/gear.svg.192dpi.png";
+
+    private const string PrintIcon = IconDir + "dark/print.svg.192dpi.png";
+    private const string PrintIconWhite = IconDir + "white/print.svg.192dpi.png";
+    private const string PrintIconYellow = IconDir + "yellow/print.svg.192dpi.png";
+
+    private const string RepeatIcon = IconDir + "dark/arrows-rotate.svg.192dpi.png";
+    private const string RepeatIconWhite = IconDir + "white/arrows-rotate.svg.192dpi.png";
 
     private static readonly Color AmberBright = Color.FromHex("#FAC000");
     private static readonly Color AmberDim = Color.FromHex("#C69214");
@@ -75,13 +88,8 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         base.Open();
         _window = this.CreateWindow<RMCResearchComputerWindow>();
 
-        Logger.DebugS("research-computer", $"Open: AmberBright={AmberBright}, AmberDim={AmberDim}, AmberBlack={AmberBlack}");
-
         _brokerClearanceLabel = Icon(_window.BrokerClearanceButton, GearIcon, GearIconWhite, "Broker Clearance");
         Icon(_window.ReprintContractButton, RepeatIcon, RepeatIconWhite, "Reprint");
-
-        LogButtonStyle("BrokerClearanceButton", _window.BrokerClearanceButton);
-        LogButtonStyle("ReprintContractButton", _window.ReprintContractButton);
 
         _window.BrokerClearanceButton.OnPressed += _ =>
         {
@@ -146,15 +154,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         compoundButton.Text = column == SortColumn.Compound ? $"Compound {arrow}" : "Compound";
     }
 
-    private static void LogButtonStyle(string name, Button button)
-    {
-        var box = button.StyleBoxOverride as StyleBoxFlat;
-        Logger.DebugS("research-computer",
-            $"LogButtonStyle: {name} Disabled={button.Disabled} Modulate={button.Modulate} " +
-            $"ActualModulateSelf={button.ActualModulateSelf} " +
-            $"StyleBoxOverride={(box == null ? "null-or-not-flat" : box.BackgroundColor.ToString())}");
-    }
-
     private static void SetPurchasableStyle(Button button, bool canAfford)
     {
         if (button.StyleBoxOverride is not StyleBoxFlat box)
@@ -168,18 +167,23 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         _tabButtons.Clear();
         _window!.TabBar.RemoveAllChildren();
 
-        AddTabButton(GearIcon, GearIconWhite, "Manage", "Research");
-        AddTabButton(FlaskIcon, FlaskIconWhite, "View", "Chemicals");
-        AddTabButton(BookIcon, BookIconWhite, "Published", "Material");
+        AddTabButton(GearIcon, GearIconWhite, GearIconYellow, "Manage", "Research");
+        AddTabButton(FlaskIcon, FlaskIconWhite, FlaskIconYellow, "View", "Chemicals");
+        AddTabButton(BookIcon, BookIconWhite, BookIconYellow, "Published", "Material");
 
         SetActiveTab(_window.Tabs.CurrentTab);
         _window.Tabs.OnTabChanged += SetActiveTab;
     }
 
-    private void AddTabButton(string iconPath, string whiteIconPath, string line1, string line2)
+    private void AddTabButton(string iconPath, string whiteIconPath, string yellowIconPath, string line1, string line2)
     {
         var index = _tabButtons.Count;
-        var tab = new TabButtonControl(_resourceCache.GetTexture(iconPath), _resourceCache.GetTexture(whiteIconPath), line1, line2);
+        var tab = new TabButtonControl(
+            _resourceCache.GetTexture(iconPath),
+            _resourceCache.GetTexture(whiteIconPath),
+            _resourceCache.GetTexture(yellowIconPath),
+            line1,
+            line2);
         tab.OnPressed += _ => _window!.Tabs.CurrentTab = index;
         _window!.TabBar.AddChild(tab);
         _tabButtons.Add(tab);
@@ -195,17 +199,23 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 
     private sealed class TabButtonControl : Button
     {
-        private readonly Texture _texture;
+        // Black texture reads on the active (amber-filled) tab; the yellow variant reads on the inactive
+        // (transparent) tab; white on hover. Swapping textures instead of modulating a black icon is the
+        // only way to actually lighten it - Modulate multiplies, so black stays black.
+        private readonly Texture _blackTexture;
         private readonly Texture _whiteTexture;
+        private readonly Texture _yellowTexture;
         private readonly TextureRect _icon;
         private readonly Label _line1;
         private readonly Label _line2;
         private bool _active;
+        private bool _hovered;
 
-        public TabButtonControl(Texture texture, Texture whiteTexture, string line1, string line2)
+        public TabButtonControl(Texture blackTexture, Texture whiteTexture, Texture yellowTexture, string line1, string line2)
         {
-            _texture = texture;
+            _blackTexture = blackTexture;
             _whiteTexture = whiteTexture;
+            _yellowTexture = yellowTexture;
             HorizontalExpand = true;
             Modulate = Color.White;
             ModulateSelfOverride = Color.White;
@@ -227,10 +237,11 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 
             _icon = new TextureRect
             {
-                Texture = texture,
+                Texture = yellowTexture,
                 Stretch = TextureRect.StretchMode.KeepAspectCentered,
                 SetSize = new Vector2(24, 24),
                 VerticalAlignment = VAlignment.Center,
+                ModulateSelfOverride = Color.White,
             };
 
             var textCol = new BoxContainer
@@ -250,16 +261,21 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 
             OnMouseEntered += _ =>
             {
-                _icon.Texture = _whiteTexture;
-                _icon.ModulateSelfOverride = Color.White;
+                _hovered = true;
+                UpdateIcon();
             };
             OnMouseExited += _ =>
             {
-                _icon.Texture = _texture;
-                _icon.ModulateSelfOverride = _active ? AmberBlack : AmberBright;
+                _hovered = false;
+                UpdateIcon();
             };
 
             SetActive(false);
+        }
+
+        private void UpdateIcon()
+        {
+            _icon.Texture = _hovered ? _whiteTexture : _active ? _blackTexture : _yellowTexture;
         }
 
         public void SetActive(bool active)
@@ -272,11 +288,7 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             var fontColor = active ? AmberBlack : AmberBright;
             _line1.FontColorOverride = fontColor;
             _line2.FontColorOverride = fontColor;
-            _icon.ModulateSelfOverride = fontColor;
-
-            Logger.DebugS("research-computer",
-                $"TabButtonControl.SetActive: line1={_line1.Text} active={active} " +
-                $"BackgroundColor={box.BackgroundColor} Modulate={Modulate} Disabled={Disabled}");
+            UpdateIcon();
         }
     }
 
@@ -286,12 +298,7 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             return;
 
         if (!TryGetResearch(out var research))
-        {
-            Logger.DebugS("research-computer", "Refresh: no RMCChemistryResearchComponent found on client");
             return;
-        }
-
-        Logger.DebugS("research-computer", $"Refresh: found research singleton, Contracts.Count={research.Contracts.Count}");
 
         var credits = research.Credits;
         var clearance = research.ClearanceLevel;
@@ -324,9 +331,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         var duration = research.PickedThisCycle ? TimeSpan.FromMinutes(6) : TimeSpan.FromMinutes(3);
         _window.CycleStart = research.NextReroll - duration;
         _window.CycleEnd = research.NextReroll;
-
-        LogButtonStyle("BrokerClearanceButton", _window.BrokerClearanceButton);
-        LogButtonStyle("ReprintContractButton", _window.ReprintContractButton);
 
         PopulateContracts(research);
         PopulateDocuments(_window.DocumentsBox, _window.DocumentsEmptyLabel, research, research.Documents, isPublishedTab: false);
@@ -402,7 +406,12 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             }
             else
             {
-                card = new ContractCard(_resourceCache.GetTexture(PrintIcon), _boldFont, _smallFont);
+                card = new ContractCard(
+                    _resourceCache.GetTexture(PrintIcon),
+                    _resourceCache.GetTexture(PrintIconWhite),
+                    _resourceCache.GetTexture(PrintIconYellow),
+                    _boldFont,
+                    _smallFont);
                 box.AddChild(card);
             }
 
@@ -424,11 +433,10 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             card.PropertyHintLabel.Text = $"Early testing shows property of {propertyName}";
             card.TakeButton.Disabled = slot.Taken || research.PickedThisCycle;
             SetPurchasableStyle(card.TakeButton, !card.TakeButton.Disabled);
+            card.SetEnabledVisual(!card.TakeButton.Disabled);
             card.TakeButtonLabel.Text = slot.Taken ? "Contract Taken" : "Take Contract";
             card.SlotIndex = i;
             card.OnTake = index => SendPredictedMessage(new RMCResearchComputerTakeContractBuiMsg(index));
-
-            LogButtonStyle($"ContractCard[{i}].TakeButton", card.TakeButton);
         }
 
         box.RemoveChildrenAfter(research.Contracts.Count);
@@ -443,11 +451,20 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         public readonly Button TakeButton;
         public readonly Label TakeButtonLabel;
 
+        private readonly TextureRect _takeIcon;
+        private readonly Texture _blackIcon;
+        private readonly Texture _whiteIcon;
+        private readonly Texture _yellowIcon;
+        private bool _enabled = true;
+
         public int SlotIndex;
         public Action<int>? OnTake;
 
-        public ContractCard(Texture printIcon, Font boldFont, Font smallFont)
+        public ContractCard(Texture printIcon, Texture printIconWhite, Texture printIconYellow, Font boldFont, Font smallFont)
         {
+            _blackIcon = printIcon;
+            _whiteIcon = printIconWhite;
+            _yellowIcon = printIconYellow;
             Orientation = LayoutOrientation.Vertical;
             HorizontalExpand = true;
 
@@ -492,21 +509,23 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
                 SeparationOverride = 8,
                 Margin = new Thickness(10, 4),
             };
-            var takeIcon = new TextureRect
+            _takeIcon = new TextureRect
             {
                 Texture = printIcon,
                 Stretch = TextureRect.StretchMode.KeepAspectCentered,
                 SetSize = new Vector2(28, 28),
                 VerticalAlignment = VAlignment.Center,
-                ModulateSelfOverride = AmberBlack,
+                ModulateSelfOverride = Color.White,
             };
             TakeButtonLabel = new Label { FontColorOverride = AmberBlack, FontOverride = boldFont, VerticalAlignment = VAlignment.Center };
-            takeRow.AddChild(takeIcon);
+            takeRow.AddChild(_takeIcon);
             takeRow.AddChild(TakeButtonLabel);
             TakeButton.AddChild(takeRow);
 
-            TakeButton.OnMouseEntered += _ => takeIcon.ModulateSelfOverride = Color.White;
-            TakeButton.OnMouseExited += _ => takeIcon.ModulateSelfOverride = AmberBlack;
+            // Swap to the white texture on hover (modulating a black icon can't lighten it); restore the
+            // enabled (black on amber) or disabled (yellow on transparent) texture on exit.
+            TakeButton.OnMouseEntered += _ => _takeIcon.Texture = _whiteIcon;
+            TakeButton.OnMouseExited += _ => _takeIcon.Texture = _enabled ? _blackIcon : _yellowIcon;
 
             inner.AddChild(NameLabel);
             inner.AddChild(divider);
@@ -519,6 +538,15 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             AddChild(panel);
 
             TakeButton.OnPressed += _ => OnTake?.Invoke(SlotIndex);
+        }
+
+        // Enabled: black icon + black label on the amber fill. Disabled/taken: yellow icon + amber label
+        // on the transparent fill (SetPurchasableStyle clears the background), so it stays readable.
+        public void SetEnabledVisual(bool enabled)
+        {
+            _enabled = enabled;
+            _takeIcon.Texture = enabled ? _blackIcon : _yellowIcon;
+            TakeButtonLabel.FontColorOverride = enabled ? AmberBlack : AmberBright;
         }
     }
 
@@ -559,7 +587,10 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             }
             else
             {
-                row = new DocumentRow(_resourceCache.GetTexture(BookIcon), _resourceCache.GetTexture(PrintIcon), _resourceCache.GetTexture(AnnounceIcon));
+                row = new DocumentRow(
+                    _resourceCache.GetTexture(BookIcon), _resourceCache.GetTexture(BookIconWhite),
+                    _resourceCache.GetTexture(PrintIcon), _resourceCache.GetTexture(PrintIconWhite),
+                    _resourceCache.GetTexture(AnnounceIcon), _resourceCache.GetTexture(AnnounceIconWhite));
                 box.AddChild(row);
             }
 
@@ -612,7 +643,10 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
         public Action<string, string, bool>? OnPublishToggle;
         public Action<string, string>? OnAnnounce;
 
-        public DocumentRow(Texture bookIcon, Texture printIcon, Texture announceIcon)
+        public DocumentRow(
+            Texture bookIcon, Texture bookIconWhite,
+            Texture printIcon, Texture printIconWhite,
+            Texture announceIcon, Texture announceIconWhite)
         {
             Orientation = LayoutOrientation.Horizontal;
             HorizontalExpand = true;
@@ -640,9 +674,9 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
                 button.Label.FontColorOverride = AmberBlack;
             }
 
-            IconButton(ReadButton, bookIcon, "Read");
-            IconButton(PrintButton, printIcon, "Print");
-            IconButton(AnnounceButton, announceIcon, "Announce");
+            IconButton(ReadButton, bookIcon, bookIconWhite, "Read");
+            IconButton(PrintButton, printIcon, printIconWhite, "Print");
+            IconButton(AnnounceButton, announceIcon, announceIconWhite, "Announce");
 
             AddChild(ScanTimeLabel);
             AddChild(TypeLabel);
@@ -658,7 +692,7 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             PublishButton.OnPressed += _ => OnPublishToggle?.Invoke(Category, Title, Published);
         }
 
-        private static void IconButton(Button button, Texture texture, string text)
+        private static void IconButton(Button button, Texture texture, Texture whiteTexture, string text)
         {
             button.Text = null;
 
@@ -677,7 +711,7 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
                 Stretch = TextureRect.StretchMode.KeepAspectCentered,
                 SetSize = new Vector2(16, 16),
                 VerticalAlignment = VAlignment.Center,
-                ModulateSelfOverride = AmberBlack,
+                ModulateSelfOverride = Color.White,
             };
 
             var label = new Label { Text = text, FontColorOverride = AmberBlack, VerticalAlignment = VAlignment.Center };
@@ -686,8 +720,9 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             row.AddChild(label);
             button.AddChild(row);
 
-            button.OnMouseEntered += _ => icon.ModulateSelfOverride = Color.White;
-            button.OnMouseExited += _ => icon.ModulateSelfOverride = AmberBlack;
+            // Swap to the white texture on hover; modulating the black base texture can't lighten it.
+            button.OnMouseEntered += _ => icon.Texture = whiteTexture;
+            button.OnMouseExited += _ => icon.Texture = texture;
         }
     }
 

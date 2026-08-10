@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Taken from cmss13 at https://github.com/cmss13-devs/cmss13, icons/obj/items/ceramic_plates.dmi",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "ceramic2_100"
+    },
+    {
+      "name": "ceramic2_50"
+    },
+    {
+      "name": "ceramic2_0"
+    }
+  ]
+}

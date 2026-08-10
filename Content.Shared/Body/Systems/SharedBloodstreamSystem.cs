@@ -432,6 +432,20 @@ public abstract class SharedBloodstreamSystem : EntitySystem
         return true;
     }
 
+    /// RMC
+    public bool TryModifyBloodLevelQuiet(Entity<BloodstreamComponent?> ent, FixedPoint2 amount)
+    {
+        if (!Resolve(ent, ref ent.Comp, logMissing: false)
+            || !SolutionContainer.ResolveSolution(ent.Owner, ent.Comp.BloodSolutionName, ref ent.Comp.BloodSolution))
+            return false;
+
+        if (amount >= 0)
+            return SolutionContainer.TryAddReagent(ent.Comp.BloodSolution.Value, ent.Comp.BloodReagent, amount, null, GetEntityBloodData(ent));
+
+        SolutionContainer.SplitSolution(ent.Comp.BloodSolution.Value, -amount);
+        return true;
+    }
+
     /// <summary>
     /// Tries to make an entity bleed more or less.
     /// </summary>
