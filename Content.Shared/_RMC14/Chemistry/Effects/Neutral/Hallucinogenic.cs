@@ -1,3 +1,5 @@
+using Content.Shared._RMC14.Emote;
+using Content.Shared.Chat.Prototypes;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -7,14 +9,24 @@ using Content.Shared.StatusEffectNew;
 using Content.Shared.StatusEffectNew.Components;
 using Content.Shared.Stunnable;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Hallucinogenic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageTypePrototype> CellularType = "Cellular";
 
-    private static readonly EntProtoId<StatusEffectComponent> SeeingRainbows = "StatusEffectSeeingRainbow";
+    private static readonly EntProtoId<StatusEffectComponent> SeeingRainbows = "RMCStatusEffectSeeingRainbow";
+
+    private static readonly EntProtoId ConfusedStatus = "RMCStatusEffectConfused";
+
+    private static readonly ProtoId<EmotePrototype>[] Emotes =
+    [
+        "RMCTwitch",
+        "RMCDrool",
+        "RMCGiggle",
+    ];
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -31,6 +43,13 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
             var jitter = args.EntityManager.System<SharedJitteringSystem>();
             jitter.DoJitter(args.TargetEntity, TimeSpan.FromSeconds(2), false);
         }
+
+        var random = IoCManager.Resolve<IRobustRandom>();
+        if (random.Prob(0.05f))
+        {
+            var emote = args.EntityManager.System<SharedRMCEmoteSystem>();
+            emote.TryEmoteWithChat(args.TargetEntity, random.Pick(Emotes), hideLog: true, ignoreActionBlocker: true, forceEmote: true);
+        }
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -41,13 +60,13 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
         var jitter = args.EntityManager.System<SharedJitteringSystem>();
         jitter.DoJitter(args.TargetEntity, TimeSpan.FromSeconds(2), false);
 
-        // TODO RMC14: mob effect - stumble in a random direction
+        status.TrySetStatusEffectDuration(args.TargetEntity, ConfusedStatus, TimeSpan.FromSeconds(3));
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        damage.DamageDict[CellularType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
         var stun = args.EntityManager.System<SharedStunSystem>();

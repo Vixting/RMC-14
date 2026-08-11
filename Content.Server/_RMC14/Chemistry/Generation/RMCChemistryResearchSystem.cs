@@ -206,14 +206,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
 
         if (spawnAt != null)
         {
-            var note = Spawn(ContractNotesProto, spawnAt.Value);
-            var sb = new StringBuilder();
-            RMCChemPaperFormat.AppendHeader(sb, "Official Weston-Yamada Document", "Clearance Notice");
-            sb.AppendLine();
-            sb.AppendLine($"[bold][head=3]Clearance Level {research.Comp.ClearanceLevel} Achieved[/head][/bold]");
-            sb.AppendLine();
-            sb.AppendLine("Congratulations, your research clearance has been elevated. New synthesis and simulation options may now be available. As a token of our appreciation, a complimentary synthesis report has been enclosed.");
-            _paper.SetContent(note, RMCChemPaperFormat.Wrap(sb));
+            _popup.PopupCoordinates($"Clearance access increased to level {research.Comp.ClearanceLevel} for {cost} credits.", spawnAt.Value, PopupType.Medium);
 
             var reagentId = _generator.GenerateReagent(research.Comp.ClearanceLevel);
             if (_rmcReagent.TryIndex(reagentId, out var reagent))
@@ -354,7 +347,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         research.Comp.NextReroll = _timing.CurTime + ContractRerollPicked;
 
         var notes = Spawn(ContractNotesProto, spawnAt);
-        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, stats.Properties, slot.Tier, research.Comp.ClearanceLevel));
+        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, stats.Properties));
         _audio.PlayPvs("/Audio/_RMC14/Machines/fax.ogg", notes);
         research.Comp.LastPickedContractReagent = reagentId.Id;
 
@@ -376,10 +369,9 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         }
 
         var properties = _generator.GetProperties(reagent);
-        var tier = _generator.TryGetGeneratedTier(reagentId, out var t) ? t : 1;
 
         var notes = Spawn(ContractNotesProto, spawnAt);
-        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, properties, tier, research.Comp.ClearanceLevel));
+        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, properties));
         _audio.PlayPvs("/Audio/_RMC14/Machines/fax.ogg", notes);
 
         return true;
@@ -391,9 +383,7 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
     private string FormatContractNotes(
         ProtoId<ReagentPrototype> reagentId,
         List<(string Id, int Amount, bool Catalyst)> ingredients,
-        List<(ChemGeneratorPropertyPrototype Property, int Level)> properties,
-        int tier,
-        int clearanceLevel)
+        List<(ChemGeneratorPropertyPrototype Property, int Level)> properties)
     {
         var name = GetReagentName(reagentId);
         var experimentId = $"{_random.Pick(ExperimentPrefixes)}{_random.Next(100, 1000)}{_random.Pick(ExperimentSuffixes)}";
@@ -403,16 +393,6 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         sb.AppendLine();
         sb.AppendLine($"[bold][head=3][color=#4A90E2]Contract for {name}[/color][/head][/bold]");
         sb.AppendLine();
-
-        if (clearanceLevel < tier)
-        {
-            sb.AppendLine($"[bold]CLASSIFIED: Clearance Level {tier} Required[/bold]");
-            sb.AppendLine();
-            sb.AppendLine("Formula and composition data withheld pending clearance elevation.");
-            sb.AppendLine();
-            RMCChemPaperFormat.AppendFooter(sb, "Weston-Yamada");
-            return RMCChemPaperFormat.Wrap(sb);
-        }
 
         sb.AppendLine($"During experiment {experimentId} the theorized compound identified as {name} was successfully synthesized using the following formula:");
         sb.AppendLine();

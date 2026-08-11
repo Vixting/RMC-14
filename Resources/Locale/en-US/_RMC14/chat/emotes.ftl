@@ -41,3 +41,11 @@ rmc-hands-emotes-get-closer = Get closer.
 rmc-patting-success-generic = You pat {$target} on the back.
 rmc-patting-success-generic-others = {$user} pats {$target} on the back.
 rmc-patting-success-generic-target = {$user} pats you on the back.
+
+# Hallucinogenic
+chat-emote-name-rmctwitch = Twitch
+chat-emote-name-rmcdrool = Drool
+chat-emote-name-rmcgiggle = Giggle
+chat-emote-msg-rmctwitch = twitches.
+chat-emote-msg-rmcdrool = drools.
+chat-emote-msg-rmcgiggle = giggles.

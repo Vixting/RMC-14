@@ -8,6 +8,20 @@
   components:
   - type: RMCDazed
 
+- type: entity
+  parent: MobStatusEffectBase
+  id: RMCStatusEffectSeeingRainbow
+  name: hallucinations
+  components:
+  - type: RMCSeeingRainbowsStatusEffect
+
+- type: entity
+  parent: MobStatusEffectBase
+  id: RMCStatusEffectConfused
+  name: confused
+  components:
+  - type: RMCConfusedStatusEffect
+
 - type: statusEffect
   id: Blinded
 

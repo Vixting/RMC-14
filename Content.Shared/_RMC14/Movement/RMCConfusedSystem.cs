@@ -13,7 +13,7 @@ public sealed class RMCConfusedSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly SharedStatusEffectsSystem _status = default!;
 
-    private static readonly EntProtoId ConfusedStatus = "StatusEffectConfused";
+    private static readonly EntProtoId ConfusedStatus = "RMCStatusEffectConfused";
 
     private const uint RerollTicks = 30;
 

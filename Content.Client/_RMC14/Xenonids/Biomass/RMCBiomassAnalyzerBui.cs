@@ -20,7 +20,6 @@ public sealed class RMCBiomassAnalyzerBui : BoundUserInterface, IRefreshableBui
 {
     private const string IconDir = "/Textures/_RMC14/Interface/Icons/";
 
-    // Base (dark), -white (hover), and -yellow (on dark backgrounds) variants, grouped per icon.
     private const string CancelIcon = IconDir + "dark/square-minus.svg.192dpi.png";
     private const string CancelIconWhite = IconDir + "white/square-minus.svg.192dpi.png";
     private const string CancelIconYellow = IconDir + "yellow/square-minus.svg.192dpi.png";

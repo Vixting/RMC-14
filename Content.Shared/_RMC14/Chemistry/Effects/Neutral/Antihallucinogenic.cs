@@ -16,7 +16,7 @@ public sealed partial class Antihallucinogenic : RMCChemicalEffect
     private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
 
-    private static readonly EntProtoId<StatusEffectComponent> SeeingRainbows = "StatusEffectSeeingRainbow";
+    private static readonly EntProtoId<StatusEffectComponent> SeeingRainbows = "RMCStatusEffectSeeingRainbow";
 
     private static readonly ProtoId<ReagentPrototype> MindbreakerToxin = "RMCMindbreakerToxin";
     private static readonly ProtoId<ReagentPrototype> SpaceDrugs = "RMCSpaceDrugs";

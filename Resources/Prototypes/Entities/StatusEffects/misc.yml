@@ -50,11 +50,3 @@
   name: hallucinations
   components:
   - type: SeeingRainbowsStatusEffect
-
-# Redirects movement input to a random direction while active.
-- type: entity
-  parent: MobStatusEffectBase
-  id: StatusEffectConfused
-  name: confused
-  components:
-  - type: RMCConfusedStatusEffect

@@ -17,7 +17,6 @@ public sealed class MutationSystem : EntitySystem
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
-    // cmss13's bioluminescence palette (seed_datums.dm).
     private static readonly Color[] BioluminescentColors =
     [
         Color.FromHex("#FF0000"), Color.FromHex("#FF7F00"), Color.FromHex("#FFFF00"),
@@ -361,7 +360,7 @@ public sealed class MutationSystem : EntitySystem
         // Go through gasses from the pollen in swab
         foreach (var otherGas in other)
         {
-            // if both have same gas, randomly pick amount from the two.
+            // if both have same gas, randomly pick ammount from the two.
             if (val.ContainsKey(otherGas.Key))
             {
                 val[otherGas.Key] = Random(0.5f) ? otherGas.Value : val[otherGas.Key];

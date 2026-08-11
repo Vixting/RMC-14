@@ -41,7 +41,7 @@ public sealed partial class Nervestimulating : RMCChemicalEffect
         status.TryRemoveStatusEffect(args.TargetEntity, "Jitter");
         status.TryRemoveStatusEffect(args.TargetEntity, "StatusEffectDrowsiness");
         status.TryRemoveStatusEffect(args.TargetEntity, "Dazed");
-        status.TryRemoveStatusEffect(args.TargetEntity, "StatusEffectConfused");
+        status.TryRemoveStatusEffect(args.TargetEntity, "RMCStatusEffectConfused");
 
         args.EntityManager.System<BlindableSystem>().AdjustEyeDamage(args.TargetEntity, -9);
     }

@@ -15,7 +15,7 @@ public sealed partial class Aiding : RMCChemicalEffect
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
     private static readonly ProtoId<DamageTypePrototype> CellularType = "Cellular";
 
-    private static readonly EntProtoId ConfusedStatus = "StatusEffectConfused";
+    private static readonly EntProtoId ConfusedStatus = "RMCStatusEffectConfused";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {

@@ -20,7 +20,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 {
     private const string IconDir = "/Textures/_RMC14/Interface/Icons/";
 
-    // Base (dark), -white (hover), and -yellow (inactive/disabled) variants, grouped per icon.
     private const string AnnounceIcon = IconDir + "dark/radiation.svg.192dpi.png";
     private const string AnnounceIconWhite = IconDir + "white/radiation.svg.192dpi.png";
 
@@ -200,9 +199,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
 
     private sealed class TabButtonControl : Button
     {
-        // Black texture reads on the active (amber-filled) tab; the yellow variant reads on the inactive
-        // (transparent) tab; white on hover. Swapping textures instead of modulating a black icon is the
-        // only way to actually lighten it - Modulate multiplies, so black stays black.
         private readonly Texture _blackTexture;
         private readonly Texture _whiteTexture;
         private readonly Texture _yellowTexture;
@@ -523,8 +519,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             takeRow.AddChild(TakeButtonLabel);
             TakeButton.AddChild(takeRow);
 
-            // Swap to the white texture on hover (modulating a black icon can't lighten it); restore the
-            // enabled (black on amber) or disabled (yellow on transparent) texture on exit.
             TakeButton.OnMouseEntered += _ => _takeIcon.Texture = _whiteIcon;
             TakeButton.OnMouseExited += _ => _takeIcon.Texture = _enabled ? _blackIcon : _yellowIcon;
 
@@ -541,8 +535,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             TakeButton.OnPressed += _ => OnTake?.Invoke(SlotIndex);
         }
 
-        // Enabled: black icon + black label on the amber fill. Disabled/taken: yellow icon + amber label
-        // on the transparent fill (SetPurchasableStyle clears the background), so it stays readable.
         public void SetEnabledVisual(bool enabled)
         {
             _enabled = enabled;
@@ -721,7 +713,6 @@ public sealed class RMCResearchComputerBui : BoundUserInterface, IRefreshableBui
             row.AddChild(label);
             button.AddChild(row);
 
-            // Swap to the white texture on hover; modulating the black base texture can't lighten it.
             button.OnMouseEntered += _ => icon.Texture = whiteTexture;
             button.OnMouseExited += _ => icon.Texture = texture;
         }

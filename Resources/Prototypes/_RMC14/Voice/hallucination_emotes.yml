@@ -1,0 +1,15 @@
+- type: emote
+  id: RMCGiggle
+  name: chat-emote-name-rmcgiggle
+  category: Vocal
+  chatMessages: ["chat-emote-msg-rmcgiggle"]
+
+- type: emote
+  id: RMCTwitch
+  name: chat-emote-name-rmctwitch
+  chatMessages: ["chat-emote-msg-rmctwitch"]
+
+- type: emote
+  id: RMCDrool
+  name: chat-emote-name-rmcdrool
+  chatMessages: ["chat-emote-msg-rmcdrool"]

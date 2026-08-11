@@ -16,6 +16,7 @@ using Content.Shared.Chat;
 using Content.Shared.Coordinates;
 using Content.Shared.Damage;
 using Content.Shared.Drugs;
+using Content.Shared._RMC14.Drugs;
 using Content.Shared.Drunk;
 using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Jittering;
@@ -426,7 +427,7 @@ public abstract class SharedNeurotoxinSystem : EntitySystem
                 var ev = new NeurotoxinEmoteEvent() { Emote = neurotoxin.GiggleId };
                 RaiseLocalEvent(victim, ev);
                 //TODO RMC14 hallucination status - more in depth than neuro
-                _statusEffects.TryAddStatusEffect<SeeingRainbowsStatusEffectComponent>(victim, "StatusEffectSeeingRainbow", neurotoxin.RainbowDuration, true);
+                _statusEffects.TryAddStatusEffect<RMCSeeingRainbowsStatusEffectComponent>(victim, "RMCStatusEffectSeeingRainbow", neurotoxin.RainbowDuration, true);
                 break;
             case NeuroHallucinations.Mortar:
                 position = HallucinationSoundOffset(victim, 7);
