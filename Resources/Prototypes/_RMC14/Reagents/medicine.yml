@@ -480,12 +480,8 @@
         probability: 0.05
       - !type:Psychostimulating
         potency: 6
-      - !type:ModifyStatusEffect
-        effectProto: StatusEffectSeeingRainbow
-        type: Add
-        time: 1.5 #TODO max 30
-        refresh: false
-      - !type:Jitter
+      - !type:Hallucinogenic
+        potency: 6
       - !type:Emote
         emote: Laugh #TODO twitches, drools, moans.
         showInChat: true

@@ -653,9 +653,9 @@
 - type: vendingMachineInventory
   id: CMVendorNutri
   startingInventory:
-    ChemistryBottleEZNutrient: 35
-    ChemistryBottleLeft4Zed: 25
-    ChemistryBottleRobustHarvest: 15
+    RMCChemistryBottleEZNutrient: 35
+    RMCChemistryBottleLeft4Zed: 25
+    RMCChemistryBottleRobustHarvest: 15
     WeedSpray: 20
     PestSpray: 20
     PlantBGoneSpray: 5

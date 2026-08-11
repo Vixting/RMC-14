@@ -5,6 +5,7 @@ using Content.Shared._RMC14.Barricade;
 using Content.Shared._RMC14.CCVar;
 using Content.Shared._RMC14.Tackle;
 using Content.Shared._RMC14.Weapons.Melee;
+using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions.Events;
@@ -78,6 +79,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     [Dependency] private readonly SharedXenoHiveSystem _hive = default!;
     [Dependency] private readonly SharedRMCMeleeWeaponSystem _rmcMelee = default!;
     [Dependency] private readonly SharedEntityStorageSystem _storage = default!;
+    [Dependency] private readonly XenoSystem _xeno = default!;
     // RMC14 end
 
     private const int AttackMask = (int) (CollisionGroup.MobMask | CollisionGroup.Opaque);
@@ -623,6 +625,11 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         RaiseLocalEvent(target.Value, attackedEvent);
 
         var modifiedDamage = DamageSpecifier.ApplyModifierSets(damage + hitEvent.BonusDamage + attackedEvent.BonusDamage, hitEvent.ModifiersList);
+
+        // RMC
+        if (meleeUid == user && HasComp<XenoComponent>(user))
+            modifiedDamage = _xeno.TryApplyXenoSlashDamageMultiplier(target.Value, modifiedDamage);
+
         var damageResult = Damageable.TryChangeDamage(target, modifiedDamage, origin:user, ignoreResistances:resistanceBypass, tool: meleeUid);
 
         if (damageResult is {Empty: false})
@@ -779,6 +786,10 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
             RaiseLocalEvent(entity, attackedEvent);
             var modifiedDamage = DamageSpecifier.ApplyModifierSets(damage + hitEvent.BonusDamage + attackedEvent.BonusDamage, hitEvent.ModifiersList);
 
+            // RMC
+            if (meleeUid == user && HasComp<XenoComponent>(user))
+                modifiedDamage = _xeno.TryApplyXenoSlashDamageMultiplier(entity, modifiedDamage);
+
             var damageResult = Damageable.TryChangeDamage(entity, modifiedDamage, origin:user, tool: meleeUid);
 
             if (damageResult != null && damageResult.GetTotal() > FixedPoint2.Zero)
@@ -849,7 +860,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
                 // RMC14 start
                 // Ignore dead mobs, mobs from the same hive, and open entity containers (lockers, crates, etc).
                 var filteredResults = res.Where(x => !MobState.IsDead(x.HitEntity))
-                    .Where(x => !(_mobStateQuery.HasComp(x.HitEntity) && _hive.FromSameHive(ignore, x.HitEntity)))
+                    .Where(x => !(_mobStateQuery.HasComp(x.HitEntity) && _hive.FromSameHiveOrAlly(ignore, x.HitEntity)))
                     .Where(x => !_storage.IsOpen(x.HitEntity));
 
                 if (filteredResults.Count() <= 0)

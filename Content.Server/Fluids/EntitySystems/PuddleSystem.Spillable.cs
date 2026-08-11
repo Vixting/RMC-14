@@ -46,45 +46,33 @@ public sealed partial class PuddleSystem
         if (args.Handled)
             return;
 
-        // When attacking someone reactive with a spillable entity,
-        // splash a little on them (touch react)
-        // If this also has solution transfer, then assume the transfer amount is how much we want to spill.
-        // Otherwise let's say they want to spill a quarter of its max volume.
-
-        if (!_solutionContainerSystem.TryGetDrainableSolution(entity.Owner, out var soln, out var solution))
-            return;
-
-        var hitCount = args.HitEntities.Count;
-
-        var totalSplit = FixedPoint2.Min(solution.MaxVolume * 0.25, solution.Volume);
-        if (TryComp<SolutionTransferComponent>(entity, out var transfer))
+        if (!_solutionContainerSystem.TryGetDrainableSolution(entity.Owner, out var soln, out var solution) ||
+            solution.Volume <= FixedPoint2.Zero)
         {
-            totalSplit = FixedPoint2.Min(transfer.TransferAmount, solution.Volume);
+            return;
         }
 
-        // a little lame, but reagent quantity is not very balanced and we don't want people
-        // spilling like 100u of reagent on someone at once!
-        totalSplit = FixedPoint2.Min(totalSplit, entity.Comp.MaxMeleeSpillAmount);
+        if (args.HitEntities.Count == 0)
+        {
+            args.Handled = entity.Comp.PreventMelee;
 
-        if (totalSplit == 0)
+            var splashedOnGround = _solutionContainerSystem.SplitSolution(soln.Value, solution.Volume);
+            TrySplashSpillAt(entity.Owner, Transform(args.User).Coordinates, splashedOnGround, out _);
             return;
+        }
 
         // Optionally allow further melee handling occur
         args.Handled = entity.Comp.PreventMelee;
 
-        // First update the hit count so anything that is not reactive wont count towards the total!
-        foreach (var hit in args.HitEntities)
-        {
-            if (!HasComp<ReactiveComponent>(hit))
-                hitCount -= 1;
-        }
+        var hitCount = args.HitEntities.Count;
+        var totalSplit = solution.Volume;
 
         foreach (var hit in args.HitEntities)
         {
+            var splitSolution = _solutionContainerSystem.SplitSolution(soln.Value, totalSplit / hitCount);
+
             if (!HasComp<ReactiveComponent>(hit))
                 continue;
-
-            var splitSolution = _solutionContainerSystem.SplitSolution(soln.Value, totalSplit / hitCount);
 
             _adminLogger.Add(LogType.MeleeHit, $"{ToPrettyString(args.User)} splashed {SharedSolutionContainerSystem.ToPrettyString(splitSolution):solution} from {ToPrettyString(entity.Owner):entity} onto {ToPrettyString(hit):target}");
             _reactive.DoEntityReaction(hit, splitSolution, ReactionMethod.Touch);

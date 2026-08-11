@@ -68,6 +68,7 @@ public sealed partial class DamageOnCollideComponent : Component
     public TimeSpan Paralyze;
 
     [DataField]
+    [Access(typeof(SharedOnCollideSystem), typeof(SharedRMCFlammableSystem))]
     public bool IgnoreResistances;
 
     [DataField]

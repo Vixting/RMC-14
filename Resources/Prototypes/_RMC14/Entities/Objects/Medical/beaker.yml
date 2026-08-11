@@ -7,21 +7,6 @@
     blacklist:
       components:
       - Xeno
-  - type: Destructible
-    thresholds:
-    - trigger:
-        !type:DamageTrigger
-        damage: 100
-      behaviors:
-      - !type:PlaySoundBehavior
-        sound:
-          collection: GlassBreak
-          params:
-            volume: -4
-      - !type:SpillBehavior
-        solution: beaker
-      - !type:DoActsBehavior
-        acts: [ "Destruction" ]
   - type: DamageOnLand
     damage: {}
   - type: DamageOtherOnHit
@@ -30,6 +15,8 @@
     minimumSpeed: 2
     damage: {}
   - type: RMCSmartFridgeInsertable
+  - type: Spillable
+    spillWhenThrown: false
 
 - type: entity
   parent: BaseBeakerMetallic
@@ -40,21 +27,8 @@
     blacklist:
       components:
       - Xeno
-  - type: Destructible
-    thresholds:
-    - trigger:
-        !type:DamageTrigger
-        damage: 5
-      behaviors:
-      - !type:PlaySoundBehavior
-        sound:
-          collection: GlassBreak
-          params:
-            volume: -4
-      - !type:SpillBehavior
-        solution: beaker
-      - !type:DoActsBehavior
-        acts: [ "Destruction" ]
+  - type: Spillable
+    spillWhenThrown: false
 
 - type: entity
   parent: CMBeakerBase

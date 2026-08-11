@@ -1,0 +1,44 @@
+- type: entity
+  id: RMCChemistryBottleEZNutrient
+  suffix: ez nutrient
+  parent: BaseChemistryBottleFilled
+  components:
+  - type: Label
+    currentLabel: reagent-name-e-z-nutrient
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 30
+        reagents:
+        - ReagentId: RMCEZNutrient
+          Quantity: 30
+
+- type: entity
+  id: RMCChemistryBottleLeft4Zed
+  suffix: left-4-zed
+  parent: BaseChemistryBottleFilled
+  components:
+  - type: Label
+    currentLabel: reagent-name-left4-zed
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 30
+        reagents:
+        - ReagentId: RMCLeft4Zed
+          Quantity: 30
+
+- type: entity
+  id: RMCChemistryBottleRobustHarvest
+  suffix: robust harvest
+  parent: BaseChemistryBottleFilled
+  components:
+  - type: Label
+    currentLabel: reagent-name-robust-harvest
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 30
+        reagents:
+        - ReagentId: RMCRobustHarvest
+          Quantity: 30

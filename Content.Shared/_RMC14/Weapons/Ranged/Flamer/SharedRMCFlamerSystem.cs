@@ -2,6 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 using Content.Shared._RMC14.Atmos;
 using Content.Shared._RMC14.Vehicle;
 using Content.Shared._RMC14.Attachable.Components;
+using Content.Shared._RMC14.Chemistry.Effects.Neutral;
+using Content.Shared._RMC14.Chemistry.Effects.Positive;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared._RMC14.Fluids;
 using Content.Shared._RMC14.Line;
@@ -10,6 +12,7 @@ using Content.Shared._RMC14.OnCollide;
 using Content.Shared._RMC14.Weapons.Common;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared.Actions;
+using Content.Shared.Body.Prototypes;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
@@ -30,6 +33,9 @@ using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+using SpecialDuration = Content.Shared._RMC14.Chemistry.Effects.Special.Duration;
+using SpecialIntensity = Content.Shared._RMC14.Chemistry.Effects.Special.Intensity;
+using SpecialRadius = Content.Shared._RMC14.Chemistry.Effects.Special.Radius;
 
 namespace Content.Shared._RMC14.Weapons.Ranged.Flamer;
 
@@ -55,6 +61,8 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
     [Dependency] private readonly RMCReagentSystem _reagent = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
 
+    private static readonly ProtoId<MetabolismGroupPrototype> FirePropertyGroup = "Poison";
+
     public override void Initialize()
     {
         SubscribeLocalEvent<RMCFlamerAmmoProviderComponent, MapInitEvent>(OnMapInit, after: [typeof(SharedSolutionContainerSystem)]);
@@ -63,9 +71,11 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         SubscribeLocalEvent<RMCFlamerAmmoProviderComponent, EntInsertedIntoContainerMessage>(OnInsertedIntoContainer);
         SubscribeLocalEvent<RMCFlamerAmmoProviderComponent, EntRemovedFromContainerMessage>(OnRemovedFromContainer);
         SubscribeLocalEvent<RMCFlamerAmmoProviderComponent, AttemptShootEvent>(OnAttemptShoot);
+        SubscribeLocalEvent<RMCFlamerAmmoProviderComponent, ExaminedEvent>(OnFlamerExamine, before: [typeof(SharedGunSystem)]);
 
         SubscribeLocalEvent<RMCFlamerTankComponent, BeforeRangedInteractEvent>(OnFlamerTankBeforeRangedInteract);
         SubscribeLocalEvent<RMCFlamerTankComponent, GetVerbsEvent<ExamineVerb>>(OnFlamerTankVerbExamine);
+        SubscribeLocalEvent<RMCFlamerTankComponent, GetVerbsEvent<AlternativeVerb>>(OnFlamerTankGetAltVerbs);
 
         SubscribeLocalEvent<RMCSprayAmmoProviderComponent, TakeAmmoEvent>(OnSprayTakeAmmo);
         SubscribeLocalEvent<RMCSprayAmmoProviderComponent, GetAmmoCountEvent>(OnSprayGetAmmoCount);
@@ -193,6 +203,30 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         Transfer(target, targetSolutionEnt, tank, tankSolutionEnt.Value, args.User);
     }
 
+    private void OnFlamerTankGetAltVerbs(Entity<RMCFlamerTankComponent> tank, ref GetVerbsEvent<AlternativeVerb> args)
+    {
+        if (!tank.Comp.AdjustablePressure || !args.CanInteract || !args.CanAccess || HasComp<XenoComponent>(args.User))
+            return;
+
+        var user = args.User;
+        args.Verbs.Add(new AlternativeVerb
+        {
+            Text = Loc.GetString("rmc-flamer-tank-pressure-verb"),
+            Act = () => CycleFuelPressure(tank, user),
+        });
+    }
+
+    private void CycleFuelPressure(Entity<RMCFlamerTankComponent> tank, EntityUid user)
+    {
+        var next = tank.Comp.FuelPressure + 1;
+        if (next > tank.Comp.MaxPressure)
+            next = 1;
+
+        tank.Comp.FuelPressure = next;
+        Dirty(tank);
+        _popup.PopupClient(Loc.GetString("rmc-flamer-tank-pressure-set", ("pressure", next)), tank, user);
+    }
+
     private void OnFlamerTankVerbExamine(Entity<RMCFlamerTankComponent> tank, ref GetVerbsEvent<ExamineVerb> args)
     {
         var user = args.User;
@@ -208,6 +242,12 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
 
             if (i + 1 != values.Count)
                 msg.PushNewline();
+        }
+
+        if (tank.Comp.AdjustablePressure)
+        {
+            msg.PushNewline();
+            msg.AddMarkupPermissive(Loc.GetString("rmc-flamer-tank-examine-pressure", ("value", tank.Comp.FuelPressure)));
         }
 
         _examine.AddDetailedExamineVerb(args,
@@ -281,6 +321,14 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         args.PushMarkup(Loc.GetString(ent.Comp.ExamineText), 1);
     }
 
+    private void OnFlamerExamine(Entity<RMCFlamerAmmoProviderComponent> ent, ref ExaminedEvent args)
+    {
+        if (!TryGetTankSolution(ent, out _, out var tank) || !tank.Value.Comp.AdjustablePressure)
+            return;
+
+        args.PushMarkup(Loc.GetString("rmc-flamer-loaded-pressure", ("value", tank.Value.Comp.FuelPressure)));
+    }
+
     private void UpdateAppearance(Entity<RMCFlamerAmmoProviderComponent> ent)
     {
         if (!TryComp(ent, out AppearanceComponent? appearance))
@@ -304,6 +352,15 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         _appearance.SetData(ent, RMCFlamerVisualLayers.Strip, tank, appearance);
     }
 
+    /// <summary>
+    /// Fuel consumed per tile fired. cmss13's custom tanks expose an adjustable <c>fuel_pressure</c>
+    /// regulator; other tanks derive it from the flamer's own cost-per-tile.
+    /// </summary>
+    private FixedPoint2 GetCostPer(Entity<RMCFlamerAmmoProviderComponent> flamer, Entity<RMCFlamerTankComponent> tank)
+    {
+        return tank.Comp.AdjustablePressure ? FixedPoint2.New(tank.Comp.FuelPressure) : flamer.Comp.CostPer;
+    }
+
     public void ShootFlamer(Entity<RMCFlamerAmmoProviderComponent> flamer,
         Entity<GunComponent> gun,
         EntityUid? user,
@@ -322,7 +379,8 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         if (reagent.FireSpread && cost > 2)
             cost = (int)Math.Ceiling(cost / 3.0f);
 
-        solution.Value.Comp.Solution.RemoveSolution(flamer.Comp.CostPer * cost);
+        var costPer = GetCostPer(flamer, tank.Value);
+        solution.Value.Comp.Solution.RemoveSolution(costPer * cost);
         _solution.UpdateChemicals(solution.Value);
 
         if (_net.IsClient)
@@ -335,7 +393,8 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         chainComp.Reagent = reagent.ID;
         chainComp.MaxIntensity = tank.Value.Comp.MaxIntensity;
         chainComp.MaxDuration = tank.Value.Comp.MaxDuration;
-        chainComp.FuelPressure = (int)flamer.Comp.CostPer;
+        chainComp.FuelPressure = (int)costPer;
+        chainComp.FirePenetrating = GetFireStats(reagent).FirePenetrating;
 
         Dirty(chain, chainComp);
     }
@@ -359,6 +418,103 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         return true;
     }
 
+    public RMCFireStats GetFireStats(ReagentPrototype reagent)
+    {
+        float intensity = reagent.Intensity;
+        float duration = reagent.Duration;
+        float radius = reagent.Radius;
+        FixedPoint2 intensityMod = reagent.IntensityMod;
+        FixedPoint2 durationMod = reagent.DurationMod;
+        FixedPoint2 radiusMod = reagent.RadiusMod;
+        var firePenetrating = reagent.FirePenetrating;
+
+        var hasFireProperty = false;
+
+        if (reagent.Metabolisms != null && reagent.Metabolisms.TryGetValue(FirePropertyGroup, out var entry))
+        {
+            foreach (var effect in entry.Effects)
+            {
+                switch (effect)
+                {
+                    case SpecialRadius radiusEffect:
+                        radius += radiusEffect.RadiusDelta;
+                        radiusMod += radiusEffect.RadiusModDelta;
+                        break;
+                    case SpecialIntensity intensityEffect:
+                        intensity += intensityEffect.IntensityDelta;
+                        intensityMod += intensityEffect.IntensityModDelta;
+                        break;
+                    case SpecialDuration durationEffect:
+                        duration += durationEffect.DurationDelta;
+                        durationMod += durationEffect.DurationModDelta;
+                        break;
+                    case Fueling fueling:
+                        intensity += fueling.IntensityDelta;
+                        duration += fueling.DurationDelta;
+                        intensityMod += fueling.IntensityModDelta;
+                        durationMod += fueling.DurationModDelta;
+                        radiusMod += fueling.RadiusModDelta;
+                        hasFireProperty = true;
+                        break;
+                    case Oxidizing oxidizing:
+                        intensity += oxidizing.IntensityDelta;
+                        duration += oxidizing.DurationDelta;
+                        intensityMod += oxidizing.IntensityModDelta;
+                        durationMod += oxidizing.DurationModDelta;
+                        radiusMod += oxidizing.RadiusModDelta;
+                        hasFireProperty = true;
+                        break;
+                    case Flowing flowing:
+                        radius += flowing.RadiusDelta;
+                        intensityMod += flowing.IntensityModDelta;
+                        durationMod += flowing.DurationModDelta;
+                        radiusMod += flowing.RadiusModDelta;
+                        hasFireProperty = true;
+                        break;
+                    case Viscous viscous:
+                        radiusMod += viscous.RadiusModDelta;
+                        break;
+                    case FirePenetrating:
+                        firePenetrating = true;
+                        break;
+                }
+            }
+        }
+
+        if (hasFireProperty)
+        {
+            intensity = MathF.Max(intensity, 1f);
+            duration = MathF.Max(duration, 1f);
+            radius = MathF.Max(radius, 1f);
+        }
+
+        return new RMCFireStats((int) intensity, (int) duration, (int) radius, intensityMod, durationMod, radiusMod, firePenetrating);
+    }
+
+    private const int FirePenetrationThreshold = 10;
+
+    public RMCAggregateFireStats GetAggregateFireStats(Solution solution)
+    {
+        FixedPoint2 intensity = 0;
+        FixedPoint2 duration = 0;
+        FixedPoint2 radius = 0;
+        var firePenetrating = false;
+
+        foreach (var quantity in solution.Contents)
+        {
+            if (!_reagent.TryIndex(quantity.Reagent.Prototype, out var reagent))
+                continue;
+
+            var stats = GetFireStats(reagent);
+            intensity += stats.IntensityMod * quantity.Quantity;
+            duration += stats.DurationMod * quantity.Quantity;
+            radius += stats.RadiusMod * quantity.Quantity;
+            firePenetrating |= stats.FirePenetrating && quantity.Quantity >= FirePenetrationThreshold;
+        }
+
+        return new RMCAggregateFireStats(intensity, duration, radius, firePenetrating);
+    }
+
     private bool CanShootFlamer(
         Entity<RMCFlamerAmmoProviderComponent> flamer,
         EntityCoordinates fromCoordinates,
@@ -374,7 +530,8 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
             return false;
 
         var volume = solution.Value.Comp.Solution.Volume;
-        if (volume < flamer.Comp.CostPer)
+        var costPer = GetCostPer(flamer, tank.Value);
+        if (volume < costPer)
             return false;
 
         if (!fromCoordinates.TryDelta(EntityManager, _transform, toCoordinates, out var delta))
@@ -392,9 +549,10 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
             return false;
 
         reagent = _reagent.Index(firstReagent.Value.Reagent.Prototype);
+        var fireStats = GetFireStats(reagent);
 
-        var maxRange = Math.Min(tank.Value.Comp.MaxRange, reagent.Radius);
-        var range = Math.Min((volume / flamer.Comp.CostPer).Int(), maxRange);
+        var maxRange = fireStats.Radius;
+        var range = Math.Min((volume / costPer).Int(), maxRange);
         if (delta.Length() > maxRange)
             toCoordinates = fromCoordinates.Offset(normalized * range);
 
@@ -512,11 +670,27 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
                 _popup.PopupClient(Loc.GetString("rmc-flamer-tank-not-whitelisted", ("tank", target)), source, user);
                 return;
             }
-            if (_reagent.TryIndex(content.Reagent.Prototype, out var reagent) &&
-                (reagent.Intensity <= 0 || reagent.Duration <= 0 || reagent.Radius <= 0))
+
+            if (!target.Comp.Custom && _reagent.IsGenerated(content.Reagent.Prototype))
             {
-                _popup.PopupClient(Loc.GetString("rmc-flamer-tank-not-potent-enough"), source, user);
+                _popup.PopupClient(Loc.GetString("rmc-flamer-tank-no-custom-fuel", ("tank", target)), source, user);
                 return;
+            }
+
+            if (_reagent.TryIndex(content.Reagent.Prototype, out var reagent))
+            {
+                if (!target.Comp.Specialist && reagent.Specialist)
+                {
+                    _popup.PopupClient(Loc.GetString("rmc-flamer-tank-no-specialist-fuel", ("tank", target)), source, user);
+                    return;
+                }
+
+                var fireStats = GetFireStats(reagent);
+                if (fireStats.Intensity <= 0)
+                {
+                    _popup.PopupClient(Loc.GetString("rmc-flamer-tank-not-potent-enough"), source, user);
+                    return;
+                }
             }
         }
 
@@ -661,9 +835,12 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
 
                     if (_reagent.TryIndex(comp.Reagent, out var reagent))
                     {
-                        var intensity = Math.Min(comp.MaxIntensity, reagent.Intensity);
-                        var duration = Math.Min(comp.MaxDuration, reagent.Duration + (int)(comp.FuelPressure * reagent.DurationMod));
-                        _rmcFlammable.SetIntensityDuration(fire, intensity, duration);
+                        var fireStats = GetFireStats(reagent);
+                        var intensity = Math.Min(comp.MaxIntensity, fireStats.Intensity);
+                        var duration = Math.Clamp(fireStats.Duration, 1, comp.MaxDuration) + (int)(comp.FuelPressure * fireStats.DurationMod);
+
+                        Color? fireColor = reagent.Unknown ? reagent.SubstanceColor : null;
+                        _rmcFlammable.SetIntensityDuration(fire, intensity, duration, comp.FirePenetrating, fireColor);
                     }
 
                     break;
@@ -672,3 +849,18 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         }
     }
 }
+
+public readonly record struct RMCFireStats(
+    int Intensity,
+    int Duration,
+    int Radius,
+    FixedPoint2 IntensityMod,
+    FixedPoint2 DurationMod,
+    FixedPoint2 RadiusMod,
+    bool FirePenetrating);
+
+public readonly record struct RMCAggregateFireStats(
+    FixedPoint2 Intensity,
+    FixedPoint2 Duration,
+    FixedPoint2 Radius,
+    bool FirePenetrating);

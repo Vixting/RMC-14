@@ -96,6 +96,9 @@ public sealed class TemporarySpeedModifiersSystem : EntitySystem
         {
             comp.Modifiers.Add((_timing.CurTime + modifier.Duration, modifier.Walk, modifier.Sprint));
         }
+
+        Dirty(entUid, comp);
+        _movementSpeedSystem.RefreshMovementSpeedModifiers(entUid);
     }
 
     /// <summary>

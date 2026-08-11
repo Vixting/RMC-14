@@ -7,6 +7,9 @@ namespace Content.Shared.Botany
     {
         PlantRsi,
         PlantState,
+        FlowerRsi,
+        FlowerState,
+        FlowerColor,
         HealthLight,
         WaterLight,
         NutritionLight,

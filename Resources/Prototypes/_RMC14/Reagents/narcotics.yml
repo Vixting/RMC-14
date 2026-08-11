@@ -13,6 +13,8 @@
     Narcotic:
       metabolismRate: 0.1
       effects:
+      - !type:Addictive
+        potency: 1
       - !type:Emote
         emote: Laugh #TODO twitches, drools, moans.
         showInChat: true

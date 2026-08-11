@@ -199,6 +199,12 @@ public partial class SeedData
     /// </summary>
     [DataField] public bool Ligneous;
 
+    /// <summary>
+    ///     Flavor text
+    /// </summary>
+    [DataField]
+    public float AlterTemperature;
+
     // No, I'm not removing these.
     // if you re-add these, make sure that they get cloned.
     //public PlantSpread Spread { get; set; }
@@ -237,6 +243,20 @@ public partial class SeedData
     public ResPath PlantRsi { get; set; } = default!;
 
     [DataField] public string PlantIconState { get; set; } = "produce";
+
+    [DataField] public Color? ProductColor;
+
+    [DataField] public bool Flowers;
+
+    [DataField] public string? FlowerIcon;
+
+    [DataField] public Color? FlowerColor;
+
+    [DataField] public bool Bioluminescent;
+
+    [DataField] public Color BioluminescentColor = Color.White;
+
+    [DataField] public float BioluminescentRadius = 2f;
 
     /// <summary>
     /// Screams random sound from collection SoundCollectionSpecifier
@@ -314,6 +334,7 @@ public partial class SeedData
             GrowthStages = GrowthStages,
             HarvestRepeat = HarvestRepeat,
             Potency = Potency,
+            AlterTemperature = AlterTemperature,
 
             Seedless = Seedless,
             Viable = Viable,
@@ -324,6 +345,13 @@ public partial class SeedData
 
             PlantRsi = PlantRsi,
             PlantIconState = PlantIconState,
+            ProductColor = ProductColor,
+            Flowers = Flowers,
+            FlowerIcon = FlowerIcon,
+            FlowerColor = FlowerColor,
+            Bioluminescent = Bioluminescent,
+            BioluminescentColor = BioluminescentColor,
+            BioluminescentRadius = BioluminescentRadius,
             CanScream = CanScream,
             TurnIntoKudzu = TurnIntoKudzu,
             SplatPrototype = SplatPrototype,
@@ -379,6 +407,7 @@ public partial class SeedData
             GrowthStages = other.GrowthStages,
             HarvestRepeat = HarvestRepeat,
             Potency = Potency,
+            AlterTemperature = AlterTemperature,
 
             Mutations = Mutations,
 
@@ -391,6 +420,13 @@ public partial class SeedData
 
             PlantRsi = other.PlantRsi,
             PlantIconState = other.PlantIconState,
+            ProductColor = ProductColor,
+            Flowers = Flowers,
+            FlowerIcon = FlowerIcon,
+            FlowerColor = FlowerColor,
+            Bioluminescent = Bioluminescent,
+            BioluminescentColor = BioluminescentColor,
+            BioluminescentRadius = BioluminescentRadius,
             CanScream = CanScream,
             TurnIntoKudzu = TurnIntoKudzu,
             SplatPrototype = other.SplatPrototype,

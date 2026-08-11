@@ -140,26 +140,8 @@
       effects:
       - !type:Toxic
         potency: 1
-      - !type:Emote # Sedative 6
-        emote: Yawn
-        showInChat: true
-        probability: 0.25 #TODO makes them confused and eventually sleepy
-      - !type:GenericStatusEffect
-        conditions:
-        - !type:ReagentThreshold
-          min: 15
-        key: Unconscious
-        component: RMCUnconscious
-        type: Add
-        time: 3
-        refresh: false
-      - !type:HealthChange
-        conditions:
-        - !type:ReagentThreshold
-          min: 25
-        damage:
-          types:
-            Asphyxiation: 15
+      - !type:Hypnotic
+        potency: 6
 
 - type: reagent
   parent: CMReagent

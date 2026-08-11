@@ -23,6 +23,16 @@
   desc: reagent-desc-rmcammonia
   physicalDesc: reagent-physical-desc-gaseous
   color: "#404030"
+  plantMetabolism:
+  - !type:Nutritious
+    potency: 8
+  - !type:Toxic
+    potency: 12
+  - !type:Fertilizing
+    healthMod: 0.5
+    yieldMod: 0.1
+    nutrientMod: 2
+    potency: 4
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -144,6 +154,9 @@
   desc: reagent-desc-rmcdiethylamine
   physicalDesc: reagent-physical-desc-oily
   color: "#604030"
+  plantMetabolism:
+  - !type:Fertilizing
+    potency: 4
 
 - type: reagent
   parent: CMReagent
@@ -153,7 +166,7 @@
   desc: reagent-desc-rmcglycerol
   physicalDesc: reagent-physical-desc-oily
   color: "#808080"
-  medical: true # cmss13 glycerol carries REAGENT_TYPE_MEDICAL
+  medical: true
 
 - type: reagent
   parent: CMReagent

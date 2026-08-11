@@ -1,0 +1,59 @@
+- type: reagent
+  parent: CMReagent
+  id: RMCEZNutrient
+  chemClass: Common
+  group: Botanical
+  name: reagent-name-e-z-nutrient
+  desc: reagent-desc-e-z-nutrient
+  physicalDesc: reagent-physical-desc-thick
+  flavor: bitter
+  color: "#664330"
+  plantMetabolism:
+  - !type:Fertilizing
+    healthMod: 0.05
+    yieldMod: 0.01
+    nutrientMod: 1
+    potency: 4
+  - !type:Toxic
+    potency: 2
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Toxic
+        potency: 0.5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCLeft4Zed
+  chemClass: Common
+  group: Botanical
+  name: reagent-name-left4-zed
+  desc: reagent-desc-left4-zed
+  physicalDesc: reagent-physical-desc-heterogeneous
+  flavor: bitter
+  color: "#5b406c"
+  plantMetabolism:
+  - !type:Fertilizing
+    healthMod: 0.1
+    yieldMod: 0
+    nutrientMod: 0.25
+    lifespanMod: 0.2
+    potency: 4
+
+- type: reagent
+  parent: CMReagent
+  id: RMCRobustHarvest
+  chemClass: Common
+  group: Botanical
+  name: reagent-name-robust-harvest
+  desc: reagent-desc-robust-harvest
+  physicalDesc: reagent-physical-desc-robust
+  flavor: bitter
+  color: "#3e901c"
+  plantMetabolism:
+  - !type:Fertilizing
+    healthMod: -0.01
+    yieldMod: 0.1
+    nutrientMod: 0.5
+    potency: 4

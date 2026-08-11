@@ -29,4 +29,19 @@ public sealed partial class RMCFlamerTankComponent : Component
 
     [DataField, AutoNetworkedField]
     public List<ProtoId<ReagentPrototype>>? ReagentWhitelist = null;
+
+    [DataField, AutoNetworkedField]
+    public bool Custom;
+
+    [DataField, AutoNetworkedField]
+    public bool Specialist;
+
+    [DataField, AutoNetworkedField]
+    public bool AdjustablePressure;
+
+    [DataField, AutoNetworkedField]
+    public int FuelPressure = 1;
+
+    [DataField, AutoNetworkedField]
+    public int MaxPressure = 10;
 }

@@ -253,6 +253,11 @@
   color: "#a65d7f"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Biocidic
+    potency: 8
+  - !type:Blighting
+    potency: 4
   metabolisms:
     Poison:
       metabolismRate: 0.1

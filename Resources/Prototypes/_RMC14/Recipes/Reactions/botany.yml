@@ -1,0 +1,33 @@
+- type: reaction
+  id: RMCEZNutrient
+  reactants:
+    RMCNitrogen:
+      amount: 1
+    RMCPhosphorus:
+      amount: 1
+    RMCPotassium:
+      amount: 1
+  products:
+    RMCEZNutrient: 1
+
+- type: reaction
+  id: RMCRobustHarvest
+  reactants:
+    RMCEZNutrient:
+      amount: 1
+    RMCSulphuricAcid:
+      amount: 1
+      catalyst: true
+  products:
+    RMCRobustHarvest: 1
+
+- type: reaction
+  id: RMCLeft4Zed
+  reactants:
+    RMCEZNutrient:
+      amount: 1
+    RMCRadium:
+      amount: 1
+      catalyst: true
+  products:
+    RMCLeft4Zed: 1

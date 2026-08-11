@@ -29,4 +29,7 @@ public sealed partial class RMCFlamerChainComponent : Component
 
     [DataField, AutoNetworkedField]
     public int FuelPressure = 1;
+
+    [DataField, AutoNetworkedField]
+    public bool FirePenetrating;
 }
