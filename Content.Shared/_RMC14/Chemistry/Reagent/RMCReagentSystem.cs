@@ -1,8 +1,14 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using Content.Shared._RMC14.Chemistry.Effects;
+using Content.Shared._RMC14.Chemistry.Generation;
+using Content.Shared.Body.Prototypes;
 using Content.Shared.Chemistry.Reagent;
+using Content.Shared.EntityEffects;
+using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
+using Robust.Shared.Serialization.Markdown.Mapping;
 
 namespace Content.Shared._RMC14.Chemistry.Reagent;
 
@@ -11,7 +17,9 @@ public sealed class RMCReagentSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly ISerializationManager _serialization = default!;
 
+    private static readonly ProtoId<MetabolismGroupPrototype> GeneratedMetabolismGroup = "Poison";
     private FrozenDictionary<string, Reagent> _reagents = FrozenDictionary<string, Reagent>.Empty;
+    private readonly Dictionary<string, RMCGeneratedReagentData> _generated = new();
 
     public override void Initialize()
     {
@@ -46,6 +54,7 @@ public sealed class RMCReagentSystem : EntitySystem
             }
         }
 
+        ApplyGenerated(dict);
         _reagents = dict.ToFrozenDictionary();
     }
 
@@ -62,7 +71,81 @@ public sealed class RMCReagentSystem : EntitySystem
             dict[reagentProto.ID] = reagent;
         }
 
+        ApplyGenerated(dict);
         _reagents = dict.ToFrozenDictionary();
+    }
+
+    private void ApplyGenerated(Dictionary<string, Reagent> dict)
+    {
+        foreach (var data in _generated.Values)
+        {
+            if (BuildGenerated(data) is { } reagent)
+                dict[data.Id] = reagent;
+        }
+    }
+
+    public void RegisterGenerated(RMCGeneratedReagentData data)
+    {
+        _generated[data.Id] = data;
+
+        if (BuildGenerated(data) is not { } reagent)
+            return;
+
+        var dict = new Dictionary<string, Reagent>(_reagents) { [data.Id] = reagent };
+        _reagents = dict.ToFrozenDictionary();
+    }
+
+    private Reagent? BuildGenerated(RMCGeneratedReagentData data)
+    {
+        var desc = string.IsNullOrEmpty(data.PhysicalDescription) ? data.Name : data.PhysicalDescription;
+        var node = new MappingDataNode();
+        node.Add("id", data.Id);
+        node.Add("name", data.Name);
+        node.Add("desc", desc);
+        node.Add("physicalDesc", desc);
+        if (!string.IsNullOrEmpty(data.Color))
+            node.Add("color", data.Color);
+        node.Add("group", "Generated");
+
+        Reagent reagent;
+        try
+        {
+            reagent = _serialization.Read<Reagent>(node, notNullableOverride: true);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to build generated reagent {data.Id}: {e}");
+            return null;
+        }
+
+        reagent.ChemClass = data.ChemClass;
+        reagent.Overdose = data.Overdose > 0 ? FixedPoint2.New(data.Overdose) : null;
+        reagent.CriticalOverdose = data.CriticalOverdose > 0 ? FixedPoint2.New(data.CriticalOverdose) : null;
+        reagent.Recognizable = true;
+
+        var effects = new List<EntityEffect>();
+        foreach (var prop in data.Properties)
+        {
+            if (!_prototypes.TryIndex<ChemGeneratorPropertyPrototype>(prop.PropertyId, out var propProto))
+                continue;
+
+            var effect = _serialization.CreateCopy(propProto.Effect, notNullableOverride: true);
+            if (effect is RMCChemicalEffect rmc)
+                rmc.Potency = prop.Level;
+
+            effects.Add(effect);
+        }
+
+        if (effects.Count > 0)
+        {
+            var entry = new ReagentEffectsEntry { Effects = effects.ToArray() };
+            reagent.Metabolisms = new Dictionary<ProtoId<MetabolismGroupPrototype>, ReagentEffectsEntry>
+            {
+                [GeneratedMetabolismGroup] = entry,
+            }.ToFrozenDictionary();
+        }
+
+        return reagent;
     }
 
     public Reagent Index(ProtoId<ReagentPrototype> id)
@@ -78,5 +161,10 @@ public sealed class RMCReagentSystem : EntitySystem
     public bool TryIndex(ReagentId id, [NotNullWhen(true)] out Reagent? reagent)
     {
         return _reagents.TryGetValue(id.Prototype, out reagent);
+    }
+
+    public bool IsGenerated(ProtoId<ReagentPrototype> id)
+    {
+        return _generated.ContainsKey(id);
     }
 }

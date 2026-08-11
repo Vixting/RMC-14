@@ -23,7 +23,7 @@ public sealed partial class Nutritious : RMCChemicalEffect
         plant.PestLevel += amount * 0.5f;
         plant.NutritionLevel += amount * 0.5f;
         plant.Health += amount * 0.5f;
-        plant.YieldMod += (int) MathF.Round(amount * 0.05f);
+        AddYieldMod(plant, amount * 0.05f);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

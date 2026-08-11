@@ -2,6 +2,7 @@
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Robust.Shared.Random;
 
 namespace Content.Shared._RMC14.Chemistry.Effects;
 
@@ -100,6 +101,19 @@ public abstract partial class RMCChemicalEffect : EntityEffect
 
     protected virtual void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
+    }
+
+    protected static void AddYieldMod(PlantHolderComponent plant, float delta)
+    {
+        if (delta == 0f)
+            return;
+
+        var whole = (int) MathF.Floor(delta);
+        var remainder = delta - whole;
+        if (remainder > 0f && IoCManager.Resolve<IRobustRandom>().Prob(remainder))
+            whole += 1;
+
+        plant.YieldMod += whole;
     }
 
     protected static void SuppressMutationSlot(PlantHolderComponent plant, string slot, float value)

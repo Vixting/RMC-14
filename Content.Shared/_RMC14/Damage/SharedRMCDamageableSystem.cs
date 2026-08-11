@@ -688,7 +688,7 @@ public abstract class SharedRMCDamageableSystem : EntitySystem
                 if (!_entityWhitelist.IsWhitelistPassOrNull(damage.Whitelist, user))
                     continue;
 
-                if (_hive.FromSameHive(contact, user))
+                if (_hive.FromSameHiveOrAlly(contact, user))
                     continue;
 
                 userDamage.NextDamageAt = time + userDamage.DamageEvery;

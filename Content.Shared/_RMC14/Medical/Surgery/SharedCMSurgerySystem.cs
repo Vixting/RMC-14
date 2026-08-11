@@ -54,6 +54,7 @@ public abstract partial class SharedCMSurgerySystem : EntitySystem
         SubscribeLocalEvent<RMCSurgeryXenoHeartConditionComponent, CMSurgeryValidEvent>(OnXenoHeartValid);
 
         InitializeSteps();
+        InitializeLaserScalpelGate();
     }
 
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
