@@ -1,5 +1,7 @@
 ﻿rmc-flamer-tank-not-potent-enough = This chemical is not potent enough to be used in a flamethrower!
 rmc-flamer-tank-not-whitelisted = This chemical can't be used in {THE($tank)}.
+rmc-flamer-tank-no-custom-fuel = {THE($tank)} cannot accept custom fuels!
+rmc-flamer-tank-no-specialist-fuel = {THE($tank)} cannot accept specialist fuels!
 rmc-flamer-ignite-first = You need to ignite the gun with {$key} first!
 rmc-flamer-ignite-first-with = You need to ignite the gun first!
 rmc-flamer-ignite-action-examine = [bold]Press your [color=cyan]unique action[/color] keybind (Spacebar by default) to toggle the pilot light.[/bold]
@@ -14,6 +16,11 @@ rmc-flamer-tank-examine-short = Tank properties
 rmc-flamer-tank-examine-line-0 = [color=yellow]Max Intensity[/color]: [color=lightblue]{$value}[/color]
 rmc-flamer-tank-examine-line-1 = [color=yellow]Max Duration[/color]: [color=lightblue]{$value}[/color]
 rmc-flamer-tank-examine-line-2 = [color=yellow]Max Range[/color]: [color=lightblue]{$value}[/color]
+rmc-flamer-tank-examine-pressure = [color=yellow]Fuel Pressure[/color]: [color=lightblue]{$value}[/color] U/t
+
+rmc-flamer-tank-pressure-verb = Change Fuel Pressure
+rmc-flamer-tank-pressure-set = You set the pressure regulator to {$pressure} U/t.
+rmc-flamer-loaded-pressure = The loaded tank's pressure regulator is set to [color=lightblue]{$value}[/color] U/t.
 
 rmc-flamer-guidebook-header = Flammability
 rmc-flamer-guidebook-description-base = It burns with an intensity of [bold]{$intensity}[/bold] for [bold]{$duration}[/bold] seconds.

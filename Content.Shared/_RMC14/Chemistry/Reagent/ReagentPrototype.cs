@@ -56,8 +56,20 @@ public partial class ReagentPrototype
     public bool FireSpread;
 
     [DataField]
+    public bool FirePenetrating;
+
+    [DataField]
     public bool Toxin;
 
     [DataField]
     public bool Alcohol;
+
+    [DataField]
+    public bool Specialist;
+
+    [DataField]
+    public bool Medical;
+
+    [DataField]
+    public bool NoGeneration;
 }

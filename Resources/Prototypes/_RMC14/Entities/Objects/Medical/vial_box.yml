@@ -69,5 +69,12 @@
     - id: RMCVial
       amount: 6
 
+- type: entity
+  parent: RMCVialBox
+  suffix: Intel
+  id: RMCIntelVialBox
+  components:
+  - type: IntelVialBox
+
 - type: Tag
   id: VialBox

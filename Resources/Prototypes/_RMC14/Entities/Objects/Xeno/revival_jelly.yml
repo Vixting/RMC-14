@@ -1,0 +1,16 @@
+- type: entity
+  parent: BaseItem
+  id: RMCRevivalJelly
+  name: revival jelly
+  description: A weird jelly, capable of bringing a dead xenonid back to life.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Xeno/Marine_Research.rsi
+    state: royal_jelly
+  - type: Item
+    size: Small
+    sprite: _RMC14/Objects/Xeno/Marine_Research.rsi
+  - type: Stack
+    count: 1
+    stackType: RMCRevivalJelly
+  - type: RMCRevivalJelly

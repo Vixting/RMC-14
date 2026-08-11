@@ -74,6 +74,7 @@
     maxIntensity: 80
     maxRange: 5
     maxDuration: 24
+    specialist: true
   - type: Tag
     tags:
     - RMCTankFlamerLarge
@@ -137,6 +138,8 @@
     maxIntensity: 60
     maxRange: 8
     maxDuration: 50
+    custom: true
+    adjustablePressure: true
   - type: SolutionContainerManager
     solutions:
       rmc_flamer_tank:

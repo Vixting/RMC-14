@@ -61,7 +61,7 @@ public sealed partial class ContractSlot
     [DataField]
     public bool Taken;
 }
-s
+
 [DataDefinition, Serializable, NetSerializable]
 public sealed partial class DocumentEntry
 {

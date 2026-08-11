@@ -259,6 +259,36 @@
 
 - type: entity
   parent: RMCPaperWeYa
+  id: RMCChemResearchReport
+  name: research report
+  description: A Weston-Yamada chemical research report, automatically printed by an XRF scanner or synthesis simulator.
+  components:
+  - type: RMCChemResearchReport
+
+- type: entity
+  parent: RMCPaperWeYa
+  id: RMCChemContractNotes
+  name: research notes
+  description: A Weston-Yamada document printed by a research data terminal.
+
+- type: entity
+  parent: RMCPaperWeYa
+  id: RMCIntelResearchPaper
+  name: property breakthrough report
+  description: A leaked Weston-Yamada document detailing a breakthrough chemical property combination.
+  components:
+  - type: IntelResearchPaper
+
+- type: entity
+  parent: RMCPaperWeYa
+  id: RMCChemGrantNotes
+  name: research grant notice
+  description: A Weston-Yamada research grant notice, redeemable for credits at a research terminal.
+  components:
+  - type: IntelChemGrantPaper
+
+- type: entity
+  parent: RMCPaperWeYa
   id: RMCPaperWeYaLiaison
   name: weston-yamada document
 

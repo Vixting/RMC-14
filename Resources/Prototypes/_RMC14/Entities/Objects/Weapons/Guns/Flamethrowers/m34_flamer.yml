@@ -186,6 +186,19 @@
   - type: Appearance
   - type: SolutionStorageFillable
     solution: rmc_flamer_tank
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Metallic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:SpillBehavior
+        solution: rmc_flamer_tank
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
 
 - type: entity
   parent: RMCTankFlamer
@@ -196,6 +209,8 @@
   components:
   - type: RMCFlamerTank
     maxRange: 5
+    custom: true
+    adjustablePressure: true
   - type: SolutionContainerManager
     solutions:
       rmc_flamer_tank:
@@ -232,6 +247,8 @@
     maxIntensity: 60
     maxRange: 7
     maxDuration: 50
+    custom: true
+    adjustablePressure: true
   - type: SolutionContainerManager
     solutions:
       rmc_flamer_tank:

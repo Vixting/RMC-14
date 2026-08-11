@@ -13,6 +13,24 @@
 
 - type: entity
   parent: RMCComputerDisk
+  id: RMCResearchRerollDisk
+  name: research market disk
+  description: A disk containing all the bits of data the analyzer could salvage. Insert this into a research computer to sell the data and immediately reroll the synthesis contracts.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Misc/computer_disks.rsi
+    state: disk6
+  - type: Item
+    sprite: _RMC14/Objects/Misc/computer_disks.rsi
+    inhandVisuals:
+      left:
+      - state: disk6-inhand-left
+      right:
+      - state: disk6-inhand-right
+  - type: RMCResearchRerollDisk
+
+- type: entity
+  parent: RMCComputerDisk
   id: RMCIntelComputerDisk1
   name: Grey computer disk
   suffix: Disk, 1
