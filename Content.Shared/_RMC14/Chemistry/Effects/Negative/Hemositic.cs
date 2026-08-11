@@ -5,6 +5,7 @@ using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
+using Content.Shared.Speech.EntitySystems;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Negative;
@@ -15,8 +16,6 @@ public sealed partial class Hemositic : RMCChemicalEffect
     {
         return "Shows parasitic behavior towards live erythrocytes in order to produce more of itself.";
     }
-
-    // TODO RMC14: nervous disability on critical overdose
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
@@ -30,8 +29,6 @@ public sealed partial class Hemositic : RMCChemicalEffect
         var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
         bloodstreamSystem.TryModifyBloodLevelQuiet((args.TargetEntity, bloodstream), wellFed ? -potency * 3f : -potency * 0.5f);
 
-        // cm hemositic/process(): holder.volume++ - reproduces itself into its own containing
-        // solution at a flat 1u/tick, but only while well-fed
         if (wellFed && args.Source != null && args.Reagent != null)
             args.Source.AddReagent(args.Reagent.ID, FixedPoint2.New(1));
     }
@@ -47,5 +44,10 @@ public sealed partial class Hemositic : RMCChemicalEffect
         // cm hemositic/process_overdose(): holder.volume += potency * POTENCY_MULTIPLIER_MEDIUM(2).
         if (args.Source != null && args.Reagent != null)
             args.Source.AddReagent(args.Reagent.ID, potency * 2f);
+    }
+
+    protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        args.EntityManager.System<SharedStutteringSystem>().DoStutter(args.TargetEntity, TimeSpan.FromSeconds(10), true);
     }
 }

@@ -18,4 +18,5 @@ public enum RMCArmorPlateKind
     EmergencyInjector,
     Ceramic,
     AntiDecay,
+    Translator,
 }

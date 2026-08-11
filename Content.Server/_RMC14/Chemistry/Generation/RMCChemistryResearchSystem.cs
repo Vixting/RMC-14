@@ -42,8 +42,8 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
 
     private const int ResearchLevelIncreaseMultiplier = 3;
     public const int TechtreeLevelMultiplier = 2;
-    // level 6 == "5X" access
-    public const int MaxClearanceLevel = 6;
+    public const int MaxClearanceLevel = 5;
+    public const int XAccessClearanceTier = 6;
 
     public const int ContractSlotCount = 3;
     private static readonly TimeSpan ContractRerollNotPicked = TimeSpan.FromMinutes(3);
@@ -233,7 +233,13 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
 
     public bool HasSufficientClearance(int tier)
     {
-        return TryGetResearch(out var research) && research.Value.Comp.ClearanceLevel >= tier;
+        if (!TryGetResearch(out var research))
+            return false;
+
+        if (tier >= XAccessClearanceTier)
+            return research.Value.Comp.ReachedXAccess;
+
+        return research.Value.Comp.ClearanceLevel >= tier;
     }
 
     public bool TryRequestXAccess()

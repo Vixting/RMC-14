@@ -1,9 +1,11 @@
+using Content.Shared._RMC14.Deafness;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
 using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Eye.Blinding.Systems;
 using Content.Shared.FixedPoint;
+using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffect;
 using Robust.Shared.Prototypes;
 
@@ -20,14 +22,21 @@ public sealed partial class Neuroinhibiting : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if ((float) potency > 1f)
-        {
-            var status = args.EntityManager.System<StatusEffectsSystem>();
-            status.TryAddStatusEffect<TemporaryBlindnessComponent>(
-                args.TargetEntity, TemporaryBlindnessSystem.BlindingStatusEffect, TimeSpan.FromSeconds(2), true);
-        }
+        var p = (float) potency;
+        var target = args.TargetEntity;
+        var duration = TimeSpan.FromSeconds(2);
 
-        // TODO RMC14: mob effect - deafness and muteness at higher potency, requires surgery to cure
+        // TODO RMC: Should be cured by surgeries instead of being status effects
+        var status = args.EntityManager.System<StatusEffectsSystem>();
+
+        if (p > 1f)
+            status.TryAddStatusEffect<TemporaryBlindnessComponent>(target, TemporaryBlindnessSystem.BlindingStatusEffect, duration, true);
+
+        if (p > 2f)
+            args.EntityManager.System<SharedDeafnessSystem>().TryDeafen(target, duration, true, ignoreProtection: true);
+
+        if (p > 3f)
+            status.TryAddStatusEffect(target, "Muted", duration, true, "Muted");
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -35,6 +44,8 @@ public sealed partial class Neuroinhibiting : RMCChemicalEffect
         var damage = new DamageSpecifier();
         damage.DamageDict[PoisonType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
+
+        args.EntityManager.System<SharedStutteringSystem>().DoStutter(args.TargetEntity, TimeSpan.FromSeconds(10), true);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

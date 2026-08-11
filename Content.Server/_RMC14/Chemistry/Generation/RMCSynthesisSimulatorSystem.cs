@@ -19,7 +19,7 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
         var comp = ent.Comp;
         comp.Simulating = false;
 
-        if (!TryGetSlotReport(ent, comp.TargetSlotId, out var targetItem, out var targetReport))
+        if (!TryGetSlotReport(ent, comp.TargetSlotId, out _, out var targetReport))
         {
             Dirty(ent);
             UpdateAppearance(ent);
@@ -50,9 +50,7 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
                 if (TryGetProperty(targetReport, comp.TargetProperty, out var suppressProperty, out var suppressLevel))
                 {
                     properties.RemoveAll(p => p.Property.ID == suppressProperty.ID);
-                    var newLevel = suppressLevel - 1;
-                    if (newLevel > 0)
-                        properties.Add((suppressProperty, newLevel));
+                    properties.Add((suppressProperty, Math.Max(suppressLevel - 1, 0)));
                 }
                 break;
 
@@ -120,10 +118,6 @@ public sealed class RMCSynthesisSimulatorSystem : SharedRMCSynthesisSimulatorSys
 
         if (candidates.Count == 0)
         {
-            QueueDel(targetItem);
-            if (TryGetSlotReport(ent, comp.ReferenceSlotId, out var referenceItem, out _))
-                QueueDel(referenceItem);
-
             comp.SimulationFailed = true;
             comp.RecipeCandidates = null;
             comp.PendingProperties = null;

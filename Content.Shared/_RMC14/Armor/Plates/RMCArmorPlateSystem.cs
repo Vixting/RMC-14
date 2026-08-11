@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared._RMC14.Language;
 using Content.Shared._RMC14.Medical.Unrevivable;
 using Content.Shared._RMC14.Medical.Wounds;
 using Content.Shared.Actions;
@@ -46,6 +47,7 @@ public sealed class RMCArmorPlateSystem : EntitySystem
         SubscribeLocalEvent<RMCEmergencyInjectorPlateActiveComponent, RMCEmergencyInjectorInjectActionEvent>(OnEmergencyInjectorInject);
         SubscribeLocalEvent<RMCEmergencyInjectorPlateActiveComponent, RMCEmergencyInjectorToggleOverdoseActionEvent>(OnEmergencyInjectorToggleOverdose);
         SubscribeLocalEvent<RMCCeramicPlateActiveComponent, DamageModifyEvent>(OnCeramicDamageModify);
+        SubscribeLocalEvent<RMCTranslatorPlateActiveComponent, CanUnderstandLanguageEvent>(OnTranslatorCanUnderstand);
     }
 
     private void OnPlateChanged(Entity<RMCArmorPlateSlotComponent> ent, ref EntInsertedIntoContainerMessage args)
@@ -108,6 +110,9 @@ public sealed class RMCArmorPlateSystem : EntitySystem
                 ceramic.Plate = GetPlateEntity(ent);
                 Dirty(wearer, ceramic);
                 break;
+            case RMCArmorPlateKind.Translator:
+                EnsureComp<RMCTranslatorPlateActiveComponent>(wearer);
+                break;
         }
     }
 
@@ -123,6 +128,12 @@ public sealed class RMCArmorPlateSystem : EntitySystem
         RemComp<RMCAntiDecayPlateActiveComponent>(wearer);
         RemComp<RMCEmergencyInjectorPlateActiveComponent>(wearer);
         RemComp<RMCCeramicPlateActiveComponent>(wearer);
+        RemComp<RMCTranslatorPlateActiveComponent>(wearer);
+    }
+
+    private void OnTranslatorCanUnderstand(Entity<RMCTranslatorPlateActiveComponent> ent, ref CanUnderstandLanguageEvent args)
+    {
+        args.CanUnderstand = true;
     }
 
     private bool TryGetPlate(Entity<RMCArmorPlateSlotComponent> ent, out RMCArmorPlateKind kind, out int magnitude)

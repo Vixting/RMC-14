@@ -527,7 +527,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
 
         foreach (var r in _prototype.EnumeratePrototypes<ReagentPrototype>())
         {
-            if (r.Abstract || r.Unknown)
+            if (r.Abstract || r.Unknown || r.NoGeneration)
                 continue;
 
             pools[r.ChemClass].Add(r.ID);
