@@ -49,6 +49,7 @@
 - type: reagent
   parent: [ CMReagent, Lexorin ]
   id: RMCLexorin
+  chemClass: Uncommon
   name: reagent-name-rmclexorin
   desc: reagent-desc-rmclexorin
   physicalDesc: reagent-physical-desc-pungent
@@ -68,6 +69,7 @@
 - type: reagent
   parent: [ CMReagent, MindbreakerToxin ]
   id: RMCMindbreakerToxin
+  chemClass: Uncommon
   name: reagent-name-rmcmindbreakertoxin
   desc: reagent-desc-rmcmindbreakertoxin
   color: "#B31008"
@@ -122,6 +124,7 @@
 - type: reagent
   parent: CMReagent
   id: RMCChloralhydrate
+  chemClass: Uncommon
   name: reagent-name-rmc-chloral-hydrate
   desc: reagent-desc-rmc-chloral-hydrate
   physicalDesc: reagent-physical-desc-nondescript
@@ -161,6 +164,7 @@
 - type: reagent
   parent: CMReagent
   id: RMCCyanide
+  chemClass: Hydro
   name: rmc-reagent-name-cyanide
   desc: rmc-reagent-desc-cyanide
   physicalDesc: reagent-physical-desc-pungent
@@ -171,10 +175,260 @@
       metabolismRate: 0.2
       effects:
       - !type:Hypoxemic
+        potency: 12
+      - !type:Neurotoxic
         potency: 4
+      - !type:Hypnotic
+        potency: 5
       - !type:GenericStatusEffect
         key: Drowsiness
         component: Drowsiness
         time: 4
         type: Add
         refresh: false
+
+- type: reagent
+  parent: CMReagent
+  id: RMCUnstableMutagen
+  chemClass: Uncommon
+  name: reagent-name-rmcunstablemutagen
+  desc: reagent-desc-rmcunstablemutagen
+  physicalDesc: reagent-physical-desc-oily
+  color: "#13BC5E"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Carcinogenic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCDinitroaniline
+  chemClass: Uncommon
+  name: reagent-name-rmcdinitroaniline
+  desc: reagent-desc-rmcdinitroaniline
+  physicalDesc: reagent-physical-desc-oily
+  color: "#CF3600"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPotassiumChloride
+  chemClass: Uncommon
+  name: reagent-name-rmcpotassiumchloride
+  desc: reagent-desc-rmcpotassiumchloride
+  physicalDesc: reagent-physical-desc-crystalline
+  color: white
+  overdose: 30
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Hypoxemic
+        potency: 2
+      - !type:Antispasmodic
+        potency: 4
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPotassiumChlorophoride
+  chemClass: Uncommon
+  name: reagent-name-rmcpotassiumchlorophoride
+  desc: reagent-desc-rmcpotassiumchlorophoride
+  physicalDesc: reagent-physical-desc-crystalline
+  color: white
+  overdose: 20
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Antispasmodic
+        potency: 8
+      - !type:Hypoxemic
+        potency: 4
+      - !type:Toxic
+        potency: 2
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPotassiumPhorosulfate
+  chemClass: Rare
+  name: reagent-name-rmcpotassiumphorosulfate
+  desc: reagent-desc-rmcpotassiumphorosulfate
+  physicalDesc: reagent-physical-desc-crystalline
+  color: white
+  overdose: 10
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Antispasmodic
+        potency: 10
+      - !type:Hypoxemic
+        potency: 4
+      - !type:Biocidic
+        potency: 5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCIronSulfate
+  chemClass: Uncommon
+  name: reagent-name-rmcironsulfate
+  desc: reagent-desc-rmcironsulfate
+  physicalDesc: reagent-physical-desc-oily
+  color: "#303030"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCIronPhorideSulfate
+  chemClass: Rare
+  name: reagent-name-rmcironphoridesulfate
+  desc: reagent-desc-rmcironphoridesulfate
+  physicalDesc: reagent-physical-desc-oily
+  color: "#4b1f5e"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Corrosive
+        potency: 5
+      - !type:Oxidizing
+        potency: 3
+
+- type: reagent
+  parent: CMReagent
+  id: RMCCopperSulfate
+  chemClass: Rare
+  name: reagent-name-rmccoppersulfate
+  desc: reagent-desc-rmccoppersulfate
+  physicalDesc: reagent-physical-desc-oily
+  color: "#1d39db"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Corrosive
+        potency: 5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCFormaldehyde
+  chemClass: Rare
+  name: reagent-name-rmcformaldehyde
+  desc: reagent-desc-rmcformaldehyde
+  physicalDesc: reagent-physical-desc-gaseous
+  color: "#808080"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 1
+      - !type:Carcinogenic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCParaformaldehyde
+  chemClass: Rare
+  name: reagent-name-rmcparaformaldehyde
+  desc: reagent-desc-rmcparaformaldehyde
+  physicalDesc: reagent-physical-desc-crystalline
+  color: "#E0E0E0"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCAmatoxin
+  chemClass: Hydro
+  name: reagent-name-rmcamatoxin
+  desc: reagent-desc-rmcamatoxin
+  physicalDesc: reagent-physical-desc-oily
+  color: "#792300"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPhenolFormaldehydeResin
+  chemClass: Hydro
+  name: reagent-name-rmcphenolformaldehyderesin
+  desc: reagent-desc-rmcphenolformaldehyderesin
+  physicalDesc: reagent-physical-desc-crystalline
+  color: "#909648"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 3
+
+- type: reagent
+  parent: [ CMReagent, PolytrinicAcid ]
+  id: RMCPolytrinicAcid
+  chemClass: Uncommon
+  name: reagent-name-rmcpolytrinicacid
+  desc: reagent-desc-rmcpolytrinicacid
+  physicalDesc: reagent-physical-desc-oily
+  color: "#8E18A9"
+  toxin: true
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 2
+      - !type:Corrosive
+        potency: 3
+
+# TODO RMC14: pain reduction potency isnt offset by the same reduced confusion/sleep transition
+- type: reagent
+  parent: CMReagent
+  id: RMCSoporific
+  chemClass: Common
+  name: reagent-name-rmcsoporific
+  desc: reagent-desc-rmcsoporific
+  physicalDesc: reagent-physical-desc-oily
+  color: "#E895CC"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.05
+      effects:
+      - !type:Hypnotic
+        potency: 2
+      - !type:Painkilling
+        potency: 5

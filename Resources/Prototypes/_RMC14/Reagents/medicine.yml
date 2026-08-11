@@ -1,7 +1,7 @@
-﻿# TODO RMC14 other effects
-- type: reagent
+﻿- type: reagent
   parent: [ CMReagentMedicine, Dylovene ]
   id: CMDylovene
+  chemClass: Common
   name: reagent-name-cmdylovene
   desc: reagent-desc-cmdylovene
   color: "#3fc92a"
@@ -19,10 +19,10 @@
       - !type:Antihallucinogenic
         potency: 2
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, Ethylredoxrazine ]
   id: CMEthylredoxrazine
+  chemClass: Uncommon
   name: reagent-name-cmethylredoxrazine
   desc: reagent-desc-cmethylredoxrazine
   color: "#605048"
@@ -34,11 +34,13 @@
       effects:
       - !type:Focusing
         potency: 3
+      - !type:Antiaddictive
+        potency: 3
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, Arithrazine ]
   id: CMArithrazine
+  chemClass: Uncommon
   name: reagent-name-cmarithrazine
   desc: reagent-desc-cmarithrazine
   color: "#3c8529"
@@ -61,6 +63,7 @@
 - type: reagent
   parent: [ CMReagentMedicine, Bicaridine ]
   id: CMBicaridine
+  chemClass: Common
   name: reagent-name-cmbicaridine
   desc: reagent-desc-cmbicaridine
   color: "#ed4847"
@@ -76,6 +79,8 @@
 - type: reagent
   parent: [ CMReagentMedicine, Stimulants ]
   id: RMCUltrazine
+  chemClass: Rare
+  noGeneration: true
   name: reagent-name-rmcultrazine
   desc: reagent-desc-rmcultrazine
   color: "#ffe043"
@@ -94,10 +99,10 @@
         time: 3
         type: Add
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, Cryoxadone ]
   id: CMCryoxadone
+  chemClass: Uncommon
   name: reagent-name-cmcryoxadone
   desc: reagent-desc-cmcryoxadone
   color: "#4acaca"
@@ -115,10 +120,21 @@
         - Toxin: -1.5
         - Airloss: -0.5
         - Genetic: -1
+      - !type:Cryometabolizing
+        potency: 2
+      - !type:Neogenetic
+        potency: 1
+      - !type:Anticorrosive
+        potency: 1
+      - !type:Antitoxic
+        potency: 1
+      - !type:Anticarcinogenic
+        potency: 1
 
 - type: reagent
   parent: [ CMReagentMedicine, Dermaline ]
   id: CMDermaline
+  chemClass: Uncommon
   name: reagent-name-cmdermaline
   desc: reagent-desc-cmdermaline
   color: "#e2972e"
@@ -137,6 +153,7 @@
 - type: reagent
   parent: [ CMReagentMedicine, Dexalin ]
   id: CMDexalin
+  chemClass: Common
   name: reagent-name-cmdexalin
   desc: reagent-desc-cmdexalin
   color: "#1f28a7"
@@ -152,6 +169,7 @@
 - type: reagent
   parent: [ CMReagentMedicine, DexalinPlus ]
   id: CMDexalinPlus
+  chemClass: Uncommon
   name: reagent-name-cmdexalinplus
   desc: reagent-desc-cmdexalinplus
   color: "#5887D5"
@@ -164,11 +182,10 @@
       - !type:Oxygenating
         potency: 6
 
-# TODO RMC14 other effects (pain)
-# TODO RMC14 injected only
 - type: reagent
   parent: [ CMReagentMedicine, Epinephrine ]
   id: CMEpinephrine
+  chemClass: Common
   name: reagent-name-cmepinephrine
   desc: reagent-desc-cmepinephrine
   color: "#6bd43c"
@@ -180,6 +197,10 @@
       effects:
       - !type:Electrogenetic
         potency: 2
+      - !type:Painkilling
+        potency: 0.75
+      - !type:Intravenous
+        potency: 1
       - !type:HealthChange
         conditions:
         - !type:ReagentThreshold
@@ -200,6 +221,7 @@
 - type: reagent
   parent: [ CMReagentMedicine, Inaprovaline ]
   id: CMInaprovaline
+  chemClass: Common
   name: reagent-name-cminaprovaline
   desc: reagent-desc-cminaprovaline
   color: "#fe33cb"
@@ -244,6 +266,7 @@
 - type: reagent
   parent: [ CMReagentMedicine, Kelotane ]
   id: CMKelotane
+  chemClass: Common
   name: reagent-name-cmkelotane
   desc: reagent-desc-cmkelotane
   color: "#f5e123"
@@ -259,10 +282,10 @@
       - !type:Anticorrosive
         potency: 2
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, Leporazine ]
   id: CMLeporazine
+  chemClass: Uncommon
   name: reagent-name-cmleporazine
   desc: reagent-desc-cmleporazine
   color: "#a03919"
@@ -275,10 +298,10 @@
       - !type:Thermostabilizing
         potency: 2
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, Tricordrazine ]
   id: CMTricordrazine
+  chemClass: Uncommon
   name: reagent-name-cmtricordrazine
   desc: reagent-desc-cmtricordrazine
   color: "#d87f2b"
@@ -305,6 +328,7 @@
 - type: reagent
   parent: [ CMReagentMedicine, CMBicaridine ]
   id: CMMeralyne
+  chemClass: Uncommon
   name: reagent-name-cmmeralyne
   desc: reagent-desc-cmmeralyne
   color: "#b40000"
@@ -317,12 +341,12 @@
       - !type:Neogenetic
         potency: 3
 
-# TODO RMC14 other effects
 # TODO RMC14 progressive eye healing
 # TODO RMC14 brain damage over 50u
 - type: reagent
   parent: [ CMReagentMedicine, CMDylovene ]
   id: CMImidazoline
+  chemClass: Uncommon
   name: reagent-name-cmimidazoline
   desc: reagent-desc-cmimidazoline
   color: "#C8A5DC"
@@ -333,6 +357,8 @@
       metabolismRate: 0.1
       effects:
       - !type:ChemHealEyeDamage
+      - !type:Oculopeutic
+        potency: 2
       - !type:HealthChange
         conditions:
         - !type:ReagentThreshold
@@ -350,10 +376,10 @@
             Burn: 0.5
             Toxin: 1.5
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, CMCryoxadone ]
   id: CMClonexadone
+  chemClass: Uncommon
   name: reagent-name-cmclonexadone
   desc: reagent-desc-cmclonexadone
   color: "#51b4db"
@@ -370,8 +396,17 @@
         - Burn: -2.25
         - Toxin: -3
         - Genetic: -1.5
+      - !type:Cryometabolizing
+        potency: 6
+      - !type:Neogenetic
+        potency: 3
+      - !type:Anticorrosive
+        potency: 3
+      - !type:Antitoxic
+        potency: 3
+      - !type:Anticarcinogenic
+        potency: 3
 
-# TODO RMC14 other effects
 - type: reagent
   parent: [ CMReagentMedicine, CMArithrazine ]
   id: RMCRussianRed
@@ -393,6 +428,7 @@
 - type: reagent
   parent: CMReagentMedicine
   id: RMCMethylphenidate
+  chemClass: Uncommon
   name: reagent-name-rmcmethylphenidate
   desc: reagent-desc-rmcmethylphenidate
   physicalDesc: reagent-physical-desc-crystalline
@@ -406,10 +442,13 @@
         type: Local
         messages: [ "antidepressant-effect-rmcmethylphenidate" ]
         probability: 0.05
+      - !type:Psychostimulating
+        potency: 4
 
 - type: reagent
   parent: RMCMethylphenidate
   id: RMCCitalopram
+  chemClass: Uncommon
   name: reagent-name-rmccitalopram
   desc: reagent-desc-rmccitalopram
   color: "#C8A5DC"
@@ -421,10 +460,13 @@
         type: Local
         messages: [ "antidepressant-effect-rmccitalopram" ]
         probability: 0.05
+      - !type:Psychostimulating
+        potency: 2
 
 - type: reagent
   parent: RMCMethylphenidate
   id: RMCParoxetine
+  chemClass: Uncommon
   name: reagent-name-rmcparoxetine
   desc: reagent-desc-rmcparoxetine
   color: "#C8A5DC"
@@ -436,6 +478,8 @@
         type: Local
         messages: [ "antidepressant-effect-rmcparoxetine" ]
         probability: 0.05
+      - !type:Psychostimulating
+        potency: 6
       - !type:ModifyStatusEffect
         effectProto: StatusEffectSeeingRainbow
         type: Add
@@ -479,3 +523,152 @@
       effects:
       - !type:Ketogenic
         potency: 4
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCTramadol
+  chemClass: Common
+  name: reagent-name-rmctramadol
+  desc: reagent-desc-rmctramadol
+  physicalDesc: reagent-physical-desc-oily
+  color: "#d7c7e0"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Painkilling
+        potency: 2.5
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCOxycodone
+  chemClass: Common
+  name: reagent-name-rmcoxycodone
+  desc: reagent-desc-rmcoxycodone
+  physicalDesc: reagent-physical-desc-oily
+  color: "#1cc282"
+  overdose: 20
+  criticalOverdose: 30
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Painkilling
+        potency: 4
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCPeridaxon
+  chemClass: Common
+  name: reagent-name-rmcperidaxon
+  desc: reagent-desc-rmcperidaxon
+  physicalDesc: reagent-physical-desc-oily
+  color: "#403142"
+  overdose: 15
+  criticalOverdose: 25
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Organstabilize
+        potency: 4
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCRyetalyn
+  chemClass: Uncommon
+  name: reagent-name-rmcryetalyn
+  desc: reagent-desc-rmcryetalyn
+  physicalDesc: reagent-physical-desc-crystalline
+  color: "#E4D2EE"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Aiding
+        potency: 2
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCParacetamol
+  chemClass: Uncommon
+  name: reagent-name-rmcparacetamol
+  desc: reagent-desc-rmcparacetamol
+  physicalDesc: reagent-physical-desc-oily
+  color: "#C855DC"
+  overdose: 60
+  criticalOverdose: 100
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Painkilling
+        potency: 1
+
+# Just rp thing
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCSterilizine
+  chemClass: Uncommon
+  name: reagent-name-rmcsterilizine
+  desc: reagent-desc-rmcsterilizine
+  physicalDesc: reagent-physical-desc-oily
+  color: "#b8d2f5"
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCAlkysine
+  chemClass: Uncommon
+  name: reagent-name-rmcalkysine
+  desc: reagent-desc-rmcalkysine
+  physicalDesc: reagent-physical-desc-oily
+  color: "#e9d191"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Neuropeutic
+        potency: 2
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCNeuraline
+  chemClass: Rare
+  noGeneration: true
+  name: reagent-name-rmcneuraline
+  desc: reagent-desc-rmcneuraline
+  physicalDesc: reagent-physical-desc-oily
+  color: "#a244d8"
+  overdose: 2
+  criticalOverdose: 3
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Nervestimulating
+        potency: 5
+
+# TODO RMC14: reduce incoming stamina damage by 75% while present
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCStimulant
+  chemClass: Rare
+  noGeneration: true
+  name: reagent-name-rmcstimulant
+  desc: reagent-desc-rmcstimulant
+  physicalDesc: reagent-physical-desc-oily
+  color: "#2bd4d4"
+  overdose: 15
+  criticalOverdose: 25
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Unknown
+        potency: 1

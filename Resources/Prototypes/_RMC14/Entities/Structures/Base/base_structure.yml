@@ -41,6 +41,7 @@
         collection: XenoResinBreak
   - type: XenoConstruct
   - type: RMCDeleteAnchoredOnInit
+  - type: HiveColored
     whitelist:
       tags:
       - XenoWeedNode

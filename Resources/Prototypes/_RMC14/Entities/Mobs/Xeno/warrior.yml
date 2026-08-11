@@ -102,7 +102,7 @@
   - type: FixedIdentity
     name: cm-job-name-xeno-warrior
   - type: RMCSurgeryXenoHeart
-    item: RMCOrganXenoHeartT2
+    item: RMCOrganXenoHeartT2V2000
   - type: RMCActionOrder
     id: CMXenoWarrior
   - type: XenoPlasmaBlood

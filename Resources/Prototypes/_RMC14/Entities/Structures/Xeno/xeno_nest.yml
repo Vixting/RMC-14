@@ -40,3 +40,4 @@
   - type: XenoFriendly
   - type: RMCNightVisionVisible
     priority: 1
+  - type: HiveColored

@@ -107,7 +107,7 @@
   - type: FixedIdentity
     name: cm-job-name-xeno-drone
   - type: RMCSurgeryXenoHeart
-    item: RMCOrganXenoHeartT1
+    item: RMCOrganXenoHeartT1V800
   - type: XenoPlasmaBlood
     plasmaTypes:
     - RMCPurplePlasma

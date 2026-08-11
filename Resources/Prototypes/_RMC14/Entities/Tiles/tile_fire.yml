@@ -708,3 +708,22 @@
           Two: { state: red_2 }
           Three: { state: red_3 }
           Four: { state: red_4 }
+
+- type: entity
+  parent: RMCTileFire
+  id: RMCTileFireGenerated
+  suffix: Generated
+  components:
+  - type: Sprite
+    layers:
+    - map: [ "base" ]
+      state: dynamic_4
+  - type: RMCFireColor
+  - type: GenericVisualizer
+    visuals:
+      enum.TileFireLayers.Base:
+        base:
+          One: { state: dynamic_1 }
+          Two: { state: dynamic_2 }
+          Three: { state: dynamic_3 }
+          Four: { state: dynamic_4 }

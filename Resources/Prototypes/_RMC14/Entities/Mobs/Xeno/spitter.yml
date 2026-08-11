@@ -115,7 +115,7 @@
   - type: FixedIdentity
     name: cm-job-name-xeno-spitter
   - type: RMCSurgeryXenoHeart
-    item: RMCOrganXenoHeartT2
+    item: RMCOrganXenoHeartT2V2000
   - type: VentCrawler
     ventCrawlIcon: spitter
   - type: RMCActionOrder

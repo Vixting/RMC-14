@@ -1,0 +1,72 @@
+- type: entity
+  id: RMCBiomassAnalyzerData
+  name: biomass analyzer data
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: RMCBiomassAnalyzer
+
+- type: entity
+  parent: CMBaseStructure
+  id: RMCBiomassAnalyzer
+  name: biomass analyzer
+  description: A machine that breaks down harvested xenomorph biomatter into biomass points, spent on research upgrades.
+  components:
+  - type: WallMount
+    arc: 360
+  - type: Transform
+    anchored: false
+  - type: Physics
+    bodyType: Static
+    canCollide: false
+  - type: Sprite
+    drawdepth: SmallObjects
+    sprite: _RMC14/Structures/Machines/Science/xeno_analyzer.rsi
+    layers:
+    - map: ["base"]
+      state: "xeno_analyzer_off"
+    - map: ["enum.PowerDeviceVisualLayers.Powered"]
+      state: "xeno_analyzer"
+    - map: ["enum.RMCBiomassAnalyzerVisualLayers.Printing"]
+      state: "xeno_analyzer_printing"
+      visible: false
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerDeviceVisuals.Powered:
+        enum.PowerDeviceVisualLayers.Powered:
+          True: { visible: true }
+          False: { visible: false }
+      enum.RMCBiomassAnalyzerVisuals.State:
+        enum.RMCBiomassAnalyzerVisualLayers.Printing:
+          Printing: { visible: true }
+          Idle: { visible: false }
+  - type: Appearance
+  - type: ApcPowerReceiver
+    powerLoad: 250
+    needsPower: true
+  - type: RMCPowerReceiver
+    idleLoad: 600
+    activeLoad: 600
+    channel: Equipment
+  - type: ActivatableUIRequiresPower
+  - type: Clickable
+  - type: Corrodible
+    isCorrodible: false
+  - type: InteractionOutline
+  - type: RMCBiomassAnalyzerMachine
+  - type: UserInterface
+    interfaces:
+      enum.RMCBiomassAnalyzerUi.Key:
+        type: RMCBiomassAnalyzerBui
+  - type: ActivatableUI
+    key: enum.RMCBiomassAnalyzerUi.Key
+  - type: RequiresSkill
+    skills:
+      RMCSkillResearch: 1
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+  - type: ActivatableUIBlacklist
+    blacklist:
+      components:
+      - Xeno

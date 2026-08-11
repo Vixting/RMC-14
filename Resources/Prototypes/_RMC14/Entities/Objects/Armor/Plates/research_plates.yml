@@ -1,0 +1,74 @@
+- type: entity
+  parent: BaseItem
+  id: RMCArmorPlateBase
+  abstract: true
+  components:
+  - type: Item
+    size: Small
+  - type: Sprite
+    sprite: _RMC14/Objects/Armor/Plates/research_plate.rsi
+    state: plate_research
+
+- type: entity
+  parent: RMCArmorPlateBase
+  id: RMCArmorPlateCoagulator
+  name: coagulator research plate
+  description: An armor accessory plate that suppresses bleeding while worn.
+  components:
+  - type: RMCArmorPlate
+    kind: Coagulator
+    magnitude: 100
+
+- type: entity
+  parent: RMCArmorPlateBase
+  id: RMCArmorPlateEmergencyInjector
+  name: emergency-injector research plate
+  description: A single-use plate that injects an emergency chemical cocktail, with overdose protection, when the wearer enters critical condition.
+  components:
+  - type: RMCArmorPlate
+    kind: EmergencyInjector
+    magnitude: 15
+  - type: RMCEmergencyInjectorPlate
+
+- type: entity
+  parent: RMCArmorPlateBase
+  id: RMCArmorPlateCeramic
+  name: ceramic research plate
+  description: A destructible trauma plate that soaks bullets until it shatters. Ineffective against sharp objects.
+  components:
+  - type: RMCArmorPlate
+    kind: Ceramic
+    magnitude: 10
+  - type: RMCCeramicPlate
+  - type: Sprite
+    sprite: _RMC14/Objects/Armor/Plates/ceramic_plate.rsi
+    layers:
+    - state: ceramic2_100
+      map: [ "plate" ]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.RMCCeramicPlateVisuals.State:
+        plate:
+          Full: { state: ceramic2_100 }
+          Damaged: { state: ceramic2_50 }
+          Broken: { state: ceramic2_0 }
+
+- type: entity
+  parent: RMCArmorPlateBase
+  id: RMCArmorPlateAntiDecay
+  name: anti-decay research plate
+  description: A preservation plate that activates on death, slowing decay and extending the time you can be revived by four minutes.
+  components:
+  - type: RMCArmorPlate
+    kind: AntiDecay
+    magnitude: 4
+
+- type: entity
+  parent: RMCArmorPlateBase
+  id: RMCArmorPlateTranslator
+  name: experimental language translator
+  description: An armor accessory plate whose microphones translate any language heard by the wearer, without any linguistic input - even languages never heard before.
+  components:
+  - type: RMCArmorPlate
+    kind: Translator

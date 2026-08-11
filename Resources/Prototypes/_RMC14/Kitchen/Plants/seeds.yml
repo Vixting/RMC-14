@@ -710,6 +710,10 @@
       Min: 1
       Max: 5
       PotencyDivisor: 5
+    RMCAmatoxin:
+      Min: 1
+      Max: 5
+      PotencyDivisor: 5
 
 - type: seed
   id: glowshroom

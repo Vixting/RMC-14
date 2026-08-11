@@ -97,7 +97,7 @@
   - type: FixedIdentity
     name: cm-job-name-xeno-sentinel
   - type: RMCSurgeryXenoHeart
-    item: RMCOrganXenoHeartT1
+    item: RMCOrganXenoHeartT1V800
   - type: VentCrawler
     ventCrawlIcon: sentinel
   - type: RMCActionOrder

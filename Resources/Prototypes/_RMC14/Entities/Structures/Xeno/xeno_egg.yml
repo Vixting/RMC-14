@@ -67,6 +67,7 @@
     requiredTriggeredSpeed: 0
     intersectRatio: 0.5
   - type: RMCNightVisionVisible
+  - type: HiveColored
     priority: -1
   - type: Corrodible
     isCorrodible: false
@@ -83,6 +84,16 @@
     - Electrocution
   - type: DeletedByWeedKiller
   - type: XenoChargeDontHit
+  - type: SolutionContainerManager
+    solutions:
+      egg:
+        reagents:
+        - ReagentId: RMCEggPlasma
+          Quantity: 60
+  - type: DrawableSolution
+    solution: egg
+  - type: ExaminableSolution
+    solution: egg
 
 - type: entity
   parent: BaseItem

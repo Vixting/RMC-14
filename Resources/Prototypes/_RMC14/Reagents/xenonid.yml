@@ -1,0 +1,305 @@
+
+# TODO RMC14: predator remove/change
+# - type: reagent
+#   parent: CMReagentMedicine
+#   id: RMCThwei
+#   chemClass: Special
+#   name: reagent-name-rmcthwei
+#   desc: reagent-desc-rmcthwei
+#   physicalDesc: reagent-physical-desc-oily
+#   color: "#41c498"
+#   metabolisms:
+#     Medicine:
+#       metabolismRate: 0.1
+#       effects:
+#       - !type:Cardiostabilizing
+#         potency: 4
+#       - !type:Organstabilize
+#         potency: 1
+#       - !type:Painkilling
+#         potency: 4
+#       - !type:Hemogenic
+#         potency: 9
+#       - !type:Antitoxic
+#         potency: 1
+#       - !type:Oxygenating
+#         potency: 6
+#       - !type:Anticarcinogenic
+#         potency: 6
+#       - !type:Bonemending
+#         potency: 6
+#       - !type:Aiding
+#         potency: 1
+#       - !type:Antihallucinogenic
+#         potency: 2
+#       - !type:Focusing
+#         potency: 6
+#       - !type:Curing
+#         potency: 4
+#       - !type:Oculopeutic
+#         potency: 2
+#       - !type:Neuropeutic
+#         potency: 2
+
+# TODO RMC14: predator remove/change
+# - type: reagent
+#   parent: Blood
+#   id: RMCGreenBlood
+#   chemClass: Special
+#   name: reagent-name-rmcgreenblood
+#   desc: reagent-desc-rmcgreenblood
+#   physicalDesc: reagent-physical-desc-oily
+#   color: "#81d434"
+
+- type: reagent
+  parent: Blood
+  id: RMCXenoBlood
+  chemClass: Special
+  name: reagent-name-rmcxenoblood
+  desc: reagent-desc-rmcxenoblood
+  physicalDesc: reagent-physical-desc-oily
+  color: "#bed700"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Corrosive
+        potency: 3
+  plantMetabolism:
+  - !type:AcidBloodMutating
+    potency: 1
+
+- type: reagent
+  parent: RMCXenoBlood
+  id: RMCXenoBloodRoyal
+  chemClass: Special
+  name: reagent-name-rmcxenobloodroyal
+  desc: reagent-desc-rmcxenobloodroyal
+  physicalDesc: reagent-physical-desc-oily
+  color: "#cac703"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Corrosive
+        potency: 6
+  plantMetabolism:
+  - !type:AcidBloodMutating
+    royal: true
+    potency: 1
+
+# TODO RMC14: Hemositic NERVOUS disability on crit od
+- type: reagent
+  parent: CMReagent
+  id: RMCXenogeneticCatalyst
+  chemClass: Special
+  name: reagent-name-rmcxenogeneticcatalyst
+  desc: reagent-desc-rmcxenogeneticcatalyst
+  physicalDesc: reagent-physical-desc-oily
+  color: "#a244d8"
+  overdose: 10
+  criticalOverdose: 20
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Hemositic
+        potency: 2
+      - !type:DNADisintegrating
+        potency: 5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPheromonePlasma
+  chemClass: Special
+  name: reagent-name-rmcpheromoneplasma
+  desc: reagent-desc-rmcpheromoneplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#a2e7d6"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Hallucinogenic
+        potency: 8
+      - !type:Nervestimulating
+        potency: 2
+
+- type: reagent
+  parent: CMReagent
+  id: RMCChitinPlasma
+  chemClass: Special
+  name: reagent-name-rmcchitinplasma
+  desc: reagent-desc-rmcchitinplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#6d7694"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Hyperdensificating
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCCatecholaminePlasma
+  chemClass: Special
+  name: reagent-name-rmccatecholamineplasma
+  desc: reagent-desc-rmccatecholamineplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#cf7551"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Neuropathic
+        potency: 2
+      - !type:Musclestimulating
+        potency: 6
+
+- type: reagent
+  parent: CMReagent
+  id: RMCEggPlasma
+  chemClass: Special
+  name: reagent-name-rmceggplasma
+  desc: reagent-desc-rmceggplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#c3c371"
+  overdose: 80
+  criticalOverdose: 100
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Hemositic
+        potency: 4
+      - !type:Embryonic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCNeurotoxinPlasma
+  chemClass: Special
+  name: reagent-name-rmcneurotoxinplasma
+  desc: reagent-desc-rmcneurotoxinplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#ba8216"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Neurotoxic
+        potency: 4
+      - !type:Excreting
+        potency: 2
+      - !type:Hallucinogenic
+        potency: 6
+
+- type: reagent
+  parent: CMReagent
+  id: RMCAntiNeurotoxin
+  chemClass: Special
+  name: reagent-name-rmcantineurotoxin
+  desc: reagent-desc-rmcantineurotoxin
+  physicalDesc: reagent-physical-desc-oily
+  color: "#afffc9"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Neuroshielding
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCNutrientPlasma
+  chemClass: Special
+  name: reagent-name-rmcnutrientplasma
+  desc: reagent-desc-rmcnutrientplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#2fbe88"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Fueling
+        potency: 1
+      - !type:Viscous
+        potency: 3
+      - !type:Addictive
+        potency: 4
+      - !type:Nutritious
+        potency: 3
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPurplePlasma
+  chemClass: Special
+  name: reagent-name-rmcpurpleplasma
+  desc: reagent-desc-rmcpurpleplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#a65d7f"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Biocidic
+        potency: 2
+
+- type: reagent
+  parent: CMReagent
+  id: RMCRoyalPlasma
+  chemClass: Special
+  name: reagent-name-rmcroyalplasma
+  desc: reagent-desc-rmcroyalplasma
+  physicalDesc: reagent-physical-desc-oily
+  color: "#ffeb9c"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Biocidic
+        potency: 4
+      - !type:Addictive
+        potency: 1
+      - !type:Hallucinogenic
+        potency: 4
+      - !type:Encrypted
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCFruitResin
+  chemClass: Special
+  name: reagent-name-rmcfruitresin
+  desc: reagent-desc-rmcfruitresin
+  physicalDesc: reagent-physical-desc-oily
+  color: "#12911d"
+  overdose: 20
+  criticalOverdose: 30
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Transformative
+        potency: 4
+      - !type:Nutritious
+        potency: 3
+      - !type:Hemogenic
+        potency: 1

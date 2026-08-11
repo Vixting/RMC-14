@@ -97,7 +97,7 @@
   - type: FixedIdentity
     name: cm-job-name-xeno-lurker
   - type: RMCSurgeryXenoHeart
-    item: RMCOrganXenoHeartT2
+    item: RMCOrganXenoHeartT2V2000
   - type: XenoPlasmaBlood
     plasmaTypes:
     - RMCCatecholaminePlasma

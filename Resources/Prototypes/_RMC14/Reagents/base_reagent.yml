@@ -8,6 +8,7 @@
   parent: CMReagent
   id: CMReagentMedicine
   group: Medicine
+  medical: true
 
 - type: reagent
   abstract: true

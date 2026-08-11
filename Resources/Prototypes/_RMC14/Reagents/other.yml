@@ -1,10 +1,223 @@
 - type: reagent
   parent: CMReagent
   id: RMCVirusFood
+  chemClass: Rare
   name: reagent-name-rmcvirusfood
   desc: reagent-desc-rmcvirusfood
   physicalDesc: reagent-physical-desc-opaque
   color: "#899613"
+  metabolisms:
+    Food:
+      metabolismRate: 0.1
+      effects:
+      - !type:Nutritious
+        potency: 2
+        nutFactor: 2
+        nutMetabolism: 0.1
+
+- type: reagent
+  parent: [ CMReagent, Ammonia ]
+  id: RMCAmmonia
+  chemClass: Common
+  name: reagent-name-rmcammonia
+  desc: reagent-desc-rmcammonia
+  physicalDesc: reagent-physical-desc-gaseous
+  color: "#404030"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Toxic
+        potency: 3
+      - !type:Nutritious
+        potency: 2
+
+- type: reagent
+  parent: [ CMReagent, Nicotine ]
+  id: RMCNicotine
+  chemClass: Rare
+  name: reagent-name-rmcnicotine
+  desc: reagent-desc-rmcnicotine
+  physicalDesc: reagent-physical-desc-oily
+  color: "#181818"
+
+- type: reagent
+  parent: [ CMReagent, Thermite ]
+  id: RMCThermite
+  chemClass: Uncommon
+  name: reagent-name-rmcthermite
+  desc: reagent-desc-rmcthermite
+  physicalDesc: reagent-physical-desc-powdery
+  color: "#673910"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Fueling
+        potency: 7
+      - !type:Oxidizing
+        potency: 5
+      - !type:Viscous
+        potency: 4
+      - !type:Corrosive
+        potency: 2
+
+- type: reagent
+  parent: [ CMReagent, SpaceCleaner ]
+  id: RMCSpaceCleaner
+  chemClass: Uncommon
+  name: reagent-name-rmcspacecleaner
+  desc: reagent-desc-rmcspacecleaner
+  physicalDesc: reagent-physical-desc-oily
+  color: "#A5F0EE"
+  overdose: 30
+  criticalOverdose: 50
+
+- type: reagent
+  parent: CMReagent
+  id: RMCCryptobiolin
+  chemClass: Uncommon
+  name: reagent-name-rmccryptobiolin
+  desc: reagent-desc-rmccryptobiolin
+  physicalDesc: reagent-physical-desc-oily
+  color: "#C8A5DC"
+  overdose: 30
+  criticalOverdose: 50
+
+- type: reagent
+  parent: CMReagent
+  id: RMCImpedrezene
+  chemClass: Uncommon
+  name: reagent-name-rmcimpedrezene
+  desc: reagent-desc-rmcimpedrezene
+  physicalDesc: reagent-physical-desc-oily
+  color: "#C8A5DC"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Neurotoxic
+        potency: 2
+      - !type:Antispasmodic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCFluorosurfactant
+  chemClass: Uncommon
+  name: reagent-name-rmcfluorosurfactant
+  desc: reagent-desc-rmcfluorosurfactant
+  physicalDesc: reagent-physical-desc-oily
+  color: "#9E6B38"
+
+- type: reagent
+  parent: CMReagent
+  id: RMCFoamingAgent
+  chemClass: Uncommon
+  name: reagent-name-rmcfoamingagent
+  desc: reagent-desc-rmcfoamingagent
+  physicalDesc: reagent-physical-desc-powdery
+  color: "#664B63"
+
+- type: reagent
+  parent: RMCFoamingAgent
+  id: RMCStabilizedMetallicFoam
+  chemClass: Uncommon
+  name: reagent-name-rmcstabilizedmetallicfoam
+  desc: reagent-desc-rmcstabilizedmetallicfoam
+  physicalDesc: reagent-physical-desc-oily
+  color: "#d4b8d1"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Toxic
+        potency: 8
+
+- type: reagent
+  parent: [ CMReagent, Diethylamine ]
+  id: RMCDiethylamine
+  chemClass: Uncommon
+  name: reagent-name-rmcdiethylamine
+  desc: reagent-desc-rmcdiethylamine
+  physicalDesc: reagent-physical-desc-oily
+  color: "#604030"
+
+- type: reagent
+  parent: CMReagent
+  id: RMCGlycerol
+  chemClass: Rare
+  name: reagent-name-rmcglycerol
+  desc: reagent-desc-rmcglycerol
+  physicalDesc: reagent-physical-desc-oily
+  color: "#808080"
+  medical: true # cmss13 glycerol carries REAGENT_TYPE_MEDICAL
+
+- type: reagent
+  parent: CMReagent
+  id: RMCHexamine
+  chemClass: Rare
+  name: reagent-name-rmchexamine
+  desc: reagent-desc-rmchexamine
+  physicalDesc: reagent-physical-desc-crystalline
+  color: "#F0F0F0"
+
+- type: reagent
+  parent: CMReagent
+  id: RMCOxidizingAgent
+  chemClass: Rare
+  noGeneration: true
+  name: reagent-name-rmcoxidizingagent
+  desc: reagent-desc-rmcoxidizingagent
+  physicalDesc: reagent-physical-desc-gaseous
+  color: "#c4c4c4"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Oxidizing
+        potency: 6
+
+# TODO RMC14: remove fingerpints idk if this an actual thing in cm
+- type: reagent
+  parent: CMReagent
+  id: RMCForensicSpray
+  chemClass: Rare
+  noGeneration: true
+  name: reagent-name-rmcforensicspray
+  desc: reagent-desc-rmcforensicspray
+  physicalDesc: reagent-physical-desc-oily
+  color: "#79847a"
+
+- type: reagent
+  parent: CMReagent
+  id: RMCSleen
+  chemClass: Uncommon
+  name: reagent-name-rmcsleen
+  desc: reagent-desc-rmcsleen
+  physicalDesc: reagent-physical-desc-oily
+  flavor: sweet
+  color: "#C21D24"
+  overdose: 20
+  criticalOverdose: 30
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Painkilling
+        potency: 3
+
+- type: reagent
+  parent: CMReagent
+  id: RMCCornOil
+  chemClass: Rare
+  name: reagent-name-rmccornoil
+  desc: reagent-desc-rmccornoil
+  physicalDesc: reagent-physical-desc-oily
+  flavor: oily
+  color: "#302000"
   metabolisms:
     Food:
       metabolismRate: 0.1

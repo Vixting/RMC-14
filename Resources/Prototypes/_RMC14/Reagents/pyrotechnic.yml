@@ -171,6 +171,7 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#00b8ff"
+  specialist: true
   fireEntity: RMCTileFireBlue
   metabolisms:
     Poison:
@@ -191,6 +192,7 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#00dd00"
+  specialist: true
   fireEntity: RMCTileFireGreen
   fireSpread: true
   metabolisms:

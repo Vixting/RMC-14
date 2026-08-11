@@ -87,6 +87,16 @@
     outlineColor: "#17991b80"
   - type: XenoFruitHeal
     healAmount: 50
+  - type: SolutionContainerManager
+    solutions:
+      fruit:
+        reagents:
+        - ReagentId: RMCFruitResin
+          Quantity: 30
+  - type: DrawableSolution
+    solution: fruit
+  - type: ExaminableSolution
+    solution: fruit
 
 - type: entity
   parent: XenoFruitLesser
@@ -108,6 +118,12 @@
     tickCount: 5      # 100 health over 5 seconds
     tickPeriod: 1
     regenPerTick: 20
+  - type: SolutionContainerManager
+    solutions:
+      fruit:
+        reagents:
+        - ReagentId: RMCFruitResin
+          Quantity: 60
 
 - type: entity
   parent: XenoFruitBase
@@ -133,6 +149,18 @@
     shieldAmount: 200
     shieldDecay: 10
     shieldRatio: 0.3
+  - type: SolutionContainerManager
+    solutions:
+      fruit:
+        reagents:
+        - ReagentId: RMCFruitResin
+          Quantity: 30
+        - ReagentId: RMCChitinPlasma
+          Quantity: 30
+  - type: DrawableSolution
+    solution: fruit
+  - type: ExaminableSolution
+    solution: fruit
 
 - type: entity
   parent: XenoFruitBase
@@ -156,6 +184,18 @@
   - type: XenoPheromones
     pheromonesMultiplier: 1
   - type: XenoPheromonesObject
+  - type: SolutionContainerManager
+    solutions:
+      fruit:
+        reagents:
+        - ReagentId: RMCFruitResin
+          Quantity: 30
+        - ReagentId: RMCPheromonePlasma
+          Quantity: 30
+  - type: DrawableSolution
+    solution: fruit
+  - type: ExaminableSolution
+    solution: fruit
 
 - type: entity
   parent: XenoFruitBase
@@ -174,6 +214,18 @@
     outlineColor: "#9061BA80"
   - type: XenoFruitSpeed
     speedModifier: 0.2
+  - type: SolutionContainerManager
+    solutions:
+      fruit:
+        reagents:
+        - ReagentId: RMCFruitResin
+          Quantity: 30
+        - ReagentId: RMCCatecholaminePlasma
+          Quantity: 30
+  - type: DrawableSolution
+    solution: fruit
+  - type: ExaminableSolution
+    solution: fruit
 
 - type: entity
   parent: XenoFruitBase
@@ -194,3 +246,15 @@
     tickCount: 5      # 240 plasma over 15 seconds
     tickPeriod: 3
     regenPerTick: 48
+  - type: SolutionContainerManager
+    solutions:
+      fruit:
+        reagents:
+        - ReagentId: RMCFruitResin
+          Quantity: 30
+        - ReagentId: RMCPurplePlasma
+          Quantity: 30
+  - type: DrawableSolution
+    solution: fruit
+  - type: ExaminableSolution
+    solution: fruit

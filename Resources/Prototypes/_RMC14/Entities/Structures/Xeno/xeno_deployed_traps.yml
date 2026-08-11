@@ -67,6 +67,7 @@
   - type: TimedDespawn
     lifetime: 10
   - type: XenoChargeDontHit
+  - type: HiveColored
 
 - type: entity
   id: XenoTrapperEmpoweredTrap

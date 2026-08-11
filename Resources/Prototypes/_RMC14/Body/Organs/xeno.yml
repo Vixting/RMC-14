@@ -21,7 +21,7 @@
   - type: Sprite
     state: heart_t1
   - type: RMCBiomassOrgan
-    value: 10
+    value: 500
 
 - type: entity
   parent: RMCOrganXenoHeart
@@ -32,7 +32,7 @@
   - type: Sprite
     state: heart_t2
   - type: RMCBiomassOrgan
-    value: 20
+    value: 1500
 
 - type: entity
   parent: RMCOrganXenoHeart
@@ -43,7 +43,7 @@
   - type: Sprite
     state: heart_t3
   - type: RMCBiomassOrgan
-    value: 35
+    value: 3000
 
 - type: entity
   parent: RMCOrganXenoHeart
@@ -55,4 +55,65 @@
     state: heart_t3
     scale: 1.25, 1.25
   - type: RMCBiomassOrgan
-    value: 75
+    value: 8000
+
+- type: entity
+  parent: RMCOrganXenoHeart
+  id: RMCOrganXenoHeartT1V800
+  suffix: 800
+  components:
+  - type: Item
+    size: Tiny
+  - type: Sprite
+    state: heart_t1
+  - type: RMCBiomassOrgan
+    value: 800
+
+- type: entity
+  parent: RMCOrganXenoHeart
+  id: RMCOrganXenoHeartT1V1000
+  suffix: 1000
+  components:
+  - type: Item
+    size: Tiny
+  - type: Sprite
+    state: heart_t1
+  - type: RMCBiomassOrgan
+    value: 1000
+
+- type: entity
+  parent: RMCOrganXenoHeart
+  id: RMCOrganXenoHeartT2V1000
+  suffix: 1000
+  components:
+  - type: Item
+    size: Small
+  - type: Sprite
+    state: heart_t2
+  - type: RMCBiomassOrgan
+    value: 1000
+
+- type: entity
+  parent: RMCOrganXenoHeart
+  id: RMCOrganXenoHeartT2V2000
+  suffix: 2000
+  components:
+  - type: Item
+    size: Small
+  - type: Sprite
+    state: heart_t2
+  - type: RMCBiomassOrgan
+    value: 2000
+
+- type: entity
+  parent: RMCOrganXenoHeart
+  id: RMCOrganXenoHeartKing
+  suffix: king
+  components:
+  - type: Item
+    size: Large
+  - type: Sprite
+    state: heart_t3
+    scale: 1.25, 1.25
+  - type: RMCBiomassOrgan
+    value: 50000

@@ -105,7 +105,7 @@
   - type: FixedIdentity
     name: cm-job-name-xeno-carrier
   - type: RMCSurgeryXenoHeart
-    item: RMCOrganXenoHeartT2
+    item: RMCOrganXenoHeartT2V1000
   - type: XenoPlasmaBlood
     plasmaTypes:
     - RMCPurplePlasma
