@@ -2,6 +2,7 @@ using Content.Shared._RMC14.Chemistry.Generation;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Chemistry.Reagent;
+using Content.Shared.FixedPoint;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 
@@ -76,8 +77,20 @@ public sealed class RMCReagentAnalyzerSystem : SharedRMCReagentAnalyzerSystem
 
         if (reagent.ChemClass >= ChemClass.Special)
         {
-            var tier = _generator.TryGetGeneratedTier(reagentId, out var t) ? t : 1;
-            _research.TryAwardIdentificationCredits(reagentId, tier);
+            if (_generator.TryGetGeneratedTier(reagentId, out var tier))
+            {
+                var credits = tier switch
+                {
+                    1 => 3,
+                    2 => 5,
+                    _ => 7,
+                };
+                _research.TryAwardIdentificationCredits(reagentId, credits, FixedPoint2.Zero);
+            }
+            else
+            {
+                _research.TryAwardIdentificationCredits(reagentId, reagent.CreditReward, reagent.ObjectiveValue);
+            }
         }
     }
 

@@ -62,11 +62,17 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        if (HasComp<FloraDataDiscComponent>(args.Used))
+        if (TryComp(args.Used, out FloraDataDiscComponent? insertDisc))
         {
             if (ent.Comp.DiscSlot.ContainedEntity != null)
             {
                 _popup.PopupCursor("A disc is already loaded. Eject it first via the interface.", args.User);
+                return;
+            }
+
+            if (insertDisc.Genes.Count > 0)
+            {
+                _popup.PopupCursor("That disc already has gene data stored. Use a blank disc.", args.User);
                 return;
             }
 
@@ -86,9 +92,9 @@ public sealed class LysisCentrifugeSystem : EntitySystem
                 return;
             }
 
-            if (seed.Seedless)
+            if (seed.Immutable)
             {
-                _popup.PopupCursor("This plant is seedless — its genome cannot be extracted.", args.User);
+                _popup.PopupCursor("This seed is not compatible with our genetics technology.", args.User);
                 return;
             }
 

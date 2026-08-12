@@ -71,7 +71,7 @@ public sealed class GeneEditorSystem : EntitySystem
             return;
         }
 
-        if (HasComp<SeedComponent>(args.Used))
+        if (TryComp(args.Used, out SeedComponent? insertSeedComp))
         {
             if (ent.Comp.DiscSlot.ContainedEntity == null)
             {
@@ -82,6 +82,12 @@ public sealed class GeneEditorSystem : EntitySystem
             if (ent.Comp.SeedSlot.ContainedEntity != null)
             {
                 _popup.PopupCursor("A seed packet is already loaded. Eject it first.", args.User);
+                return;
+            }
+
+            if (_botany.TryGetSeed(insertSeedComp, out var insertSeed) && insertSeed.Immutable)
+            {
+                _popup.PopupCursor("This seed is not compatible with our genetics technology.", args.User);
                 return;
             }
 
@@ -164,13 +170,6 @@ public sealed class GeneEditorSystem : EntitySystem
             return;
         }
 
-        if (seed.GeneEditCount >= comp.MaxEditCount)
-        {
-            _popup.PopupCursor("This seed has been modified too many times and can no longer accept genetic changes.", user);
-            EjectAll(ent, user);
-            return;
-        }
-
         if (!seed.Unique)
         {
             seed = seed.Clone();
@@ -178,32 +177,23 @@ public sealed class GeneEditorSystem : EntitySystem
             seedComp.SeedId = null;
         }
 
-        var failureChance = seed.GeneEditCount / 100f;
-        var failed = false;
-
-        foreach (var gene in disc.Genes)
-        {
-            if (_random.Prob(failureChance))
-            {
-                failed = true;
-                break;
-            }
-
-            gene.ApplyTo(seed);
-        }
-
-        if (failed)
+        if (_random.Prob(seed.GeneEditCount / 100f))
         {
             seed.GeneEditCount = comp.MaxEditCount + 1;
             seed.Viable = false;
             _audio.PlayPvs(comp.FailSound, ent);
             _popup.PopupCursor("[color=red]Gene delivery failed! The seed is ruined.[/color]", user);
+            EjectAll(ent, user);
+            return;
         }
-        else
+
+        foreach (var gene in disc.Genes)
         {
+            gene.ApplyTo(seed);
             seed.GeneEditCount += _random.Next(comp.EditCountAddMin, comp.EditCountAddMax + 1);
-            _audio.PlayPvs(comp.ApplySound, ent);
         }
+
+        _audio.PlayPvs(comp.ApplySound, ent);
 
         var newName = Loc.GetString("botany-seed-packet-name",
             ("seedName", Loc.GetString(seed.Name)),

@@ -29,14 +29,21 @@ public sealed partial class BotanySystem
                 FixedPoint2.Zero))
             return;
 
+        var maxProduceVolume = FixedPoint2.New(60);
         solutionContainer.RemoveAllSolution();
+        solutionContainer.MaxVolume = maxProduceVolume;
         foreach (var (chem, quantity) in seed.Chemicals)
         {
+            var available = solutionContainer.AvailableVolume;
+            if (available <= FixedPoint2.Zero)
+                break;
+
             var amount = FixedPoint2.New(quantity.Min);
             if (quantity.PotencyDivisor > 0 && seed.Potency > 0)
                 amount += FixedPoint2.New(seed.Potency / quantity.PotencyDivisor);
             amount = FixedPoint2.New(MathHelper.Clamp(amount.Float(), quantity.Min, quantity.Max));
-            solutionContainer.MaxVolume += amount;
+            if (amount > available)
+                amount = available;
             solutionContainer.AddReagent(chem, amount);
         }
     }
@@ -50,7 +57,6 @@ public sealed partial class BotanySystem
         {
             foreach (var m in comp.Seed.Mutations)
             {
-                // Don't show mutations that have no effect on produce (sentience)
                 if (!m.AppliesToProduce)
                     continue;
 

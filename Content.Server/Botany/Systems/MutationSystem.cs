@@ -61,7 +61,6 @@ public sealed class MutationSystem : EntitySystem
         Slot.NewChems,
         Slot.NewChems2,
         Slot.NewChems3,
-        Slot.MutateSpecies,
     ];
 
     /// <summary>
@@ -79,30 +78,37 @@ public sealed class MutationSystem : EntitySystem
         if (seed.Immutable)
             return;
 
-        var degree = severity switch
-        {
-            <= 8f => 1,
-            <= 16f => 2,
-            _ => 3,
-        };
+        var degree = severity <= 8f ? 1 : 2;
 
         var controller = seed.MutationController;
 
+        var speciesVal = controller.GetValueOrDefault(Slot.MutateSpecies, 0f);
+        if (seed.MutationPrototypes.Count > 0 && ((degree > 1 && speciesVal == 0f) || speciesVal > 0f))
+        {
+            var targetProto = _robustRandom.Pick(seed.MutationPrototypes);
+            if (_prototypeManager.TryIndex(targetProto, out SeedPrototype? protoSeed))
+                seed = seed.SpeciesChange(protoSeed);
+
+            ResetController(seed);
+            return;
+        }
+
         var superAllowed = new List<string>();
         var normalAllowed = new List<string>();
+        var cancelSlots = new HashSet<string>();
 
-        for (var i = 0; i < MutationSlots.Length; i++)
+        foreach (var slotName in MutationSlots)
         {
-            var slotName = MutationSlots[i];
-            if (slotName == Slot.MutateSpecies && degree < 2)
-                continue;
-
             var val = controller.GetValueOrDefault(slotName, 0f);
 
             if (val > 0f)
                 superAllowed.Add(slotName);
             else if (val >= -1f)
+            {
                 normalAllowed.Add(slotName);
+                if (val == -1f)
+                    cancelSlots.Add(slotName);
+            }
             // val < -1 means suppressed — excluded from both lists
         }
 
@@ -114,15 +120,16 @@ public sealed class MutationSystem : EntitySystem
             return;
         }
 
-        var totalMutations = _robustRandom.Next(1, 1 + degree + 1);
+        var mutationLevel = TryComp(plantHolder, out PlantHolderComponent? holder) ? holder.MutationLevel : 0f;
+        var iterations = _robustRandom.Next(1, degree + 2) + (int) MathF.Round(mutationLevel / 50f) + 1;
 
-        for (var i = 0; i < totalMutations; i++)
+        for (var i = 0; i < iterations; i++)
         {
-            if (candidates.Count == 0)
-                break;
-
             var slot = _robustRandom.Pick(candidates);
-            candidates.Remove(slot);
+
+            if (cancelSlots.Contains(slot))
+                return;
+
             ApplyMutation(plantHolder, ref seed, slot, degree);
         }
 
@@ -167,20 +174,24 @@ public sealed class MutationSystem : EntitySystem
                     seed.IdealLight + _robustRandom.Next(-1, 2) * degree,
                     0f, 30f);
                 seed.LightTolerance = Math.Clamp(
-                    seed.LightTolerance + _robustRandom.Next(-1, 2) * degree,
+                    seed.LightTolerance + _robustRandom.Next(-2, 3) * degree,
                     0f, 10f);
                 break;
 
             case Slot.ToxinTolerance:
                 seed.ToxinsTolerance = Math.Clamp(
-                    seed.ToxinsTolerance + _robustRandom.Next(-1, 2) * degree,
+                    seed.ToxinsTolerance + _robustRandom.Next(-2, 3) * degree,
                     0f, 10f);
                 break;
 
             case Slot.WeedTolerance:
                 seed.WeedTolerance = Math.Clamp(
-                    seed.WeedTolerance + _robustRandom.Next(-1, 2) * degree,
+                    seed.WeedTolerance + _robustRandom.Next(-2, 3) * degree,
                     0f, 10f);
+                if (_robustRandom.Prob(degree * 0.05f))
+                    seed.Carnivorous = Math.Clamp(seed.Carnivorous + _robustRandom.Next(-degree, degree + 1), 0, 2);
+                else if (_robustRandom.Prob(degree * 0.05f))
+                    seed.Parasite = !seed.Parasite;
                 break;
 
             case Slot.Production:
@@ -214,13 +225,21 @@ public sealed class MutationSystem : EntitySystem
                 break;
 
             case Slot.Bioluminescence:
-                seed.Bioluminescent = !seed.Bioluminescent;
-                if (seed.Bioluminescent)
-                    seed.BioluminescentColor = _robustRandom.Pick(BioluminescentColors);
+                if (_robustRandom.Prob(degree * 0.02f))
+                {
+                    seed.Bioluminescent = !seed.Bioluminescent;
+                    if (seed.Bioluminescent && _robustRandom.Prob(degree * 0.02f))
+                        seed.BioluminescentColor = _robustRandom.Pick(BioluminescentColors);
+                }
                 break;
 
             case Slot.Flowers:
-                seed.Flowers = !seed.Flowers;
+                if (_robustRandom.Prob(degree * 0.02f))
+                {
+                    seed.Flowers = !seed.Flowers;
+                    if (seed.Flowers && _robustRandom.Prob(degree * 0.02f))
+                        seed.FlowerColor = _robustRandom.Pick(BioluminescentColors);
+                }
                 break;
 
             case Slot.NewChems:
@@ -228,20 +247,32 @@ public sealed class MutationSystem : EntitySystem
             case Slot.NewChems3:
                 AddRandomChem(ref seed);
                 break;
-
-            case Slot.MutateSpecies:
-                if (seed.MutationPrototypes.Count > 0)
-                {
-                    var targetProto = _robustRandom.Pick(seed.MutationPrototypes);
-                    if (_prototypeManager.TryIndex(targetProto, out SeedPrototype? protoSeed))
-                        seed = seed.SpeciesChange(protoSeed);
-                }
-                break;
         }
     }
 
     private void AddRandomChem(ref SeedData seed)
     {
+        // 60u chem cap - no mutations after
+        if (ChemOutputFull(seed))
+            return;
+
+        if (seed.SpecialChemicals.Count > 0 && _robustRandom.Prob(0.4f))
+        {
+            var specialId = _robustRandom.Pick(seed.SpecialChemicals);
+            if (!seed.Chemicals.ContainsKey(specialId))
+            {
+                seed.Chemicals[specialId] = new SeedChemQuantity
+                {
+                    Min = 7,
+                    Max = 15,
+                    PotencyDivisor = _robustRandom.Next(5, 9),
+                    Inherent = false,
+                };
+            }
+
+            return;
+        }
+
         var fills = _prototypeManager.Index(RandomPickBotanyReagent).Fills;
         if (fills.Count == 0)
             return;
@@ -265,6 +296,20 @@ public sealed class MutationSystem : EntitySystem
         }
         seedChemQuantity.PotencyDivisor = (int) Math.Ceiling(100.0 / seedChemQuantity.Max);
         chemicals[chemicalId] = seedChemQuantity;
+    }
+
+    private static bool ChemOutputFull(SeedData seed)
+    {
+        var total = 0f;
+        foreach (var (_, q) in seed.Chemicals)
+        {
+            var amount = (float) q.Min;
+            if (q.PotencyDivisor > 0 && seed.Potency > 0)
+                amount += seed.Potency / q.PotencyDivisor;
+            total += Math.Clamp(amount, q.Min, q.Max);
+        }
+
+        return total >= 60f;
     }
 
     public SeedData Cross(SeedData a, SeedData b)
