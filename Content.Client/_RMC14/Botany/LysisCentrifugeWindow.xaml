@@ -1,7 +1,8 @@
 <DefaultWindow
     xmlns="https://spacestation14.io"
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-    MinSize="420 300">
+    MinSize="380 460"
+    SetSize="380 535">
     <PanelContainer>
         <PanelContainer.PanelOverride>
             <graphics:StyleBoxFlat BackgroundColor="#181C24" />
@@ -14,25 +15,25 @@
                 </PanelContainer>
                 <BoxContainer Orientation="Horizontal" Margin="0 3 0 0" VerticalAlignment="Center">
                     <SpriteView Name="SeedSpriteView"
-                                SetSize="28 28"
+                                SetSize="26 26"
                                 OverrideDirection="South"
                                 Stretch="Fit"
                                 VerticalAlignment="Center"
                                 Margin="0 0 4 0" />
-                    <PanelContainer Name="SeedStatusPanel" Access="Public" HorizontalExpand="True">
-                        <Label Name="SeedStatusLabel" Access="Public" Margin="6 1" />
+                    <PanelContainer Name="SeedStatusPanel" Access="Public" HorizontalExpand="True" MinHeight="26">
+                        <Label Name="SeedStatusLabel" Access="Public" Margin="6 1" VerticalAlignment="Center" />
                     </PanelContainer>
                 </BoxContainer>
-                <BoxContainer Orientation="Horizontal" Margin="0 3 0 8">
-                    <Button Name="EjectSeedButton" HorizontalExpand="True" />
-                    <Button Name="ProcessSeedButton" HorizontalExpand="True" />
+                <BoxContainer Orientation="Horizontal" Margin="0 3 0 6">
+                    <Button Name="EjectSeedButton" HorizontalExpand="True" Margin="0 0 2 0" />
+                    <Button Name="ProcessSeedButton" HorizontalExpand="True" Margin="2 0 0 0" />
                 </BoxContainer>
 
                 <PanelContainer Name="GenomeHeader" Access="Public">
                     <Label Text="GENOME BUFFER" FontColorOverride="#FFFFFF" Margin="6 2" />
                 </PanelContainer>
-                <PanelContainer Name="GenomeStatusPanel" Access="Public" Margin="0 3 0 0">
-                    <Label Name="GenomeNameLabel" Access="Public" Margin="6 1" />
+                <PanelContainer Name="GenomeStatusPanel" Access="Public" Margin="0 3 0 0" MinHeight="26">
+                    <Label Name="GenomeNameLabel" Access="Public" Margin="6 1" VerticalAlignment="Center" />
                 </PanelContainer>
                 <ProgressBar Name="DegradationBar"
                              Access="Public"
@@ -44,16 +45,16 @@
                 </ProgressBar>
                 <Button Name="ClearBufferButton"
                         HorizontalExpand="True"
-                        Margin="0 3 0 8" />
+                        Margin="0 3 0 6" />
 
                 <PanelContainer Name="DiscHeader" Access="Public">
                     <Label Text="DATA DISC" FontColorOverride="#FFFFFF" Margin="6 2" />
                 </PanelContainer>
-                <BoxContainer Orientation="Horizontal" Margin="0 3 0 8">
-                    <PanelContainer Name="DiscStatusPanel" Access="Public" HorizontalExpand="True">
-                        <Label Name="DiscStatusLabel" Access="Public" Margin="6 1" />
+                <BoxContainer Orientation="Horizontal" Margin="0 3 0 6">
+                    <PanelContainer Name="DiscStatusPanel" Access="Public" HorizontalExpand="True" MinHeight="26">
+                        <Label Name="DiscStatusLabel" Access="Public" Margin="6 1" VerticalAlignment="Center" />
                     </PanelContainer>
-                    <Button Name="EjectDiscButton" />
+                    <Button Name="EjectDiscButton" Margin="4 0 0 0" />
                 </BoxContainer>
 
                 <BoxContainer Name="GenesSection" Orientation="Vertical" VerticalExpand="True">
