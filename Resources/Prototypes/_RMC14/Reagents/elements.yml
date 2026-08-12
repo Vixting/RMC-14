@@ -215,6 +215,9 @@
   flavor: metallic
   color: "#484848"
   unknown: true
+  plantMetabolism:
+  - !type:Neurotoxic
+    potency: 16
   metabolisms:
     Poison:
       metabolismRate: 0.1

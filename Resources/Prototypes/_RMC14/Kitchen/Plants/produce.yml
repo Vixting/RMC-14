@@ -16,7 +16,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: plump
+    seedId: rmcplump
   - type: Tag
     tags:
     - Vegetable
@@ -45,7 +45,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: peanut
+    seedId: rmcpeanut
   - type: Tag
     tags:
     - Vegetable
@@ -69,7 +69,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: whitebeet
+    seedId: rmcwhitebeet
   - type: Tag
     tags:
     - Vegetable
@@ -91,7 +91,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: sunflower
+    seedId: rmcsunflower
   - type: Tag
     tags:
     - Vegetable
@@ -112,7 +112,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: grass
+    seedId: rmcgrass
   - type: Tag
     tags:
     - Vegetable
@@ -134,7 +134,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: shand
+    seedId: rmcshand
   - type: Tag
     tags:
     - Vegetable
@@ -158,7 +158,7 @@
   - type: Item
     heldPrefix: produce
   - type: Produce
-    seedId: mtear
+    seedId: rmcmtear
   - type: Tag
     tags:
     - Vegetable
@@ -546,3 +546,12 @@
   - type: Tag
     tags:
     - Vegetable
+
+- type: entity
+  parent: FoodApple
+  id: RMCFoodPoisonApple
+  name: poison apple
+  description: A crisp, sweet-smelling apple. Something about it feels wrong.
+  components:
+  - type: Produce
+    seedId: rmcpoisonapple

@@ -285,6 +285,12 @@ public partial class SeedData
     public List<string> MutationPrototypes = new();
 
     /// <summary>
+    ///     reagents that can only be found by mutating this plant
+    /// </summary>
+    [DataField]
+    public List<string> SpecialChemicals = new();
+
+    /// <summary>
     ///  Log impact for when the seed is planted.
     /// </summary>
     [DataField]
@@ -310,6 +316,7 @@ public partial class SeedData
             PacketPrototype = PacketPrototype,
             ProductPrototypes = new List<string>(ProductPrototypes),
             MutationPrototypes = new List<string>(MutationPrototypes),
+            SpecialChemicals = new List<string>(SpecialChemicals),
             Chemicals = new Dictionary<string, SeedChemQuantity>(Chemicals),
             ConsumeGasses = new Dictionary<Gas, float>(ConsumeGasses),
             ExudeGasses = new Dictionary<Gas, float>(ExudeGasses),
@@ -382,6 +389,7 @@ public partial class SeedData
             PacketPrototype = other.PacketPrototype,
             ProductPrototypes = new List<string>(other.ProductPrototypes),
             MutationPrototypes = new List<string>(other.MutationPrototypes),
+            SpecialChemicals = new List<string>(other.SpecialChemicals),
 
             Chemicals = new Dictionary<string, SeedChemQuantity>(Chemicals),
             ConsumeGasses = new Dictionary<Gas, float>(ConsumeGasses),

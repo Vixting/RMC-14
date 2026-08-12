@@ -63,3 +63,18 @@ reagent-desc-instant-grape = It's grrrrrape!
 
 reagent-name-instant-pineapple = instant pineapple juice
 reagent-desc-instant-pineapple = Refreshingly citric, with a pleasant flavor.
+
+reagent-name-rmc-honey = honey
+reagent-desc-rmc-honey = Honey is a natural sweet, viscous food substance composed of mainly fructose and glucose.
+
+reagent-name-rmc-banana = banana
+reagent-desc-rmc-banana = A common yellow fruit extract, known for its sweet flavor and slippery peel.
+
+reagent-name-rmc-coco = coco
+reagent-desc-rmc-coco = Ground cocoa. The base for all things chocolate.
+
+reagent-name-rmc-rice = rice
+reagent-desc-rmc-rice = Grains of rice, a nutritious staple food.
+
+reagent-name-rmc-capsaicin = capsaicin
+reagent-desc-rmc-capsaicin = The active component of chili peppers, producing a fierce burning sensation.

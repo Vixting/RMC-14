@@ -625,6 +625,9 @@
   color: "#e9d191"
   overdose: 30
   criticalOverdose: 50
+  plantMetabolism:
+  - !type:Neuropeutic
+    potency: 8
   metabolisms:
     Medicine:
       metabolismRate: 0.1

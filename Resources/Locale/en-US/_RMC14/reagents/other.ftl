@@ -48,3 +48,6 @@ reagent-desc-rmcsleen = An illicit mixture of name brand lime soda and oxycodone
 
 reagent-name-rmccornoil = Corn Oil
 reagent-desc-rmccornoil = An oil derived from various types of corn.
+
+reagent-name-rmcplasticide = Plasticide
+reagent-desc-rmcplasticide = Liquid plastic. Not safe to eat.

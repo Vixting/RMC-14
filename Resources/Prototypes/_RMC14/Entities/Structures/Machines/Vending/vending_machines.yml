@@ -690,44 +690,37 @@
 - type: vendingMachineInventory
   id: CMVendorSeeds
   startingInventory:
-    BananaSeeds: 3
-    BerrySeeds: 3
-    CarrotSeeds: 3
-    ChanterelleSeeds: 2
-    ChiliSeeds: 3
-    CornSeeds: 3
-    CottonSeeds: 3
-    EggplantSeeds: 3
-    PotatoSeeds: 3
-    SoybeanSeeds: 3
-    SunflowerSeeds: 2
-    TomatoSeeds: 3
-    WheatSeeds: 3
-    OatSeeds: 3
-    AppleSeeds: 3
-    PoppySeeds: 3
-    SugarcaneSeeds: 3
-    PeanutSeeds: 3
-    WhiteBeetSeeds: 3
-    WatermelonSeeds: 3
-    LimeSeeds: 3
-    LemonSeeds: 3
-    OrangeSeeds: 3
-    PineappleSeeds: 3
-    GrassSeeds: 3
-    CocoaSeeds: 3
-    PlumpSeeds: 2
-    LingzhiSeeds: 3
-    CabbageSeeds: 3
-    GrapeSeeds: 3
-    PumpkinSeeds: 3
-    CherrySeeds: 3
-    RiceSeeds: 3
-    GarlicSeeds: 3
-    OnionSeeds: 3
-    OnionRedSeeds: 3
+    RMCBananaSeeds: 3
+    RMCBerriesSeeds: 3
+    RMCCarrotSeeds: 3
+    RMCChanterelleSeeds: 2
+    RMCChiliSeeds: 3
+    RMCCornSeeds: 3
+    RMCEggplantSeeds: 3
+    RMCPotatoSeeds: 3
+    RMCSoybeansSeeds: 3
+    RMCTomatoSeeds: 3
+    RMCWheatSeeds: 3
+    RMCAppleSeeds: 3
+    RMCPoppySeeds: 3
+    RMCSugarcaneSeeds: 3
+    RMCWatermelonSeeds: 3
+    RMCLimeSeeds: 3
+    RMCLemonSeeds: 3
+    RMCOrangeSeeds: 3
+    RMCCocoaSeeds: 3
+    RMCCabbageSeeds: 3
+    RMCGrapeSeeds: 3
+    RMCPumpkinSeeds: 3
+    RMCCherrySeeds: 3
+    RMCRiceSeeds: 3
+    RMCSunflowerSeeds: 2
+    RMCPeanutSeeds: 3
+    RMCWhiteBeetSeeds: 3
+    RMCGrassSeeds: 3
+    RMCPlumpSeeds: 2
     RMCMangoSeeds: 3
-    ShandSeeds: 2
+    RMCShandSeeds: 2
     RMCIcePepperSeeds: 3
     RMCGlowberrySeeds: 2
     RMCMoldSeeds: 2
@@ -739,11 +732,19 @@
     RMCBluespacetomaSeeds: 1
     RMCKudzuSeeds: 1
     RMCPoisonberrySeeds: 1
+    # Dont exist in CM just going to leave tho
+    CottonSeeds: 3
+    OatSeeds: 3
+    PineappleSeeds: 3
+    LingzhiSeeds: 3
+    GarlicSeeds: 3
+    OnionSeeds: 3
+    OnionRedSeeds: 3
   emaggedInventory:
     RMCLibertySeeds: 1
-    MtearSeeds: 1
-    AmbrosiaVulgarisSeeds: 1
-    NettleSeeds: 1
+    RMCMtearSeeds: 1
+    RMCAmbrosiaVulgarisSeeds: 1
+    RMCNettleSeeds: 1
     RMCDeathberrySeeds: 1
     RMCAngelSeeds: 1
     RMCWeedsSeeds: 1

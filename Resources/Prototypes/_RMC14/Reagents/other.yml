@@ -239,3 +239,21 @@
         potency: 2
         nutFactor: 2
         nutMetabolism: 0.1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPlasticide
+  name: reagent-name-rmcplasticide
+  desc: reagent-desc-rmcplasticide
+  physicalDesc: reagent-physical-desc-oily
+  flavor: plastic
+  color: "#CF3600"
+  plantMetabolism:
+  - !type:Toxic
+    potency: 4.0
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Toxic
+        potency: 1

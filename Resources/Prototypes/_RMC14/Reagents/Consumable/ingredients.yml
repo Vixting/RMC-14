@@ -72,3 +72,66 @@
   flavor: honey
   color: "#FFFF00"
   recognizable: true
+
+# Banana
+- type: reagent
+  parent: BaseJuice
+  id: RMCBanana
+  name: reagent-name-rmc-banana
+  desc: reagent-desc-rmc-banana
+  physicalDesc: reagent-physical-desc-sweet
+  flavor: banana
+  color: "#e4c439"
+  recognizable: true
+
+# Coco
+- type: reagent
+  parent: BaseJuice
+  id: RMCCoco
+  chemClass: Rare
+  name: reagent-name-rmc-coco
+  desc: reagent-desc-rmc-coco
+  physicalDesc: reagent-physical-desc-bitter
+  flavor: chocolate
+  color: "#302000"
+  recognizable: true
+  metabolisms:
+    Food:
+      metabolismRate: 0.1
+      effects:
+      - !type:Nutritious
+        potency: 2
+
+# Rice
+- type: reagent
+  parent: BaseJuice
+  id: RMCRice
+  name: reagent-name-rmc-rice
+  desc: reagent-desc-rmc-rice
+  physicalDesc: reagent-physical-desc-opaque
+  flavor: rice
+  color: "#ffffff"
+  recognizable: true
+  metabolisms:
+    Food:
+      metabolismRate: 0.1
+      effects:
+      - !type:Nutritious
+        potency: 2
+
+# Capsaicin
+- type: reagent
+  parent: CMReagent
+  id: RMCCapsaicin
+  chemClass: Rare
+  name: reagent-name-rmc-capsaicin
+  desc: reagent-desc-rmc-capsaicin
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: spicy
+  color: "#B31008"
+  metabolisms:
+    Food:
+      metabolismRate: 0.1
+      effects:
+      - !type:Hyperthermic
+        potency: 1

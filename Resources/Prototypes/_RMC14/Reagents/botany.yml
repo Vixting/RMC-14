@@ -57,3 +57,158 @@
     yieldMod: 0.1
     nutrientMod: 0.5
     potency: 4
+
+# ── Botany mutation special chems
+- type: reagent
+  parent: CMReagent
+  id: RMCThymol
+  chemClass: Hydro
+  name: reagent-name-rmcthymol
+  desc: reagent-desc-rmcthymol
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#badb9e"
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Antiparasitic
+        potency: 1.5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPsoralen
+  chemClass: Hydro
+  name: reagent-name-rmcpsoralen
+  desc: reagent-desc-rmcpsoralen
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#c9ca75"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Carcinogenic
+        potency: 6
+
+- type: reagent
+  parent: CMReagent
+  id: RMCConiine
+  chemClass: Hydro
+  name: reagent-name-rmcconiine
+  desc: reagent-desc-rmcconiine
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#8f947b"
+  overdose: 6
+  criticalOverdose: 10
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Hypnotic
+        potency: 7
+      - !type:Hypoxemic
+        potency: 6
+      - !type:Excreting
+        potency: 2
+      - !type:Hepatopeutic
+        potency: 2
+
+- type: reagent
+  parent: CMReagent
+  id: RMCZygacine
+  chemClass: Hydro
+  name: reagent-name-rmczygacine
+  desc: reagent-desc-rmczygacine
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#aaaaaa"
+  overdose: 6
+  criticalOverdose: 10
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Cardiotoxic
+        potency: 3
+
+- type: reagent
+  parent: CMReagent
+  id: RMCDigoxin
+  chemClass: Hydro
+  name: reagent-name-rmcdigoxin
+  desc: reagent-desc-rmcdigoxin
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#9ec265"
+  overdose: 10.5
+  criticalOverdose: 20
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Cardiopeutic
+        potency: 3
+      - !type:Trichogenic
+        potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCUrishiol
+  chemClass: Hydro
+  name: reagent-name-rmcurishiol
+  desc: reagent-desc-rmcurishiol
+  physicalDesc: reagent-physical-desc-oily
+  flavor: bitter
+  color: "#c0bf90"
+  overdose: 6
+  criticalOverdose: 10
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Allergenic
+        potency: 6
+      - !type:Corrosive
+        potency: 3
+
+- type: reagent
+  parent: CMReagent
+  id: RMCAtropine
+  chemClass: Hydro
+  name: reagent-name-rmcatropine
+  desc: reagent-desc-rmcatropine
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#B31008"
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Electrogenetic
+        potency: 7
+      - !type:Intravenous
+        potency: 1
+      - !type:Neurotoxic
+        potency: 0.5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCPhenol
+  chemClass: Hydro
+  name: reagent-name-rmcphenol
+  desc: reagent-desc-rmcphenol
+  physicalDesc: reagent-physical-desc-pungent
+  flavor: bitter
+  color: "#c095c9"
+  overdose: 10.5
+  criticalOverdose: 20
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intravenous
+        potency: 1
+      - !type:Neurotoxic
+        potency: 5
