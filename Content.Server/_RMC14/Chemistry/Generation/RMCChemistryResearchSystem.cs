@@ -126,28 +126,15 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
         return false;
     }
 
-    public void TryAwardIdentificationCredits(string reagentId, int tier)
+    public void TryAwardIdentificationCredits(string reagentId, int credits, FixedPoint2 points)
     {
         var research = EnsureResearch();
         if (!research.Comp.IdentifiedIds.Add(reagentId))
             return;
 
-        var reward = tier switch
-        {
-            1 => 3,
-            2 => 5,
-            _ => 7,
-        };
-
-        research.Comp.Credits += reward;
+        research.Comp.Credits += credits;
         Dirty(research);
 
-        var points = tier switch
-        {
-            1 => FixedPoint2.New(0.1),
-            2 => FixedPoint2.New(0.2),
-            _ => FixedPoint2.New(0.3),
-        };
         _intel.AddAnalyzedChemical(points);
         _intel.RemovePendingChemical(reagentId);
     }

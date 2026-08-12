@@ -26,6 +26,12 @@ public partial class ReagentPrototype
     public ChemClass ChemClass = ChemClass.None;
 
     [DataField]
+    public int CreditReward = 2;
+
+    [DataField]
+    public FixedPoint2 ObjectiveValue;
+
+    [DataField]
     public FixedPoint2? Overdose;
 
     [DataField]
