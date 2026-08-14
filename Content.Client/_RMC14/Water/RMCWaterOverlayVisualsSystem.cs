@@ -10,6 +10,7 @@ using Robust.Client.Graphics;
 using Robust.Shared.Animations;
 using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Client._RMC14.Water;
 
@@ -161,24 +162,44 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
 
     private void ApplyLayer(EntityUid uid, SpriteComponent sprite, int bucket, WaterDepth depth, bool toxic)
     {
+        var state = GetStateName(uid, depth);
+        var color = toxic ? ToxicTint : NormalTint;
         var rsiPath = $"/Textures/_RMC14/Effects/WaterOverlay/_{bucket}.rsi";
-        var layerData = new PrototypeLayerData
-        {
-            RsiPath = rsiPath,
-            State = GetStateName(uid, depth),
-            Color = toxic ? ToxicTint : NormalTint,
-            Visible = true,
-        };
+        TryComp(uid, out RMCWaterOverlayVisualsComponent? visuals);
 
-        if (_sprite.LayerMapTryGet((uid, sprite), OverlayLayerKey, out var index, false))
+        if (!_sprite.LayerMapTryGet((uid, sprite), OverlayLayerKey, out var index, false))
         {
-            _sprite.LayerSetData((uid, sprite), index, layerData);
+            var layerData = new PrototypeLayerData
+            {
+                RsiPath = rsiPath,
+                State = state,
+                Color = color,
+                Visible = true,
+            };
+
+            index = _sprite.AddLayer((uid, sprite), layerData, null);
+            _sprite.LayerMapSet((uid, sprite), OverlayLayerKey, index);
+
+            if (visuals is not null)
+                visuals.OverlayBucket = bucket;
+
+            return;
+        }
+
+        if (visuals is null || visuals.OverlayBucket != bucket)
+        {
+            _sprite.LayerSetRsi((uid, sprite), index, new ResPath(rsiPath), state);
+
+            if (visuals is not null)
+                visuals.OverlayBucket = bucket;
         }
         else
         {
-            index = _sprite.AddLayer((uid, sprite), layerData, null);
-            _sprite.LayerMapSet((uid, sprite), OverlayLayerKey, index);
+            _sprite.LayerSetRsiState((uid, sprite), index, state);
         }
+
+        _sprite.LayerSetColor((uid, sprite), index, color);
+        _sprite.LayerSetVisible((uid, sprite), index, true);
     }
 
     private void ApplySubmersionShader(EntityUid uid, SpriteComponent sprite, WaterDepth depth)

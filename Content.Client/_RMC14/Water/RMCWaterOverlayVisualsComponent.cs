@@ -9,4 +9,6 @@ public sealed partial class RMCWaterOverlayVisualsComponent : Component
     public Vector2 OriginalOffset;
 
     public ShaderInstance? SubmersionShader;
+
+    public int OverlayBucket;
 }
