@@ -113,6 +113,7 @@
         layer:
         - MobLayer
   - type: FloorOcclusion
+  - type: RMCWaterOverlay
   - type: RangedDamageSound
     soundGroups:
       Brute:

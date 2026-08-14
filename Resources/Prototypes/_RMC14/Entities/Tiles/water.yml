@@ -53,6 +53,7 @@
   - type: MinimapColor
     color: "#94b0d59c"
   - type: RMCWater
+    depth: Shallow
     cover:
       tags:
       - Catwalk
@@ -70,6 +71,44 @@
   - type: SpeedModifierContacts
     walkSpeedModifier: 0.25
     sprintSpeedModifier: 0.25
+  - type: RMCWater
+    depth: Deep
+
+# Depth-tier variants for the water overlay effect. Reuse the shallow/deep ground sprite and
+# movement slowdown - only the mob overlay/sink effect differs by depth. Available for mappers to
+# place going forward; existing maps are unaffected.
+- type: entity
+  parent: CMFloorShallowWaterEntity
+  id: CMFloorCoastShallowWaterEntity
+  name: shallow water
+  suffix: Coast Shallow
+  components:
+  - type: RMCWater
+    depth: CoastShallow
+
+- type: entity
+  parent: CMFloorShallowWaterEntity
+  id: CMFloorCoastDeepWaterEntity
+  name: shallow water
+  suffix: Coast Deep
+  components:
+  - type: SpeedModifierContacts
+    walkSpeedModifier: 0.4
+    sprintSpeedModifier: 0.4
+  - type: RMCWater
+    depth: CoastDeep
+
+- type: entity
+  parent: CMFloorDeepWaterEntity
+  id: CMFloorIntermediateWaterEntity
+  name: deep water
+  suffix: Intermediate
+  components:
+  - type: SpeedModifierContacts
+    walkSpeedModifier: 0.35
+    sprintSpeedModifier: 0.35
+  - type: RMCWater
+    depth: Intermediate
 
 - type: entity
   parent: CMFloorShallowWaterEntity

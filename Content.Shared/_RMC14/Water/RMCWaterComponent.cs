@@ -9,4 +9,7 @@ public sealed partial class RMCWaterComponent : Component
 {
     [DataField(required: true), AutoNetworkedField]
     public EntityWhitelist? Cover;
+
+    [DataField(required: true), AutoNetworkedField]
+    public WaterDepth Depth;
 }

@@ -42,3 +42,16 @@
     light_boost: 4.0
     light_gamma: 1.0
     light_whitepoint: 1.0
+
+- type: shader
+  id: RMCWaterOverlayCull
+  kind: source
+  path: "/Textures/_RMC14/Shaders/water_overlay_cull.swsl"
+
+- type: shader
+  id: RMCWaterSubmersion
+  kind: source
+  path: "/Textures/_RMC14/Shaders/water_submersion.swsl"
+  params:
+    cutoff: 0.0
+    alphaModifier: 0.15

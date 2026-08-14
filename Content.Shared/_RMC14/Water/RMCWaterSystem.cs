@@ -76,6 +76,16 @@ public sealed class RMCWaterSystem : EntitySystem
         return CanCollide(water, user);
     }
 
+    public WaterDepth GetDepth(Entity<RMCWaterComponent?> water)
+    {
+        return Resolve(water, ref water.Comp, false) ? water.Comp.Depth : WaterDepth.CoastShallow;
+    }
+
+    public bool IsToxic(Entity<PurifiableWaterComponent?> water)
+    {
+        return Resolve(water, ref water.Comp, false) && water.Comp.Toxic;
+    }
+
     /// <summary>
     /// Checks current physics contacts for active RMC water.
     /// </summary>

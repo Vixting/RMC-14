@@ -1,0 +1,12 @@
+- type: entity
+  parent: RMCBaseEffect
+  id: RMCWaterSplashEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 1.5
+  - type: Sprite
+    sprite: _RMC14/Effects/Water/water_effects.rsi
+    state: splash
+    drawdepth: Effects
+    noRot: true

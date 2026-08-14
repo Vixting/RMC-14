@@ -11,6 +11,9 @@
   description: A huge, looming alien creature. The biggest and the baddest.
   components:
   - type: CanBuildThickFromConstructNode
+  - type: RMCHeavyWaterFootstep
+    sound:
+      collection: RMCHeavyWaterFootstep
   - type: GuideHelp
     guides:
     - RMCGuideRoleQueen

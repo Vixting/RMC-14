@@ -1,0 +1,16 @@
+// Same technique as /Textures/Shaders/hcut.swsl (used by FloorOcclusionSystem), but with a runtime
+// uniform instead of a hardcoded constant, so the cutoff can scale with water depth: mostly hides
+// the portion of the mob's sprite below the cutoff line, so more of the body visually disappears
+// into the water the deeper it is.
+light_mode unshaded;
+
+uniform highp float cutoff;
+uniform highp float alphaModifier;
+
+void fragment()
+{
+    highp vec4 tex = zTexture(UV);
+    highp float modifier = UV.y > cutoff ? 1.0 : alphaModifier;
+
+    COLOR = vec4(tex.rgb, tex.a * modifier);
+}

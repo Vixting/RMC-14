@@ -1,0 +1,20 @@
+// Cuts the water overlay layer wherever the mob's culling mask layer is opaque, so a xeno's
+// irregular silhouette (tail, legs) isn't covered by the water sprite where it sticks out past it.
+light_mode unshaded;
+
+uniform sampler2D cullMask;
+uniform highp vec4 cullMaskUV;
+
+varying highp vec2 cullMaskUVOut;
+
+void vertex()
+{
+    cullMaskUVOut = mix(cullMaskUV.xy, cullMaskUV.zw, tCoord2);
+}
+
+void fragment()
+{
+    highp vec4 tex = zTexture(UV);
+    highp vec4 mask = texture2D(cullMask, cullMaskUVOut);
+    COLOR = vec4(tex.rgb, tex.a * (1.0 - mask.a));
+}
