@@ -1,6 +1,8 @@
 using System.Numerics;
 using Content.Shared._RMC14.Water;
 using Content.Shared._RMC14.Xenonids.Rest;
+using Content.Shared.Movement.Components;
+using Content.Shared.Movement.Events;
 using Content.Shared.Standing;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
@@ -35,6 +37,7 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
         SubscribeLocalEvent<RMCWaterOverlayComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<RMCWaterOverlayComponent, AfterAutoHandleStateEvent>(OnState);
         SubscribeLocalEvent<RMCWaterOverlayComponent, WaterOverlayChangedEvent>(OnChanged);
+        SubscribeLocalEvent<RMCWaterOverlayComponent, SpriteMoveEvent>(OnSpriteMove);
 
         SubscribeLocalEvent<RMCWaterOverlayComponent, DownedEvent>(OnPoseChanged);
         SubscribeLocalEvent<RMCWaterOverlayComponent, StoodEvent>(OnPoseChanged);
@@ -87,6 +90,29 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
         RefreshIfPresent(ent.Owner);
     }
 
+    private void OnSpriteMove(Entity<RMCWaterOverlayComponent> ent, ref SpriteMoveEvent args)
+    {
+        if (!ent.Comp.InWater || !TryComp(ent, out SpriteComponent? sprite))
+            return;
+
+        SetWading(ent.Owner, sprite, IsResting(ent.Owner) || args.IsMoving);
+    }
+
+    private void SetWading(EntityUid uid, SpriteComponent sprite, bool wading)
+    {
+        if (!_sprite.TryGetLayer((uid, sprite), OverlayLayerKey, out var layer, false))
+            return;
+
+        if (layer.Visible == wading && layer.AutoAnimated == wading)
+            return;
+
+        if (!wading)
+            _sprite.LayerSetAnimationTime((uid, sprite), OverlayLayerKey, 0f);
+
+        _sprite.LayerSetVisible((uid, sprite), OverlayLayerKey, wading);
+        _sprite.LayerSetAutoAnimated((uid, sprite), OverlayLayerKey, wading);
+    }
+
     private void RefreshIfPresent(EntityUid uid)
     {
         if (!HasComp<RMCWaterOverlayComponent>(uid) || !TryComp(uid, out SpriteComponent? sprite))
@@ -110,6 +136,9 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
         ApplyLayer(uid, sprite, bucket, depth, toxic);
         ApplySubmersionShader(uid, sprite, depth);
         AnimateSink(uid, sprite, depth);
+
+        var moving = TryComp(uid, out InputMoverComponent? mover) && mover.HasDirectionalMovement;
+        SetWading(uid, sprite, IsResting(uid) || moving);
     }
 
     private int GetBucket(EntityUid uid, SpriteComponent sprite)
