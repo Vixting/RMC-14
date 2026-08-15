@@ -51,7 +51,9 @@ public sealed class RMCWaterOverlaySystem : EntitySystem
         if (!wasInWater)
         {
             SetHeavyFootstep(other, true);
-            PlaySplash(other);
+
+            if (_timing.IsFirstTimePredicted)
+                PlaySplash(other);
         }
     }
 
@@ -75,7 +77,9 @@ public sealed class RMCWaterOverlaySystem : EntitySystem
         if (!stillInWater)
         {
             SetHeavyFootstep(other, false);
-            PlaySplash(other);
+
+            if (_timing.IsFirstTimePredicted)
+                PlaySplash(other);
         }
     }
 
@@ -179,6 +183,9 @@ public sealed class RMCWaterOverlaySystem : EntitySystem
             return;
 
         if (_timing.ApplyingState)
+            return;
+
+        if (!_timing.IsFirstTimePredicted)
             return;
 
         if (!TryComp(ent, out InputMoverComponent? mover) || !mover.Sprinting)
