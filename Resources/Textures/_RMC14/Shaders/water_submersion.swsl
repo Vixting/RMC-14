@@ -1,5 +1,3 @@
-light_mode unshaded;
-
 uniform highp float cutoff;
 uniform highp float alphaModifier;
 

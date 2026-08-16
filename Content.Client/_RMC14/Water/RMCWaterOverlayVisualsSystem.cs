@@ -109,7 +109,7 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
         if (!ent.Comp.InWater || !TryComp(ent, out SpriteComponent? sprite))
             return;
 
-        SetWading(ent.Owner, sprite, IsResting(ent.Owner) || args.IsMoving);
+        SetWading(ent.Owner, sprite, args.IsMoving);
     }
 
     private void SetWading(EntityUid uid, SpriteComponent sprite, bool wading)
@@ -120,10 +120,6 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
         if (layer.Visible == wading && layer.AutoAnimated == wading)
             return;
 
-        // AutoAnimated=false pauses the layer's animation clock entirely while hidden (it doesn't keep
-        // advancing in the background), so leaving it alone here means the ripple resumes from wherever
-        // it actually left off instead of always restarting from frame 0's own pose held for its own
-        // delay - which looked like the overlay freezing for a moment every time wading started.
         _sprite.LayerSetVisible((uid, sprite), OverlayLayerKey, wading);
         _sprite.LayerSetAutoAnimated((uid, sprite), OverlayLayerKey, wading);
     }
@@ -155,7 +151,7 @@ public sealed class RMCWaterOverlayVisualsSystem : EntitySystem
         AnimateSink(uid, sprite, depth);
 
         var moving = TryComp(uid, out InputMoverComponent? mover) && mover.HasDirectionalMovement;
-        SetWading(uid, sprite, IsResting(uid) || moving);
+        SetWading(uid, sprite, moving);
     }
 
     private int GetBucket(EntityUid uid, SpriteComponent sprite)

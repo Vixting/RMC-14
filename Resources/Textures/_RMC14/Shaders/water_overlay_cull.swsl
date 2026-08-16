@@ -1,5 +1,3 @@
-light_mode unshaded;
-
 uniform sampler2D cullMask;
 uniform highp vec4 cullMaskUV;
 uniform bool keepWhereOpaque;
