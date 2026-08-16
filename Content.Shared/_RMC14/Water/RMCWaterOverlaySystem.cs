@@ -1,8 +1,6 @@
 using Content.Shared.Movement.Components;
 using Robust.Shared.Audio.Systems;
-using Robust.Shared.Network;
 using Robust.Shared.Physics.Events;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Shared._RMC14.Water;
@@ -10,11 +8,8 @@ namespace Content.Shared._RMC14.Water;
 public sealed class RMCWaterOverlaySystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly RMCWaterSystem _rmcWater = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
-
-    private static readonly EntProtoId SplashEffect = "RMCWaterSplashEffect";
 
     private const float WadingSoundDistance = 1f;
 
@@ -49,12 +44,7 @@ public sealed class RMCWaterOverlaySystem : EntitySystem
         RefreshOverlay((other, overlay), forceEvent: !wasInWater);
 
         if (!wasInWater)
-        {
             SetHeavyFootstep(other, true);
-
-            if (_timing.IsFirstTimePredicted)
-                PlaySplash(other);
-        }
     }
 
     private void OnWaterEndCollide(Entity<RMCWaterComponent> water, ref EndCollideEvent args)
@@ -75,12 +65,7 @@ public sealed class RMCWaterOverlaySystem : EntitySystem
         RefreshOverlay((other, overlay), forceEvent: !stillInWater);
 
         if (!stillInWater)
-        {
             SetHeavyFootstep(other, false);
-
-            if (_timing.IsFirstTimePredicted)
-                PlaySplash(other);
-        }
     }
 
     public bool IsInWater(Entity<RMCWaterOverlayComponent?> overlay)
@@ -169,18 +154,16 @@ public sealed class RMCWaterOverlaySystem : EntitySystem
         }
     }
 
-    private void PlaySplash(EntityUid uid)
-    {
-        _audio.PlayPredicted(WaterSounds.Splash, uid, uid);
-
-        if (!_net.IsClient)
-            Spawn(SplashEffect, Transform(uid).Coordinates);
-    }
-
     private void OnOverlayMove(Entity<RMCWaterOverlayComponent> ent, ref MoveEvent args)
     {
         if (!ent.Comp.InWater)
             return;
+
+        if (args.NewRotation != args.OldRotation)
+        {
+            var ev = new WaterOverlayChangedEvent();
+            RaiseLocalEvent(ent.Owner, ref ev);
+        }
 
         if (_timing.ApplyingState)
             return;

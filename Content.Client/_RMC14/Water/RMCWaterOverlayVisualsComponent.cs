@@ -10,5 +10,9 @@ public sealed partial class RMCWaterOverlayVisualsComponent : Component
 
     public ShaderInstance? SubmersionShader;
 
+    public ShaderInstance? SubmersionMaskShader;
+
+    public ShaderInstance? CullShader;
+
     public int OverlayBucket;
 }

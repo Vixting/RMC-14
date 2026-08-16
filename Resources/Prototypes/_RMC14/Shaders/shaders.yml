@@ -47,6 +47,8 @@
   id: RMCWaterOverlayCull
   kind: source
   path: "/Textures/_RMC14/Shaders/water_overlay_cull.swsl"
+  params:
+    keepWhereOpaque: false
 
 - type: shader
   id: RMCWaterSubmersion
@@ -55,3 +57,11 @@
   params:
     cutoff: 0.0
     alphaModifier: 0.15
+
+- type: shader
+  id: RMCWaterSubmersionMask
+  kind: source
+  path: "/Textures/_RMC14/Shaders/water_submersion_mask.swsl"
+  params:
+    alphaModifier: 0.15
+    spriteRotation: 0.0

@@ -1,16 +1,22 @@
-// Same technique as /Textures/Shaders/hcut.swsl (used by FloorOcclusionSystem), but with a runtime
-// uniform instead of a hardcoded constant, so the cutoff can scale with water depth: mostly hides
-// the portion of the mob's sprite below the cutoff line, so more of the body visually disappears
-// into the water the deeper it is.
 light_mode unshaded;
 
 uniform highp float cutoff;
 uniform highp float alphaModifier;
 
+const highp float waterlineWave = 0.015;
+const highp float waterlineFrequency = 20.0;
+const highp float waterlineSoftness = 0.03;
+const highp float highlightWidth = 0.02;
+const highp float highlightStrength = 0.35;
+
 void fragment()
 {
     highp vec4 tex = zTexture(UV);
-    highp float modifier = UV.y > cutoff ? 1.0 : alphaModifier;
+    highp float wavyCutoff = cutoff + sin(UV.x * waterlineFrequency + TIME * 1.5) * waterlineWave;
+    highp float modifier = mix(alphaModifier, 1.0, smoothstep(wavyCutoff - waterlineSoftness, wavyCutoff + waterlineSoftness, UV.y));
 
-    COLOR = vec4(tex.rgb, tex.a * modifier);
+    highp float edgeDist = abs(UV.y - wavyCutoff);
+    highp float highlight = (1.0 - smoothstep(0.0, highlightWidth, edgeDist)) * highlightStrength;
+
+    COLOR = vec4(tex.rgb + highlight, tex.a * modifier);
 }

@@ -74,9 +74,6 @@
   - type: RMCWater
     depth: Deep
 
-# Depth-tier variants for the water overlay effect. Reuse the shallow/deep ground sprite and
-# movement slowdown - only the mob overlay/sink effect differs by depth. Available for mappers to
-# place going forward; existing maps are unaffected.
 - type: entity
   parent: CMFloorShallowWaterEntity
   id: CMFloorCoastShallowWaterEntity
