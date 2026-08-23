@@ -3,10 +3,12 @@ using System.Linq;
 using System.Numerics;
 using Content.Client.Hands.Systems;
 using Content.Client.Items.Systems;
+using Content.Client.Resources;
 using Content.Client.Storage;
 using Content.Client.Storage.Systems;
 using Content.Shared._RMC14.Inventory;
 using Content.Shared._RMC14.Item;
+using Content.Shared._RMC14.Storage;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Input;
 using Content.Shared.Item;
@@ -14,6 +16,7 @@ using Content.Shared.Storage;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
+using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
@@ -28,6 +31,7 @@ public sealed partial class StorageWindow : BaseWindow
 {
     [Dependency] private readonly IEntityManager _entity = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!;
     private readonly StorageUIController _storageController;
 
     public EntityUid? StorageEntity;
@@ -42,6 +46,10 @@ public sealed partial class StorageWindow : BaseWindow
     // Needs to be nullable in case a piece is in default spot.
     private readonly Dictionary<EntityUid, (ItemStorageLocation? Loc, ItemGridPiece Control)> _pieces = new();
     private readonly List<Control> _controlGrid = new();
+
+    // RMC14 - faded placeholders shown at slots reserved for items currently held/taken out
+    private readonly Dictionary<EntityUid, ItemGridPiece> _ghostPieces = new();
+    private readonly List<EntityUid> _ghostsToRemove = new();
 
     private ValueList<EntityUid> _contained = new();
     private ValueList<EntityUid> _toRemove = new();
@@ -76,6 +84,9 @@ public sealed partial class StorageWindow : BaseWindow
     private Texture? _sidebarBottomTexture;
     private readonly string _sidebarFatTexturePath = "Storage/sidebar_fat";
     private Texture? _sidebarFatTexture;
+
+    // RMC
+    private Texture? _saveLayoutTexture;
 
     public StorageWindow()
     {
@@ -184,6 +195,9 @@ public sealed partial class StorageWindow : BaseWindow
         _sidebarMiddleTexture = Theme.ResolveTextureOrNull(_sidebarMiddleTexturePath)?.Texture;
         _sidebarBottomTexture = Theme.ResolveTextureOrNull(_sidebarBottomTexturePath)?.Texture;
         _sidebarFatTexture = Theme.ResolveTextureOrNull(_sidebarFatTexturePath)?.Texture;
+
+        // RMC
+        _saveLayoutTexture = _resourceCache.GetTexture("/Textures/Interface/NavMap/beveled_star.png");
     }
 
     public void UpdateContainer(Entity<StorageComponent>? entity)
@@ -238,7 +252,20 @@ public sealed partial class StorageWindow : BaseWindow
         #region Sidebar
         _sidebar.Children.Clear();
         var rows = boundingGrid.Height + 1;
-        _sidebar.Rows = rows;
+
+        // RMC - strange thing with an additonal panel being present. idk if this is the correct way to handle this but it works
+        var isNested = false;
+        if (_entity.System<StorageSystem>().NestedStorage && StorageEntity is { } nestCheckEntity)
+        {
+            var nestCheckContainerSystem = _entity.System<SharedContainerSystem>();
+            isNested = nestCheckContainerSystem.TryGetContainingContainer(nestCheckEntity, out var parentContainer) &&
+                _entity.TryGetComponent(parentContainer.Owner, out StorageComponent? parentStorageComp) &&
+                parentStorageComp.Container.Contains(nestCheckEntity);
+        }
+
+        // RMC
+        var realRows = isNested ? 3 : 2;
+        _sidebar.Rows = Math.Max(rows, realRows);
 
         var exitButton = new TextureButton
         {
@@ -283,9 +310,52 @@ public sealed partial class StorageWindow : BaseWindow
         };
 
         _sidebar.AddChild(exitContainer);
-        var offset = 2;
 
-        if (_entity.System<StorageSystem>().NestedStorage && rows > 0)
+        // RMC
+        {
+            Name = "SaveLayoutButton",
+            TextureNormal = _saveLayoutTexture,
+            Scale = new Vector2(0.8f, 0.8f),
+            Modulate = Color.FromHex("#a8a8a8"),
+            ToolTip = Loc.GetString("rmc-ui-storage-save-layout"),
+        };
+        saveLayoutButton.OnPressed += _ =>
+        {
+            if (StorageEntity is { } storageEntity)
+                _entity.RaisePredictiveEvent(new RMCStorageSaveLayoutEvent(_entity.GetNetEntity(storageEntity)));
+        };
+        saveLayoutButton.OnKeyBindDown += args =>
+        {
+            if (args.Function != ContentKeyFunctions.RotateStoredItem)
+                return;
+
+            if (StorageEntity is { } storageEntity)
+            {
+                _entity.RaisePredictiveEvent(new RMCStorageSaveLayoutEvent(_entity.GetNetEntity(storageEntity), hard: true));
+                args.Handle();
+            }
+        };
+
+        var saveLayoutContainer = new BoxContainer
+        {
+            Name = "SaveLayoutContainer",
+            Children =
+            {
+                new TextureRect
+                {
+                    Texture = _sidebar.Rows > 1 ? _sidebarMiddleTexture : _sidebarBottomTexture,
+                    TextureScale = new Vector2(2, 2),
+                    Children =
+                    {
+                        saveLayoutButton,
+                    }
+                }
+            }
+        };
+
+        _sidebar.AddChild(saveLayoutContainer);
+
+        if (isNested)
         {
             _backButton = new TextureButton
             {
@@ -319,7 +389,7 @@ public sealed partial class StorageWindow : BaseWindow
                 {
                     new TextureRect
                     {
-                        Texture = rows > 2 ? _sidebarMiddleTexture : _sidebarBottomTexture,
+                        Texture = _sidebar.Rows > 3 ? _sidebarMiddleTexture : _sidebarBottomTexture,
                         TextureScale = new Vector2(2, 2),
                         Children =
                         {
@@ -332,7 +402,7 @@ public sealed partial class StorageWindow : BaseWindow
             _sidebar.AddChild(backContainer);
         }
 
-        var fillerRows = rows - offset;
+        var fillerRows = _sidebar.Rows - realRows;
 
         for (var i = 0; i < fillerRows; i++)
         {
@@ -436,10 +506,13 @@ public sealed partial class StorageWindow : BaseWindow
             _lastUpdate.Stored.Count == storageComp.StoredItems.Count &&
             _lastUpdate.Stored.All(kvp => storageComp.StoredItems.TryGetValue(kvp.Key, out var v) && kvp.Value == v))
         {
+            // RMC
+            UpdateReservedGhosts(storageComp, boundingGrid, size);
             return;
         }
 
-        _lastUpdate = (boundingGrid, containedEntities, storageComp.StoredItems);
+        // RMC
+        _lastUpdate = (boundingGrid, containedEntities, new Dictionary<EntityUid, ItemStorageLocation>(storageComp.StoredItems));
 
         _contained.Clear();
         _contained.AddRange(storageComp.Container.ContainedEntities.Reverse());
@@ -531,6 +604,117 @@ public sealed partial class StorageWindow : BaseWindow
                 _controlGrid[controlIndex].AddChild(gridPiece);
                 _pieces[ent] = (loc, gridPiece);
             }
+        }
+
+        // RMC
+        UpdateReservedGhosts(storageComp, boundingGrid, size);
+    }
+
+    // RMC
+    private void UpdateReservedGhosts(StorageComponent storageComp, Box2i boundingGrid, Vector2 size)
+    {
+        var reserved = _entity.GetComponentOrNull<RMCStorageReservedSlotsComponent>(StorageEntity);
+        var storageSystem = _entity.System<StorageSystem>();
+
+        _ghostsToRemove.Clear();
+
+        foreach (var (item, control) in _ghostPieces)
+        {
+            if (reserved != null &&
+                StorageEntity is { } se &&
+                !storageComp.StoredItems.ContainsKey(item) &&
+                reserved.Reserved.TryGetValue(item, out var stillLoc) &&
+                _entity.EntityExists(item) &&
+                _entity.TryGetComponent<ItemComponent>(item, out var stillItemComp) &&
+                storageSystem.ItemFitsInGridLocation((item, stillItemComp), (se, storageComp), stillLoc))
+            {
+                control.GhostHardReserved = reserved.HardReserved.Contains(item);
+
+                if (control.Location.Equals(stillLoc))
+                    continue;
+
+                var index = stillLoc.Position.X + stillLoc.Position.Y * (boundingGrid.Width + 1);
+                if (index >= 0 && index < _controlGrid.Count)
+                {
+                    control.Location = stillLoc;
+                    control.Orphan();
+                    _controlGrid[index].AddChild(control);
+                    continue;
+                }
+            }
+
+            _ghostsToRemove.Add(item);
+        }
+
+        foreach (var item in _ghostsToRemove)
+        {
+            _ghostPieces.Remove(item, out var control);
+            control?.Orphan();
+        }
+
+        if (reserved == null || StorageEntity is not { } storageEntity)
+            return;
+
+        foreach (var (item, loc) in reserved.Reserved)
+        {
+            if (_ghostPieces.ContainsKey(item))
+                continue;
+
+            if (storageComp.StoredItems.ContainsKey(item))
+                continue;
+
+            if (!_entity.EntityExists(item) || !_entity.TryGetComponent<ItemComponent>(item, out var itemComp))
+                continue;
+
+            if (!storageSystem.ItemFitsInGridLocation((item, itemComp), (storageEntity, storageComp), loc))
+                continue;
+
+            var controlIndex = loc.Position.X + loc.Position.Y * (boundingGrid.Width + 1);
+            if (controlIndex < 0 || controlIndex >= _controlGrid.Count)
+                continue;
+
+            var ghostPiece = new ItemGridPiece((item, itemComp), loc, _entity, (storageEntity, storageComp))
+            {
+                MinSize = size,
+                GhostHardReserved = reserved.HardReserved.Contains(item),
+            };
+
+            var ghostItem = item;
+            var ghostItemName = _entity.GetComponent<MetaDataComponent>(item).EntityName;
+            ghostPiece.OnPiecePressed += (args, _) =>
+            {
+                if (args.Function == ContentKeyFunctions.RotateStoredItem)
+                {
+                    args.Handle();
+                    _entity.RaisePredictiveEvent(new RMCStorageToggleHardReservedEvent(
+                        _entity.GetNetEntity(storageEntity),
+                        _entity.GetNetEntity(ghostItem)));
+                    return;
+                }
+
+                if (args.Function != ContentKeyFunctions.MoveStoredItem)
+                    return;
+
+                var handEntity = _entity.System<HandsSystem>().GetActiveHandEntity();
+                var handMatches = handEntity == ghostItem ||
+                    (handEntity is { } held &&
+                     _entity.TryGetComponent<MetaDataComponent>(held, out var heldMeta) &&
+                     heldMeta.EntityName == ghostItemName);
+
+                if (handMatches)
+                {
+                    return;
+                }
+
+                args.Handle();
+
+                _entity.RaisePredictiveEvent(new RMCStorageClearReservedSlotEvent(
+                    _entity.GetNetEntity(storageEntity),
+                    _entity.GetNetEntity(ghostItem)));
+            };
+
+            _controlGrid[controlIndex].AddChild(ghostPiece);
+            _ghostPieces[item] = ghostPiece;
         }
     }
 

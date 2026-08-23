@@ -1,4 +1,5 @@
-﻿using Content.Shared.Item;
+using Content.Shared._RMC14.Storage;
+using Content.Shared.Item;
 using Content.Shared.Storage;
 using Content.Shared.Storage.EntitySystems;
 
@@ -12,6 +13,7 @@ public static class CMInventoryExtensions
 
         var entities = IoCManager.Resolve<IEntityManager>();
         var storageSystem = entities.System<SharedStorageSystem>();
+        var rmcStorageSystem = entities.System<RMCStorageSystem>();
 
         if (!entities.TryGetComponent(storageId, out StorageComponent? storage) ||
             !entities.TryGetComponent(itemId, out ItemComponent? item))
@@ -19,7 +21,15 @@ public static class CMInventoryExtensions
             return false;
         }
 
+        if (rmcStorageSystem.TryGetReservedLocation((storageId, storage), (itemId, item), out var reservedLocation))
+        {
+            location = reservedLocation.Value;
+            return true;
+        }
+
         var storageBounding = storage.Grid.GetBoundingBox();
+
+        ItemStorageLocation? reservedFallback = null;
 
         for (var y = storageBounding.Bottom; y <= storageBounding.Top; y++)
         {
@@ -28,9 +38,24 @@ public static class CMInventoryExtensions
                 location = new ItemStorageLocation(0, (x, y));
                 if (storageSystem.ItemFitsInGridLocation(itemId, storageId, location))
                 {
+                    if (rmcStorageSystem.IsHardReservedForOther((storageId, storage), (itemId, item), location))
+                        continue;
+
+                    if (rmcStorageSystem.IsReservedForOther((storageId, storage), (itemId, item), location))
+                    {
+                        reservedFallback ??= location;
+                        continue;
+                    }
+
                     return true;
                 }
             }
+        }
+
+        if (reservedFallback is { } fallback)
+        {
+            location = fallback;
+            return true;
         }
 
         location = default;

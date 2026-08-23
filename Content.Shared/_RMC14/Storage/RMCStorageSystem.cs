@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared._RMC14.CrashLand;
 using Content.Shared._RMC14.Dropship;
 using Content.Shared._RMC14.Marines;
@@ -747,5 +748,172 @@ public sealed class RMCStorageSystem : EntitySystem
             if (open.OpenedAt.Count == 0)
                 RemCompDeferred<StorageOpenComponent>(uid);
         }
+    }
+
+    public void SaveLayout(Entity<StorageComponent> storage, bool hard = false)
+    {
+        var reserved = EnsureComp<RMCStorageReservedSlotsComponent>(storage);
+        reserved.Reserved.Clear();
+        reserved.HardReserved.Clear();
+
+        foreach (var (item, location) in storage.Comp.StoredItems)
+        {
+            reserved.Reserved[item] = location;
+
+            if (hard)
+                reserved.HardReserved.Add(item);
+        }
+
+        Dirty(storage.Owner, reserved);
+
+        _storage.UpdateUI((storage.Owner, storage.Comp));
+    }
+
+    public void ClearReservedSlot(Entity<StorageComponent> storage, EntityUid item)
+    {
+        if (!TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved))
+            return;
+
+        var removed = reserved.Reserved.Remove(item);
+        removed |= reserved.HardReserved.Remove(item);
+
+        if (removed)
+        {
+            Dirty(storage.Owner, reserved);
+
+            Dirty(storage.Owner, storage.Comp);
+            _storage.CompactStorage(storage);
+
+            _storage.UpdateUI((storage.Owner, storage.Comp));
+        }
+    }
+
+    public void ToggleHardReserved(Entity<StorageComponent> storage, EntityUid item)
+    {
+        if (!TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved) ||
+            !reserved.Reserved.ContainsKey(item))
+        {
+            return;
+        }
+
+        if (!reserved.HardReserved.Remove(item))
+            reserved.HardReserved.Add(item);
+
+        Dirty(storage.Owner, reserved);
+
+        _storage.UpdateUI((storage.Owner, storage.Comp));
+    }
+
+    public bool IsHardReserved(Entity<StorageComponent?> storage, EntityUid item)
+    {
+        return TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved) &&
+               reserved.HardReserved.Contains(item);
+    }
+
+    public bool IsHardReservedForOther(Entity<StorageComponent?> storage, Entity<ItemComponent?> item, ItemStorageLocation location)
+    {
+        if (!TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved) || reserved.HardReserved.Count == 0)
+            return false;
+
+        var shape = _item.GetAdjustedItemShape(storage, item, location);
+
+        foreach (var reservedItem in reserved.HardReserved)
+        {
+            if (reservedItem == item.Owner)
+                continue;
+
+            if (!reserved.Reserved.TryGetValue(reservedItem, out var reservedLocation) ||
+                !TryComp(reservedItem, out ItemComponent? reservedItemComp))
+            {
+                continue;
+            }
+
+            var reservedShape = _item.GetAdjustedItemShape(storage, (reservedItem, reservedItemComp), reservedLocation);
+
+            foreach (var box in shape)
+            {
+                foreach (var reservedBox in reservedShape)
+                {
+                    if (box.Intersects(reservedBox))
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public bool TryGetReservedLocation(
+        Entity<StorageComponent?> storage,
+        Entity<ItemComponent?> item,
+        [NotNullWhen(true)] out ItemStorageLocation? location)
+    {
+        location = null;
+
+        if (!TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved) || reserved.Reserved.Count == 0)
+            return false;
+
+        if (reserved.Reserved.TryGetValue(item.Owner, out var exactLocation) &&
+            _storage.ItemFitsInGridLocation(item, storage, exactLocation))
+        {
+            location = exactLocation;
+            return true;
+        }
+
+        var itemName = Name(item.Owner);
+
+        foreach (var (reservedItem, reservedLocation) in reserved.Reserved)
+        {
+            if (reservedItem == item.Owner)
+                continue;
+
+            if (!TryComp(reservedItem, out MetaDataComponent? reservedMeta) || reservedMeta.EntityName != itemName)
+                continue;
+
+            if (!_storage.ItemFitsInGridLocation(item, storage, reservedLocation))
+                continue;
+
+            location = reservedLocation;
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsReservedForOther(Entity<StorageComponent?> storage, Entity<ItemComponent?> item, ItemStorageLocation location)
+    {
+        if (!TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved) || reserved.Reserved.Count == 0)
+            return false;
+
+        var itemName = Name(item.Owner);
+        var shape = _item.GetAdjustedItemShape(storage, item, location);
+
+        foreach (var (reservedItem, reservedLocation) in reserved.Reserved)
+        {
+            if (reservedItem == item.Owner)
+                continue;
+
+            if (!TryComp(reservedItem, out ItemComponent? reservedItemComp) ||
+                !TryComp(reservedItem, out MetaDataComponent? reservedMeta))
+            {
+                continue;
+            }
+
+            if (reservedMeta.EntityName == itemName)
+                continue;
+
+            var reservedShape = _item.GetAdjustedItemShape(storage, (reservedItem, reservedItemComp), reservedLocation);
+
+            foreach (var box in shape)
+            {
+                foreach (var reservedBox in reservedShape)
+                {
+                    if (box.Intersects(reservedBox))
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

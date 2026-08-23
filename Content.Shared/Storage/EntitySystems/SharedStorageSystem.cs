@@ -170,6 +170,11 @@ public abstract class SharedStorageSystem : EntitySystem
         SubscribeAllEvent<StorageInsertItemIntoLocationEvent>(OnInsertItemIntoLocation);
         SubscribeAllEvent<StorageSaveItemLocationEvent>(OnSaveItemLocation);
 
+        // RMC
+        SubscribeAllEvent<RMCStorageSaveLayoutEvent>(OnRMCSaveLayout);
+        SubscribeAllEvent<RMCStorageClearReservedSlotEvent>(OnRMCClearReservedSlot);
+        SubscribeAllEvent<RMCStorageToggleHardReservedEvent>(OnRMCToggleHardReserved);
+
         SubscribeLocalEvent<ItemSizeChangedEvent>(OnItemSizeChanged);
 
         CommandBinds.Builder
@@ -833,6 +838,39 @@ public abstract class SharedStorageSystem : EntitySystem
         SaveItemLocation(storage!, item.Owner);
     }
 
+    // RMC
+    private void OnRMCSaveLayout(RMCStorageSaveLayoutEvent msg, EntitySessionEventArgs args)
+    {
+        if (!ValidateInput(args, msg.Storage, out _, out var storage))
+            return;
+
+        RMCStorage.SaveLayout(storage, msg.Hard);
+    }
+
+    // RMC
+    private void OnRMCClearReservedSlot(RMCStorageClearReservedSlotEvent msg, EntitySessionEventArgs args)
+    {
+        if (!ValidateInput(args, msg.Storage, out _, out var storage))
+            return;
+
+        if (!TryGetEntity(msg.Item, out var item))
+            return;
+
+        RMCStorage.ClearReservedSlot(storage, item.Value);
+    }
+
+    // RMC
+    private void OnRMCToggleHardReserved(RMCStorageToggleHardReservedEvent msg, EntitySessionEventArgs args)
+    {
+        if (!ValidateInput(args, msg.Storage, out _, out var storage))
+            return;
+
+        if (!TryGetEntity(msg.Item, out var item))
+            return;
+
+        RMCStorage.ToggleHardReserved(storage, item.Value);
+    }
+
     private void OnBoundUIOpen(Entity<StorageComponent> ent, ref BoundUIOpenedEvent args)
     {
         UpdateAppearance((ent.Owner, ent.Comp, null));
@@ -919,6 +957,13 @@ public abstract class SharedStorageSystem : EntitySystem
         UpdateAppearance((entity, entity.Comp, null));
         UpdateUI((entity, entity.Comp));
 
+        // RMC move compact to own
+        CompactStorage(entity);
+    }
+
+    // RMC made own meth
+    public void CompactStorage(Entity<StorageComponent> entity)
+    {
         var items = new List<(EntityUid Id, ItemStorageLocation Location)>();
         foreach (var (item, location) in entity.Comp.StoredItems)
         {
@@ -1354,6 +1399,10 @@ public abstract class SharedStorageSystem : EntitySystem
         if (!Resolve(storageEnt, ref storageEnt.Comp) || !Resolve(itemEnt, ref itemEnt.Comp))
             return false;
 
+        // RMC14 - if the item has a reserved slot from being taken out of this storage, use that
+        if (RMCStorage.TryGetReservedLocation(storageEnt, itemEnt, out storageLocation))
+            return true;
+
         // if the item has an available saved location, use that
         if (FindSavedLocation(storageEnt, itemEnt, out storageLocation))
             return true;
@@ -1381,6 +1430,9 @@ public abstract class SharedStorageSystem : EntitySystem
             }
         }
 
+        // RMC
+        ItemStorageLocation? reservedFallback = null;
+
         for (var y = storageBounding.Bottom; y <= storageBounding.Top; y++)
         {
             for (var x = storageBounding.Left; x <= storageBounding.Right; x++)
@@ -1391,12 +1443,33 @@ public abstract class SharedStorageSystem : EntitySystem
                 var location = new ItemStorageLocation(Angle.Zero, (x, y));
                 if (ItemFitsInGridLocation(itemEnt, storageEnt, location))
                 {
-                    storageLocation = location;
-                    return true;
+                    if (RMCStorage.IsHardReservedForOther(storageEnt, itemEnt, location))
+                    {
+                        continue;
+                    }
+
+                    if (RMCStorage.IsReservedForOther(storageEnt, itemEnt, location))
+                    {
+                        reservedFallback ??= location;
+                    }
+                    else
+                    {
+                        storageLocation = location;
+                        return true;
+                    }
+
+                    continue;
                 }
                 // }
                 // RMC14
             }
+        }
+
+        // RMC
+        if (reservedFallback != null)
+        {
+            storageLocation = reservedFallback;
+            return true;
         }
 
         return false;
