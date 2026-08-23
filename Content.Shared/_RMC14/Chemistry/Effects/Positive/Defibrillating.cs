@@ -93,17 +93,17 @@ public sealed partial class Defibrillating : RMCChemicalEffect
             return;
 
         var heal = new DamageSpecifier();
-        heal.DamageDict[BluntType] = -potency * 0.1f;
-        heal.DamageDict[HeatType] = -potency * 0.1f;
-        heal.DamageDict[PoisonType] = -potency * 0.1f;
-        heal.DamageDict[CellularType] = -potency * 0.1f;
+        heal.DamageDict[BluntType] = -potency * 0.25f;
+        heal.DamageDict[HeatType] = -potency * 0.25f;
+        heal.DamageDict[PoisonType] = -potency * 0.25f;
+        heal.DamageDict[CellularType] = -potency * 0.25f;
 
         if (ActualPotency > 2)
         {
-            heal.DamageDict[BluntType] -= potency * 0.25f;
-            heal.DamageDict[HeatType] -= potency * 0.25f;
-            heal.DamageDict[PoisonType] -= potency * 0.25f;
-            heal.DamageDict[CellularType] -= potency * 0.25f;
+            heal.DamageDict[BluntType] -= potency * 0.5f;
+            heal.DamageDict[HeatType] -= potency * 0.5f;
+            heal.DamageDict[PoisonType] -= potency * 0.5f;
+            heal.DamageDict[CellularType] -= potency * 0.5f;
         }
 
         if (damageableComp.Damage.DamageDict.TryGetValue(AsphyxiationType, out var oxyLoss) && oxyLoss > FixedPoint2.Zero)

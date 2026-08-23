@@ -336,7 +336,7 @@
   effect: !type:Antitoxic {}
   description: "Absorbs and neutralizes toxic chemicals in the bloodstream and xylem sap, allowing them to be excreted safely."
   category: Positive
-  value: 2
+  value: 1
 
 - type: chemGeneratorProperty
   id: Anticorrosive
@@ -368,7 +368,9 @@
   effect: !type:Oxygenating {}
   description: "Treats oxygen deprivation by improving the ability of erythrocytes to absorb oxygen and increases oxygen intake."
   category: Positive
-  value: 2
+  value: 1
+  maxLevel: 6
+  flags: [ Disabled ]
 
 - type: chemGeneratorProperty
   id: Anticarcinogenic
@@ -377,6 +379,7 @@
   description: "Fixes genetic damage in cells that have been exposed carcinogens."
   category: Positive
   value: 1
+  flags: [ Disabled ]
 
 - type: chemGeneratorProperty
   id: Photosensitive
@@ -385,7 +388,8 @@
   description: "Reacts with any amount of light. Can be useful to create light-sensitive objects. Not safe to administer. Supercharges photosynthesis, treated plants are able to be harvested repeatedly."
   category: Positive
   rarity: Uncommon
-  value: 1
+  value: 2
+  maxLevel: 1
 
 - type: chemGeneratorProperty
   id: Crystallization
@@ -394,7 +398,8 @@
   description: "The chemical structure of the chemical forms itself in a lens. passing light wider, while also keeping focus. Not safe to administer. Hardens root structure of plants, improving survivability during repeat harvests."
   category: Positive
   rarity: Uncommon
-  value: 1
+  value: 2
+  maxLevel: 1
 
 - type: chemGeneratorProperty
   id: Aiding
@@ -403,6 +408,8 @@
   description: "Fixes genetic defects, disfigurements, disabilities. In plants removes compounds modifying yield and mutation."
   category: Positive
   value: 1
+  maxLevel: 1
+  flags: [ Disabled ]
 
 - type: chemGeneratorProperty
   id: Neurocryogenic
@@ -410,7 +417,8 @@
   effect: !type:Neurocryogenic {}
   description: "Causes a temporal freeze of all neurological processes and cellular respirations in the brain. This allows the brain to be preserved for long periods of time."
   category: Positive
-  value: 1
+  rarity: Uncommon
+  value: 2
 
 - type: chemGeneratorProperty
   id: Criticalstabilize
@@ -418,8 +426,8 @@
   effect: !type:Criticalstabilize {}
   description: "Stabilizes critical damage and bleeding."
   category: Positive
-  rarity: Uncommon
   value: 2
+  flags: [ Disabled ]
 
 - type: chemGeneratorProperty
   id: Electrogenetic
@@ -427,7 +435,6 @@
   effect: !type:Electrogenetic {}
   description: "Stimulates cardiac muscles when exposed to electric shock and provides general healing. Useful in restarting the heart in combination with a defibrillator."
   category: Positive
-  rarity: Uncommon
   value: 2
 
 - type: chemGeneratorProperty
@@ -436,7 +443,8 @@
   effect: !type:Disrupting {}
   description: "Disrupts certain neurological processes related to communication in animals."
   category: Positive
-  value: 1
+  rarity: Uncommon
+  value: 2
 
 - type: chemGeneratorProperty
   id: Neutralizing
@@ -444,7 +452,8 @@
   effect: !type:Neutralizing {}
   description: "Neutralizes certain reactive chemicals and plasmas on contact. Unsafe to administer intravenously."
   category: Positive
-  value: 1
+  rarity: Uncommon
+  value: 2
 
 - type: chemGeneratorProperty
   id: Cardiostabilizing
@@ -453,6 +462,7 @@
   description: "Stabilizes the cardiac cycle when under shock."
   category: Positive
   value: 1
+  flags: [ Disabled ]
 
 - type: chemGeneratorProperty
   id: Hemostatic
@@ -461,7 +471,60 @@
   description: "Vastly improves the blood's natural ability to coagulate and stop bleeding by heightening platelet production and effectiveness. Overdosing will cause extreme blood clotting, resulting in severe tissue damage."
   category: Positive
   rarity: Uncommon
+  value: 3
+  maxLevel: 1
+
+- type: chemGeneratorProperty
+  id: Cardiopeutic
+  code: CDP
+  effect: !type:Cardiopeutic {}
+  description: "Regenerates damaged cardiomyocytes and recovers a correct cardiac cycle and heart functionality. Prevents forced mutation of produced chemicals in plants."
+  category: Positive
+  rarity: Uncommon
   value: 1
+
+- type: chemGeneratorProperty
+  id: Hepatopeutic
+  code: HPP
+  effect: !type:Hepatopeutic {}
+  description: "Treats deteriorated hepatocytes and damaged tissue in the liver, restoring organ functions. Forces some negative mutations in plants."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Nephropeutic
+  code: NPP
+  effect: !type:Nephropeutic {}
+  description: "Heals damaged and deteriorated podocytes in the kidney, restoring organ functions. Forces mutation of the tolerance to light, weeds, and toxins in plants."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Pneumopeutic
+  code: PNP
+  effect: !type:Pneumopeutic {}
+  description: "Mends the interstitium tissue of the alveoli restoring respiratory functions in the lungs. Forces mutation of growth speed and health in plants."
+  category: Positive
+  rarity: Uncommon
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Oculopeutic
+  code: OCP
+  effect: !type:Oculopeutic {}
+  description: "Restores sensory capabilities of photoreceptive cells in the eyes returning lost vision. Forces mutation of potency in plants."
+  category: Positive
+  value: 1
+
+- type: chemGeneratorProperty
+  id: Neuropeutic
+  code: NRP
+  effect: !type:Neuropeutic {}
+  description: "Rebuilds damaged and broken neurons in the central nervous system re-establishing brain functionality. Forces species mutation in plants."
+  category: Positive
+  value: 2
 
 - type: chemGeneratorProperty
   id: Repairing
@@ -505,7 +568,7 @@
   description: "Liquefies large crystalline and metallic structures the body and allows them to migrate to and be excreted through the skin."
   category: Positive
   rarity: Uncommon
-  value: 1
+  value: 2
 
 - type: chemGeneratorProperty
   id: Antiparasitic
@@ -514,7 +577,7 @@
   description: "Antimicrobial property specifically targeting parasitic pathogens in the body disrupting their growth and potentially killing them."
   category: Positive
   rarity: Uncommon
-  value: 1
+  value: 2
 
 - type: chemGeneratorProperty
   id: Defibrillating
@@ -585,7 +648,7 @@
   description: "The chemical is highly explosive. Do not ignite. Careful when handling, sensitivity is based off the OD threshold, which can lead to spontaneous detonation."
   category: Positive
   rarity: Uncommon
-  value: 1
+  value: 2
 
 - type: chemGeneratorProperty
   id: FirePenetrating

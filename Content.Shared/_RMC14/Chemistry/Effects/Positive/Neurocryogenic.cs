@@ -26,7 +26,7 @@ public sealed partial class Neurocryogenic : RMCChemicalEffect
             entities.System<MobStateSystem>().IsDead(target, mobStateComp))
         {
             var rotting = entities.System<SharedRottingSystem>();
-            rotting.ReduceAccumulator(target, TimeSpan.FromSeconds((double) potency));
+            rotting.ReduceAccumulator(target, TimeSpan.FromSeconds((double) potency * 5));
             return;
         }
 
@@ -37,6 +37,6 @@ public sealed partial class Neurocryogenic : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var temperature = args.EntityManager.System<SharedRMCTemperatureSystem>();
-        temperature.ForceChangeTemperature(args.TargetEntity, temperature.GetTemperature(args.TargetEntity) - (float) potency * 2.5f);
+        temperature.ForceChangeTemperature(args.TargetEntity, temperature.GetTemperature(args.TargetEntity) - (float) potency * 5f);
     }
 }

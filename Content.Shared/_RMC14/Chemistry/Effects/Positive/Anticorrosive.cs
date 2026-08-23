@@ -19,7 +19,7 @@ public sealed partial class Anticorrosive : RMCChemicalEffect
     {
         var healing = PotencyPerSecond;
         if (ActualPotency > 2)
-            healing += PotencyPerSecond * 0.25f;
+            healing += PotencyPerSecond * 0.5f;
 
         return $"Heals [color=green]{healing}[/color] burn damage.\n" +
                $"Overdoses cause [color=red]{PotencyPerSecond}[/color] brute and [color=red]{PotencyPerSecond}[/color] toxin damage.\n" +
@@ -40,7 +40,7 @@ public sealed partial class Anticorrosive : RMCChemicalEffect
         damageable.TryChangeDamage(args.TargetEntity, healing, true, interruptsDoAfters: false);
         if (ActualPotency > 2)
         {
-            healing = rmcDamageable.DistributeHealingCached(args.TargetEntity, BurnGroup, potency * 0.25f);
+            healing = rmcDamageable.DistributeHealingCached(args.TargetEntity, BurnGroup, potency * 0.5f);
             damageable.TryChangeDamage(args.TargetEntity, healing, true, interruptsDoAfters: false);
         }
     }

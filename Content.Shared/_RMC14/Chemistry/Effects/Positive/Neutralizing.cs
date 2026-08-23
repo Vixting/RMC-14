@@ -20,7 +20,7 @@ public sealed partial class Neutralizing : RMCChemicalEffect
     {
         var damage = new DamageSpecifier();
         damage.DamageDict[HeatType] = potency;
-        damage.DamageDict[PoisonType] = potency * 0.25f;
+        damage.DamageDict[PoisonType] = potency * 0.5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
@@ -32,5 +32,5 @@ public sealed partial class Neutralizing : RMCChemicalEffect
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
-    // TODO RMC14: mob effect - liver organ damage on critical overdose; extinguishes fire and drains xeno plasma on touch
+    // TODO RMC14: liver damage on critical overdose; extinguishes fire & drains xeno plasma on touch
 }

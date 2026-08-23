@@ -24,12 +24,14 @@ public sealed partial class Musclestimulating : RMCChemicalEffect
         speed.ModifySpeed(args.TargetEntity, modifiers);
     }
 
-    // TODO RMC14: mob effect - heart organ damage on overdose
+    // TODO RMC14: speed buff on touch for xenos/marines
+
+    // TODO RMC14: heart organ damage on overdose
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 0.5f;
+        damage.DamageDict[BluntType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

@@ -20,7 +20,7 @@ public sealed partial class Photosensitive : RMCChemicalEffect
         if (plant.Seed is not { } seed || seed.HarvestRepeat == HarvestType.Repeat)
             return;
 
-        var amount = (float) potency;
+        var amount = (float) args.Quantity;
         plant.WeedLevel += amount * 0.25f;
         plant.NutritionLevel -= amount * 0.25f;
         plant.RepeatHarvestCounter += amount * 10f;
@@ -45,5 +45,5 @@ public sealed partial class Photosensitive : RMCChemicalEffect
         popup.PopupEntity(Loc.GetString("plant-repeat-harvest-shimmer", ("name", Loc.GetString(seed.DisplayName))), args.TargetEntity);
     }
 
-    // TODO RMC14: mob effect - migraine popup and brain organ damage
+    // TODO RMC14: migraine popup & brain organ damage
 }
