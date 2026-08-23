@@ -33,7 +33,7 @@ public sealed partial class Transformative : RMCChemicalEffect
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = HealAmount * (float) potency * 0.25f;
+        damage.DamageDict[PoisonType] = HealAmount * (float) potency * 0.5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

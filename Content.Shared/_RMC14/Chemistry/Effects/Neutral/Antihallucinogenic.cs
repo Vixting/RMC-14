@@ -8,7 +8,7 @@ using Content.Shared.StatusEffectNew;
 using Content.Shared.StatusEffectNew.Components;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared._RMC14.Chemistry.Effects.neutral;
+namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Antihallucinogenic : RMCChemicalEffect
 {
@@ -31,8 +31,8 @@ public sealed partial class Antihallucinogenic : RMCChemicalEffect
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var bloodstream = args.EntityManager.System<SharedRMCBloodstreamSystem>();
-        bloodstream.RemoveBloodstreamChemical(args.TargetEntity, MindbreakerToxin, 2.5f);
-        bloodstream.RemoveBloodstreamChemical(args.TargetEntity, SpaceDrugs, 2.5f);
+        bloodstream.RemoveBloodstreamChemical(args.TargetEntity, MindbreakerToxin, 5f);
+        bloodstream.RemoveBloodstreamChemical(args.TargetEntity, SpaceDrugs, 5f);
 
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
         status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds(PotencyPerSecond * -10)); // SeeingRainbows is M.druggy in CM13

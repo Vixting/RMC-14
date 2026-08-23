@@ -26,7 +26,8 @@ public sealed partial class Neuroinhibiting : RMCChemicalEffect
         var target = args.TargetEntity;
         var duration = TimeSpan.FromSeconds(2);
 
-        // TODO RMC: Should be cured by surgeries instead of being status effects
+        // TODO RMC14: Should be cured by surgeries instead of being status effects
+        // TODO RMC14: nearsightedness at potency <= 1
         var status = args.EntityManager.System<StatusEffectsSystem>();
 
         if (p > 1f)

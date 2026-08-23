@@ -2,6 +2,7 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Content.Shared.StatusEffectNew;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
@@ -10,9 +11,17 @@ public sealed partial class Psychostimulating : RMCChemicalEffect
 {
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
 
+    private static readonly EntProtoId ConfusedStatus = "RMCStatusEffectConfused";
+
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Stimulates psychological functions, causing increased awareness, focus, and anti-depressing effects.";
+    }
+
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        var status = args.EntityManager.System<SharedStatusEffectsSystem>();
+        status.TryAddTime(args.TargetEntity, ConfusedStatus, TimeSpan.FromSeconds(-(float) potency));
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

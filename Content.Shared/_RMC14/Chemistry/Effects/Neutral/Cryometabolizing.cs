@@ -15,6 +15,12 @@ public sealed partial class Cryometabolizing : RMCChemicalEffect
     {
         var temperature = args.EntityManager.System<SharedRMCTemperatureSystem>();
         if (temperature.GetTemperature(args.TargetEntity) < 210f)
-            boost += Potency * 0.25f;
+            boost += Potency * 0.5f;
+    }
+
+    protected override bool ShouldCancel(EntityEffectReagentArgs args)
+    {
+        var temperature = args.EntityManager.System<SharedRMCTemperatureSystem>();
+        return temperature.GetTemperature(args.TargetEntity) > 210f;
     }
 }

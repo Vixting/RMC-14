@@ -37,10 +37,10 @@ public sealed partial class Antispasmodic : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (random.Prob(0.3f * (float) potency))
+        if (random.Prob(0.15f * (float) potency))
         {
             var stun = args.EntityManager.System<SharedStunSystem>();
-            stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds((float) potency), true);
+            stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds((float) potency * 0.1f), true);
         }
 
         var damage = new DamageSpecifier();

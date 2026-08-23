@@ -109,7 +109,8 @@
   effect: !type:Excreting {}
   description: "Excretes all chemicals contained in the blood stream by using the kidneys to turn it into urine. Upregulates chemical production in plants."
   category: Neutral
-  value: 0
+  rarity: Uncommon
+  value: -1
 
 - type: chemGeneratorProperty
   id: Nutritious
@@ -117,7 +118,7 @@
   effect: !type:Nutritious {}
   description: "The compound can be used as, or be broken into, nutrition for cell metabolism."
   category: Neutral
-  value: 1
+  value: 0
 
 - type: chemGeneratorProperty
   id: Trichogenic
@@ -125,7 +126,8 @@
   effect: !type:Trichogenic {}
   description: "Accelerates cell division in the hair follicles resulting in random and excessive hair growth. Found to increase yields in plants."
   category: Neutral
-  value: 1
+  rarity: Uncommon
+  value: 0
 
 - type: chemGeneratorProperty
   id: Hypometabolic
@@ -133,7 +135,8 @@
   effect: !type:Hypometabolic {}
   description: "Takes longer for this chemical to metabolize, resulting in it being in the bloodstream for more time per unit. Slows down metabolism of plants."
   category: Neutral
-  value: 0
+  rarity: Uncommon
+  value: 3
 
 - type: chemGeneratorProperty
   id: Hypermetabolic
@@ -158,6 +161,7 @@
   description: "Causes a mix of endothermic and exothermic reactions in the bloodstream in order to stabilize internal body temperature."
   category: Neutral
   value: 1
+  flags: [ Disabled ]
 
 - type: chemGeneratorProperty
   id: Focusing
@@ -165,7 +169,7 @@
   effect: !type:Focusing {}
   description: "Removes common alcoholic substances from the bloodstream and increases focus."
   category: Neutral
-  value: 1
+  value: 0
 
 - type: chemGeneratorProperty
   id: Ketogenic
@@ -173,7 +177,7 @@
   effect: !type:Ketogenic {}
   description: "Activates ketosis causing the liver to rapidly burn fatty acids and alcohols in the body, resulting in weight loss. Can cause ketoacidosis in high concentrations, resulting in a buildup of acids and lowered pH levels in the blood."
   category: Neutral
-  value: 0
+  value: -1
 
 - type: chemGeneratorProperty
   id: Alcoholic
@@ -181,7 +185,7 @@
   effect: !type:Alcoholic {}
   description: "Binds to glutamate neurotransmitters and gamma aminobutyric acid (GABA), slowing brain functions response to stimuli. This effect is also known as intoxication."
   category: Neutral
-  value: -1
+  value: 0
 
 - type: chemGeneratorProperty
   id: Hallucinogenic
@@ -213,6 +217,7 @@
   effect: !type:Hypothermic {}
   description: "Causes an endothermic reaction when metabolized in the body, decreasing internal body temperature."
   category: Neutral
+  rarity: Uncommon
   value: -1
 
 - type: chemGeneratorProperty
@@ -221,7 +226,8 @@
   effect: !type:Psychostimulating {}
   description: "Stimulates psychological functions causing increased awareness, focus and anti-depressing effects."
   category: Neutral
-  value: 1
+  value: 0
+  maxLevel: 7
 
 - type: chemGeneratorProperty
   id: Hypnotic
@@ -237,8 +243,8 @@
   effect: !type:Transformative {}
   description: "Mends damaged tissue, in the process creating a small amount of weak toxin as a byproduct, which then seeps into the bloodstream and damages the recipient."
   category: Neutral
-  rarity: Uncommon
-  value: 2
+  rarity: Rare
+  value: 3
 
 - type: chemGeneratorProperty
   id: Unknown
@@ -246,7 +252,7 @@
   effect: !type:Unknown {}
   category: Neutral
   value: -1
-  flags: [ Anomalous, Unadjustable ]
+  flags: [ Anomalous, Unadjustable, Disabled ]
 
 - type: chemGeneratorProperty
   id: Cryometabolizing
@@ -327,7 +333,7 @@
   effect: !type:Viscous {}
   description: "The chemical is thick and gooey due to high surface tension. It will not spread very far when spilled. This would decrease the radius of a chemical fire."
   category: Neutral
-  value: 0
+  value: -1
 
 # Positive
 - type: chemGeneratorProperty

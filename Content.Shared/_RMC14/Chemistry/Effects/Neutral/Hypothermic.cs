@@ -1,4 +1,3 @@
-using Content.Shared._RMC14.BlurredVision;
 using Content.Shared._RMC14.Temperature;
 using Content.Shared.Atmos;
 using Content.Shared.Body.Components;
@@ -7,7 +6,7 @@ using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
-using Content.Shared.StatusEffect;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
 using Robust.Shared.Prototypes;
 
@@ -50,8 +49,8 @@ public sealed partial class Hypothermic : RMCChemicalEffect
         var temperature = args.EntityManager.System<SharedRMCTemperatureSystem>();
         temperature.ForceChangeTemperature(args.TargetEntity, temperature.GetTemperature(args.TargetEntity) - (float) potency * 5f);
 
-        var status = args.EntityManager.System<StatusEffectsSystem>();
-        status.TryAddStatusEffect<RMCBlindedComponent>(args.TargetEntity, "Blinded", TimeSpan.FromSeconds(6), true);
+        var status = args.EntityManager.System<SharedStatusEffectsSystem>();
+        status.TryAddStatusEffectDuration(args.TargetEntity, "StatusEffectDrowsiness", TimeSpan.FromSeconds(30));
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

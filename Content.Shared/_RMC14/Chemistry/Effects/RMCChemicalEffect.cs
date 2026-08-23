@@ -46,6 +46,9 @@ public abstract partial class RMCChemicalEffect : EntityEffect
             return;
         }
 
+        if (IsCancelled(reagentArgs))
+            return;
+
         Tick(damageable, scaledPotency, reagentArgs);
 
         var totalQuantity = FixedPoint2.Zero;
@@ -92,6 +95,28 @@ public abstract partial class RMCChemicalEffect : EntityEffect
             }
         }
 
+        return false;
+    }
+
+    private static bool IsCancelled(EntityEffectReagentArgs args)
+    {
+        if (args.Reagent?.Metabolisms == null)
+            return false;
+
+        foreach (var (_, entry) in args.Reagent.Metabolisms)
+        {
+            foreach (var effect in entry.Effects)
+            {
+                if (effect is RMCChemicalEffect { } rmcEffect && rmcEffect.ShouldCancel(args))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected virtual bool ShouldCancel(EntityEffectReagentArgs args)
+    {
         return false;
     }
 
