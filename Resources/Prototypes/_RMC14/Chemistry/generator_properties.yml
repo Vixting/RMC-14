@@ -776,7 +776,7 @@
   effect: !type:Encrypted {}
   description: "This extremely complex chemical structure contains a cipher that appears to be missing a few parts to complete the process."
   category: Positive
-  value: 1
+  value: 8
   flags: [ Disabled ]
 
 - type: chemGeneratorProperty
