@@ -20,8 +20,12 @@ public sealed partial class Biocidic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (plant.WeedLevel > 0) plant.WeedLevel = MathF.Max(0f, plant.WeedLevel - (float) potency);
-        if (plant.PestLevel > 0) plant.PestLevel = MathF.Max(0f, plant.PestLevel - (float) potency);
+        var amount = Potency * (float) args.Quantity;
+        if (plant.WeedLevel > 0)
+            plant.WeedLevel = MathF.Max(0f, plant.WeedLevel - amount);
+
+        if (plant.PestLevel > 0)
+            plant.PestLevel = MathF.Max(0f, plant.PestLevel - amount);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

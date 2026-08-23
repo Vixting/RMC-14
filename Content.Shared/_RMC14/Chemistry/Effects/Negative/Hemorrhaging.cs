@@ -17,8 +17,9 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.Health -= (float) potency;
-        plant.MutationMod += (float) potency;
+        var amount = 0.4f * Potency * (float) args.Quantity;
+        plant.Health -= amount;
+        plant.MutationMod += amount;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -28,5 +29,16 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
 
         var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
         bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), (float) potency);
+    }
+
+    // TODO RMC14: - organ damage on overdose
+
+    protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (!args.EntityManager.TryGetComponent<BloodstreamComponent>(args.TargetEntity, out var bloodstream))
+            return;
+
+        var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
+        bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), (float) potency * 4f);
     }
 }

@@ -14,7 +14,7 @@
   effect: !type:Corrosive {}
   description: "Damages or destroys other substances on contact through a chemical reaction. Causes chemical burns on contact with living tissue. Reduces pest and weed populations."
   category: Negative
-  value: -2
+  value: 1
 
 - type: chemGeneratorProperty
   id: Biocidic
@@ -30,7 +30,8 @@
   effect: !type:Hemorrhaging {}
   description: "Ruptures endothelial cells making up blood vessels, causing blood to escape from the circulatory system. Persistent mutagen to plants."
   category: Negative
-  value: -2
+  rarity: Uncommon
+  value: 1
 
 - type: chemGeneratorProperty
   id: Carcinogenic
@@ -38,7 +39,7 @@
   effect: !type:Carcinogenic {}
   description: "Penetrates the cell nucleus causing direct damage to the deoxyribonucleic acid in cells resulting in cancer, abnormal cell proliferation, and mutation in plants. In extreme cases causing hyperactive apoptosis, potentially atrophy."
   category: Negative
-  value: -1
+  value: -2
 
 - type: chemGeneratorProperty
   id: Hypoxemic
@@ -46,7 +47,7 @@
   effect: !type:Hypoxemic {}
   description: "Reacts with hemoglobin in red blood cells preventing oxygen from being absorbed, resulting in hypoxemia."
   category: Negative
-  value: -2
+  value: -1
 
 - type: chemGeneratorProperty
   id: Hemolytic
@@ -54,7 +55,8 @@
   effect: !type:Hemolytic {}
   description: "Causes intravascular hemolysis, resulting in the destruction of erythrocytes (red blood cells) in the bloodstream. This can result in Hemoglobinemia, where a high concentration of hemoglobin is released into the blood plasma."
   category: Negative
-  value: -1
+  rarity: Uncommon
+  value: -2
 
 - type: chemGeneratorProperty
   id: Igniting
@@ -62,9 +64,7 @@
   effect: !type:Igniting {}
   description: "The chemical appears capable of self-igniting on contact with most materials."
   category: Negative
-  rarity: Rare
-  value: -3
-  maxLevel: 3
+  value: 1
   flags: [ Disabled ]
 
 - type: chemGeneratorProperty
@@ -82,7 +82,7 @@
   effect: !type:Intravenous {}
   description: "Due to chemical composition, this chemical can only be administered intravenously."
   category: Negative
-  value: -1
+  value: -2
 
 - type: chemGeneratorProperty
   id: Addictive
@@ -99,8 +99,60 @@
   effect: !type:Hemositic {}
   description: "The chemical shows parasitic behavior towards live erythrocytes (red blood cells) in order to produce more of itself."
   category: Negative
-  value: -2
+  value: 2
   flags: [ Anomalous, Disabled ]
+
+- type: chemGeneratorProperty
+  id: Hepatotoxic
+  code: HPT
+  effect: !type:Hepatotoxic {}
+  description: "Damages hepatocytes in the liver, resulting in liver deterioration and eventually liver failure. Prevents some negative mutations in plants."
+  category: Negative
+  rarity: Uncommon
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Nephrotoxic
+  code: NPT
+  effect: !type:Nephrotoxic {}
+  description: "Causes deterioration and damage to podocytes in the kidney resulting in potential kidney failure. Prevents the tolerance to light, weeds, and toxins from mutating in plants."
+  category: Negative
+  rarity: Uncommon
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Pneumotoxic
+  code: PNT
+  effect: !type:Pneumotoxic {}
+  description: "Toxic substance which causes damage to connective tissue that forms the support structure (the interstitium) of the alveoli in the lungs. Prevents growth speed and health from mutation in plants."
+  category: Negative
+  rarity: Uncommon
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Oculotoxic
+  code: OCT
+  effect: !type:Oculotoxic {}
+  description: "Damages the photoreceptive cells in the eyes impairing neural transmissions to the brain, resulting in loss of sight or blindness. Prevents potency from mutation in plants."
+  category: Negative
+  rarity: Uncommon
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Cardiotoxic
+  code: CDT
+  effect: !type:Cardiotoxic {}
+  description: "Attacks cardiomyocytes when passing through the heart in the bloodstream. This disrupts the cardiac cycle and can lead to cardiac arrest. Prevents produced chemicals from mutation in plants."
+  category: Negative
+  value: -2
+
+- type: chemGeneratorProperty
+  id: Neurotoxic
+  code: NRT
+  effect: !type:Neurotoxic {}
+  description: "Breaks down neurons causing widespread damage to the central nervous system and brain functions. Exposure may cause disorientation or unconsciousness to affected persons. Prevents species mutation in plants."
+  category: Negative
+  value: -2
 
 # Neutral
 - type: chemGeneratorProperty

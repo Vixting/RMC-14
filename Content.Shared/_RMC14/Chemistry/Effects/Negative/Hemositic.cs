@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Synth;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
@@ -15,6 +16,11 @@ public sealed partial class Hemositic : RMCChemicalEffect
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Shows parasitic behavior towards live erythrocytes in order to produce more of itself.";
+    }
+
+    protected override bool ShouldCancel(EntityEffectReagentArgs args)
+    {
+        return args.EntityManager.HasComponent<SynthComponent>(args.TargetEntity);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -41,7 +47,6 @@ public sealed partial class Hemositic : RMCChemicalEffect
         var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
         bloodstreamSystem.TryModifyBloodLevelQuiet((args.TargetEntity, bloodstream), -potency * 10f);
 
-        // cm hemositic/process_overdose(): holder.volume += potency * POTENCY_MULTIPLIER_MEDIUM(2).
         if (args.Source != null && args.Reagent != null)
             args.Source.AddReagent(args.Reagent.ID, potency * 2f);
     }

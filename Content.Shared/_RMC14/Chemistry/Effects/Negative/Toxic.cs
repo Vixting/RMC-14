@@ -21,8 +21,9 @@ public sealed partial class Toxic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.Health -= (float) potency;
-        plant.Toxins += (float) potency;
+        var amount = Potency * (float) args.Quantity;
+        plant.Health -= 1.5f * amount;
+        plant.Toxins += amount;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

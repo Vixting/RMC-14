@@ -22,8 +22,9 @@ public sealed partial class Carcinogenic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.Toxins += (float) potency;
-        plant.MutationLevel += (float) potency * plant.MutationMod;
+        var amount = Potency * (float) args.Quantity;
+        plant.Toxins += 3f * amount;
+        plant.MutationLevel += 20f * amount + plant.MutationMod;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
