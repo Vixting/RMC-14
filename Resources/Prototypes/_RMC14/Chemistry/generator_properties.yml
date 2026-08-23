@@ -154,6 +154,15 @@
   category: Negative
   value: -2
 
+- type: chemGeneratorProperty
+  id: Hypermetabolic
+  code: EMB
+  effect: !type:Hypermetabolic {}
+  description: "Takes less time for this chemical to metabolize, resulting in it being in the bloodstream for less time per unit. Accelerates plant growth."
+  category: Negative
+  rarity: Uncommon
+  value: -2
+
 # Neutral
 - type: chemGeneratorProperty
   id: Excreting
@@ -189,14 +198,6 @@
   category: Neutral
   rarity: Uncommon
   value: 3
-
-- type: chemGeneratorProperty
-  id: Hypermetabolic
-  code: EMB
-  effect: !type:Hypermetabolic {}
-  description: "Takes less time for this chemical to metabolize, resulting in it being in the bloodstream for less time per unit. Accelerates plant growth."
-  category: Neutral
-  value: -1
 
 - type: chemGeneratorProperty
   id: Antihallucinogenic
