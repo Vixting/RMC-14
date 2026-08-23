@@ -25,3 +25,6 @@ rmc-xeno-infection-burst-now-victim = You feel something ripping up your insides
 rmc-xeno-infection-burst-now-xeno = We start bursting out of {THE($victim)}'s chest!
 
 rmc-xeno-infected-bursted = {CAPITALIZE(SUBJECT($victim))} {CONJUGATE-HAVE($victim)} a giant hole in {POSS-ADJ($victim)} chest!
+
+rmc-xeno-infection-cured-self = You throw up several bits of wormlike matter! Whatever was growing inside you is dead.
+rmc-xeno-infection-cured = {CAPITALIZE($victim)} throws up several bits of wormlike matter!

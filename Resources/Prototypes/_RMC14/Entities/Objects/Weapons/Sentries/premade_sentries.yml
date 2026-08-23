@@ -93,6 +93,9 @@
   - type: GunIFF
     enabled: true
     intrinsic: true
+  - type: Reactive
+    groups:
+      RMCGenerated: [ Touch ]
   - type: Damageable
     damageContainer: Inorganic
   - type: Destructible
@@ -162,6 +165,9 @@
   - type: UserIFF
     factions:
     - FactionMarine
+  - type: Reactive
+    groups:
+      RMCGenerated: [ Touch ]
   - type: Damageable
     damageContainer: Inorganic
   - type: Destructible

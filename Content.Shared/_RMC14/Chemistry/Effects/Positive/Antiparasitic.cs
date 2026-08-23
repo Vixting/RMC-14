@@ -10,10 +10,14 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 public sealed partial class Antiparasitic : RMCChemicalEffect
 {
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
+    private const float HostDamageMultiplier = 1.5f;
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
-        return "Antimicrobial property specifically targeting parasitic pathogens, disrupting their growth and potentially killing them.";
+        return "Antimicrobial property specifically targeting parasitic pathogens, disrupting their growth and " +
+            "potentially killing them. Causes minor burns to the host, and can cure an infection outright with " +
+            "sustained treatment.";
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -22,7 +26,15 @@ public sealed partial class Antiparasitic : RMCChemicalEffect
             return;
 
         var parasiteSystem = args.EntityManager.System<SharedXenoParasiteSystem>();
-        parasiteSystem.DelayBurst((args.TargetEntity, infected), TimeSpan.FromSeconds((double) potency));
+        var progress = TimeSpan.FromSeconds((double) potency);
+        parasiteSystem.DelayBurst((args.TargetEntity, infected), progress);
+
+        if (parasiteSystem.TryResistInfection((args.TargetEntity, infected), progress))
+            return;
+
+        var damage = new DamageSpecifier();
+        damage.DamageDict[HeatType] = potency * HostDamageMultiplier;
+        damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

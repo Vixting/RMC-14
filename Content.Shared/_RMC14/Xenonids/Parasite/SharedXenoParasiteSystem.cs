@@ -1,6 +1,7 @@
 using System.Linq;
 using Content.Shared._RMC14.Actions;
 using Content.Shared._RMC14.Atmos;
+using Content.Shared._RMC14.Chemistry;
 using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Gibbing;
 using Content.Shared._RMC14.Hands;
@@ -20,6 +21,7 @@ using Content.Shared.Actions;
 using Content.Shared.Atmos.Rotting;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.DoAfter;
 using Content.Shared.Doors.Components;
 using Content.Shared.DragDrop;
@@ -85,9 +87,12 @@ public abstract partial class SharedXenoParasiteSystem : EntitySystem
     [Dependency] private readonly RMCSizeStunSystem _size = default!;
     [Dependency] private readonly RMCUnrevivableSystem _unrevivable = default!;
     [Dependency] private readonly SharedRMCActionsSystem _rmcActions = default!;
+    [Dependency] private readonly RMCVomitSystem _vomit = default!;
 
     private const CollisionGroup LeapCollisionGroup = CollisionGroup.InteractImpassable;
     private const CollisionGroup ThrownCollisionGroup = CollisionGroup.InteractImpassable | CollisionGroup.BarricadeImpassable;
+
+    private static readonly ProtoId<DamageTypePrototype> HeatDamageType = "Heat";
 
     protected readonly ProtoId<TagPrototype> ParasiteIsPreparingLeapProtoID = new ProtoId<TagPrototype>("RMCXenoParasitePreparingLeap");
 
@@ -1071,6 +1076,40 @@ public abstract partial class SharedXenoParasiteSystem : EntitySystem
     {
         burst.Comp.BurstAt += time;
         Dirty(burst);
+    }
+
+    public bool TryResistInfection(Entity<VictimInfectedComponent> victim, TimeSpan progress)
+    {
+        var infected = victim.Comp;
+
+        if (infected.IsBursting || infected.SpawnedLarva != null)
+            return false;
+
+        infected.CureProgress += progress;
+        Dirty(victim);
+
+        if (infected.CureProgress < infected.CureThreshold)
+            return false;
+
+        CureInfection(victim);
+        return true;
+    }
+
+    private void CureInfection(Entity<VictimInfectedComponent> victim)
+    {
+        if (_net.IsClient)
+            return;
+
+        _vomit.DoVomit(victim, hungerLoss: 0f, toxinHeal: 0f);
+
+        var damage = new DamageSpecifier();
+        damage.DamageDict[HeatDamageType] = _random.Next(20, 40);
+        _damage.TryChangeDamage(victim, damage, true, interruptsDoAfters: false);
+
+        _popup.PopupEntity(Loc.GetString("rmc-xeno-infection-cured-self"), victim, victim, PopupType.Medium);
+        _popup.PopupEntity(Loc.GetString("rmc-xeno-infection-cured", ("victim", victim.Owner)), victim, Filter.PvsExcept(victim), true, PopupType.Medium);
+
+        RemCompDeferred<VictimInfectedComponent>(victim);
     }
 
     public void SetHive(Entity<VictimInfectedComponent> burst, EntityUid? hive)

@@ -1,4 +1,8 @@
+using Content.Shared._RMC14.Damage;
+using Content.Shared._RMC14.Entrenching;
+using Content.Shared._RMC14.Sentry;
 using Content.Shared._RMC14.Synth;
+using Content.Shared.Chemistry;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -12,14 +16,24 @@ public sealed partial class Repairing : RMCChemicalEffect
     private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
     private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
+
+    private const float StructureHealMultiplier = 6f;
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
-        return "Repairs inorganic materials such as barricades and synthetics.";
+        return "Repairs inorganic materials such as barricades and synthetics. Also heals barricades and defenses when sprayed on them.";
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
+        if (args.Method == ReactionMethod.Touch)
+        {
+            HealStructure(damageable, args);
+            return;
+        }
+
         if (!args.EntityManager.HasComponent<SynthComponent>(args.TargetEntity))
             return;
 
@@ -27,6 +41,26 @@ public sealed partial class Repairing : RMCChemicalEffect
         damage.DamageDict[BluntType] = -potency * 2f;
         damage.DamageDict[HeatType] = -potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
+    }
+
+    private void HealStructure(DamageableSystem damageable, EntityEffectReagentArgs args)
+    {
+        var entities = args.EntityManager;
+        if (!entities.HasComponent<BarricadeComponent>(args.TargetEntity) &&
+            !entities.HasComponent<SentryComponent>(args.TargetEntity) &&
+            !entities.HasComponent<TurretComponent>(args.TargetEntity))
+        {
+            return;
+        }
+
+        var heal = FixedPoint2.New(ActualPotency * StructureHealMultiplier);
+        if (heal <= FixedPoint2.Zero)
+            return;
+
+        var rmcDamageable = entities.System<SharedRMCDamageableSystem>();
+        var specifier = rmcDamageable.DistributeHealing(args.TargetEntity, BruteGroup, heal);
+        rmcDamageable.DistributeHealingCached(args.TargetEntity, BurnGroup, heal, specifier);
+        damageable.TryChangeDamage(args.TargetEntity, specifier, true, interruptsDoAfters: false);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -42,6 +76,4 @@ public sealed partial class Repairing : RMCChemicalEffect
         damage.DamageDict[PoisonType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
-
-    // TODO RMC14: heals barricades/defense structures when sprayed on them
 }

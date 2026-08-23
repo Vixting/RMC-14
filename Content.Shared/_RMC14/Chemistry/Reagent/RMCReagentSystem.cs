@@ -1,14 +1,18 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared._RMC14.Chemistry.Effects;
+using Content.Shared._RMC14.Chemistry.Effects.Positive;
 using Content.Shared._RMC14.Chemistry.Generation;
 using Content.Shared.Body.Prototypes;
+using Content.Shared.Chemistry;
+using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Serialization.Markdown.Mapping;
+using ReactiveReagentEffectEntry = Content.Shared.Chemistry.Reagent.ReactiveReagentEffectEntry;
 
 namespace Content.Shared._RMC14.Chemistry.Reagent;
 
@@ -18,6 +22,15 @@ public sealed class RMCReagentSystem : EntitySystem
     [Dependency] private readonly ISerializationManager _serialization = default!;
 
     private static readonly ProtoId<MetabolismGroupPrototype> GeneratedMetabolismGroup = "Poison";
+
+    private static readonly ProtoId<ReactiveGroupPrototype> GeneratedReactiveGroup = "RMCGenerated";
+
+    private static readonly HashSet<Type> TouchAwareEffects = new()
+    {
+        typeof(Repairing),
+        typeof(Fueling),
+        typeof(Oxidizing),
+    };
     private FrozenDictionary<string, Reagent> _reagents = FrozenDictionary<string, Reagent>.Empty;
     private readonly Dictionary<string, RMCGeneratedReagentData> _generated = new();
 
@@ -124,6 +137,7 @@ public sealed class RMCReagentSystem : EntitySystem
         reagent.Recognizable = true;
 
         var effects = new List<EntityEffect>();
+        var touchEffects = new List<EntityEffect>();
         foreach (var prop in data.Properties)
         {
             if (!_prototypes.TryIndex<ChemGeneratorPropertyPrototype>(prop.PropertyId, out var propProto))
@@ -134,6 +148,8 @@ public sealed class RMCReagentSystem : EntitySystem
                 rmc.Potency = prop.Level;
 
             effects.Add(effect);
+            if (TouchAwareEffects.Contains(effect.GetType()))
+                touchEffects.Add(effect);
         }
 
         if (effects.Count > 0)
@@ -143,6 +159,18 @@ public sealed class RMCReagentSystem : EntitySystem
             {
                 [GeneratedMetabolismGroup] = entry,
             }.ToFrozenDictionary();
+        }
+
+        if (touchEffects.Count > 0)
+        {
+            reagent.ReactiveEffects = new Dictionary<ProtoId<ReactiveGroupPrototype>, ReactiveReagentEffectEntry>
+            {
+                [GeneratedReactiveGroup] = new ReactiveReagentEffectEntry
+                {
+                    Methods = new HashSet<ReactionMethod> { ReactionMethod.Touch },
+                    Effects = touchEffects.ToArray(),
+                },
+            };
         }
 
         return reagent;

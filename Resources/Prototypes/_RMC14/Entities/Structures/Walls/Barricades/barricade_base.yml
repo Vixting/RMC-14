@@ -34,6 +34,9 @@
   - type: RotationDrawDepth
     southDrawDepth: OverMobs
   - type: Barricade
+  - type: Reactive
+    groups:
+      RMCGenerated: [ Touch ]
   - type: Damageable
     damageContainer: Inorganic
     damageModifierSet: CMBarricade
