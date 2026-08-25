@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Chemistry.Disabilities;
 using Content.Shared._RMC14.Synth;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
@@ -6,7 +7,6 @@ using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
-using Content.Shared.Speech.EntitySystems;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Negative;
@@ -53,6 +53,6 @@ public sealed partial class Hemositic : RMCChemicalEffect
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        args.EntityManager.System<SharedStutteringSystem>().DoStutter(args.TargetEntity, TimeSpan.FromSeconds(10), true);
+        args.EntityManager.EnsureComponent<RMCNervousComponent>(args.TargetEntity);
     }
 }

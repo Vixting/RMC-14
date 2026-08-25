@@ -1,7 +1,6 @@
 using Content.Shared._RMC14.Emote;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Damage;
-using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Jittering;
@@ -15,8 +14,6 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Hallucinogenic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> CellularType = "Cellular";
-
     private static readonly EntProtoId<StatusEffectComponent> SeeingRainbows = "RMCStatusEffectSeeingRainbow";
 
     private static readonly EntProtoId ConfusedStatus = "RMCStatusEffectConfused";
@@ -65,9 +62,7 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[CellularType] = potency;
-        damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
+        // TODO RMC14: brain damage
 
         var stun = args.EntityManager.System<SharedStunSystem>();
         stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds(2), true);

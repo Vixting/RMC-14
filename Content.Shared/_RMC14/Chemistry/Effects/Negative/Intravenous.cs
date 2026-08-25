@@ -1,3 +1,5 @@
+using Content.Shared._RMC14.Chemistry.ChemMaster;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
 
@@ -15,5 +17,22 @@ public sealed partial class Intravenous : RMCChemicalEffect
         boost += Potency;
     }
 
-    // TODO RMC14: restrict this reagent to only be effective when injecte
+    public override float MetabolismRateMultiplier => Potency;
+
+    public static bool IsNotIngestible(ReagentPrototype reagent)
+    {
+        if (reagent.Metabolisms == null)
+            return false;
+
+        foreach (var (_, entry) in reagent.Metabolisms)
+        {
+            foreach (var effect in entry.Effects)
+            {
+                if (effect is Intravenous)
+                    return true;
+            }
+        }
+
+        return false;
+    }
 }

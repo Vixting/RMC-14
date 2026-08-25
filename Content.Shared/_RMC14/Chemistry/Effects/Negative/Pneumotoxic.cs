@@ -18,14 +18,14 @@ public sealed partial class Pneumotoxic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var suppress = (float) potency * -2f;
+        var suppress = -Potency;
         SuppressMutationSlot(plant, "Endurance", suppress);
         SuppressMutationSlot(plant, "Production", suppress);
         SuppressMutationSlot(plant, "Lifespan", suppress);
         SuppressMutationSlot(plant, "Maturity", suppress);
     }
 
-    // TODO RMC14: mob effect - damage lung organ
+    // TODO RMC14: damage lung
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

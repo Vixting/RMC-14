@@ -1,15 +1,24 @@
+using Content.Shared._RMC14.Chemistry.Buildup;
+using Content.Shared._RMC14.Synth;
+using Content.Shared._RMC14.Xenonids;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Botany.Components;
+using Content.Shared.Chemistry;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Content.Shared.Humanoid;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Negative;
 
 public sealed partial class Hemorrhaging : RMCChemicalEffect
 {
+    private const float TouchBleedMultiplier = 0.25f;
+    private const float HealingReductionDissipation = 0.4f;
+    private const float HealingReductionMax = 50f;
+
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Causes hemorrhaging.";
@@ -24,6 +33,12 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
+        if (args.Method == ReactionMethod.Touch)
+        {
+            TouchReaction(args);
+            return;
+        }
+
         if (!args.EntityManager.TryGetComponent<BloodstreamComponent>(args.TargetEntity, out var bloodstream))
             return;
 
@@ -31,7 +46,23 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
         bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), (float) potency);
     }
 
-    // TODO RMC14: - organ damage on overdose
+    private void TouchReaction(EntityEffectReagentArgs args)
+    {
+        var entities = args.EntityManager;
+        var target = args.TargetEntity;
+
+        var isXenoHuman = entities.HasComponent<XenoComponent>(target) ||
+            (entities.HasComponent<HumanoidAppearanceComponent>(target) && !entities.HasComponent<SynthComponent>(target));
+        if (!isXenoHuman)
+            return;
+
+        var volume = (float) args.Quantity;
+        var magnitude = (float) ActualPotency * volume * TouchBleedMultiplier;
+        var buildup = entities.System<RMCHealingReductionSystem>();
+        buildup.AddBuildup(target, magnitude, HealingReductionDissipation, HealingReductionMax);
+    }
+
+    // TODO RMC14: organ damage on overdose
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

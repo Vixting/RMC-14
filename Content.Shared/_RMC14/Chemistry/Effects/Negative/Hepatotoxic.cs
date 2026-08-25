@@ -18,7 +18,7 @@ public sealed partial class Hepatotoxic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var suppress = (float) potency * -2f;
+        var suppress = -Potency;
         SuppressMutationSlot(plant, "Plant Cancer", suppress);
         SuppressMutationSlot(plant, "Gluttony", suppress);
     }

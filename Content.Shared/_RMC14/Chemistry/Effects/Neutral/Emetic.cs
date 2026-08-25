@@ -19,8 +19,13 @@ public sealed partial class Emetic : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
+        if (args.Source is not { } source || args.Reagent is not { } reagent)
+            return;
+
+        var quantity = source.GetTotalPrototypeQuantity(reagent.ID);
+
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (random.Prob(0.1f * (float) potency))
+        if (random.Prob((float) ActualPotency * (float) quantity * 0.005f))
         {
             var vomit = args.EntityManager.System<RMCVomitSystem>();
             vomit.StartVomit(args.TargetEntity);

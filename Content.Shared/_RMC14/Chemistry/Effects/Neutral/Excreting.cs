@@ -13,19 +13,16 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 public sealed partial class Excreting : RMCChemicalEffect
 {
     [DataField]
-    public float ToxinsAmount = 1f;
+    public float ToxinsAmount = 1.5f;
 
     [DataField]
-    public float WeedsAmount = 0.5f;
+    public float WeedsAmount = 1f;
 
     [DataField]
     public float CounterIncrement = 5f;
 
     [DataField]
-    public int MaxPotencyBonus = 5;
-
-    [DataField]
-    public float NutrientConsumptionIncrease = 0.25f;
+    public float NutrientConsumptionIncrease = 0.3f;
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -45,22 +42,25 @@ public sealed partial class Excreting : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.Toxins += ToxinsAmount;
-        plant.WeedLevel += WeedsAmount;
-        plant.PotencyCounter += CounterIncrement;
+        var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
+        plant.Toxins += ToxinsAmount * scaled;
+        plant.WeedLevel += WeedsAmount * scaled;
+        plant.PotencyCounter += CounterIncrement * scaled;
 
         if (plant.PotencyCounter < 100f || plant.Seed == null)
             return;
 
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (!random.Prob(0.5f))
+        var level = Math.Max((int) Potency, 1);
+
+        if (random.Next(0, level + 1) <= 0)
             return;
 
         if (!plant.Seed.Unique)
             plant.Seed = plant.Seed.Clone();
 
-        plant.Seed.Potency += random.Next(1, MaxPotencyBonus + 1);
-        plant.Seed.NutrientConsumption += NutrientConsumptionIncrease;
+        plant.Seed.Potency += random.Next(1, level + 1);
+        plant.Seed.NutrientConsumption += NutrientConsumptionIncrease * Potency;
         plant.PotencyCounter = 0f;
         var popup = args.EntityManager.System<SharedPopupSystem>();
         popup.PopupEntity(Loc.GetString("plant-excreting-potency-boost"), args.TargetEntity);

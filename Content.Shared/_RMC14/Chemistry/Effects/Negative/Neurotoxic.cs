@@ -1,8 +1,13 @@
 using Content.Shared._RMC14.Slow;
+using Content.Shared._RMC14.Stun;
+using Content.Shared._RMC14.Synth;
+using Content.Shared._RMC14.Xenonids;
 using Content.Shared.Botany.Components;
+using Content.Shared.Chemistry;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Content.Shared.Humanoid;
 using Content.Shared.Jittering;
 using Content.Shared.StatusEffectNew;
 using Robust.Shared.Prototypes;
@@ -19,11 +24,46 @@ public sealed partial class Neurotoxic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var suppress = (float) potency * -2f;
+        var suppress = -Potency;
         SuppressMutationSlot(plant, "Mutate Species", suppress);
     }
 
-    // TODO RMC14: brain damage
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (args.Method == ReactionMethod.Touch)
+        {
+            HandleTouch(args);
+            return;
+        }
+    }
+
+    private void HandleTouch(EntityEffectReagentArgs args)
+    {
+        var entities = args.EntityManager;
+        var target = args.TargetEntity;
+
+        var potency = (float) ActualPotency;
+        var volume = (float) args.Quantity;
+        if (potency <= 0f || volume <= 0f)
+            return;
+
+        var isXeno = entities.HasComponent<XenoComponent>(target);
+        var isHuman = entities.HasComponent<HumanoidAppearanceComponent>(target) &&
+            !entities.HasComponent<SynthComponent>(target);
+        if (!isXeno && !isHuman)
+            return;
+
+        var dazed = entities.System<RMCDazedSystem>();
+
+        if (isHuman)
+            dazed.TryDaze(target, TimeSpan.FromSeconds(potency * volume * 0.25f), false);
+
+        if (isXeno)
+        {
+            var duration = MathF.Min(potency * volume * 0.5f, 30f);
+            dazed.TryDaze(target, TimeSpan.FromSeconds(duration), false);
+        }
+    }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

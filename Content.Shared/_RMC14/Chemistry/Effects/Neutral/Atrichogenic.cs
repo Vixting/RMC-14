@@ -2,6 +2,9 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Content.Shared.Humanoid;
+using Content.Shared.Humanoid.Markings;
+using Content.Shared.Popups;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
@@ -15,7 +18,26 @@ public sealed partial class Atrichogenic : RMCChemicalEffect
         return "Damages the hair follicles, causing extreme alopecia.";
     }
 
-    // TODO RMC14: mob effect - baldness
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        if (!args.EntityManager.TryGetComponent<HumanoidAppearanceComponent>(args.TargetEntity, out var humanoid))
+            return;
+
+        var changed = false;
+        if (humanoid.MarkingSet.RemoveCategory(MarkingCategories.Hair))
+            changed = true;
+
+        if (humanoid.MarkingSet.RemoveCategory(MarkingCategories.FacialHair))
+            changed = true;
+
+        if (!changed)
+            return;
+
+        args.EntityManager.Dirty(args.TargetEntity, humanoid);
+
+        var popup = args.EntityManager.System<SharedPopupSystem>();
+        popup.PopupEntity(Loc.GetString("chem-atrichogenic-hair-loss"), args.TargetEntity);
+    }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

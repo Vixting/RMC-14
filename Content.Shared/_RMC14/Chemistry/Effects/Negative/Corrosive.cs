@@ -12,6 +12,7 @@ using Content.Shared.Humanoid;
 using Content.Shared.Inventory;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Popups;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -59,14 +60,20 @@ public sealed partial class Corrosive : RMCChemicalEffect
         if (isHuman)
         {
             var inventory = entities.System<InventorySystem>();
+            var popup = entities.System<SharedPopupSystem>();
             var random = IoCManager.Resolve<IRobustRandom>();
 
             if (inventory.TryGetSlotEntity(target, "head", out var head))
             {
-                if (random.Prob(meltChance))
+                if (random.Prob(meltChance) && !entities.HasComponent<RMCUnacidableComponent>(head))
                 {
                     inventory.TryUnequip(target, "head", force: true);
                     entities.QueueDeleteEntity(head);
+                    popup.PopupEntity("Your headgear melts away but protects you from the acid!", target, target, PopupType.MediumCaution);
+                }
+                else
+                {
+                    popup.PopupEntity("Your headgear protects you from the acid.", target, target, PopupType.Small);
                 }
 
                 return;
@@ -74,21 +81,28 @@ public sealed partial class Corrosive : RMCChemicalEffect
 
             if (inventory.TryGetSlotEntity(target, "mask", out var mask))
             {
-                if (random.Prob(meltChance))
+                if (random.Prob(meltChance) && !entities.HasComponent<RMCUnacidableComponent>(mask))
                 {
                     inventory.TryUnequip(target, "mask", force: true);
                     entities.QueueDeleteEntity(mask);
+                    popup.PopupEntity("Your mask melts away but protects you from the acid!", target, target, PopupType.MediumCaution);
+                }
+                else
+                {
+                    popup.PopupEntity("Your mask protects you from the acid.", target, target, PopupType.Small);
                 }
 
                 return;
             }
 
+            // cm13's glasses branch has no "protects you" message on a failed/blocked roll, unlike head/mask
             if (inventory.TryGetSlotEntity(target, "eyes", out var eyes))
             {
-                if (random.Prob(meltChance))
+                if (random.Prob(meltChance) && !entities.HasComponent<RMCUnacidableComponent>(eyes))
                 {
                     inventory.TryUnequip(target, "eyes", force: true);
                     entities.QueueDeleteEntity(eyes);
+                    popup.PopupEntity("Your eyewear melts away!", target, target, PopupType.MediumCaution);
                 }
 
                 return;

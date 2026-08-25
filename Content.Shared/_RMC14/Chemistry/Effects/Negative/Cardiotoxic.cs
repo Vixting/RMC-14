@@ -18,7 +18,7 @@ public sealed partial class Cardiotoxic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var suppress = (float) potency * -2f;
+        var suppress = -Potency;
         SuppressMutationSlot(plant, "New Chems", suppress);
         SuppressMutationSlot(plant, "New Chems2", suppress);
         SuppressMutationSlot(plant, "New Chems3", suppress);
