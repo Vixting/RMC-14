@@ -1,8 +1,12 @@
+using Content.Shared._RMC14.Synth;
+using Content.Shared._RMC14.Xenonids;
+using Content.Shared.Chemistry;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
+using Content.Shared.Drunk;
 using Content.Shared.EntityEffects;
-using Content.Shared.Eye.Blinding.Systems;
 using Content.Shared.FixedPoint;
+using Content.Shared.Humanoid;
 using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffect;
 using Content.Shared.StatusEffectNew;
@@ -23,6 +27,12 @@ public sealed partial class Nervestimulating : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
+        if (args.Method == ReactionMethod.Touch)
+        {
+            HandleTouch(args);
+            return;
+        }
+
         var reduction = TimeSpan.FromSeconds((double) PotencyPerSecond);
 
         var oldStatus = args.EntityManager.System<StatusEffectsSystem>();
@@ -32,18 +42,38 @@ public sealed partial class Nervestimulating : RMCChemicalEffect
         var stutter = args.EntityManager.System<SharedStutteringSystem>();
         stutter.DoRemoveStutterTime(args.TargetEntity, (double) PotencyPerSecond);
 
-        if (!(ActualPotency >= 3))
+        if (!(ActualPotency > 2))
             return;
 
-        stutter.DoRemoveStutter(args.TargetEntity, 0);
+        var reductionSeconds = 2f * (float) potency;
+        stutter.DoRemoveStutterTime(args.TargetEntity, reductionSeconds);
 
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryRemoveStatusEffect(args.TargetEntity, "Jitter");
-        status.TryRemoveStatusEffect(args.TargetEntity, "StatusEffectDrowsiness");
-        status.TryRemoveStatusEffect(args.TargetEntity, "Dazed");
-        status.TryRemoveStatusEffect(args.TargetEntity, "RMCStatusEffectConfused");
+        var gradualReduction = TimeSpan.FromSeconds(-reductionSeconds);
+        status.TryAddTime(args.TargetEntity, "RMCStatusEffectConfused", gradualReduction);
+        status.TryAddTime(args.TargetEntity, "StatusEffectDrowsiness", gradualReduction);
+        status.TryAddTime(args.TargetEntity, "Jitter", gradualReduction);
 
-        args.EntityManager.System<BlindableSystem>().AdjustEyeDamage(args.TargetEntity, -9);
+        var drunk = args.EntityManager.System<SharedDrunkSystem>();
+        drunk.TryRemoveDrunkenessTime(args.TargetEntity, reductionSeconds);
+    }
+
+    private void HandleTouch(EntityEffectReagentArgs args)
+    {
+        var entities = args.EntityManager;
+        var target = args.TargetEntity;
+
+        var isXenoHuman = entities.HasComponent<XenoComponent>(target) ||
+            (entities.HasComponent<HumanoidAppearanceComponent>(target) && !entities.HasComponent<SynthComponent>(target));
+        if (!isXenoHuman || !(ActualPotency > 3))
+            return;
+
+        var oldStatus = entities.System<StatusEffectsSystem>();
+        oldStatus.TryRemoveStatusEffect(target, "Stun");
+        oldStatus.TryRemoveStatusEffect(target, "KnockedDown");
+
+        var status = entities.System<SharedStatusEffectsSystem>();
+        status.TryRemoveStatusEffect(target, "Dazed");
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

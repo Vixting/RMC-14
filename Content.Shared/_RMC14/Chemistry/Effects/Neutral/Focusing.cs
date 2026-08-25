@@ -38,7 +38,12 @@ public sealed partial class Focusing : RMCChemicalEffect
         drunkSystem.TryRemoveDrunkenessTime(args.TargetEntity, PotencyPerSecond * 2);
         stutterSystem.DoRemoveStutterTime(args.TargetEntity, PotencyPerSecond * 2);
         statusEffects.TryAddTime(args.TargetEntity, "Jitter", TimeSpan.FromSeconds(PotencyPerSecond * -2));
-        // ReduceEyeBlur(PotencyPerSecond * 2) but BlurryVisionComponent is sealed so only healing the eyes will remove blur.
+
+        statusEffects.TryAddTime(args.TargetEntity, "RMCStatusEffectConfused", TimeSpan.FromSeconds((float) potency * -2f));
+        statusEffects.TryAddTime(args.TargetEntity, "StatusEffectDrowsiness", TimeSpan.FromSeconds((float) potency * -2f));
+
+        // dizziness in cm
+        drunkSystem.TryRemoveDrunkenessTime(args.TargetEntity, (float) potency * 2f);
 
         if (!(ActualPotency >= 3))
             return;

@@ -6,8 +6,6 @@ public sealed partial class Optimized : RMCChemicalEffect
 {
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
-        return "This chemical's molecule is structured differently, resulting in a more efficient synthesis process.";
+        return "This chemical's molecule is structured differently, resulting in a more efficient synthesis process. Yields 3 units per synthesis instead of 1.";
     }
-
-    // TODO RMC14: increases the yield of the chemical reaction that produces this reagent
 }

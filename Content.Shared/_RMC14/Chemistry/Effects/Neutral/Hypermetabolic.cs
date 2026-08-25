@@ -8,24 +8,15 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Hypermetabolic : RMCChemicalEffect
 {
-    [DataField]
-    public float Amount = 5f;
-
-    [DataField]
-    public float MaxAdjust = 20f;
-
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Accelerates plant growth cycle. In mobs, speeds up this chemical's own metabolism, increasing overdose risk.";
     }
 
-    protected override void ReagentBoost(EntityEffectReagentArgs args, ref float boost)
-    {
-        boost += Potency * 0.25f;
-    }
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.MetabolismAdjust = MathF.Max(plant.MetabolismAdjust - Amount, -MaxAdjust);
+        var delta = Math.Clamp(-20f * (float) ActualPotency, -130f, 0f);
+        plant.MetabolismAdjust = MathF.Max(plant.MetabolismAdjust + delta, -130f);
     }
 }

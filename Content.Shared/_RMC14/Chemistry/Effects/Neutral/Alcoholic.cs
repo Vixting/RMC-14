@@ -37,6 +37,9 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         var timing = IoCManager.Resolve<IGameTiming>();
         var actualPotency = (float) ActualPotency;
 
+        // dizziness in cm
+        drunk.TryApplyDrunkenness(args.TargetEntity, 0.1f * actualPotency, applySlur: false);
+
         ApplyCapped(status, timing, args.TargetEntity, DrowsinessStatus, 0.5f * actualPotency, 5f * actualPotency);
 
         var random = IoCManager.Resolve<IRobustRandom>();
@@ -58,6 +61,9 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
         var timing = IoCManager.Resolve<IGameTiming>();
         var actualPotency = (float) ActualPotency;
+
+        // dizziness in cm
+        drunk.TryApplyDrunkenness(args.TargetEntity, 0.25f * actualPotency, applySlur: false);
 
         ApplyCapped(status, timing, args.TargetEntity, DrowsinessStatus, actualPotency, 7.5f * actualPotency);
 
@@ -88,6 +94,9 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         var timing = IoCManager.Resolve<IGameTiming>();
         var random = IoCManager.Resolve<IRobustRandom>();
         var actualPotency = (float) ActualPotency;
+
+        // dizziness in cm
+        drunk.TryApplyDrunkenness(args.TargetEntity, 0.5f * actualPotency, applySlur: false);
 
         ApplyCapped(status, timing, args.TargetEntity, ConfusedStatus, 2f * actualPotency, 10f * actualPotency);
         ApplyCapped(status, timing, args.TargetEntity, DrowsinessStatus, 2f * actualPotency, 10f * actualPotency);

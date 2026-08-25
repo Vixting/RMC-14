@@ -31,6 +31,7 @@ public sealed partial class Repairing : RMCChemicalEffect
         if (args.Method == ReactionMethod.Touch)
         {
             HealStructure(damageable, args);
+            HealSynthTouch(damageable, args);
             return;
         }
 
@@ -61,6 +62,22 @@ public sealed partial class Repairing : RMCChemicalEffect
         var specifier = rmcDamageable.DistributeHealing(args.TargetEntity, BruteGroup, heal);
         rmcDamageable.DistributeHealingCached(args.TargetEntity, BurnGroup, heal, specifier);
         damageable.TryChangeDamage(args.TargetEntity, specifier, true, interruptsDoAfters: false);
+    }
+
+    private void HealSynthTouch(DamageableSystem damageable, EntityEffectReagentArgs args)
+    {
+        var entities = args.EntityManager;
+        if (!entities.HasComponent<SynthComponent>(args.TargetEntity))
+            return;
+
+        var heal = (float) ActualPotency * (float) args.Quantity;
+        if (heal <= 0f)
+            return;
+
+        var damage = new DamageSpecifier();
+        damage.DamageDict[BluntType] = -heal;
+        damage.DamageDict[HeatType] = -heal;
+        damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

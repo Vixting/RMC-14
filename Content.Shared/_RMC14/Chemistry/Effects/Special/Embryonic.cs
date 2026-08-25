@@ -20,27 +20,20 @@ public sealed partial class Embryonic : RMCChemicalEffect
         if (args.Source == null || args.Reagent == null)
             return;
 
-        if (CanBeInfected(args.EntityManager, args.TargetEntity))
-            return;
-
-        var quantity = args.Source.GetTotalPrototypeQuantity(args.Reagent.ID);
-        args.Source.RemoveReagent(args.Reagent.ID, quantity);
-    }
-
-    protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
-    {
-        if (args.Source == null || args.Reagent == null)
-            return;
-
         if (!CanBeInfected(args.EntityManager, args.TargetEntity))
+        {
+            var quantity = args.Source.GetTotalPrototypeQuantity(args.Reagent.ID);
+            args.Source.RemoveReagent(args.Reagent.ID, quantity);
             return;
+        }
 
-        var quantity = args.Source.GetTotalPrototypeQuantity(args.Reagent.ID);
-        args.Source.RemoveReagent(args.Reagent.ID, quantity);
         args.EntityManager.EnsureComponent<VictimInfectedComponent>(args.TargetEntity);
 
         var popup = args.EntityManager.System<SharedPopupSystem>();
         popup.PopupEntity("Your stomach cramps and you suddenly feel very sick!", args.TargetEntity, args.TargetEntity, PopupType.MediumCaution);
+
+        var consumed = args.Source.GetTotalPrototypeQuantity(args.Reagent.ID);
+        args.Source.RemoveReagent(args.Reagent.ID, consumed);
     }
 
     private static bool CanBeInfected(IEntityManager entityManager, EntityUid target)

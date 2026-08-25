@@ -1,12 +1,11 @@
 using Content.Shared._RMC14.Body;
-using Content.Shared._RMC14.Stun;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Drunk;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Nutrition.EntitySystems;
-using Content.Shared.StatusEffect;
+using Content.Shared.Stunnable;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -15,14 +14,13 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 public sealed partial class Ketogenic : RMCChemicalEffect
 {
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
-    private static readonly ProtoId<StatusEffectPrototype> Unconscious = "Unconscious";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return $"Removes [color=red]{PotencyPerSecond * 5}[/color] nutrients, causing hunger over time.\n" +
                $"Increases alcohol metabolism rate by [color=green]{PotencyPerSecond}[/color] units.\n" +
                $"Overdoses cause [color=red]{PotencyPerSecond * 5}[/color] nutrition loss, [color=red]{PotencyPerSecond}[/color] toxin damage, and a [color=red]{ActualPotency * 2.5}%[/color] chance of vomiting.\n" +
-               $"Critical overdoses will knock you unconscious for [color=red]10[/color] seconds";
+               $"Critical overdoses will paralyze you for [color=red]2[/color] seconds";
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
@@ -55,7 +53,7 @@ public sealed partial class Ketogenic : RMCChemicalEffect
         damageable.TryChangeDamage(target, damage, true, interruptsDoAfters: false);
 
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (random.Prob(0.05f * ActualPotency))
+        if (random.Prob(0.025f * ActualPotency))
         {
             entityManager.System<RMCVomitSystem>().StartVomit(target);
         }
@@ -63,12 +61,7 @@ public sealed partial class Ketogenic : RMCChemicalEffect
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var status = args.EntityManager.System<StatusEffectsSystem>();
-        status.TryAddStatusEffect<RMCUnconsciousComponent>(
-            args.TargetEntity,
-            Unconscious,
-            TimeSpan.FromSeconds(40),
-            true
-        );
+        var stun = args.EntityManager.System<SharedStunSystem>();
+        stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds(2), true);
     }
 }

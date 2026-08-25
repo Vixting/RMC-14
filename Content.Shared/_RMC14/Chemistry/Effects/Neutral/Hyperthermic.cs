@@ -26,7 +26,7 @@ public sealed partial class Hyperthermic : RMCChemicalEffect
         var newTemp = MathF.Min(MaxTemperature, temperature.GetTemperature(args.TargetEntity) + (float) potency * 2f);
         temperature.ForceChangeTemperature(args.TargetEntity, newTemp);
 
-        if ((float) potency >= 2f)
+        if ((float) potency >= 1f)
         {
             var dazed = args.EntityManager.System<RMCDazedSystem>();
             dazed.TryDaze(args.TargetEntity, TimeSpan.FromSeconds(1), false);

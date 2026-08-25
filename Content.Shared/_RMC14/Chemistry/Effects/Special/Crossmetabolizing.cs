@@ -1,3 +1,5 @@
+using Content.Shared._RMC14.Xenonids;
+using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Special;
@@ -9,5 +11,8 @@ public sealed partial class Crossmetabolizing : RMCChemicalEffect
         return "Can be metabolized in certain non-human species.";
     }
 
-    // TODO RMC14: gates metabolism to specific species
+    protected override bool ShouldCancel(EntityEffectReagentArgs args)
+    {
+        return Potency < 2 && !args.EntityManager.HasComponent<XenoComponent>(args.TargetEntity);
+    }
 }
