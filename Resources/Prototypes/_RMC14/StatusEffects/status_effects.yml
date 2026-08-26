@@ -22,6 +22,11 @@
   components:
   - type: RMCConfusedStatusEffect
 
+- type: entity
+  parent: MobStatusEffectBase
+  id: RMCStatusEffectResistNeuro
+  name: resisting neurological effects
+
 - type: statusEffect
   id: Blinded
 

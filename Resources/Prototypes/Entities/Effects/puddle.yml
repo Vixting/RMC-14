@@ -194,6 +194,7 @@
       puddle:
         maxVol: 1000
   - type: Puddle
+    overflowVolume: 20
   - type: MixableSolution
     solution: puddle
   - type: Appearance

@@ -113,6 +113,8 @@
   color: "#0a0b0d"
   worksOnTheDead: true
   unknown: true
+  tileReactions:
+  - !type:SpillTileReaction
   metabolisms:
     Medicine:
       effects:

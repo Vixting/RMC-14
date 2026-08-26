@@ -5,6 +5,8 @@
   desc: reagent-desc-blood
   flavor: metallic
   color: "#800000"
+  tileReactions:
+  - !type:SpillTileReaction
   metamorphicSprite:
     sprite: Objects/Consumable/Drinks/bloodglass.rsi
     state: icon_empty

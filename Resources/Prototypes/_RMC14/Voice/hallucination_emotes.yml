@@ -13,3 +13,25 @@
   id: RMCDrool
   name: chat-emote-name-rmcdrool
   chatMessages: ["chat-emote-msg-rmcdrool"]
+
+- type: emote
+  id: RMCBlink
+  name: chat-emote-name-rmcblink
+  chatMessages: ["chat-emote-msg-rmcblink"]
+
+- type: emote
+  id: RMCShiver
+  name: chat-emote-name-rmcshiver
+  chatMessages: ["chat-emote-msg-rmcshiver"]
+
+- type: emote
+  id: RMCGrin
+  name: chat-emote-name-rmcgrin
+  category: Vocal
+  chatMessages: ["chat-emote-msg-rmcgrin"]
+
+- type: emote
+  id: RMCSmile
+  name: chat-emote-name-rmcsmile
+  category: Vocal
+  chatMessages: ["chat-emote-msg-rmcsmile"]

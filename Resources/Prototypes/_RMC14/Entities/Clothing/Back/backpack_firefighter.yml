@@ -1,0 +1,118 @@
+- type: entity
+  parent: BaseItem
+  id: RMCBackpackFirefighter
+  name: backpack firefighting watertank
+  description: A refrigerated and pressurised backpack tank with an extinguisher nozzle, intended to fight fires and plug hull breaches. Swaps between extinguisher, metal foam launcher and a smaller scale metal foamer.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Clothing/Back/Sprayers/backpack_sprayers.rsi
+    layers:
+    - state: backpack_foamer
+    - state: backpack_foamer_nozzle
+      map: [ "enum.RMCBackpackSprayerVisuals.Layer" ]
+  - type: Item
+    size: Huge
+  - type: Clothing
+    sprite: _RMC14/Objects/Clothing/Back/Sprayers/onmob_backpack.rsi
+    equippedPrefix: foamer
+    slots:
+    - back
+    equipSound:
+      collection: storageRustle
+    unequipSound:
+      collection: RMCEquipArmor
+  - type: SolutionContainerManager
+    solutions:
+      tank:
+        maxVol: 500
+        reagents:
+        - ReagentId: Water
+          Quantity: 500
+  - type: RefillableSolution
+    solution: tank
+  - type: DrainableSolution
+    solution: tank
+  - type: DrawableSolution
+    solution: tank
+  - type: ExaminableSolution
+    solution: tank
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.RMCBackpackSprayerVisuals.NozzleAttached:
+        enum.RMCBackpackSprayerVisuals.Layer:
+          True: { visible: true }
+          False: { visible: false }
+  - type: RMCBackpackSprayer
+    solution: tank
+    nozzlePrototype: RMCFirefighterNozzle
+  - type: Tag
+    tags:
+    - RMCBackpackFirefighter
+
+- type: entity
+  parent: BaseItem
+  id: RMCFirefighterNozzle
+  name: multipurpose nozzle
+  description: A heavy-duty foam-spraying nozzle attached to a firefighter's backpack tank.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Clothing/Back/Sprayers/backpack_sprayers.rsi
+    layers:
+    - state: fnozzle
+    - state: fnozzle_extinguisher
+      map: [ "enum.RMCFirefighterNozzleVisuals.Layer" ]
+  - type: Item
+    size: Large
+    heldPrefix: fnozzle
+  - type: SolutionContainerManager
+    solutions:
+      spray:
+        maxVol: 50
+  - type: RefillableSolution
+    solution: spray
+  - type: ExaminableSolution
+    solution: spray
+  - type: UseDelay
+  - type: Spray
+    transferAmount: 10
+    pushbackAmount: 0
+    sprayDistance: 5
+    sprayVelocity: 5
+    vaporAmount: 3
+    sprayedPrototype: RMCExtinguisherSpraySpec
+    spraySound:
+      path: /Audio/Effects/extinguish.ogg
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.RMCFirefighterNozzleVisuals.Mode:
+        enum.RMCFirefighterNozzleVisuals.Layer:
+          Extinguisher: { state: fnozzle_extinguisher }
+          MetalFoamLauncher: { state: fnozzle_launcher }
+          MetalFoamer: { state: fnozzle_foamer }
+  - type: RMCFirefighterNozzle
+  - type: RMCSprayerNozzle
+  - type: Tag
+    tags:
+    - RMCFirefighterNozzle
+
+- type: entity
+  id: RMCMetalFoamBall
+  name: metal foam ball
+  description: A compacted ball of expansive metal foam, used to repair the atmosphere in a room, or seal off breaches.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _RMC14/Effects/effects.rsi
+    state: foam_ball
+    noRot: true
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: Tag
+  id: RMCBackpackFirefighter
+
+- type: Tag
+  id: RMCFirefighterNozzle

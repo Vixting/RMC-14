@@ -127,6 +127,7 @@
       Flammable: [ Touch ]
       Extinguish: [ Touch ]
       Acidic: [Touch, Ingestion]
+      RMCGenerated: [ Touch ]
     reactions:
     - reagents: [Water, SpaceCleaner]
       methods: [Touch]

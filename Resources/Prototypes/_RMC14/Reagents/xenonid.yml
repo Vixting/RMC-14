@@ -241,6 +241,8 @@
   color: "#2fbe88"
   overdose: 30
   criticalOverdose: 50
+  tileReactions:
+  - !type:SpillTileReaction
   metabolisms:
     Poison:
       metabolismRate: 0.1

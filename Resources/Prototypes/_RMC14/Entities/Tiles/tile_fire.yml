@@ -51,6 +51,9 @@
     id: RMCTileFire
     extinguishInstantly: true
     duration: 20
+  - type: Reactive
+    groups:
+      RMCGenerated: [ Touch ]
   - type: Appearance
   - type: GenericVisualizer
     visuals:

@@ -13,6 +13,7 @@
   radiusMod: 0.05
   tileReactions:
   - !type:FlammableTileReaction {}
+  - !type:SpillTileReaction
   reactiveEffects:
     Flammable:
       methods: [ Touch ]
@@ -39,6 +40,8 @@
   flavor: bitter
   color: "#ffb300"
   fireEntity: RMCTileFireNapalmBase
+  tileReactions:
+  - !type:SpillTileReaction
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -126,6 +129,25 @@
 
 - type: reagent
   parent: [ CMReagent, BasePyrotechnic ]
+  id: RMCNapalmWeak
+  name: reagent-name-rmcnapalm-weak
+  desc: reagent-desc-rmcnapalm-weak
+  physicalDesc: reagent-physical-desc-shiny
+  flavor: bitter
+  color: "#EE6515"
+  metabolisms:
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Intensity
+        potency: 15
+      - !type:Duration
+        potency: 20
+      - !type:Radius
+        potency: 5
+
+- type: reagent
+  parent: [ CMReagent, BasePyrotechnic ]
   id: RMCNapalmUTTank
   name: reagent-name-rmcnapalm-ut
   desc: reagent-desc-rmcnapalm-ut
@@ -152,6 +174,7 @@
   flavor: bitter
   color: "#00dd00"
   fireEntity: RMCTileFireGreen
+  fireSpread: true
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -278,12 +301,6 @@
   physicalDesc: reagent-physical-desc-shiny
   flavor: bitter
   color: "#ff9300"
-  intensity: 72
-  duration: -27
-  radius: 0
-  intensityMod: 1.8
-  durationMod: -0.9
-  radiusMod: -0.09
   metabolisms:
     Poison:
       metabolismRate: 0.1
@@ -294,6 +311,8 @@
         potency: 6
       - !type:Igniting
         potency: 1
+      - !type:Oxidizing
+        potency: 9
   reactiveEffects:
     Flammable:
       methods: [ Touch ]
@@ -312,15 +331,24 @@
   flavor: bitter
   color: "#0064C8"
   toxin: true
-  intensity: -6
-  duration: 16
-  radius: 6
-  intensityMod: -0.35
-  durationMod: 0.25
-  radiusMod: 0.095
+  tileReactions:
+  - !type:SpillTileReaction
   metabolisms:
     Poison:
       metabolismRate: 0.1
       effects:
       - !type:Toxic
+        potency: 2
+      - !type:Flowing
+        potency: 3
+      - !type:Viscous
+        potency: 3
+      - !type:Fueling
+        potency: 2
+  reactiveEffects:
+    Flammable:
+      methods: [ Touch ]
+      effects:
+      - !type:FlammableReaction
+      - !type:Fueling
         potency: 2

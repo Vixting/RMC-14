@@ -131,6 +131,7 @@
     groups:
       Flammable: [ Touch ]
       Extinguish: [ Touch ]
+      RMCGenerated: [ Touch ]
   - type: FireVisuals
     sprite: _RMC14/Mobs/Effects/on_fire_xeno.rsi
     normalState: simple_onfire

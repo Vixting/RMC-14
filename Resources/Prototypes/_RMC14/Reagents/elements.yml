@@ -29,6 +29,8 @@
   color: "#1C1300"
   unknown: true
   durationMod: 1
+  tileReactions:
+  - !type:SpillTileReaction
   metabolisms:
     Medicine:
       metabolismRate: 0.01 # 1 every 200 seconds in CM? 0.005 would be right but impossible because fixed point 2
@@ -380,6 +382,8 @@
   flavor: metallic
   color: "#B8B8C0"
   unknown: true
+  tileReactions:
+  - !type:SpillTileReaction
   plantMetabolism:
   - !type:Carcinogenic
     potency: 8.0

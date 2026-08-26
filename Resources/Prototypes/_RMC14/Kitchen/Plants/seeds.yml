@@ -1092,9 +1092,9 @@
 
 - type: seed
   id: rmcapple
-  name: seeds-apple-name
+  name: seeds-rmcapple-name
   noun: seeds-noun-seeds
-  displayName: seeds-apple-display-name
+  displayName: seeds-rmcapple-display-name
   plantRsi: Objects/Specific/Hydroponics/apple.rsi
   packetPrototype: RMCAppleSeeds
   harvestRepeat: Repeat
@@ -1145,9 +1145,9 @@
 
 - type: seed
   id: rmccabbage
-  name: seeds-cabbage-name
+  name: seeds-rmccabbage-name
   noun: seeds-noun-seeds
-  displayName: seeds-cabbage-display-name
+  displayName: seeds-rmccabbage-display-name
   plantRsi: Objects/Specific/Hydroponics/cabbage.rsi
   packetPrototype: RMCCabbageSeeds
   productPrototypes:
@@ -1202,9 +1202,9 @@
 
 - type: seed
   id: rmcpoppy
-  name: seeds-poppy-name
+  name: seeds-rmcpoppy-name
   noun: seeds-noun-seeds
-  displayName: seeds-poppy-display-name
+  displayName: seeds-rmcpoppy-display-name
   plantRsi: Objects/Specific/Hydroponics/poppy.rsi
   packetPrototype: RMCPoppySeeds
   harvestRepeat: Repeat
@@ -1253,9 +1253,9 @@
 
 - type: seed
   id: rmcberries
-  name: seeds-berries-name
+  name: seeds-rmcberries-name
   noun: seeds-noun-seeds
-  displayName: seeds-berries-display-name
+  displayName: seeds-rmcberries-display-name
   plantRsi: Objects/Specific/Hydroponics/berries.rsi
   packetPrototype: RMCBerriesSeeds
   harvestRepeat: Repeat
@@ -1505,9 +1505,9 @@
 
 - type: seed
   id: rmcchili
-  name: seeds-chili-name
+  name: seeds-rmcchili-name
   noun: seeds-noun-seeds
-  displayName: seeds-chili-display-name
+  displayName: seeds-rmcchili-display-name
   plantRsi: Objects/Specific/Hydroponics/chili.rsi
   packetPrototype: RMCChiliSeeds
   harvestRepeat: Repeat
@@ -1535,9 +1535,9 @@
 
 - type: seed
   id: rmctomato
-  name: seeds-tomato-name
+  name: seeds-rmctomato-name
   noun: seeds-noun-seeds
-  displayName: seeds-tomato-display-name
+  displayName: seeds-rmctomato-display-name
   plantRsi: Objects/Specific/Hydroponics/tomato.rsi
   packetPrototype: RMCTomatoSeeds
   harvestRepeat: Repeat
@@ -1563,9 +1563,9 @@
 
 - type: seed
   id: rmceggplant
-  name: seeds-eggplant-name
+  name: seeds-rmceggplant-name
   noun: seeds-noun-seeds
-  displayName: seeds-eggplant-display-name
+  displayName: seeds-rmceggplant-display-name
   plantRsi: Objects/Specific/Hydroponics/eggplant.rsi
   packetPrototype: RMCEggplantSeeds
   harvestRepeat: Repeat
@@ -1588,9 +1588,9 @@
 
 - type: seed
   id: rmcchanterelle
-  name: seeds-chanterelle-name
+  name: seeds-rmcchanterelle-name
   noun: seeds-noun-spores
-  displayName: seeds-chanterelle-display-name
+  displayName: seeds-rmcchanterelle-display-name
   plantRsi: Objects/Specific/Hydroponics/chanterelle.rsi
   packetPrototype: RMCChanterelleSeeds
   productPrototypes:
@@ -1615,9 +1615,9 @@
 
 - type: seed
   id: rmcbanana
-  name: seeds-banana-name
+  name: seeds-rmcbanana-name
   noun: seeds-noun-seeds
-  displayName: seeds-banana-display-name
+  displayName: seeds-rmcbanana-display-name
   plantRsi: Objects/Specific/Hydroponics/banana.rsi
   packetPrototype: RMCBananaSeeds
   harvestRepeat: Repeat
@@ -1639,9 +1639,9 @@
 
 - type: seed
   id: rmccorn
-  name: seeds-corn-name
+  name: seeds-rmccorn-name
   noun: seeds-noun-seeds
-  displayName: seeds-corn-display-name
+  displayName: seeds-rmccorn-display-name
   plantRsi: Objects/Specific/Hydroponics/corn.rsi
   packetPrototype: RMCCornSeeds
   productPrototypes:
@@ -1667,9 +1667,9 @@
 
 - type: seed
   id: rmcpotato
-  name: seeds-potato-name
+  name: seeds-rmcpotato-name
   noun: seeds-noun-seeds
-  displayName: seeds-potato-display-name
+  displayName: seeds-rmcpotato-display-name
   plantRsi: Objects/Specific/Hydroponics/potato.rsi
   packetPrototype: RMCPotatoSeeds
   productPrototypes:
@@ -1691,9 +1691,9 @@
 
 - type: seed
   id: rmcsoybeans
-  name: seeds-soybeans-name
+  name: seeds-rmcsoybeans-name
   noun: seeds-noun-seeds
-  displayName: seeds-soybeans-display-name
+  displayName: seeds-rmcsoybeans-display-name
   plantRsi: Objects/Specific/Hydroponics/soybeans.rsi
   packetPrototype: RMCSoybeansSeeds
   harvestRepeat: Repeat
@@ -1720,9 +1720,9 @@
 
 - type: seed
   id: rmcwheat
-  name: seeds-wheat-name
+  name: seeds-rmcwheat-name
   noun: seeds-noun-seeds
-  displayName: seeds-wheat-display-name
+  displayName: seeds-rmcwheat-display-name
   plantRsi: Objects/Specific/Hydroponics/wheat.rsi
   packetPrototype: RMCWheatSeeds
   productPrototypes:
@@ -1743,9 +1743,9 @@
 
 - type: seed
   id: rmcrice
-  name: seeds-rice-name
+  name: seeds-rmcrice-name
   noun: seeds-noun-seeds
-  displayName: seeds-rice-display-name
+  displayName: seeds-rmcrice-display-name
   plantRsi: Objects/Specific/Hydroponics/rice.rsi
   packetPrototype: RMCRiceSeeds
   productPrototypes:
@@ -1771,9 +1771,9 @@
 
 - type: seed
   id: rmcsugarcane
-  name: seeds-sugarcane-name
+  name: seeds-rmcsugarcane-name
   noun: seeds-noun-seeds
-  displayName: seeds-sugarcane-display-name
+  displayName: seeds-rmcsugarcane-display-name
   plantRsi: Objects/Specific/Hydroponics/sugarcane.rsi
   packetPrototype: RMCSugarcaneSeeds
   harvestRepeat: Repeat
@@ -1796,9 +1796,9 @@
 
 - type: seed
   id: rmcwatermelon
-  name: seeds-watermelon-name
+  name: seeds-rmcwatermelon-name
   noun: seeds-noun-seeds
-  displayName: seeds-watermelon-display-name
+  displayName: seeds-rmcwatermelon-display-name
   plantRsi: Objects/Specific/Hydroponics/watermelon.rsi
   packetPrototype: RMCWatermelonSeeds
   harvestRepeat: Repeat
@@ -1820,9 +1820,9 @@
 
 - type: seed
   id: rmcpumpkin
-  name: seeds-pumpkin-name
+  name: seeds-rmcpumpkin-name
   noun: seeds-noun-seeds
-  displayName: seeds-pumpkin-display-name
+  displayName: seeds-rmcpumpkin-display-name
   plantRsi: Objects/Specific/Hydroponics/pumpkin.rsi
   packetPrototype: RMCPumpkinSeeds
   harvestRepeat: Repeat
@@ -1845,9 +1845,9 @@
 
 - type: seed
   id: rmclime
-  name: seeds-lime-name
+  name: seeds-rmclime-name
   noun: seeds-noun-seeds
-  displayName: seeds-lime-display-name
+  displayName: seeds-rmclime-display-name
   plantRsi: Objects/Specific/Hydroponics/lime.rsi
   packetPrototype: RMCLimeSeeds
   harvestRepeat: Repeat
@@ -1869,9 +1869,9 @@
 
 - type: seed
   id: rmclemon
-  name: seeds-lemon-name
+  name: seeds-rmclemon-name
   noun: seeds-noun-seeds
-  displayName: seeds-lemon-display-name
+  displayName: seeds-rmclemon-display-name
   plantRsi: Objects/Specific/Hydroponics/lemon.rsi
   packetPrototype: RMCLemonSeeds
   harvestRepeat: Repeat
@@ -1893,9 +1893,9 @@
 
 - type: seed
   id: rmcorange
-  name: seeds-orange-name
+  name: seeds-rmcorange-name
   noun: seeds-noun-seeds
-  displayName: seeds-orange-display-name
+  displayName: seeds-rmcorange-display-name
   plantRsi: Objects/Specific/Hydroponics/orange.rsi
   packetPrototype: RMCOrangeSeeds
   harvestRepeat: Repeat
@@ -1917,9 +1917,9 @@
 
 - type: seed
   id: rmccocoa
-  name: seeds-cocoa-name
+  name: seeds-rmccocoa-name
   noun: seeds-noun-seeds
-  displayName: seeds-cocoa-display-name
+  displayName: seeds-rmccocoa-display-name
   plantRsi: Objects/Specific/Hydroponics/cocoa.rsi
   packetPrototype: RMCCocoaSeeds
   harvestRepeat: Repeat
@@ -1946,9 +1946,9 @@
 
 - type: seed
   id: rmcgrape
-  name: seeds-grape-name
+  name: seeds-rmcgrape-name
   noun: seeds-noun-seeds
-  displayName: seeds-grape-display-name
+  displayName: seeds-rmcgrape-display-name
   plantRsi: Objects/Specific/Hydroponics/grape.rsi
   packetPrototype: RMCGrapeSeeds
   harvestRepeat: Repeat
@@ -1977,9 +1977,9 @@
 
 - type: seed
   id: rmccherry
-  name: seeds-cherry-name
+  name: seeds-rmccherry-name
   noun: seeds-noun-seeds
-  displayName: seeds-cherry-display-name
+  displayName: seeds-rmccherry-display-name
   plantRsi: Objects/Specific/Hydroponics/cherry.rsi
   packetPrototype: RMCCherrySeeds
   harvestRepeat: Repeat

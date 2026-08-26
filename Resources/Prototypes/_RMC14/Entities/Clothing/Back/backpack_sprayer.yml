@@ -1,0 +1,89 @@
+- type: entity
+  parent: BaseItem
+  id: RMCBackpackSprayer
+  name: backpack watertank
+  description: A commercially-produced backpack tank, capable of holding and spraying various liquids. Widely used in the agricultural industry on colonies and in space stations.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Clothing/Back/Sprayers/backpack_sprayers.rsi
+    layers:
+    - state: backpack_sprayer
+    - state: backpack_sprayer_nozzle
+      map: [ "enum.RMCBackpackSprayerVisuals.Layer" ]
+  - type: Item
+    size: Huge
+  - type: Clothing
+    sprite: _RMC14/Objects/Clothing/Back/Sprayers/onmob_backpack.rsi
+    slots:
+    - back
+    equipSound:
+      collection: storageRustle
+    unequipSound:
+      collection: RMCEquipArmor
+  - type: SolutionContainerManager
+    solutions:
+      tank:
+        maxVol: 250
+        reagents:
+        - ReagentId: Water
+          Quantity: 250
+  - type: RefillableSolution
+    solution: tank
+  - type: DrainableSolution
+    solution: tank
+  - type: DrawableSolution
+    solution: tank
+  - type: ExaminableSolution
+    solution: tank
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.RMCBackpackSprayerVisuals.NozzleAttached:
+        enum.RMCBackpackSprayerVisuals.Layer:
+          True: { visible: true }
+          False: { visible: false }
+  - type: RMCBackpackSprayer
+    solution: tank
+  - type: Tag
+    tags:
+    - RMCBackpackSprayer
+
+- type: entity
+  parent: BaseItem
+  id: RMCSprayerNozzle
+  name: spray nozzle
+  description: A mister nozzle attached to a backpack watertank. This is what your reagents come out of.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Clothing/Back/Sprayers/backpack_sprayers.rsi
+    layers:
+    - state: nozzle
+  - type: Item
+    size: Large
+    heldPrefix: nozzle
+  - type: SolutionContainerManager
+    solutions:
+      spray:
+        maxVol: 10
+  - type: RefillableSolution
+    solution: spray
+  - type: ExaminableSolution
+    solution: spray
+  - type: UseDelay
+    delay: 1
+  - type: Spray
+    transferAmount: 10
+    sprayDistance: 5
+    sprayVelocity: 3.33
+    spraySound:
+      path: /Audio/Effects/spray2.ogg
+  - type: RMCSprayerNozzle
+  - type: Tag
+    tags:
+    - RMCSprayerNozzle
+
+- type: Tag
+  id: RMCBackpackSprayer
+
+- type: Tag
+  id: RMCSprayerNozzle
