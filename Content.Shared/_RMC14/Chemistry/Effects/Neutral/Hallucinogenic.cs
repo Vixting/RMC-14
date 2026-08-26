@@ -9,6 +9,7 @@ using Content.Shared.StatusEffectNew.Components;
 using Content.Shared.Stunnable;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
@@ -33,7 +34,9 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddStatusEffectDuration(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds((float) potency));
+        var timing = IoCManager.Resolve<IGameTiming>();
+
+        ApplyCapped(status, timing, args.TargetEntity, SeeingRainbows, (float) potency, ActualPotency * 10f);
 
         if ((float) potency > 1f)
         {
@@ -66,5 +69,31 @@ public sealed partial class Hallucinogenic : RMCChemicalEffect
 
         var stun = args.EntityManager.System<SharedStunSystem>();
         stun.TryParalyze(args.TargetEntity, TimeSpan.FromSeconds(2), true);
+    }
+
+    private static void ApplyCapped(
+        SharedStatusEffectsSystem status,
+        IGameTiming timing,
+        EntityUid target,
+        EntProtoId proto,
+        float increment,
+        float cap)
+    {
+        if (cap <= 0f)
+            return;
+
+        var current = 0f;
+        if (status.TryGetTime(target, proto, out var time) && time.EndEffectTime is { } end)
+        {
+            var remaining = (float) (end - timing.CurTime).TotalSeconds;
+            if (remaining > 0f)
+                current = remaining;
+        }
+
+        var next = Math.Min(current + increment, cap);
+        if (next <= 0f)
+            return;
+
+        status.TrySetStatusEffectDuration(target, proto, TimeSpan.FromSeconds(next));
     }
 }

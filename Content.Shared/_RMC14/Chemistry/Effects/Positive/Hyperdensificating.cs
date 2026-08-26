@@ -29,7 +29,7 @@ public sealed partial class Hyperdensificating : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 3f;
+        damage.DamageDict[BluntType] = potency * 1.5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

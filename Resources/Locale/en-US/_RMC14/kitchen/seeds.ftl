@@ -47,81 +47,81 @@ seeds-kudzu-display-name = kudzu vines
 seeds-weeds-name = weeds
 seeds-weeds-display-name = weed patches
 
-seeds-apple-name = apple
-seeds-apple-display-name = apple trees
+seeds-rmcapple-name = apple
+seeds-rmcapple-display-name = apple trees
 
 seeds-poisonapple-name = poison apple
 seeds-poisonapple-display-name = poison apple trees
 
-seeds-cabbage-name = cabbage
-seeds-cabbage-display-name = cabbages
+seeds-rmccabbage-name = cabbage
+seeds-rmccabbage-display-name = cabbages
 
 seeds-carrot-name = carrot
 seeds-carrot-display-name = carrots
 
-seeds-poppy-name = poppy
-seeds-poppy-display-name = poppies
+seeds-rmcpoppy-name = poppy
+seeds-rmcpoppy-display-name = poppies
 
-seeds-berries-name = berry
-seeds-berries-display-name = berry bushes
+seeds-rmcberries-name = berry
+seeds-rmcberries-display-name = berry bushes
 
 seeds-goldapple-name = golden apple
 seeds-goldapple-display-name = golden apple trees
 
-seeds-chili-name = chili
-seeds-chili-display-name = chili plants
+seeds-rmcchili-name = chili
+seeds-rmcchili-display-name = chili plants
 
-seeds-tomato-name = tomato
-seeds-tomato-display-name = tomato plants
+seeds-rmctomato-name = tomato
+seeds-rmctomato-display-name = tomato plants
 
-seeds-eggplant-name = eggplant
-seeds-eggplant-display-name = eggplants
+seeds-rmceggplant-name = eggplant
+seeds-rmceggplant-display-name = eggplants
 
-seeds-chanterelle-name = chanterelle
-seeds-chanterelle-display-name = chanterelle mushrooms
+seeds-rmcchanterelle-name = chanterelle
+seeds-rmcchanterelle-display-name = chanterelle mushrooms
 
-seeds-banana-name = banana
-seeds-banana-display-name = banana trees
+seeds-rmcbanana-name = banana
+seeds-rmcbanana-display-name = banana trees
 
-seeds-corn-name = corn
-seeds-corn-display-name = ears of corn
+seeds-rmccorn-name = corn
+seeds-rmccorn-display-name = ears of corn
 
-seeds-potato-name = potato
-seeds-potato-display-name = potatoes
+seeds-rmcpotato-name = potato
+seeds-rmcpotato-display-name = potatoes
 
-seeds-soybeans-name = soybean
-seeds-soybeans-display-name = soybeans
+seeds-rmcsoybeans-name = soybean
+seeds-rmcsoybeans-display-name = soybeans
 
-seeds-wheat-name = wheat
-seeds-wheat-display-name = wheat stalks
+seeds-rmcwheat-name = wheat
+seeds-rmcwheat-display-name = wheat stalks
 
-seeds-rice-name = rice
-seeds-rice-display-name = rice stalks
+seeds-rmcrice-name = rice
+seeds-rmcrice-display-name = rice stalks
 
-seeds-sugarcane-name = sugarcane
-seeds-sugarcane-display-name = sugarcanes
+seeds-rmcsugarcane-name = sugarcane
+seeds-rmcsugarcane-display-name = sugarcanes
 
-seeds-watermelon-name = watermelon
-seeds-watermelon-display-name = watermelon vines
+seeds-rmcwatermelon-name = watermelon
+seeds-rmcwatermelon-display-name = watermelon vines
 
-seeds-pumpkin-name = pumpkin
-seeds-pumpkin-display-name = pumpkin vines
+seeds-rmcpumpkin-name = pumpkin
+seeds-rmcpumpkin-display-name = pumpkin vines
 
-seeds-lime-name = lime
-seeds-lime-display-name = lime trees
+seeds-rmclime-name = lime
+seeds-rmclime-display-name = lime trees
 
-seeds-lemon-name = lemon
-seeds-lemon-display-name = lemon trees
+seeds-rmclemon-name = lemon
+seeds-rmclemon-display-name = lemon trees
 
-seeds-orange-name = orange
-seeds-orange-display-name = orange trees
+seeds-rmcorange-name = orange
+seeds-rmcorange-display-name = orange trees
 
-seeds-cocoa-name = cocoa
-seeds-cocoa-display-name = cacao trees
+seeds-rmccocoa-name = cocoa
+seeds-rmccocoa-display-name = cacao trees
 
-seeds-grape-name = grape
-seeds-grape-display-name = grapevines
+seeds-rmcgrape-name = grape
+seeds-rmcgrape-display-name = grapevines
 
-seeds-cherry-name = cherry
-seeds-cherry-display-name = cherry trees
+seeds-rmccherry-name = cherry
+seeds-rmccherry-display-name = cherry trees
 

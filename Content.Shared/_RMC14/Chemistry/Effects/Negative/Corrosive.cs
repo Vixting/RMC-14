@@ -20,6 +20,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Negative;
 
 public sealed partial class Corrosive : RMCChemicalEffect
 {
+    public override bool ReactsOnTouch => true;
+
     private static readonly ProtoId<DamageTypePrototype> CausticType = "Caustic";
     private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
 

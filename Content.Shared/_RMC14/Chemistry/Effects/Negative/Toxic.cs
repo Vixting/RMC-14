@@ -15,6 +15,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Negative;
 
 public sealed partial class Toxic : RMCChemicalEffect
 {
+    public override bool ReactsOnTouch => true;
+
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)

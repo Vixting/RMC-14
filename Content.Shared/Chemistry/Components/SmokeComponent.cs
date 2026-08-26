@@ -37,4 +37,14 @@ public sealed partial class SmokeComponent : Component
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite), AutoNetworkedField]
     public float Duration = 10;
+
+    // RMC
+    [ViewVariables]
+    public SmokeSpillBudget? SpillBudget;
+}
+
+// RMC
+public sealed class SmokeSpillBudget
+{
+    public FixedPoint2 Remaining;
 }

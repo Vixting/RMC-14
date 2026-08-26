@@ -1,5 +1,6 @@
 using Content.Shared._RMC14.Actions;
 using Content.Shared._RMC14.Atmos;
+using Content.Shared._RMC14.Chemistry.Buildup;
 using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Stun;
 using Content.Shared._RMC14.Xenonids.Announce;
@@ -34,6 +35,7 @@ public abstract class SharedXenoHealSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly RMCHealingReductionSystem _healingReduction = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly SharedRMCFlammableSystem _flammable = default!;
     [Dependency] private readonly SharedXenoHiveSystem _hive = default!;
@@ -360,6 +362,14 @@ public abstract class SharedXenoHealSystem : EntitySystem
 
     public void Heal(EntityUid target, FixedPoint2 amount)
     {
+        var reduction = _healingReduction.GetReduction(target);
+        if (reduction > 0f)
+        {
+            amount -= FixedPoint2.New(reduction);
+            if (amount <= FixedPoint2.Zero)
+                return;
+        }
+
         var damage = _rmcDamageable.DistributeDamageCached(target, BruteGroup, amount);
         var totalHeal = damage.GetTotal();
         var leftover = amount - totalHeal;

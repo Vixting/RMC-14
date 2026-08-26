@@ -1,3 +1,6 @@
+using System.Linq;
+using Content.Shared._RMC14.Chemistry.Effects.Negative;
+using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
 using Content.Shared.Body.Organ;
@@ -13,6 +16,7 @@ namespace Content.Shared.Body.Systems
     public sealed class StomachSystem : EntitySystem
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;
+        [Dependency] private readonly RMCReagentSystem _rmcReagent = default!;
         [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
 
         public const string DefaultSolutionName = "stomach";
@@ -89,6 +93,15 @@ namespace Content.Shared.Body.Systems
                 }
 
                 _solutionContainerSystem.UpdateChemicals(stomach.Solution.Value);
+
+                // RMC14 intraveneouse
+                {
+                    if (!_rmcReagent.TryIndex(content.Reagent.Prototype, out var reagentProto))
+                        continue;
+
+                    if (Intravenous.IsNotIngestible(reagentProto))
+                        transferSolution.RemoveReagent(content);
+                }
 
                 // Transfer everything to the body solution!
                 _solutionContainerSystem.TryAddSolution(bodySolution.Value, transferSolution);

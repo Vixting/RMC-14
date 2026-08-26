@@ -782,8 +782,15 @@ public abstract partial class SharedXenoParasiteSystem : EntitySystem
             }
 
             // Stages
-            // Percentage of how far along we out to burst time times the number of stages, truncated. You can't go back a stage once you've reached one
-            int stage = Math.Max((int)((infected.BurstDelay - (infected.BurstAt - time)) / infected.BurstDelay * infected.FinalStage), infected.CurrentStage);
+            var naturalBurstAt = infected.BurstAt - infected.TreatmentDelay;
+            var naturalRawStage = (infected.BurstDelay - (naturalBurstAt - time)) / infected.BurstDelay * infected.FinalStage;
+            var naturalStage = Math.Clamp((int) naturalRawStage, 0, infected.FinalStage);
+            infected.PeakStage = Math.Max(infected.PeakStage, naturalStage);
+
+            var stageWidth = infected.BurstDelay / infected.FinalStage;
+            var treatmentRegression = stageWidth > TimeSpan.Zero ? (int) (infected.TreatmentDelay / stageWidth) : 0;
+            int stage = Math.Clamp(infected.PeakStage - treatmentRegression, 0, infected.FinalStage);
+
             if (stage != infected.CurrentStage)
             {
                 infected.CurrentStage = stage;
@@ -1075,20 +1082,18 @@ public abstract partial class SharedXenoParasiteSystem : EntitySystem
     public void DelayBurst(Entity<VictimInfectedComponent> burst, TimeSpan time)
     {
         burst.Comp.BurstAt += time;
+        burst.Comp.TreatmentDelay += time;
         Dirty(burst);
     }
 
-    public bool TryResistInfection(Entity<VictimInfectedComponent> victim, TimeSpan progress)
+    public bool TryResistInfection(Entity<VictimInfectedComponent> victim)
     {
         var infected = victim.Comp;
 
         if (infected.IsBursting || infected.SpawnedLarva != null)
             return false;
 
-        infected.CureProgress += progress;
-        Dirty(victim);
-
-        if (infected.CureProgress < infected.CureThreshold)
+        if (infected.BurstAt - _timing.CurTime < infected.BurstDelay)
             return false;
 
         CureInfection(victim);

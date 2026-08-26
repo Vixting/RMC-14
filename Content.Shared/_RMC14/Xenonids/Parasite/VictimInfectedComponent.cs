@@ -59,11 +59,11 @@ public sealed partial class VictimInfectedComponent : Component
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer)), AutoNetworkedField, AutoPausedField]
     public TimeSpan BurstAt;
 
-    [DataField, AutoNetworkedField]
-    public TimeSpan CureProgress;
+    [DataField]
+    public int PeakStage;
 
     [DataField, AutoNetworkedField]
-    public TimeSpan CureThreshold = TimeSpan.FromMinutes(8);
+    public TimeSpan TreatmentDelay;
 
     /// <summary>
     ///     How fast the larva incubates.

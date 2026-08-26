@@ -45,6 +45,7 @@ rmc-chem-master-create-bottle = Create Bottle ({$amount}u)
 rmc-chem-master-create-transfer-bottle = Create and Transfer
 
 rmc-chem-master-not-enough-space-solution = There are not enough reagents in the buffer!
+rmc-chem-master-not-ingestible = { $reagent } cannot be safely ingested and must be administered by injection - it cannot be made into a pill.
 
 rmc-chem-master-presets = Presets
 rmc-chem-master-preset-saved-title = Saved Presets:

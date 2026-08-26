@@ -127,7 +127,7 @@
   id: RMCCustomM34A1SmokeTankCase
   components:
   - type: RMCFlamerTank
-    maxRange: 4
+    maxRange: 5
     custom: true
     adjustablePressure: false
     fuelPressure: 3
