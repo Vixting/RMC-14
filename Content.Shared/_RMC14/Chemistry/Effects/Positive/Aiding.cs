@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Chemistry.Disabilities;
+using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Movement;
 using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
@@ -13,7 +14,7 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Aiding : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
     private static readonly ProtoId<DamageTypePrototype> CellularType = "Cellular";
 
     private static readonly EntProtoId ConfusedStatus = "RMCStatusEffectConfused";
@@ -40,15 +41,15 @@ public sealed partial class Aiding : RMCChemicalEffect
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
         status.TrySetStatusEffectDuration(args.TargetEntity, ConfusedStatus, TimeSpan.FromSeconds((float) potency * 2f));
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damage.DamageDict[CellularType] = potency * 3f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 

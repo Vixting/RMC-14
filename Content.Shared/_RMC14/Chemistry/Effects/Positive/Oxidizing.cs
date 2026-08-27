@@ -10,6 +10,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Oxidizing : RMCChemicalEffect
 {
+    public override bool ReactsOnTouch => true;
+
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Increases the intensity of chemical fires, at the cost of burning fuel faster. On contact with a high enough potency, ignites the target.";

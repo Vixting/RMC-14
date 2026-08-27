@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -10,16 +11,16 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Oculopeutic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
         return "Restores eyesight. Forces potency and cosmetic mutations to occur in plants.";
     }
 
-    // TODO RMC14: mob effect - heal eyes organ damage
+    // TODO RMC14: heal eyes organ damage
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
@@ -35,8 +36,8 @@ public sealed partial class Oculopeutic : RMCChemicalEffect
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
@@ -44,10 +45,10 @@ public sealed partial class Oculopeutic : RMCChemicalEffect
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency;
-        damage.DamageDict[HeatType] = potency;
-        damage.DamageDict[PoisonType] = potency * 3f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency);
+        damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency, damage);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 3f, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

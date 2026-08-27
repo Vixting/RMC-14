@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -8,8 +9,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Special;
 
 public sealed partial class Organhealing : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
     private static readonly ProtoId<DamageTypePrototype> CellularType = "Cellular";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
@@ -28,9 +29,9 @@ public sealed partial class Organhealing : RMCChemicalEffect
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 3f;
-        damage.DamageDict[HeatType] = potency * 3f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency * 3f);
+        damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency * 3f, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

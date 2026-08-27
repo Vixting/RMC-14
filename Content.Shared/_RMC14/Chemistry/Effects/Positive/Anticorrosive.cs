@@ -11,9 +11,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 public sealed partial class Anticorrosive : RMCChemicalEffect
 {
     private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
-
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -47,17 +46,17 @@ public sealed partial class Anticorrosive : RMCChemicalEffect
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency;
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 5;
-        damage.DamageDict[PoisonType] = potency * 5;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency * 5);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 5, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

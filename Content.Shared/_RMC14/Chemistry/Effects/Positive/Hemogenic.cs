@@ -1,6 +1,7 @@
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
 using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -17,8 +18,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Hemogenic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
     private static readonly ProtoId<DamageTypePrototype> AsphyxiationType = "Asphyxiation";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
@@ -56,7 +57,7 @@ public sealed partial class Hemogenic : RMCChemicalEffect
             hungerSystem.GetHunger(hungerComponent) < 200)
             return;
 
-        hungerSystem.ModifyHunger(target, -PotencyPerSecond); // TODO RMC14 Yuatja get no hunger drain.
+        hungerSystem.ModifyHunger(target, -(float) potency);
 
         if (entityManager.TryGetComponent<BloodstreamComponent>(target, out var bloodstream))
         {
@@ -67,11 +68,11 @@ public sealed partial class Hemogenic : RMCChemicalEffect
         var rmcBloodstreamSystem = entityManager.System<SharedRMCBloodstreamSystem>();
         var shouldApplyDamage = ActualPotency > 3 &&
                                 rmcBloodstreamSystem.TryGetBloodSolution(target, out var bloodSolution) &&
-                                bloodSolution.Volume > bloodSolution.MaxVolume; // TODO RMC14 Also check if they're not a Yautja.
+                                bloodSolution.Volume > bloodSolution.MaxVolume + 10;
         if (!shouldApplyDamage)
             return;
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency;
+        var rmcDamageable = entityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency);
         damage.DamageDict[AsphyxiationType] = potency * 2;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
@@ -83,8 +84,8 @@ public sealed partial class Hemogenic : RMCChemicalEffect
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
@@ -94,6 +95,6 @@ public sealed partial class Hemogenic : RMCChemicalEffect
         var target = args.TargetEntity;
         var hungerSystem = entityManager.System<HungerSystem>();
 
-        hungerSystem.ModifyHunger(target, PotencyPerSecond * -5);
+        hungerSystem.ModifyHunger(target, -(float) potency * 5f);
     }
 }

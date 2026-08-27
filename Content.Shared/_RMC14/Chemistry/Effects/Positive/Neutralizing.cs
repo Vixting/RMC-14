@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Atmos;
+using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Xenonids.Plasma;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Chemistry;
@@ -13,8 +14,10 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Neutralizing : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    public override bool ReactsOnTouch => true;
+
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
 
     private const float PlasmaDrainMultiplier = 5f;
 
@@ -31,9 +34,9 @@ public sealed partial class Neutralizing : RMCChemicalEffect
             return;
         }
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[HeatType] = potency;
-        damage.DamageDict[PoisonType] = potency * 0.5f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 0.5f, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
@@ -60,16 +63,16 @@ public sealed partial class Neutralizing : RMCChemicalEffect
             return;
         }
 
-        // TODO RMC14: neutralize turf/tile acid pools
+        // TODO RMC14: remove acid
         if (entities.HasComponent<TileFireComponent>(target))
             entities.QueueDeleteEntity(target);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[HeatType] = potency * 2f;
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency * 2f);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

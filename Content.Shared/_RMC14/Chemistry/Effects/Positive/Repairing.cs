@@ -15,11 +15,9 @@ public sealed partial class Repairing : RMCChemicalEffect
 {
     public override bool ReactsOnTouch => true;
 
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
     private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
     private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
 
     private const float StructureHealMultiplier = 6f;
 
@@ -40,9 +38,9 @@ public sealed partial class Repairing : RMCChemicalEffect
         if (!args.EntityManager.HasComponent<SynthComponent>(args.TargetEntity))
             return;
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = -potency * 2f;
-        damage.DamageDict[HeatType] = -potency * 2f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeHealingCached(args.TargetEntity, BruteGroup, potency * 2f);
+        damage = rmcDamageable.DistributeHealingCached(args.TargetEntity, BurnGroup, potency * 2f, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
@@ -76,23 +74,23 @@ public sealed partial class Repairing : RMCChemicalEffect
         if (heal <= 0f)
             return;
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = -heal;
-        damage.DamageDict[HeatType] = -heal;
+        var rmcDamageable = entities.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeHealingCached(args.TargetEntity, BruteGroup, heal);
+        damage = rmcDamageable.DistributeHealingCached(args.TargetEntity, BurnGroup, heal, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 5f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 5f);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

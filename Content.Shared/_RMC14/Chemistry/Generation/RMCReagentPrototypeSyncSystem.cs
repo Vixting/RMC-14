@@ -77,7 +77,9 @@ public sealed class RMCReagentPrototypeSyncSystem : EntitySystem
 
         if (data.Ingredients.Count > 0)
         {
-            var productAmount = data.Ingredients.Where(i => !i.Catalyst).Sum(i => Math.Max(i.Amount, 1));
+            var productAmount = data.Properties.Any(p => p.PropertyId == "Optimized")
+                ? 3
+                : data.Ingredients.Where(i => !i.Catalyst).Sum(i => Math.Max(i.Amount, 1));
             if (productAmount <= 0)
                 productAmount = 1;
 

@@ -15,6 +15,7 @@ public sealed partial class Cardiostabilizing : RMCChemicalEffect
     }
 
     // TODO RMC14: mob effect - pain reduction, heart organ damage on critical overdose
+    // TODO RMC14: lose breath thing
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {

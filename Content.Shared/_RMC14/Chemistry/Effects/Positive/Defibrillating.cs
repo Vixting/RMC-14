@@ -1,5 +1,6 @@
 using Content.Shared._RMC14.Body;
 using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Atmos.Rotting;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
@@ -19,10 +20,10 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 public sealed partial class Defibrillating : RMCChemicalEffect
 {
     private static readonly ProtoId<DamageTypePrototype> AsphyxiationType = "Asphyxiation";
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
     private static readonly ProtoId<DamageTypePrototype> CellularType = "Cellular";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -92,19 +93,16 @@ public sealed partial class Defibrillating : RMCChemicalEffect
         if (ActualPotency < 1)
             return;
 
-        var heal = new DamageSpecifier();
-        heal.DamageDict[BluntType] = -potency * 0.25f;
-        heal.DamageDict[HeatType] = -potency * 0.25f;
-        heal.DamageDict[PoisonType] = -potency * 0.25f;
-        heal.DamageDict[CellularType] = -potency * 0.25f;
-
+        var groupHeal = potency * 0.25f;
         if (ActualPotency > 2)
-        {
-            heal.DamageDict[BluntType] -= potency * 0.5f;
-            heal.DamageDict[HeatType] -= potency * 0.5f;
-            heal.DamageDict[PoisonType] -= potency * 0.5f;
-            heal.DamageDict[CellularType] -= potency * 0.5f;
-        }
+            groupHeal += potency * 0.5f;
+
+        var rmcDamageable = entities.System<SharedRMCDamageableSystem>();
+        var heal = new DamageSpecifier();
+        heal = rmcDamageable.DistributeHealingCached((target, damageableComp), BruteGroup, groupHeal, heal);
+        heal = rmcDamageable.DistributeHealingCached((target, damageableComp), BurnGroup, groupHeal, heal);
+        heal = rmcDamageable.DistributeHealingCached((target, damageableComp), ToxinGroup, groupHeal, heal);
+        heal.DamageDict[CellularType] = -groupHeal;
 
         if (damageableComp.Damage.DamageDict.TryGetValue(AsphyxiationType, out var oxyLoss) && oxyLoss > FixedPoint2.Zero)
             heal.DamageDict[AsphyxiationType] = -oxyLoss;

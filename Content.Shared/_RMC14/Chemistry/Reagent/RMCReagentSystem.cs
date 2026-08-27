@@ -1,7 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Content.Shared._RMC14.Chemistry.Effects;
-using Content.Shared._RMC14.Chemistry.Effects.Positive;
 using Content.Shared._RMC14.Chemistry.Generation;
 using Content.Shared.Body.Prototypes;
 using Content.Shared.Chemistry;
@@ -25,12 +25,6 @@ public sealed class RMCReagentSystem : EntitySystem
 
     private static readonly ProtoId<ReactiveGroupPrototype> GeneratedReactiveGroup = "RMCGenerated";
 
-    private static readonly HashSet<Type> TouchAwareEffects = new()
-    {
-        typeof(Repairing),
-        typeof(Fueling),
-        typeof(Oxidizing),
-    };
     private FrozenDictionary<string, Reagent> _reagents = FrozenDictionary<string, Reagent>.Empty;
     private readonly Dictionary<string, RMCGeneratedReagentData> _generated = new();
 
@@ -138,6 +132,10 @@ public sealed class RMCReagentSystem : EntitySystem
 
         var effects = new List<EntityEffect>();
         var touchEffects = new List<EntityEffect>();
+
+        var hyperLevel = 0f;
+        var hypoLevel = 0f;
+
         foreach (var prop in data.Properties)
         {
             if (!_prototypes.TryIndex<ChemGeneratorPropertyPrototype>(prop.PropertyId, out var propProto))
@@ -148,13 +146,32 @@ public sealed class RMCReagentSystem : EntitySystem
                 rmc.Potency = prop.Level;
 
             effects.Add(effect);
-            if (TouchAwareEffects.Contains(effect.GetType()))
+            if (effect is RMCChemicalEffect { ReactsOnTouch: true })
                 touchEffects.Add(effect);
+
+            switch (prop.PropertyId)
+            {
+                case "Hypermetabolic":
+                    hyperLevel = prop.Level;
+                    break;
+                case "Hypometabolic":
+                    hypoLevel = prop.Level;
+                    break;
+            }
         }
+
+        if (data.Properties.Any(p => p.PropertyId is "Defibrillating" or "Neurocryogenic"))
+            reagent.WorksOnTheDead = true;
 
         if (effects.Count > 0)
         {
-            var entry = new ReagentEffectsEntry { Effects = effects.ToArray() };
+            var rate = 0.1f;
+            if (hyperLevel > 0f)
+                rate *= 1f + 0.25f * hyperLevel;
+            if (hypoLevel > 0f)
+                rate = MathF.Max(rate / (1f + 0.35f * hypoLevel), 0.005f);
+
+            var entry = new ReagentEffectsEntry { Effects = effects.ToArray(), MetabolismRate = FixedPoint2.New(rate) };
             reagent.Metabolisms = new Dictionary<ProtoId<MetabolismGroupPrototype>, ReagentEffectsEntry>
             {
                 [GeneratedMetabolismGroup] = entry,

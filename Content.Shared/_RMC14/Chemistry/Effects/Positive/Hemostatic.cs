@@ -25,7 +25,7 @@ public sealed partial class Hemostatic : RMCChemicalEffect
             return;
 
         var bloodstreamSystem = args.EntityManager.System<SharedBloodstreamSystem>();
-        bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), -(float) potency);
+        bloodstreamSystem.TryModifyBleedAmount((args.TargetEntity, bloodstream), -0.67f);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

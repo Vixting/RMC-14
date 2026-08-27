@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Botany;
 using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
@@ -12,7 +13,7 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Crystallization : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -21,8 +22,8 @@ public sealed partial class Crystallization : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 0.5f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency * 0.5f);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
