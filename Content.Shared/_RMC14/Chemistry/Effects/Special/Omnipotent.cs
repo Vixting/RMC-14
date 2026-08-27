@@ -30,5 +30,5 @@ public sealed partial class Omnipotent : RMCChemicalEffect
         plant.MutationMod += amount;
     }
 
-    // TODO RMC14: fully heals damage, cures diseases, clears blindness/stuns/confusion/jitteriness
+    // TODO RMC14: fully heals damage, cures diseases, clears stuns/confusion/jitteriness
 }

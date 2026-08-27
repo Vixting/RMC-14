@@ -26,4 +26,8 @@ public sealed partial class DNADisintegrating : RMCChemicalEffect
     // close dmg >= 190 triggers disease
     // stage 2-4 flavour text, throat / skin discomfort, limb dmg, paralysis, hearing hive whipsers
     // stage 5 apply tox dmg, 40%/tick to gib body part & become T1 xeno
+
+    // TODO RMC14: DNA_Disintegrating/trigger() fires once, from the reagent analyzer, the
+    // 1st time this property is scanned/discovered - it calls a WY "Chemical Investigation Squad"
+    // shuttle/roundevent, adds bonus tech points & sends an admin/ai announcement
 }

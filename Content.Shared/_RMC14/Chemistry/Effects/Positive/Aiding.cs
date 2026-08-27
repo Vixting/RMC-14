@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Chemistry.Disabilities;
 using Content.Shared._RMC14.Movement;
 using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
@@ -22,12 +23,16 @@ public sealed partial class Aiding : RMCChemicalEffect
         return "Removes compounds modifying yield and mutation in plants.";
     }
 
-    // TODO RMC14: mob effect - cures disabilities
+    protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
+    {
+        RMCDisabilities.ClearAll(args.EntityManager, args.TargetEntity);
+    }
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.MutationMod -= (float) potency;
-        plant.YieldMod -= (int) MathF.Round((float) potency);
+        var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
+        plant.MutationMod -= 4f * scaled;
+        plant.YieldMod -= (int) MathF.Round(4f * scaled);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

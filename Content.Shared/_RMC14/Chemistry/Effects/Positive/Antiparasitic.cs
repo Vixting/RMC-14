@@ -26,10 +26,11 @@ public sealed partial class Antiparasitic : RMCChemicalEffect
             return;
 
         var parasiteSystem = args.EntityManager.System<SharedXenoParasiteSystem>();
-        var progress = TimeSpan.FromSeconds((double) potency);
-        parasiteSystem.DelayBurst((args.TargetEntity, infected), progress);
 
-        if (parasiteSystem.TryResistInfection((args.TargetEntity, infected), progress))
+        var delay = TimeSpan.FromSeconds((double) ActualPotency);
+        parasiteSystem.DelayBurst((args.TargetEntity, infected), delay);
+
+        if (parasiteSystem.TryResistInfection((args.TargetEntity, infected)))
             return;
 
         var damage = new DamageSpecifier();
@@ -49,7 +50,5 @@ public sealed partial class Antiparasitic : RMCChemicalEffect
         var damage = new DamageSpecifier();
         damage.DamageDict[PoisonType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
-
-        args.EntityManager.RemoveComponent<VictimInfectedComponent>(args.TargetEntity);
     }
 }

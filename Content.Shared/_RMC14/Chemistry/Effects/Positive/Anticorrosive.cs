@@ -29,7 +29,7 @@ public sealed partial class Anticorrosive : RMCChemicalEffect
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         if (plant.Toxins > 0)
-            plant.Health += (float) potency;
+            plant.Health += 0.75f * Potency;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

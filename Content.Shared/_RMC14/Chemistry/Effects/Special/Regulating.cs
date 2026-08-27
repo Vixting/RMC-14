@@ -8,6 +8,4 @@ public sealed partial class Regulating : RMCChemicalEffect
     {
         return "This chemical regulates its own metabolization and can never cause an overdose.";
     }
-
-    // TODO RMC14: suppresses overdose/critical overdose ticks entirely
 }

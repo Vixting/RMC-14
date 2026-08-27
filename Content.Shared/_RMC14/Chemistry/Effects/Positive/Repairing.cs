@@ -13,6 +13,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 
 public sealed partial class Repairing : RMCChemicalEffect
 {
+    public override bool ReactsOnTouch => true;
+
     private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
     private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
