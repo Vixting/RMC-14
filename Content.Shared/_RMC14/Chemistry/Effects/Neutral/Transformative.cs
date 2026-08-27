@@ -11,6 +11,8 @@ public sealed partial class Transformative : RMCChemicalEffect
     private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
     private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
 
     [DataField]
     public float HealAmount = 0.75f;
@@ -22,11 +24,32 @@ public sealed partial class Transformative : RMCChemicalEffect
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
+        if (!args.EntityManager.TryGetComponent<DamageableComponent>(args.TargetEntity, out var damageableComp))
+            return;
+
+        var prototypes = IoCManager.Resolve<IPrototypeManager>();
         var heal = HealAmount * (float) potency * 2f;
         var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = -heal;
-        damage.DamageDict[HeatType] = -heal;
-        damage.DamageDict[PoisonType] = heal * 0.2f;
+
+        if (prototypes.TryIndex(BruteGroup, out var bruteGroup) &&
+            damageableComp.Damage.TryGetDamageInGroup(bruteGroup, out var bruteDamage) &&
+            bruteDamage > FixedPoint2.Zero)
+        {
+            damage.DamageDict[BluntType] = -heal;
+            damage.DamageDict[PoisonType] = damage.DamageDict.GetValueOrDefault(PoisonType) + heal * 0.1f;
+        }
+
+        if (prototypes.TryIndex(BurnGroup, out var burnGroup) &&
+            damageableComp.Damage.TryGetDamageInGroup(burnGroup, out var burnDamage) &&
+            burnDamage > FixedPoint2.Zero)
+        {
+            damage.DamageDict[HeatType] = -heal;
+            damage.DamageDict[PoisonType] = damage.DamageDict.GetValueOrDefault(PoisonType) + heal * 0.1f;
+        }
+
+        if (damage.DamageDict.Count == 0)
+            return;
+
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

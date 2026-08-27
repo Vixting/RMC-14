@@ -8,6 +8,7 @@ using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
 using Content.Shared.Temperature;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
@@ -46,6 +47,15 @@ public sealed partial class Thermostabilizing : RMCChemicalEffect
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddStatusEffectDuration(args.TargetEntity, "StatusEffectDrowsiness", TimeSpan.FromSeconds(30));
+        var remaining = TimeSpan.Zero;
+        if (status.TryGetTime(args.TargetEntity, "StatusEffectDrowsiness", out var time) && time.EndEffectTime is { } end)
+        {
+            var timing = IoCManager.Resolve<IGameTiming>();
+            remaining = end - timing.CurTime;
+        }
+
+        var floor = TimeSpan.FromSeconds(30);
+        if (remaining < floor)
+            status.TrySetStatusEffectDuration(args.TargetEntity, "StatusEffectDrowsiness", floor);
     }
 }

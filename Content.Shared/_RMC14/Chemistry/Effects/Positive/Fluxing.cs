@@ -12,6 +12,7 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Positive;
 public sealed partial class Fluxing : RMCChemicalEffect
 {
     private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
+    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
     private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
@@ -28,7 +29,7 @@ public sealed partial class Fluxing : RMCChemicalEffect
         if (args.EntityManager.HasComponent<SynthComponent>(args.TargetEntity))
         {
             var damage = new DamageSpecifier();
-            damage.DamageDict[BluntType] = potency;
+            damage.DamageDict[HeatType] = potency;
             damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
             return;
         }

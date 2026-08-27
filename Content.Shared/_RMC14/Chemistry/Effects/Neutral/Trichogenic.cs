@@ -15,14 +15,7 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Trichogenic : RMCChemicalEffect
 {
-    [DataField]
-    public float NutritionCost = 1f;
-
-    [DataField]
-    public float WaterCost = 1f;
-
     private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -33,7 +26,7 @@ public sealed partial class Trichogenic : RMCChemicalEffect
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (!random.Prob(0.05f * (float) ActualPotency))
+        if (!random.Prob(0.025f * (float) ActualPotency))
             return;
 
         if (!args.EntityManager.TryGetComponent<HumanoidAppearanceComponent>(args.TargetEntity, out var humanoid))
@@ -71,15 +64,16 @@ public sealed partial class Trichogenic : RMCChemicalEffect
 
     protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        plant.YieldMod += (int) MathF.Round((float) potency);
-        plant.NutritionLevel -= NutritionCost;
-        plant.WaterLevel -= WaterCost;
+        var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
+        plant.YieldMod += (int) MathF.Round(0.2f * scaled);
+        plant.NutritionLevel -= 0.5f * scaled;
+        plant.WaterLevel -= 0.1f * scaled;
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var random = IoCManager.Resolve<IRobustRandom>();
-        if (!random.Prob(0.05f * (float) ActualPotency))
+        if (!random.Prob(0.025f * (float) ActualPotency))
             return;
 
         var damage = new DamageSpecifier();
@@ -87,10 +81,5 @@ public sealed partial class Trichogenic : RMCChemicalEffect
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
-    protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
-    {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
-        damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
-    }
+    // TODO RMC14: brain damage on critical overdose, "hair growing into brain"
 }
