@@ -34,6 +34,7 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
 using Content.Shared.Whitelist;
 using Robust.Shared.Network;
@@ -68,6 +69,9 @@ public sealed class XenoSpitSystem : EntitySystem
     [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly CMArmorSystem _armor = default!;
+    [Dependency] private readonly SharedStatusEffectsSystem _statusEffect = default!;
+
+    private static readonly EntProtoId ResistNeuroStatus = "RMCStatusEffectResistNeuro";
     [Dependency] private readonly RMCSlowSystem _slow = default!;
     [Dependency] private readonly SharedRMCActionsSystem _rmcActions = default!;
     [Dependency] private readonly XenoSystem _xeno = default!;
@@ -301,6 +305,9 @@ public sealed class XenoSpitSystem : EntitySystem
             _popup.PopupEntity(immuneMsg, target, target, PopupType.SmallCaution);
             return;
         }
+
+        if (_statusEffect.HasStatusEffect(target, ResistNeuroStatus))
+            return;
 
         var filter = Filter.Pvs(target);
         if (TryComp(spit, out XenoProjectileShotComponent? shot) &&

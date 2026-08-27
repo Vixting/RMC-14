@@ -6,7 +6,6 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._RMC14.Weapons.Ranged.Flamer;
 
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-[Access(typeof(SharedRMCFlamerSystem))]
 public sealed partial class RMCFlamerChainComponent : Component
 {
     [DataField, AutoNetworkedField]
@@ -32,4 +31,10 @@ public sealed partial class RMCFlamerChainComponent : Component
 
     [DataField, AutoNetworkedField]
     public bool FirePenetrating;
+
+    [DataField, AutoNetworkedField]
+    public bool Smoke;
+
+    [DataField, AutoNetworkedField]
+    public int TilesPlaced;
 }

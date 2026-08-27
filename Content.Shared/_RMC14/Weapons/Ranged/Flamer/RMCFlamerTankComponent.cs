@@ -34,6 +34,9 @@ public sealed partial class RMCFlamerTankComponent : Component
     public bool Custom;
 
     [DataField, AutoNetworkedField]
+    public bool Smoke;
+
+    [DataField, AutoNetworkedField]
     public bool Specialist;
 
     [DataField, AutoNetworkedField]

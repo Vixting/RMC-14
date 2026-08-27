@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using System.Text.RegularExpressions;
 using Content.Shared._RMC14.Chat;
+using Content.Shared._RMC14.Chemistry.Buildup;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Evolution;
 using Content.Shared.Popups;
@@ -36,6 +37,7 @@ public abstract class SharedChatSystem : EntitySystem
 
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly RMCHivemindInterferenceSystem _hivemindInterference = default!;
     [Dependency] private readonly XenoEvolutionSystem _xenoEvolution = default!;
 
     // RMC14
@@ -55,6 +57,29 @@ public abstract class SharedChatSystem : EntitySystem
     {
         if (obj.WasModified<RadioChannelPrototype>())
             CacheRadios();
+    }
+
+    // RMC
+    private bool IsHivemindChatBlocked(EntityUid source, bool quiet)
+    {
+        if (!_xenoEvolution.HasLiving<XenoEvolutionGranterComponent>(1))
+        {
+            if (!quiet)
+                _popup.PopupEntity(Loc.GetString("rmc-no-queen-hivemind-chat"), source, source, PopupType.LargeCaution);
+            return true;
+        }
+
+        if (HasComp<RMCHivemindInterferenceComponent>(source))
+        {
+            if (!quiet)
+            {
+                var seconds = (int) MathF.Ceiling(_hivemindInterference.GetRemainingSeconds(source));
+                _popup.PopupEntity(Loc.GetString("rmc-hivemind-interference-chat", ("seconds", seconds)), source, source, PopupType.LargeCaution);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     private void CacheRadios()
@@ -170,11 +195,8 @@ public abstract class SharedChatSystem : EntitySystem
 
             // RMC14
             if (channel?.ID == HivemindChannel.Id &&
-                !_xenoEvolution.HasLiving<XenoEvolutionGranterComponent>(1))
+                IsHivemindChatBlocked(source, quiet))
             {
-                if (!quiet)
-                    _popup.PopupEntity(Loc.GetString("rmc-no-queen-hivemind-chat"), source, source, PopupType.LargeCaution);
-
                 output = SanitizeMessageCapital(input[1..].TrimStart());
                 return false;
             }
@@ -213,11 +235,8 @@ public abstract class SharedChatSystem : EntitySystem
             RaiseLocalEvent(source, ev);
 
             if (ev.Channel == HivemindChannel.Id &&
-                !_xenoEvolution.HasLiving<XenoEvolutionGranterComponent>(1))
+                IsHivemindChatBlocked(source, quiet))
             {
-                if (!quiet)
-                    _popup.PopupEntity(Loc.GetString("rmc-no-queen-hivemind-chat"), source, source, PopupType.LargeCaution);
-
                 output = SanitizeMessageCapital(input[1..].TrimStart());
                 return false;
             }
@@ -235,11 +254,8 @@ public abstract class SharedChatSystem : EntitySystem
 
         // RMC14
         if (channel?.ID == HivemindChannel.Id &&
-            !_xenoEvolution.HasLiving<XenoEvolutionGranterComponent>(1))
+            IsHivemindChatBlocked(source, quiet))
         {
-            if (!quiet)
-                _popup.PopupEntity(Loc.GetString("rmc-no-queen-hivemind-chat"), source, source, PopupType.LargeCaution);
-
             return false;
         }
         // RMC14

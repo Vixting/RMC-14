@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Shared._RMC14.Xenonids.Plasma;
 using Content.Shared._RMC14.Dropship;
@@ -176,7 +177,7 @@ public abstract class SharedXenoAcidSystem : EntitySystem
         if (args.Handled || args.Cancelled || args.Target is not { } target)
             return;
 
-        if (!TryComp(target, out CorrodibleComponent? corrodible) || !corrodible.IsCorrodible)
+        if (!CanBeCorroded(target, out var corrodible))
             return;
 
         if (!xeno.Comp.CanMeltStructures && corrodible.Structure)
@@ -296,12 +297,16 @@ public abstract class SharedXenoAcidSystem : EntitySystem
         _popup.PopupClient(Loc.GetString("rmc-acid-pickup-blocked", ("target", args.Item)), args.User, args.User, PopupType.SmallCaution);
     }
 
+    private bool CanBeCorroded(EntityUid target, [NotNullWhen(true)] out CorrodibleComponent? corrodible)
+    {
+        return TryComp(target, out corrodible) && corrodible.IsCorrodible;
+    }
+
     private bool CheckCorrodiblePopupsWithReplacement(Entity<XenoAcidComponent> xeno, EntityUid target, XenoAcidStrength newStrength, out TimeSpan time, out float mult)
     {
         time = TimeSpan.Zero;
         mult = 1;
-        if (!TryComp(target, out CorrodibleComponent? corrodible) ||
-            !corrodible.IsCorrodible)
+        if (!CanBeCorroded(target, out var corrodible))
         {
             _popup.PopupClient(Loc.GetString("cm-xeno-acid-not-corrodible", ("target", target)), xeno, xeno, PopupType.SmallCaution);
             return false;
@@ -436,11 +441,8 @@ public abstract class SharedXenoAcidSystem : EntitySystem
             {
                 foreach (var contained in storage.Container.ContainedEntities.ToArray())
                 {
-                    if (!TryComp(contained, out CorrodibleComponent? corrodible) ||
-                        !corrodible.IsCorrodible)
-                    {
+                    if (!CanBeCorroded(contained, out _))
                         _container.Remove(contained, storage.Container);
-                    }
                 }
             }
 

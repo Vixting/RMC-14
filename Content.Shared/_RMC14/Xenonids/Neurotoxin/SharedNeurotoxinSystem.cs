@@ -27,6 +27,7 @@ using Content.Shared.Random.Helpers;
 using Content.Shared.Rejuvenate;
 using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffect;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
 using Robust.Shared.Audio.Systems;
@@ -50,6 +51,7 @@ public abstract class SharedNeurotoxinSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly StatusEffectsSystem _statusEffects = default!;
+    [Dependency] private readonly SharedStatusEffectsSystem _statusEffect = default!;
     [Dependency] private readonly SharedSlurredSystem _slurred = default!;
     [Dependency] private readonly SharedStutteringSystem _stutter = default!;
     [Dependency] private readonly RMCDazedSystem _daze = default!;
@@ -68,6 +70,8 @@ public abstract class SharedNeurotoxinSystem : EntitySystem
     [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly AreaSystem _area = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
+
+    private static readonly EntProtoId ResistNeuroStatus = "RMCStatusEffectResistNeuro";
 
     private readonly HashSet<Entity<MarineComponent>> _marines = new();
     public override void Initialize()
@@ -96,6 +100,12 @@ public abstract class SharedNeurotoxinSystem : EntitySystem
         {
             return;
         }
+
+        if (_statusEffect.HasStatusEffect(args.Target, ResistNeuroStatus))
+            return;
+
+        if (HasComp<SynthComponent>(args.Target))
+            return;
 
         var time = _timing.CurTime;
 
@@ -149,6 +159,12 @@ public abstract class SharedNeurotoxinSystem : EntitySystem
                 if (ev.Cancelled)
                     continue;
 
+                if (_statusEffect.HasStatusEffect(marine, ResistNeuroStatus))
+                    continue;
+
+                if (HasComp<SynthComponent>(marine))
+                    continue;
+
                 if (!EnsureComp<NeurotoxinComponent>(marine, out var builtNeurotoxin))
                 {
                     builtNeurotoxin.LastMessage = time;
@@ -182,7 +198,9 @@ public abstract class SharedNeurotoxinSystem : EntitySystem
 
             neuro.NextNeuroEffectAt = time + neuro.UpdateEvery;
 
-            if (neuro.NeurotoxinAmount <= 0 || HasComp<SynthComponent>(uid))
+            if (neuro.NeurotoxinAmount <= 0 ||
+                HasComp<SynthComponent>(uid) ||
+                _statusEffect.HasStatusEffect(uid, ResistNeuroStatus))
             {
                 RemCompDeferred<NeurotoxinComponent>(uid);
                 continue;

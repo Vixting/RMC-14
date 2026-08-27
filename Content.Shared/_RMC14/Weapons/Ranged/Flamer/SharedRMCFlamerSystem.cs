@@ -133,7 +133,7 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
     private void OnAttemptShoot(Entity<RMCFlamerAmmoProviderComponent> ent, ref AttemptShootEvent args)
     {
         if (args.ToCoordinates is not { } toCoordinates ||
-            CanShootFlamer(ent, args.FromCoordinates, toCoordinates, out _, out var solution, out _, out _))
+            CanShootFlamer(ent, args.FromCoordinates, toCoordinates, out _, out var solution, out _, out _, out _))
         {
             return;
         }
@@ -358,7 +358,9 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
     /// </summary>
     private FixedPoint2 GetCostPer(Entity<RMCFlamerAmmoProviderComponent> flamer, Entity<RMCFlamerTankComponent> tank)
     {
-        return tank.Comp.AdjustablePressure ? FixedPoint2.New(tank.Comp.FuelPressure) : flamer.Comp.CostPer;
+        return tank.Comp.AdjustablePressure || tank.Comp.Smoke
+            ? FixedPoint2.New(tank.Comp.FuelPressure)
+            : flamer.Comp.CostPer;
     }
 
     public void ShootFlamer(Entity<RMCFlamerAmmoProviderComponent> flamer,
@@ -367,7 +369,7 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         EntityCoordinates fromCoordinates,
         EntityCoordinates toCoordinates)
     {
-        if (!CanShootFlamer(flamer, fromCoordinates, toCoordinates, out var tiles, out var solution, out var reagent, out var tank))
+        if (!CanShootFlamer(flamer, fromCoordinates, toCoordinates, out var tiles, out var solution, out var reagent, out var reagentId, out var tank))
             return;
 
         _audio.PlayPredicted(gun.Comp.SoundGunshotModified, gun, user);
@@ -376,11 +378,11 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         // 1233456
         //  333456
         var cost = tiles.Count;
-        if (reagent.FireSpread && cost > 2)
+        if (!tank.Value.Comp.Smoke && reagent.FireSpread && cost > 2)
             cost = (int)Math.Ceiling(cost / 3.0f);
 
         var costPer = GetCostPer(flamer, tank.Value);
-        solution.Value.Comp.Solution.RemoveSolution(costPer * cost);
+        solution.Value.Comp.Solution.RemoveReagent(reagentId, costPer * cost);
         _solution.UpdateChemicals(solution.Value);
 
         if (_net.IsClient)
@@ -388,13 +390,22 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
 
         var chain = Spawn();
         var chainComp = EnsureComp<RMCFlamerChainComponent>(chain);
-        chainComp.Spawn = reagent.FireEntity;
         chainComp.Tiles = tiles;
         chainComp.Reagent = reagent.ID;
-        chainComp.MaxIntensity = tank.Value.Comp.MaxIntensity;
-        chainComp.MaxDuration = tank.Value.Comp.MaxDuration;
         chainComp.FuelPressure = (int)costPer;
-        chainComp.FirePenetrating = GetFireStats(reagent).FirePenetrating;
+
+        if (tank.Value.Comp.Smoke)
+        {
+            chainComp.Smoke = true;
+            chainComp.Spawn = "RMCSmokeChemical";
+        }
+        else
+        {
+            chainComp.Spawn = reagent.FireEntity;
+            chainComp.MaxIntensity = tank.Value.Comp.MaxIntensity;
+            chainComp.MaxDuration = tank.Value.Comp.MaxDuration;
+            chainComp.FirePenetrating = GetFireStats(reagent).FirePenetrating;
+        }
 
         Dirty(chain, chainComp);
     }
@@ -405,7 +416,7 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         EntityCoordinates toCoordinates,
         [NotNullWhen(true)] out List<LineTile>? tiles)
     {
-        return CanShootFlamer(flamer, fromCoordinates, toCoordinates, out tiles, out _, out _, out _);
+        return CanShootFlamer(flamer, fromCoordinates, toCoordinates, out tiles, out _, out _, out _, out _);
     }
 
     public bool TryGetFuelColor(Entity<RMCFlamerAmmoProviderComponent> flamer, out Color color)
@@ -522,14 +533,19 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         [NotNullWhen(true)] out List<LineTile>? tiles,
         [NotNullWhen(true)] out Entity<SolutionComponent>? solution,
         [NotNullWhen(true)] out ReagentPrototype? reagent,
+        out ReagentId reagentId,
         [NotNullWhen(true)] out Entity<RMCFlamerTankComponent>? tank)
     {
         tiles = null;
         reagent = null;
+        reagentId = default;
         if (!TryGetTankSolution(flamer, out solution, out tank))
             return false;
 
-        var volume = solution.Value.Comp.Solution.Volume;
+        if (!solution.Value.Comp.Solution.TryFirstOrNull(out var firstReagent))
+            return false;
+
+        var volume = firstReagent.Value.Quantity;
         var costPer = GetCostPer(flamer, tank.Value);
         if (volume < costPer)
             return false;
@@ -545,18 +561,18 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         // to prevent hitting yourself
         fromCoordinates = fromCoordinates.Offset(normalized * 0.23f);
 
-        if (!solution.Value.Comp.Solution.TryFirstOrNull(out var firstReagent))
-            return false;
-
+        reagentId = firstReagent.Value.Reagent;
         reagent = _reagent.Index(firstReagent.Value.Reagent.Prototype);
         var fireStats = GetFireStats(reagent);
 
-        var maxRange = fireStats.Radius;
+        // fixed range for smoke
+        var maxRange = tank.Value.Comp.Smoke ? tank.Value.Comp.MaxRange : fireStats.Radius;
         var range = Math.Min((volume / costPer).Int(), maxRange);
         if (delta.Length() > maxRange)
             toCoordinates = fromCoordinates.Offset(normalized * range);
 
-        tiles = _line.DrawLine(fromCoordinates, toCoordinates, flamer.Comp.DelayPer, maxRange, out _, true, reagent.FireSpread);
+        var wideShape = !tank.Value.Comp.Smoke && reagent.FireSpread;
+        tiles = _line.DrawLine(fromCoordinates, toCoordinates, flamer.Comp.DelayPer, maxRange, out _, true, wideShape);
         if (tiles.Count == 0)
         {
             tiles = null;
@@ -809,6 +825,9 @@ public abstract class SharedRMCFlamerSystem : EntitySystem
         var chains = EntityQueryEnumerator<RMCFlamerChainComponent>();
         while (chains.MoveNext(out var uid, out var comp))
         {
+            if (comp.Smoke)
+                continue;
+
             if (comp.Tiles.Count == 0)
             {
                 QueueDel(uid);

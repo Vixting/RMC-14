@@ -14,6 +14,7 @@ using Content.Shared.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.StatusEffectNew;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Audio;
@@ -48,6 +49,9 @@ public abstract class SharedXenoTailStabSystem : EntitySystem
     [Dependency] private readonly RMCDazedSystem _daze = default!;
     [Dependency] private readonly RMCCameraShakeSystem _cameraShake = default!;
     [Dependency] private readonly RMCSizeStunSystem _size = default!;
+    [Dependency] private readonly SharedStatusEffectsSystem _statusEffect = default!;
+
+    private static readonly EntProtoId ResistNeuroStatus = "RMCStatusEffectResistNeuro";
 
     protected Box2Rotated LastTailAttack;
 
@@ -185,18 +189,19 @@ public abstract class SharedXenoTailStabSystem : EntitySystem
                     if (stab.Comp.InjectNeuro &&
                         TryComp<NeurotoxinInjectorComponent>(stab, out var neuroTox))
                     {
-
-
-                        if (!EnsureComp<NeurotoxinComponent>(hit, out var neuro))
+                        if (!_statusEffect.HasStatusEffect(hit, ResistNeuroStatus))
                         {
-                            neuro.LastMessage = _timing.CurTime;
-                            neuro.LastAccentTime = _timing.CurTime;
-                            neuro.LastStumbleTime = _timing.CurTime;
+                            if (!EnsureComp<NeurotoxinComponent>(hit, out var neuro))
+                            {
+                                neuro.LastMessage = _timing.CurTime;
+                                neuro.LastAccentTime = _timing.CurTime;
+                                neuro.LastStumbleTime = _timing.CurTime;
+                            }
+                            neuro.NeurotoxinAmount += neuroTox.NeuroPerSecond;
+                            neuro.ToxinDamage = neuroTox.ToxinDamage;
+                            neuro.OxygenDamage = neuroTox.OxygenDamage;
+                            neuro.CoughDamage = neuroTox.CoughDamage;
                         }
-                        neuro.NeurotoxinAmount += neuroTox.NeuroPerSecond;
-                        neuro.ToxinDamage = neuroTox.ToxinDamage;
-                        neuro.OxygenDamage = neuroTox.OxygenDamage;
-                        neuro.CoughDamage = neuroTox.CoughDamage;
                     }
                     else if (stab.Comp.Inject != null &&
                              _solutionContainer.TryGetInjectableSolution(hit, out var solutionEnt, out _))
