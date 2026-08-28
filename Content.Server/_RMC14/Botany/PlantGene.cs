@@ -43,6 +43,7 @@ public sealed class PlantGene
     public float? Production;
 
     public ResPath? PlantRsi;
+    public int? GrowthStages;
     public string? PlantIconState;
     public Color? ProductColor;
     public bool? HasFlowers;
@@ -94,6 +95,7 @@ public sealed class PlantGene
                 break;
             case PlantGeneType.Flowers:
                 gene.PlantRsi = seed.PlantRsi;
+                gene.GrowthStages = seed.GrowthStages;
                 gene.PlantIconState = seed.PlantIconState;
                 gene.ProductColor = seed.ProductColor;
                 gene.HasFlowers = seed.Flowers;
@@ -193,6 +195,7 @@ public sealed class PlantGene
                 break;
             case PlantGeneType.Flowers:
                 seed.PlantRsi = PlantRsi!.Value;
+                seed.GrowthStages = GrowthStages!.Value;
                 seed.PlantIconState = PlantIconState!;
                 seed.ProductColor = ProductColor;
                 if (HasFlowers is { } hasFlowers)

@@ -290,25 +290,10 @@ public sealed class PlantHolderSystem : EntitySystem
                 return;
             }
 
-            if (GetCurrentGrowthStage(entity) <= 1)
-            {
-                _popup.PopupCursor(Loc.GetString("plant-holder-component-early-sample-message"), args.User);
-                return;
-            }
-
             component.Health -= (_random.Next(3, 5) * 10);
 
-            float? healthOverride;
-            if (component.Harvest)
-            {
-                healthOverride = null;
-            }
-            else
-            {
-                healthOverride = component.Health;
-            }
             var packetSeed = component.Seed;
-            var seed = _botany.SpawnSeedPacket(packetSeed, Transform(args.User).Coordinates, args.User, healthOverride);
+            var seed = _botany.SpawnSeedPacket(packetSeed, Transform(args.User).Coordinates, args.User, null);
             _randomHelper.RandomOffset(seed, 0.25f);
             var displayName = Loc.GetString(component.Seed.DisplayName);
             _popup.PopupCursor(Loc.GetString("plant-holder-component-take-sample-message",
