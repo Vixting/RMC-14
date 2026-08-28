@@ -14,7 +14,7 @@ public sealed class RMCGenerateHiveSlotsCommand : IConsoleCommand
     public string Command => "rmcgeneratehiveslots";
 
     public string Description =>
-        "Generates fixed hive slot roster (corrupted/alpha/bravo/charlie/delta)";
+        "Generates fixed hive slot roster (normal/corrupted/alpha/bravo/charlie/delta/renegade)";
 
     public string Help => "rmcgeneratehiveslots";
 

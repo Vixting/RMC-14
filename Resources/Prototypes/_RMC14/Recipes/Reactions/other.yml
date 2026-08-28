@@ -105,7 +105,7 @@
       amount: 2
     RMCCarbon:
       amount: 2
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 1
   products:
     RMCFluorosurfactant: 5
@@ -127,7 +127,7 @@
       amount: 1
     RMCIron:
       amount: 1
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 1
   products:
     RMCStabilizedMetallicFoam: 1
@@ -157,7 +157,7 @@
   reactants:
     RMCCornOil:
       amount: 3
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 1
   products:
     RMCGlycerol: 1

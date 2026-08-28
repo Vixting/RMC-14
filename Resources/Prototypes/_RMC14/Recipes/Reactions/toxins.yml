@@ -27,7 +27,7 @@
   reactants:
     RMCAmmonia:
       amount: 1
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 1
     RMCNitrogen:
       amount: 1
@@ -61,7 +61,7 @@
   reactants:
     RMCPotassiumChlorophoride:
       amount: 1
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 4
   products:
     RMCPotassiumPhorosulfate: 1
@@ -71,7 +71,7 @@
   reactants:
     RMCIron:
       amount: 1
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 5
   products:
     RMCIronSulfate: 1
@@ -91,7 +91,7 @@
   reactants:
     RMCCopper:
       amount: 2
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 5
   products:
     RMCCopperSulfate: 1
@@ -126,7 +126,7 @@
   reactants:
     RMCFormaldehyde:
       amount: 2
-    Phenol:
+    RMCPhenol:
       amount: 1
     RMCMethane:
       amount: 5
@@ -137,7 +137,7 @@
 - type: reaction
   id: RMCPolytrinicAcid
   reactants:
-    SulfuricAcid:
+    RMCSulphuricAcid:
       amount: 1
     RMCChlorine:
       amount: 1

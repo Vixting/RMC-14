@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Content.Shared._RMC14.Dropship;
 using Content.Shared._RMC14.Marines;
 using Content.Shared._RMC14.NightVision;
@@ -196,6 +197,22 @@ public abstract class SharedXenoHiveSystem : EntitySystem
         return null;
     }
 
+    public bool TryGetHiveBySlot(int position, out EntityUid hive)
+    {
+        var query = EntityQueryEnumerator<HiveSlotComponent>();
+        while (query.MoveNext(out var uid, out var slot))
+        {
+            if (slot.Position == position)
+            {
+                hive = uid;
+                return true;
+            }
+        }
+
+        hive = default;
+        return false;
+    }
+
     /// <summary>
     /// Returns true if the entity has a valid hive, i.e. it isn't a rogue xeno.
     /// Only use this if you don't need to use the hive for anything after.
@@ -335,8 +352,19 @@ public abstract class SharedXenoHiveSystem : EntitySystem
 
             if (hive.Comp.AlliedFactions.Count > 0 || hive.Comp.AlliedHives.Count > 0)
             {
-                hive.Comp.AlliedFactions.Clear();
-                hive.Comp.AlliedHives.Clear();
+                var factions = hive.Comp.AlliedFactions.ToList();
+                var hives = hive.Comp.AlliedHives.ToList();
+
+                foreach (var faction in factions)
+                {
+                    SetFactionAlly(hive, faction, false);
+                }
+
+                foreach (var otherHive in hives)
+                {
+                    SetHiveAlly(hive, otherHive, false);
+                }
+
                 _xenoAnnounce.AnnounceToHive(EntityUid.Invalid, hive.Owner, Loc.GetString("rmc-xeno-hive-alliances-broken"));
             }
         }
@@ -608,22 +636,51 @@ public abstract class SharedXenoHiveSystem : EntitySystem
 
     public void SetFactionAlly(Entity<HiveComponent> hive, ProtoId<NpcFactionPrototype> faction, bool allied)
     {
+        if (hive.Comp.AlliedFactions.Contains(faction) == allied)
+            return;
+
+        if (allied && hive.Comp.BanHumanoidAlliances)
+            return;
+
         if (allied)
             hive.Comp.AlliedFactions.Add(faction);
         else
             hive.Comp.AlliedFactions.Remove(faction);
 
         Dirty(hive);
+
+        var ev = new HiveFactionAllyChangedEvent(hive.Owner, faction, allied);
+        RaiseLocalEvent(ref ev);
     }
 
     public void SetHiveAlly(Entity<HiveComponent> hive, EntityUid otherHive, bool allied)
     {
+        if (hive.Comp.AlliedHives.Contains(otherHive) == allied)
+            return;
+
+        if (allied && hive.Comp.BanHiveAlliances)
+            return;
+
         if (allied)
             hive.Comp.AlliedHives.Add(otherHive);
         else
             hive.Comp.AlliedHives.Remove(otherHive);
 
         Dirty(hive);
+
+        if (!_query.TryComp(otherHive, out var otherHiveComp))
+            return;
+
+        if (allied)
+        {
+            _xenoAnnounce.AnnounceToHive(EntityUid.Invalid, otherHive, Loc.GetString("rmc-xeno-hive-alliance-formed-by", ("hive", Name(hive.Owner))));
+            return;
+        }
+
+        _xenoAnnounce.AnnounceToHive(EntityUid.Invalid, otherHive, Loc.GetString("rmc-xeno-hive-alliance-broken-by", ("hive", Name(hive.Owner))));
+
+        if (otherHiveComp.AlliedHives.Contains(hive.Owner))
+            SetHiveAlly((otherHive, otherHiveComp), hive.Owner, false);
     }
 
     public bool IsFactionAllied(Entity<HiveComponent> hive, ProtoId<NpcFactionPrototype> faction)
@@ -636,6 +693,9 @@ public abstract class SharedXenoHiveSystem : EntitySystem
         return hive.Comp.AlliedHives.Contains(otherHive);
     }
 }
+
+[ByRefEvent]
+public record struct HiveFactionAllyChangedEvent(EntityUid Hive, ProtoId<NpcFactionPrototype> Faction, bool Allied);
 
 /// <summary>
 /// Raised on an entity after its hive is changed.

@@ -20,6 +20,7 @@ using Content.Shared._RMC14.Xenonids.Evolution;
 using Content.Shared._RMC14.Xenonids.Fortify;
 using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.HiveLeader;
+using Content.Shared._RMC14.Xenonids.IffTag;
 using Content.Shared._RMC14.Xenonids.Parasite;
 using Content.Shared._RMC14.Xenonids.Pheromones;
 using Content.Shared._RMC14.Xenonids.Plasma;
@@ -73,6 +74,7 @@ public sealed partial class XenoSystem : EntitySystem
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedXenoHiveSystem _hive = default!;
     [Dependency] private readonly HiveLeaderSystem _hiveLeader = default!;
+    [Dependency] private readonly RMCXenoIffTagSystem _iffTag = default!;
     [Dependency] private readonly SharedImaginaryFriendSystem _imaginaryFriend = default!;
     [Dependency] private readonly SharedLanguageSystem _language = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -97,6 +99,7 @@ public sealed partial class XenoSystem : EntitySystem
 
     private EntityQuery<AffectableByWeedsComponent> _affectableQuery;
     private EntityQuery<DamageableComponent> _damageableQuery;
+    private EntityQuery<HiveSlotComponent> _hiveSlotQuery;
     private EntityQuery<MobStateComponent> _mobStateQuery;
     private EntityQuery<MobThresholdsComponent> _mobThresholdsQuery;
     private EntityQuery<XenoFriendlyComponent> _xenoFriendlyQuery;
@@ -116,6 +119,7 @@ public sealed partial class XenoSystem : EntitySystem
 
         _affectableQuery = GetEntityQuery<AffectableByWeedsComponent>();
         _damageableQuery = GetEntityQuery<DamageableComponent>();
+        _hiveSlotQuery = GetEntityQuery<HiveSlotComponent>();
         _mobStateQuery = GetEntityQuery<MobStateComponent>();
         _mobThresholdsQuery = GetEntityQuery<MobThresholdsComponent>();
         _xenoFriendlyQuery = GetEntityQuery<XenoFriendlyComponent>();
@@ -228,7 +232,7 @@ public sealed partial class XenoSystem : EntitySystem
             return;
 
         // TODO RMC14 this still falsely plays the hit red flash effect on xenos if others are hit in a wide swing
-        if ((_xenoFriendlyQuery.HasComp(target) && _hive.FromSameHiveOrAlly(xeno.Owner, target)) ||
+        if ((_xenoFriendlyQuery.HasComp(target) && IsProtectedFromAttack(xeno.Owner, target)) ||
             _mobState.IsDead(target))
         {
             if (!args.Disarm)
@@ -515,13 +519,25 @@ public sealed partial class XenoSystem : EntitySystem
         _damageable.TryChangeDamage(xeno, heal, true, origin: xeno);
     }
 
+    public bool IsProtectedFromAttack(EntityUid attacker, EntityUid target)
+    {
+        if (_hive.GetHive(attacker) is { } hive &&
+            _hiveSlotQuery.TryGetComponent(hive.Owner, out var slot) &&
+            slot.Position == HiveSlots.Renegade)
+        {
+            return _iffTag.IffProtects(attacker, target);
+        }
+
+        return _hive.FromSameHiveOrAlly(attacker, target);
+    }
+
     public bool CanAbilityAttackTarget(EntityUid xeno, EntityUid target, bool canAttackBarricades = false, bool canAttackWindows = false)
     {
         if (xeno == target)
             return false;
 
         // hiveless xenos can attack eachother
-        if (_hive.FromSameHiveOrAlly(xeno, target))
+        if (IsProtectedFromAttack(xeno, target))
             return false;
 
         if (_mobState.IsDead(target))

@@ -17,4 +17,5 @@ public static class HiveSlots
     public const int Bravo = 4;
     public const int Charlie = 5;
     public const int Delta = 6;
+    public const int Renegade = 7;
 }

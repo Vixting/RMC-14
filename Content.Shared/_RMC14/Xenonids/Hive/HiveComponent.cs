@@ -112,4 +112,10 @@ public sealed partial class HiveComponent : Component
 
     [DataField, AutoNetworkedField]
     public HashSet<EntityUid> AlliedHives = new();
+
+    [DataField, AutoNetworkedField]
+    public bool BanHumanoidAlliances = true;
+
+    [DataField, AutoNetworkedField]
+    public bool BanHiveAlliances = true;
 }

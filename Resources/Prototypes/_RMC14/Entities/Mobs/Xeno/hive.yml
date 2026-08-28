@@ -8,11 +8,21 @@
 
 - type: entity
   parent: CMXenoHive
+  id: CMXenoHiveNormal
+  name: xenonid hive
+  components:
+  - type: HiveSlot
+    position: 1
+
+- type: entity
+  parent: CMXenoHive
   id: CMXenoHiveCorrupted
   name: corrupted hive
   components:
   - type: Hive
     color: "#80FF80"
+    banHumanoidAlliances: false
+    banHiveAlliances: false
   - type: HiveSlot
     position: 2
 
@@ -55,3 +65,23 @@
     color: "#8080FF"
   - type: HiveSlot
     position: 6
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveRenegade
+  name: renegade hive
+  components:
+  - type: Hive
+    color: "#FFAE00"
+    hiveStructureSlots:
+      HiveCoreXeno: 1
+      HiveClusterXeno: 8
+      HivePylonXeno: 2
+      HiveEggMorpherXeno: 0
+      HiveRecoveryNodeXeno: 6
+      HivePlasmaTreeXeno: 3
+    alliedFactions: [ UNMC, WeYa, CLF, TSE, HEFA, SPP, Halcyon, RoyalMarines, Bureau, Civilian ]
+    banHumanoidAlliances: false
+    banHiveAlliances: true
+  - type: HiveSlot
+    position: 7
