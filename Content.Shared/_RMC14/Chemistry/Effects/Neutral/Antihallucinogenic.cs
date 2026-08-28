@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Body;
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -12,9 +13,9 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Antihallucinogenic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> HeatType = "Heat";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
 
     private static readonly EntProtoId<StatusEffectComponent> SeeingRainbows = "RMCStatusEffectSeeingRainbow";
 
@@ -35,22 +36,22 @@ public sealed partial class Antihallucinogenic : RMCChemicalEffect
         bloodstream.RemoveBloodstreamChemical(args.TargetEntity, SpaceDrugs, 5f);
 
         var status = args.EntityManager.System<SharedStatusEffectsSystem>();
-        status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds(PotencyPerSecond * -10)); // SeeingRainbows is M.druggy in CM13
+        status.TryAddTime(args.TargetEntity, SeeingRainbows, TimeSpan.FromSeconds(PotencyPerSecond * -10)); // SeeingRainbows is M.druggy in cm
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency;
-        damage.DamageDict[HeatType] = potency;
-        damage.DamageDict[PoisonType] = potency * 3;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency);
+        damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency, damage);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 3, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

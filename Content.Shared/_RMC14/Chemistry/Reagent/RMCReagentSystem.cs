@@ -9,6 +9,7 @@ using Content.Shared.Chemistry.Reaction;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Content.Shared.Nutrition;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Serialization.Markdown.Mapping;
@@ -128,7 +129,8 @@ public sealed class RMCReagentSystem : EntitySystem
         reagent.ChemClass = data.ChemClass;
         reagent.Overdose = data.Overdose > 0 ? FixedPoint2.New(data.Overdose) : null;
         reagent.CriticalOverdose = data.CriticalOverdose > 0 ? FixedPoint2.New(data.CriticalOverdose) : null;
-        reagent.Recognizable = true;
+        reagent.Unknown = true;
+        reagent.Flavor = PickGeneratedFlavor(data);
 
         var effects = new List<EntityEffect>();
         var touchEffects = new List<EntityEffect>();
@@ -191,6 +193,24 @@ public sealed class RMCReagentSystem : EntitySystem
         }
 
         return reagent;
+    }
+
+    private ProtoId<FlavorPrototype>? PickGeneratedFlavor(RMCGeneratedReagentData data)
+    {
+        RecipeCandidateIngredient? dominant = null;
+        foreach (var ingredient in data.Ingredients)
+        {
+            if (ingredient.Catalyst)
+                continue;
+
+            if (dominant == null || ingredient.Amount > dominant.Amount)
+                dominant = ingredient;
+        }
+
+        if (dominant != null && TryIndex(dominant.Id, out var ingredientReagent))
+            return ingredientReagent.Flavor;
+
+        return null;
     }
 
     public Reagent Index(ProtoId<ReagentPrototype> id)

@@ -47,6 +47,6 @@ public sealed partial class Antispasmodic : RMCChemicalEffect
         damage.DamageDict[AsphyxiationType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
-        // TODO RMC14: mob effect - heart organ damage
+        // TODO RMC14: heart organ damage
     }
 }

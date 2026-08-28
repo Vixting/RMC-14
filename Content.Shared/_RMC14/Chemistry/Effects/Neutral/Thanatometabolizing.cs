@@ -38,7 +38,7 @@ public sealed partial class Thanatometabolizing : RMCChemicalEffect
             effectiveness = Math.Clamp(severity * 0.1f * Potency, 0.1f, 1f);
         }
 
-        // RMC14 TODO: this is an aproximation
+        // this is an aproximation
         boost += Potency * effectiveness;
     }
 

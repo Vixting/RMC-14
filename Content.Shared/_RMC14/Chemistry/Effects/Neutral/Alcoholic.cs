@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Chemistry.Effects.Positive;
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Drunk;
@@ -13,7 +14,7 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Neutral;
 
 public sealed partial class Alcoholic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
     private static readonly ProtoId<DamageTypePrototype> AsphyxiationType = "Asphyxiation";
 
     private const string ConfusedStatus = "RMCStatusEffectConfused";
@@ -52,8 +53,8 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         var drunk = args.EntityManager.System<SharedDrunkSystem>();
         drunk.TryApplyDrunkenness(args.TargetEntity, (float) potency * 4f);
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency * 0.5f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 0.5f);
         damage.DamageDict[AsphyxiationType] = potency;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 
@@ -85,8 +86,8 @@ public sealed partial class Alcoholic : RMCChemicalEffect
         var drunk = args.EntityManager.System<SharedDrunkSystem>();
         drunk.TryApplyDrunkenness(args.TargetEntity, (float) potency * 8f);
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency);
         damage.DamageDict[AsphyxiationType] = potency * 2f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
 

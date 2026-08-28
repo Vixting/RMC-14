@@ -43,5 +43,5 @@ public sealed partial class Neuroinhibiting : RMCChemicalEffect
         args.EntityManager.EnsureComponent<RMCNervousComponent>(args.TargetEntity);
     }
 
-    // TODO RMC14: mob effect - brain damage on critical overdose (no Brain damage type/organ system)
+    // TODO RMC14: brain damage on critical overdose
 }

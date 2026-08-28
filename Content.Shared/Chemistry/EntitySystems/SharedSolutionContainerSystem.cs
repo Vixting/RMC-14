@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Content.Shared._RMC14.Chemistry.Reagent;
+using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Chemistry.Reaction;
@@ -821,12 +822,17 @@ public abstract partial class SharedSolutionContainerSystem : EntitySystem
                 .OrderByDescending(pair => pair.Value.Value)
                 .ThenBy(pair => pair.Key.LocalizedName);
 
+            // RMC
+            var scanEvent = new SolutionScanEvent();
+            RaiseLocalEvent(args.Examiner, scanEvent);
+
             // Add descriptions of immediately recognizable reagents, like water or beer
             var recognized = new List<ReagentPrototype>();
             foreach (var keyValuePair in sortedReagentPrototypes)
             {
                 var proto = keyValuePair.Key;
-                if (!proto.Recognizable)
+                if (!proto.Recognizable
+                && !scanEvent.CanScan) // RMC
                 {
                     continue;
                 }
