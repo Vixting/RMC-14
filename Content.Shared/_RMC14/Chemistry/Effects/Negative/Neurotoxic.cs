@@ -98,11 +98,9 @@ public sealed partial class Neurotoxic : RMCChemicalEffect
         var entities = args.EntityManager;
         var target = args.TargetEntity;
 
-        // cm13 apply_neuro(): xenomorphs are immune to this effect entirely
         if (entities.HasComponent<XenoComponent>(target))
             return;
 
-        // cm13 apply_neuro(): a CHEM_EFFECT_RESIST_NEURO source (Neuroshielding) shrugs the effect off
         var status = entities.System<SharedStatusEffectsSystem>();
         if (status.HasStatusEffect(target, ResistNeuroStatus))
             return;
@@ -111,7 +109,6 @@ public sealed partial class Neurotoxic : RMCChemicalEffect
         var duration = TimeSpan.FromSeconds((float) potency * 0.4f);
         slow.TrySuperSlowdown(target, duration);
 
-        // cm13: also falls prone (knockdown+stun) if wearing no outer clothing, or clothing that grants no slowdown
         var inventory = entities.System<InventorySystem>();
         var armored = inventory.TryGetSlotEntity(target, "outerClothing", out var outer) &&
             entities.TryGetComponent<ClothingSpeedModifierComponent>(outer, out var mod) &&

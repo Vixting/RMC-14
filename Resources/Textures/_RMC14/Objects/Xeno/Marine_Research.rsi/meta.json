@@ -48,20 +48,6 @@
         },
         {
             "name": "royal_jelly"
-        },
-        {
-            "name": "xeno_tag",
-            "delays": [
-                [
-                    0.5,
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            ]
-        },
-        {
-            "name": "tag_box"
         }
     ]
 }

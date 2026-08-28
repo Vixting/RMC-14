@@ -142,6 +142,10 @@ public sealed class SmokeSystem : EntitySystem
 
         // wtf is the logic behind any of this.
         var smokePerSpread = entity.Comp.SpreadAmount / Math.Max(1, args.NeighborFreeTiles.Count);
+
+        // RMC - dilute the reagent across the tiles it spreads into
+        var splitAmount = solution.Volume / (args.NeighborFreeTiles.Count + 1);
+
         foreach (var neighbor in args.NeighborFreeTiles)
         {
             var coords = _map.GridTileToLocal(neighbor.Tile.GridUid, neighbor.Grid, neighbor.Tile.GridIndices);
@@ -149,7 +153,9 @@ public sealed class SmokeSystem : EntitySystem
             var spreadAmount = Math.Max(0, smokePerSpread);
             entity.Comp.SpreadAmount -= args.NeighborFreeTiles.Count;
 
-            StartSmoke(ent, solution.Clone(), timer?.Lifetime ?? entity.Comp.Duration, spreadAmount);
+            // RMC - dilute the reagent across the tiles it spreads into
+            var split = _solutionContainerSystem.SplitSolution(entity.Comp.Solution.Value, splitAmount);
+            StartSmoke(ent, split, timer?.Lifetime ?? entity.Comp.Duration, spreadAmount, spillBudget: entity.Comp.SpillBudget);
 
             if (entity.Comp.SpreadAmount == 0)
             {
@@ -211,7 +217,7 @@ public sealed class SmokeSystem : EntitySystem
     /// <summary>
     /// Sets up a smoke component for spreading.
     /// </summary>
-    public void StartSmoke(EntityUid uid, Solution solution, float duration, int spreadAmount, SmokeComponent? component = null)
+    public void StartSmoke(EntityUid uid, Solution solution, float duration, int spreadAmount, SmokeComponent? component = null, SmokeSpillBudget? spillBudget = null)
     {
         if (!Resolve(uid, ref component))
             return;
@@ -219,6 +225,10 @@ public sealed class SmokeSystem : EntitySystem
         component.SpreadAmount = spreadAmount;
         component.Duration = duration;
         component.TransferRate = solution.Volume / duration;
+
+        // RMC
+        component.SpillBudget = spillBudget ?? new SmokeSpillBudget { Remaining = solution.Volume };
+
         TryAddSolution(uid, solution);
         Dirty(uid, component);
         EnsureComp<ActiveEdgeSpreaderComponent>(uid);
@@ -286,10 +296,10 @@ public sealed class SmokeSystem : EntitySystem
         var blockIngestion = _internals.AreInternalsWorking(entity);
 
         // RMC14 start
-        // Change smoke interactions to CM13's values:
-        // The transfer amount is calcuated with a base of 10, divided by the amount of different reagents in the solution
+        //breathing in chem smoke transfers up to 10 units total via reagents.copy_to(src, 10), split proportionally across whatever
+        // reagets the smoke holds not divided by how many distinct reagents are present.
         var cloneSolution = solution.Clone();
-        var availableTransfer = FixedPoint2.Min(cloneSolution.Volume, 10 / cloneSolution.Contents.Count);
+        var availableTransfer = FixedPoint2.Min(cloneSolution.Volume, 10);
         var transferAmount = FixedPoint2.Min(availableTransfer, chemSolution.AvailableVolume);
         var transferSolution = cloneSolution.SplitSolution(transferAmount);
         // RMC14 end
@@ -333,8 +343,20 @@ public sealed class SmokeSystem : EntitySystem
             if (reagentQuantity.Quantity == FixedPoint2.Zero)
                 continue;
 
+            // RMC14 - prevent smoke with reagents that spill (welding fuel) from spilking past the smoke
+            var reactVolume = reagentQuantity.Quantity;
+            if (component.SpillBudget is { } budget)
+            {
+                reactVolume = FixedPoint2.Min(reactVolume, budget.Remaining);
+                if (reactVolume <= FixedPoint2.Zero)
+                    continue;
+            }
+
             var reagent = _prototype.IndexReagent<ReagentPrototype>(reagentQuantity.Reagent.Prototype);
-            reagent.ReactionTile(tile, reagentQuantity.Quantity, EntityManager, reagentQuantity.Reagent.Data);
+            var removed = reagent.ReactionTile(tile, reactVolume, EntityManager, reagentQuantity.Reagent.Data);
+
+            if (component.SpillBudget is { } spent)
+                spent.Remaining -= removed;
         }
     }
 

@@ -2,6 +2,7 @@ using Content.Shared._RMC14.Chemistry.Buildup;
 using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Synth;
 using Content.Shared._RMC14.Xenonids;
+using Content.Shared._RMC14.Xenonids.Acid;
 using Content.Shared.Botany.Components;
 using Content.Shared.Chemistry;
 using Content.Shared.Damage;
@@ -22,8 +23,8 @@ public sealed partial class Corrosive : RMCChemicalEffect
 {
     public override bool ReactsOnTouch => true;
 
-    private static readonly ProtoId<DamageTypePrototype> CausticType = "Caustic";
     private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> BurnGroup = "Burn";
 
     protected override string ReagentEffectGuidebookText(IPrototypeManager prototype, IEntitySystemManager entSys)
     {
@@ -40,9 +41,14 @@ public sealed partial class Corrosive : RMCChemicalEffect
             return;
         }
 
-        var damage = new DamageSpecifier();
-        damage.DamageDict[CausticType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
+    }
+
+    private static bool IsUnacidable(IEntityManager entities, EntityUid? uid)
+    {
+        return entities.TryGetComponent(uid, out CorrodibleComponent? corrodible) && !corrodible.IsCorrodible;
     }
 
     private void HandleTouch(DamageableSystem damageable, EntityEffectReagentArgs args)
@@ -56,7 +62,6 @@ public sealed partial class Corrosive : RMCChemicalEffect
             return;
         }
 
-        // meltprob = potency * POTENCY_MULTIPLIER_HIGH (3), expressed as a 0-1 chance here
         var meltChance = (float) ActualPotency * 0.03f;
         var isHuman = entities.HasComponent<HumanoidAppearanceComponent>(target) && !entities.HasComponent<SynthComponent>(target);
         if (isHuman)
@@ -67,7 +72,7 @@ public sealed partial class Corrosive : RMCChemicalEffect
 
             if (inventory.TryGetSlotEntity(target, "head", out var head))
             {
-                if (random.Prob(meltChance) && !entities.HasComponent<RMCUnacidableComponent>(head))
+                if (random.Prob(meltChance) && !IsUnacidable(entities, head))
                 {
                     inventory.TryUnequip(target, "head", force: true);
                     entities.QueueDeleteEntity(head);
@@ -83,7 +88,7 @@ public sealed partial class Corrosive : RMCChemicalEffect
 
             if (inventory.TryGetSlotEntity(target, "mask", out var mask))
             {
-                if (random.Prob(meltChance) && !entities.HasComponent<RMCUnacidableComponent>(mask))
+                if (random.Prob(meltChance) && !IsUnacidable(entities, mask))
                 {
                     inventory.TryUnequip(target, "mask", force: true);
                     entities.QueueDeleteEntity(mask);
@@ -97,10 +102,9 @@ public sealed partial class Corrosive : RMCChemicalEffect
                 return;
             }
 
-            // cm13's glasses branch has no "protects you" message on a failed/blocked roll, unlike head/mask
             if (inventory.TryGetSlotEntity(target, "eyes", out var eyes))
             {
-                if (random.Prob(meltChance) && !entities.HasComponent<RMCUnacidableComponent>(eyes))
+                if (random.Prob(meltChance) && !IsUnacidable(entities, eyes))
                 {
                     inventory.TryUnequip(target, "eyes", force: true);
                     entities.QueueDeleteEntity(eyes);
@@ -111,7 +115,6 @@ public sealed partial class Corrosive : RMCChemicalEffect
             }
         }
 
-        // TODO RMC14: head burn damage instead of generic brute
         var volume = (float) args.Quantity;
         var rmcDamageable = entities.System<SharedRMCDamageableSystem>();
         var damage = rmcDamageable.DistributeDamageCached(target, BruteGroup, MathF.Min(6f, volume));
@@ -140,15 +143,15 @@ public sealed partial class Corrosive : RMCChemicalEffect
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[CausticType] = potency * 2f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency * 2f);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[CausticType] = potency * 5f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BurnGroup, potency * 5f);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 

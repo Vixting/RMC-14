@@ -1,4 +1,5 @@
 using Content.Server.Body.Components;
+using Content.Shared._RMC14.Chemistry.Effects;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared._RMC14.Medical.Stasis;
 using Content.Shared.Administration.Logs;
@@ -174,7 +175,15 @@ namespace Content.Server.Body.Systems
                     if (!proto.Metabolisms.TryGetValue(group.Id, out var entry))
                         continue;
 
-                    var rate = entry.MetabolismRate * group.MetabolismRateModifier;
+                    // RMC14
+                    var rateMultiplier = 1f;
+                    foreach (var groupEffect in entry.Effects)
+                    {
+                        if (groupEffect is RMCChemicalEffect rmcGroupEffect)
+                            rateMultiplier *= rmcGroupEffect.MetabolismRateMultiplier;
+                    }
+
+                    var rate = entry.MetabolismRate * group.MetabolismRateModifier * rateMultiplier;
 
                     // Remove $rate, as long as there's enough reagent there to actually remove that much
                     mostToRemove = FixedPoint2.Clamp(rate, 0, quantity);

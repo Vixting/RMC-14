@@ -5,11 +5,11 @@
   description: A tag containing a small IFF computer that gets inserted into the carapace of a xenonid. It automatically protects whoever implants it.
   components:
   - type: Sprite
-    sprite: _RMC14/Objects/Xeno/Marine_Research.rsi
+    sprite: _RMC14/Objects/Xeno/IFFTag.rsi
     state: xeno_tag
   - type: Item
     size: Tiny
-    sprite: _RMC14/Objects/Xeno/Marine_Research.rsi
+    sprite: _RMC14/Objects/Xeno/IFFTag.rsi
   - type: RMCXenoIffTagItem
 
 - type: entity
@@ -19,11 +19,11 @@
   description: A sturdy case designed to store and charge xenonid IFF tags.
   components:
   - type: Sprite
-    sprite: _RMC14/Objects/Xeno/Marine_Research.rsi
+    sprite: _RMC14/Objects/Xeno/IFFTag.rsi
     state: tag_box
   - type: Item
     size: Normal
-    sprite: _RMC14/Objects/Xeno/Marine_Research.rsi
+    sprite: _RMC14/Objects/Xeno/IFFTag.rsi
   - type: Storage
     grid:
     - 0,0,7,1

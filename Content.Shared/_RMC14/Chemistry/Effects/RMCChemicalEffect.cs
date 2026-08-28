@@ -29,6 +29,11 @@ public abstract partial class RMCChemicalEffect : EntityEffect
 
     public float NutrimentFactor => NutFactor * NutMetabolism;
 
+
+    public virtual float MetabolismRateMultiplier => 1f;
+
+    public virtual bool ReactsOnTouch => false;
+
     public override void Effect(EntityEffectBaseArgs args)
     {
         if (args is not EntityEffectReagentArgs { Reagent: { } reagent } reagentArgs)

@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Emote;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -11,8 +12,8 @@ namespace Content.Shared._RMC14.Chemistry.Effects.Negative;
 
 public sealed partial class Hypoxemic : RMCChemicalEffect
 {
-    private static readonly ProtoId<DamageTypePrototype> BluntType = "Blunt";
-    private static readonly ProtoId<DamageTypePrototype> PoisonType = "Poison";
+    private static readonly ProtoId<DamageGroupPrototype> BruteGroup = "Brute";
+    private static readonly ProtoId<DamageGroupPrototype> ToxinGroup = "Toxin";
     private static readonly ProtoId<DamageTypePrototype> AsphyxiationType = "Asphyxiation";
     private static readonly ProtoId<EmotePrototype> GaspEmote = "Gasp";
 
@@ -45,18 +46,18 @@ public sealed partial class Hypoxemic : RMCChemicalEffect
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency;
-        damage.DamageDict[PoisonType] = potency;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency, damage);
         damage.DamageDict[AsphyxiationType] = potency * 5f;
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var damage = new DamageSpecifier();
-        damage.DamageDict[BluntType] = potency * 5f;
-        damage.DamageDict[PoisonType] = potency * 2f;
+        var rmcDamageable = args.EntityManager.System<SharedRMCDamageableSystem>();
+        var damage = rmcDamageable.DistributeFreshDamage(BruteGroup, potency * 5f);
+        damage = rmcDamageable.DistributeFreshDamage(ToxinGroup, potency * 2f, damage);
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 }

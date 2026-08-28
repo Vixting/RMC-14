@@ -24,7 +24,6 @@ namespace Content.Server._RMC14.Fluids;
 public sealed class RMCPuddleFireSystem : EntitySystem
 {
     private static readonly ProtoId<ReactiveGroupPrototype> FlammableGroup = "Flammable";
-    private static readonly ProtoId<Content.Shared.Chemistry.Reagent.ReagentPrototype> BaselineFuel = "RMCNapalmWeak";
     private static readonly TimeSpan SpreadDelay = TimeSpan.FromMilliseconds(400);
     private static readonly TimeSpan ExistingFireCheckInterval = TimeSpan.FromSeconds(1);
 
@@ -53,6 +52,44 @@ public sealed class RMCPuddleFireSystem : EntitySystem
         SubscribeLocalEvent<IgnitionSourceComponent, AfterInteractEvent>(OnIgnitionSourceAfterInteract);
         SubscribeLocalEvent<AlwaysHotComponent, AfterInteractEvent>(OnAlwaysHotAfterInteract);
         SubscribeLocalEvent<IgnitionSourceComponent, ItemToggledEvent>(OnIgnitionSourceToggled);
+
+        SubscribeLocalEvent<PuddleComponent, ComponentStartup>(OnPuddleStartup);
+        SubscribeLocalEvent<SmokeComponent, ComponentStartup>(OnSmokeStartup);
+        SubscribeLocalEvent<RMCPuddleComponent, SolutionContainerChangedEvent>(OnMonitoredSolutionChanged);
+    }
+
+    private void OnPuddleStartup(Entity<PuddleComponent> ent, ref ComponentStartup args)
+    {
+        EnsureComp<RMCPuddleComponent>(ent.Owner);
+
+        if (_solutionContainer.TryGetSolution((ent.Owner, null), ent.Comp.SolutionName, out _, out var solution))
+            UpdateFlammableMarker(ent.Owner, solution);
+    }
+
+    private void OnSmokeStartup(Entity<SmokeComponent> ent, ref ComponentStartup args)
+    {
+        EnsureComp<RMCPuddleComponent>(ent.Owner);
+
+        if (_solutionContainer.TryGetSolution((ent.Owner, null), SmokeComponent.SolutionName, out _, out var solution))
+            UpdateFlammableMarker(ent.Owner, solution);
+    }
+
+    private void OnMonitoredSolutionChanged(Entity<RMCPuddleComponent> ent, ref SolutionContainerChangedEvent args)
+    {
+        var isPuddleSolution = TryComp<PuddleComponent>(ent.Owner, out var puddle) && args.SolutionId == puddle.SolutionName;
+        var isSmokeSolution = args.SolutionId == SmokeComponent.SolutionName && HasComp<SmokeComponent>(ent.Owner);
+        if (!isPuddleSolution && !isSmokeSolution)
+            return;
+
+        UpdateFlammableMarker(ent.Owner, args.Solution);
+    }
+
+    private void UpdateFlammableMarker(EntityUid uid, Solution solution)
+    {
+        if (IsFlammable(solution))
+            EnsureComp<RMCFlammableAreaEffectComponent>(uid);
+        else
+            RemCompDeferred<RMCFlammableAreaEffectComponent>(uid);
     }
 
     private void OnIgnitionSourceAfterInteract(Entity<IgnitionSourceComponent> ent, ref AfterInteractEvent args)
@@ -113,28 +150,29 @@ public sealed class RMCPuddleFireSystem : EntitySystem
 
     private void CheckAreaEffectsNextToExistingFire()
     {
-        var puddles = EntityQueryEnumerator<PuddleComponent>();
-        while (puddles.MoveNext(out var uid, out var puddle))
+        if (Count<TileFireComponent>() == 0)
+            return;
+
+        var puddles = EntityQueryEnumerator<RMCFlammableAreaEffectComponent, PuddleComponent>();
+        while (puddles.MoveNext(out var uid, out _, out var puddle))
         {
-            if (_solutionContainer.TryGetSolution((uid, null), puddle.SolutionName, out _, out var solution) &&
-                IsFlammable(solution))
-            {
-                var coords = Transform(uid).Coordinates;
-                if (IsNextToFire(coords) || IsHotSourcePresent(coords))
-                    IgniteSolution(coords, solution, isSmoke: false);
-            }
+            if (!_solutionContainer.TryGetSolution((uid, null), puddle.SolutionName, out _, out var solution))
+                continue;
+
+            var coords = Transform(uid).Coordinates;
+            if (IsNextToFire(coords) || IsHotSourcePresent(coords))
+                IgniteSolution(coords, solution, isSmoke: false);
         }
 
-        var smokes = EntityQueryEnumerator<SmokeComponent>();
-        while (smokes.MoveNext(out var uid, out _))
+        var smokes = EntityQueryEnumerator<RMCFlammableAreaEffectComponent, SmokeComponent>();
+        while (smokes.MoveNext(out var uid, out _, out _))
         {
-            if (_solutionContainer.TryGetSolution((uid, null), SmokeComponent.SolutionName, out _, out var solution) &&
-                IsFlammable(solution))
-            {
-                var coords = Transform(uid).Coordinates;
-                if (IsNextToFire(coords) || IsHotSourcePresent(coords))
-                    IgniteSolution(coords, solution, isSmoke: true);
-            }
+            if (!_solutionContainer.TryGetSolution((uid, null), SmokeComponent.SolutionName, out _, out var solution))
+                continue;
+
+            var coords = Transform(uid).Coordinates;
+            if (IsNextToFire(coords) || IsHotSourcePresent(coords))
+                IgniteSolution(coords, solution, isSmoke: true);
         }
     }
 
@@ -312,11 +350,7 @@ public sealed class RMCPuddleFireSystem : EntitySystem
             }
         }
 
-        if (flammableVolume <= FixedPoint2.Zero)
-            return;
-
-        var fuel = dominant;
-        if (fuel is null && !_rmcReagent.TryIndex(BaselineFuel, out fuel))
+        if (flammableVolume <= FixedPoint2.Zero || dominant is not { } fuel)
             return;
 
         var stats = _flamer.GetFireStats(fuel);

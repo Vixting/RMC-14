@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Shared._RMC14.ARES;
 using Content.Shared._RMC14.ARES.Logs;
+using Content.Shared._RMC14.Chemistry.Effects.Negative;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared._RMC14.Chemistry.SmartFridge;
 using Content.Shared._RMC14.IconLabel;
@@ -420,6 +421,21 @@ public abstract class SharedRMCChemMasterSystem : EntitySystem
         {
             var msg = Loc.GetString("rmc-chem-master-not-enough-space-solution");
             _popup.PopupClient(msg, args.Actor, PopupType.MediumCaution);
+            return;
+        }
+
+        // RMC14 REAGENT_NOT_INGESTIBLE
+        foreach (var content in buffer.Value.Comp.Solution.Contents)
+        {
+            if (content.Quantity <= FixedPoint2.Zero)
+                continue;
+
+            var contentProto = _reagent.Index(content.Reagent.Prototype);
+            if (!Intravenous.IsNotIngestible(contentProto))
+                continue;
+
+            var notIngestibleMsg = Loc.GetString("rmc-chem-master-not-ingestible", ("reagent", contentProto.LocalizedName));
+            _popup.PopupClient(notIngestibleMsg, args.Actor, PopupType.MediumCaution);
             return;
         }
 

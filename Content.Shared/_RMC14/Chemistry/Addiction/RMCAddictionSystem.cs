@@ -206,7 +206,10 @@ public sealed class RMCAddictionSystem : EntitySystem
         if (!TryComp<RMCAddictedComponent>(uid, out var addicted))
             return;
 
-        if (potency > 3f)
+        // cm13 checks its own potency (=ActualPotency) against POTENCY_MAX_TIER_1(3); the `potency`
+        // passed in here is the Tick()-halved parameter (correct for the *2f reduction below), so it's
+        // doubled back for this instantaneous gate
+        if (potency * 2f > 3f)
         {
             RemComp<RMCAddictedComponent>(uid);
             return;
