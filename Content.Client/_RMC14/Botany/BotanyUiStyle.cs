@@ -1,5 +1,6 @@
 using System.Numerics;
 using Content.Client.Resources;
+using Content.Shared._RMC14.Botany;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
@@ -14,7 +15,15 @@ internal static class BotanyUiStyle
     public static readonly Color TanColor = Color.FromHex("#ffb950");
     public static readonly Color RedColor = Color.FromHex("#8B2020");
 
-    private static readonly Color DisabledModulate = new(1f, 1f, 1f, 0.45f);
+    public static readonly Color MetricHealthColor = Color.FromHex("#E06C75");
+    public static readonly Color MetricGrowthColor = Color.FromHex("#98C379");
+    public static readonly Color MetricTemperatureColor = Color.FromHex("#E06C75");
+    public static readonly Color MetricPressureColor = Color.FromHex("#61AFEF");
+    public static readonly Color MetricWaterColor = Color.FromHex("#56B6C2");
+    public static readonly Color MetricNutrientsColor = Color.FromHex("#E5C07B");
+    public static readonly Color MetricWeedsColor = Color.FromHex("#7AAB55");
+    public static readonly Color MetricPestsColor = Color.FromHex("#D19A66");
+    public static readonly Color MetricToxinsColor = Color.FromHex("#C678DD");
 
     public static StyleBoxFlat Flat(Color color)
     {
@@ -33,17 +42,35 @@ internal static class BotanyUiStyle
         panel.PanelOverride = Flat(HeaderColor);
     }
 
+    public static string ShortSeedName(string name)
+    {
+        const string prefix = "packet of ";
+        return name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            ? name[prefix.Length..]
+            : name;
+    }
+
+    public static void AddStatRow(GridContainer grid, string name, string value)
+    {
+        grid.AddChild(new Label { Text = name, StyleClasses = { "LabelSubText" } });
+        grid.AddChild(new Label { Text = value });
+    }
+
+    public static string GetHarvestLabel(HarvestType type)
+    {
+        return type switch
+        {
+            HarvestType.Repeat => "Repeating",
+            HarvestType.SelfHarvest => "Self-harvesting",
+            _ => "No repeat",
+        };
+    }
+
     public static void StatusRow(PanelContainer panel, Label label, string text, Color color)
     {
         label.Text = text;
         label.FontColorOverride = color == RedColor ? Color.White : Color.Black;
         panel.PanelOverride = Flat(color);
-    }
-
-    public static void SetButtonEnabled(Button button, bool enabled)
-    {
-        button.Disabled = !enabled;
-        button.Modulate = enabled ? Color.White : DisabledModulate;
     }
 
     public static IconHandle IconButton(IResourceCache resourceCache, Button button, string texturePath, string whiteTexturePath, string text)
