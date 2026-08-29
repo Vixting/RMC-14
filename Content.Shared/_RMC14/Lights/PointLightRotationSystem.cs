@@ -20,4 +20,18 @@ public sealed class PointLightRotationSystem : EntitySystem
 
         Dirty(ent);
     }
+
+    public void SetRotation(EntityUid uid, Angle rotation, PointLightRotationComponent? comp = null)
+    {
+        if (!Resolve(uid, ref comp))
+            return;
+
+        comp.Rotation = rotation;
+        Dirty(uid, comp);
+
+        if (_pointLight.TryGetLight(uid, out var light))
+#pragma warning disable RA0002
+            light.Rotation = rotation;
+#pragma warning restore RA0002
+    }
 }

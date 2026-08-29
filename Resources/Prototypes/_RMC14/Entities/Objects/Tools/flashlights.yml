@@ -114,6 +114,12 @@
   - type: Construction
     graph: RMCFlashLightGraph
     node: Flashlight
+  - type: PointLight
+    mask: /Textures/_RMC14/Effects/LightMasks/flashlight_cone.png
+    autoRot: true
+  - type: PointLightRotation
+    rotation: 0
+  - type: RMCAimableLight
 
 - type: entity
   parent: RMCFlashlightBase
