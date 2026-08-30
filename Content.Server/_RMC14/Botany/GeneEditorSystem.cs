@@ -1,9 +1,6 @@
-using Content.Server.Botany.Components;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
-using Content.Server.Botany.Systems;
-using Content.Server.Power.EntitySystems;
+using System.Linq;
 using Content.Shared._RMC14.Botany;
+using Content.Server.Power.EntitySystems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
@@ -13,19 +10,18 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Random;
-using System.Linq;
 
 namespace Content.Server._RMC14.Botany;
 
 public sealed class GeneEditorSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly BotanySystem _botany = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RMCPlantSeedSystem _plantSeed = default!;
 
     public override void Initialize()
     {
@@ -71,7 +67,7 @@ public sealed class GeneEditorSystem : EntitySystem
             return;
         }
 
-        if (TryComp(args.Used, out SeedComponent? insertSeedComp))
+        if (TryComp(args.Used, out RMCPlantSeedComponent? _))
         {
             if (ent.Comp.DiscSlot.ContainedEntity == null)
             {
@@ -85,7 +81,8 @@ public sealed class GeneEditorSystem : EntitySystem
                 return;
             }
 
-            if (_botany.TryGetSeed(insertSeedComp, out var insertSeed) && insertSeed.Immutable)
+            var snapshot = _plantSeed.GetOrCreateSeedSnapshot(args.Used);
+            if (snapshot.OfType<RMCPlantMutationComponent>().FirstOrDefault() is { Immutable: true })
             {
                 _popup.PopupCursor("This seed is not compatible with our genetics technology.", args.User);
                 return;
@@ -164,23 +161,26 @@ public sealed class GeneEditorSystem : EntitySystem
             return;
         }
 
-        if (!TryComp(seedEnt, out SeedComponent? seedComp) || !_botany.TryGetSeed(seedComp, out var seed))
+        if (!TryComp(seedEnt, out RMCPlantSeedComponent? _))
         {
             _popup.PopupCursor("This seed packet contains no genetic data.", user);
             return;
         }
 
-        if (!seed.Unique)
+        var snapshot = _plantSeed.GetOrCreateSeedSnapshot(seedEnt.Value);
+        var mutation = snapshot.OfType<RMCPlantMutationComponent>().FirstOrDefault();
+        if (mutation == null)
         {
-            seed = seed.Clone();
-            seedComp.Seed = seed;
-            seedComp.SeedId = null;
+            _popup.PopupCursor("This seed packet contains no genetic data.", user);
+            return;
         }
 
-        if (_random.Prob(seed.GeneEditCount / 100f))
+        if (_random.Prob(mutation.GeneEditCount / 100f))
         {
-            seed.GeneEditCount = comp.MaxEditCount + 1;
-            seed.Viable = false;
+            mutation.GeneEditCount = comp.MaxEditCount + 1;
+            var growth = snapshot.OfType<RMCPlantGrowthComponent>().FirstOrDefault();
+            if (growth != null)
+                growth.Viable = false;
             _audio.PlayPvs(comp.FailSound, ent);
             _popup.PopupCursor("[color=red]Gene delivery failed! The seed is ruined.[/color]", user);
             EjectAll(ent, user);
@@ -189,16 +189,13 @@ public sealed class GeneEditorSystem : EntitySystem
 
         foreach (var gene in disc.Genes)
         {
-            gene.ApplyTo(seed);
-            seed.GeneEditCount += _random.Next(comp.EditCountAddMin, comp.EditCountAddMax + 1);
+            gene.ApplyTo(snapshot);
+            mutation.GeneEditCount += _random.Next(comp.EditCountAddMin, comp.EditCountAddMax + 1);
         }
 
         _audio.PlayPvs(comp.ApplySound, ent);
 
-        var newName = Loc.GetString("botany-seed-packet-name",
-            ("seedName", Loc.GetString(seed.Name)),
-            ("seedNoun", Loc.GetString(seed.Noun)));
-        _metaData.SetEntityName(seedEnt.Value, newName + "*");
+        _metaData.SetEntityName(seedEnt.Value, MetaData(seedEnt.Value).EntityName + "*");
 
         EjectAll(ent, user);
     }
@@ -243,11 +240,33 @@ public sealed class GeneEditorSystem : EntitySystem
         comp.SeedEntityNet = seedEnt != null ? GetNetEntity(seedEnt.Value) : null;
         comp.SeedName = null;
         comp.SeedEditCount = 0;
+        comp.SeedEndurance = 0f;
+        comp.SeedLifespan = 0f;
+        comp.SeedMaturation = 0f;
+        comp.SeedProduction = 0f;
+        comp.SeedYield = 0;
+        comp.SeedHarvestRepeat = HarvestType.NoRepeat;
+        comp.SeedSeedless = false;
+        comp.SeedPotency = 0f;
+        comp.SeedViable = true;
 
-        if (seedEnt != null && TryComp(seedEnt, out SeedComponent? seedComp) && _botany.TryGetSeed(seedComp, out var seed))
+        if (seedEnt != null && TryComp(seedEnt, out RMCPlantSeedComponent? _))
         {
-            comp.SeedName = Loc.GetString(seed.DisplayName);
-            comp.SeedEditCount = seed.GeneEditCount;
+            comp.SeedName = MetaData(seedEnt.Value).EntityName;
+            var snapshot = _plantSeed.GetOrCreateSeedSnapshot(seedEnt.Value);
+            var mutation = snapshot.OfType<RMCPlantMutationComponent>().FirstOrDefault();
+            comp.SeedEditCount = mutation?.GeneEditCount ?? 0;
+
+            var stats = _plantSeed.GetSeedStats(seedEnt.Value);
+            comp.SeedEndurance = stats.Endurance;
+            comp.SeedLifespan = stats.Lifespan;
+            comp.SeedMaturation = stats.Maturation;
+            comp.SeedProduction = stats.Production;
+            comp.SeedYield = stats.Yield;
+            comp.SeedHarvestRepeat = stats.HarvestRepeat;
+            comp.SeedSeedless = stats.Seedless;
+            comp.SeedPotency = stats.Potency;
+            comp.SeedViable = stats.Viable;
         }
 
         Dirty(ent, comp);

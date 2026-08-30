@@ -1,9 +1,6 @@
-using Content.Server.Botany.Components;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
-using Content.Server.Botany.Systems;
-using Content.Server.Power.EntitySystems;
+using System.Linq;
 using Content.Shared._RMC14.Botany;
+using Content.Server.Power.EntitySystems;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
@@ -12,18 +9,17 @@ using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Random;
-using System.Linq;
 
 namespace Content.Server._RMC14.Botany;
 
 public sealed class LysisCentrifugeSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly BotanySystem _botany = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RMCPlantSeedSystem _plantSeed = default!;
 
     public override void Initialize()
     {
@@ -44,7 +40,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
 
     private void OnInit(Entity<LysisCentrifugeComponent> ent, ref ComponentInit args)
     {
-        EnsureComp<LysisCentrifugeServerComponent>(ent);
+        EnsureComp<LysisCentrifugeBufferComponent>(ent);
         ent.Comp.DiscSlot = _container.EnsureContainer<ContainerSlot>(ent, ent.Comp.DiscSlotId);
         ent.Comp.SeedSlot = _container.EnsureContainer<ContainerSlot>(ent, ent.Comp.SeedSlotId);
 
@@ -84,15 +80,18 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        if (TryComp(args.Used, out SeedComponent? seedComp))
+        if (TryComp(args.Used, out RMCPlantSeedComponent? _))
         {
-            if (!_botany.TryGetSeed(seedComp, out var seed))
+            var snapshot = _plantSeed.GetOrCreateSeedSnapshot(args.Used);
+            var mutation = snapshot.OfType<RMCPlantMutationComponent>().FirstOrDefault();
+
+            if (mutation == null)
             {
                 _popup.PopupCursor("This seed packet contains no genetic data.", args.User);
                 return;
             }
 
-            if (seed.Immutable)
+            if (mutation.Immutable)
             {
                 _popup.PopupCursor("This seed is not compatible with our genetics technology.", args.User);
                 return;
@@ -139,7 +138,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        if (!TryComp(seedEnt, out SeedComponent? seedComp) || !_botany.TryGetSeed(seedComp, out var seed))
+        if (!TryComp(seedEnt, out RMCPlantSeedComponent? _))
         {
             _popup.PopupCursor("This seed packet contains no genetic data.", args.Actor);
             _container.Remove(seedEnt, comp.SeedSlot);
@@ -147,9 +146,11 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        var server = EnsureComp<LysisCentrifugeServerComponent>(ent);
-        server.LoadedSeed = seed.Clone();
-        comp.GenomeName = Loc.GetString(seed.DisplayName);
+        var snapshot = _plantSeed.GetOrCreateSeedSnapshot(seedEnt);
+
+        var buffer = EnsureComp<LysisCentrifugeBufferComponent>(ent);
+        buffer.LoadedSnapshot = snapshot;
+        comp.GenomeName = MetaData(seedEnt).EntityName;
         comp.Degradation = 0;
 
         _container.Remove(seedEnt, comp.SeedSlot);
@@ -179,7 +180,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        if (!TryComp(ent, out LysisCentrifugeServerComponent? server) || server.LoadedSeed == null)
+        if (!TryComp(ent, out LysisCentrifugeBufferComponent? buffer) || buffer.LoadedSnapshot == null)
         {
             _popup.PopupCursor("No genome is loaded. Insert a seed packet first.", args.Actor);
             return;
@@ -188,7 +189,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         if (comp.Degradation >= comp.MaxDegradation)
         {
             _popup.PopupCursor("Buffer fully degraded. Genome wiped.", args.Actor);
-            WipeBuffer(comp, server);
+            WipeBuffer(comp, buffer);
             UpdateState(ent);
             return;
         }
@@ -207,7 +208,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             return;
         }
 
-        var gene = PlantGene.FromSeed(server.LoadedSeed, geneType);
+        var gene = PlantGene.FromSnapshot(buffer.LoadedSnapshot, geneType);
         gene.DisplayLabel = comp.ObfuscationCodes.GetValueOrDefault(geneType);
         disc.Genes.Add(gene);
         disc.GeneSource ??= comp.GenomeName;
@@ -217,7 +218,7 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         if (comp.Degradation >= comp.MaxDegradation)
         {
             _audio.PlayPvs(comp.FailSound, ent);
-            WipeBuffer(comp, server);
+            WipeBuffer(comp, buffer);
             _container.Remove(discEnt.Value, comp.DiscSlot);
             _hands.TryPickupAnyHand(args.Actor, discEnt.Value);
             UpdateState(ent);
@@ -237,10 +238,10 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         if (!this.IsPowered(ent, EntityManager))
             return;
 
-        if (!TryComp(ent, out LysisCentrifugeServerComponent? server))
+        if (!TryComp(ent, out LysisCentrifugeBufferComponent? buffer))
             return;
 
-        WipeBuffer(ent.Comp, server);
+        WipeBuffer(ent.Comp, buffer);
         UpdateState(ent);
     }
 
@@ -265,9 +266,9 @@ public sealed class LysisCentrifugeSystem : EntitySystem
             Text = "Clear buffer",
             Act = () =>
             {
-                if (!TryComp(ent, out LysisCentrifugeServerComponent? server))
+                if (!TryComp(ent, out LysisCentrifugeBufferComponent? buffer))
                     return;
-                WipeBuffer(ent.Comp, server);
+                WipeBuffer(ent.Comp, buffer);
                 _popup.PopupEntity("Genetic buffer cleared.", ent, user);
                 UpdateState(ent);
             },
@@ -300,12 +301,36 @@ public sealed class LysisCentrifugeSystem : EntitySystem
         comp.SeedPacketName = seedEnt != null ? Name(seedEnt.Value) : null;
         comp.SeedEntityNet = seedEnt != null ? GetNetEntity(seedEnt.Value) : null;
 
+        comp.SeedEndurance = 0f;
+        comp.SeedLifespan = 0f;
+        comp.SeedMaturation = 0f;
+        comp.SeedProduction = 0f;
+        comp.SeedYield = 0;
+        comp.SeedHarvestRepeat = HarvestType.NoRepeat;
+        comp.SeedSeedless = false;
+        comp.SeedPotency = 0f;
+        comp.SeedViable = true;
+
+        if (seedEnt != null)
+        {
+            var stats = _plantSeed.GetSeedStats(seedEnt.Value);
+            comp.SeedEndurance = stats.Endurance;
+            comp.SeedLifespan = stats.Lifespan;
+            comp.SeedMaturation = stats.Maturation;
+            comp.SeedProduction = stats.Production;
+            comp.SeedYield = stats.Yield;
+            comp.SeedHarvestRepeat = stats.HarvestRepeat;
+            comp.SeedSeedless = stats.Seedless;
+            comp.SeedPotency = stats.Potency;
+            comp.SeedViable = stats.Viable;
+        }
+
         Dirty(ent, comp);
     }
 
-    private static void WipeBuffer(LysisCentrifugeComponent comp, LysisCentrifugeServerComponent server)
+    private static void WipeBuffer(LysisCentrifugeComponent comp, LysisCentrifugeBufferComponent buffer)
     {
-        server.LoadedSeed = null;
+        buffer.LoadedSnapshot = null;
         comp.GenomeName = null;
         comp.Degradation = 0;
     }

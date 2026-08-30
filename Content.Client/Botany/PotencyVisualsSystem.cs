@@ -17,8 +17,5 @@ public sealed class PotencyVisualsSystem : VisualizerSystem<PotencyVisualsCompon
             var scale = MathHelper.Lerp(component.MinimumScale, component.MaximumScale, potency / 100);
             SpriteSystem.SetScale((uid, args.Sprite), new Vector2(scale, scale));
         }
-
-        if (AppearanceSystem.TryGetData<Color>(uid, ProduceVisuals.Color, out var color, args.Component))
-            SpriteSystem.SetColor((uid, args.Sprite), color);
     }
 }

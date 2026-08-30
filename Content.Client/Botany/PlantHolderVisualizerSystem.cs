@@ -20,9 +20,6 @@ public sealed class PlantHolderVisualizerSystem : VisualizerSystem<PlantHolderVi
 
         SpriteSystem.LayerMapReserve((uid, sprite), PlantHolderLayers.Plant);
         SpriteSystem.LayerSetVisible((uid, sprite), PlantHolderLayers.Plant, false);
-
-        SpriteSystem.LayerMapReserve((uid, sprite), PlantHolderLayers.Flower);
-        SpriteSystem.LayerSetVisible((uid, sprite), PlantHolderLayers.Flower, false);
     }
 
     protected override void OnAppearanceChange(EntityUid uid, PlantHolderVisualsComponent component, ref AppearanceChangeEvent args)
@@ -43,32 +40,12 @@ public sealed class PlantHolderVisualizerSystem : VisualizerSystem<PlantHolderVi
                 SpriteSystem.LayerSetRsiState((uid, args.Sprite), PlantHolderLayers.Plant, state);
             }
         }
-
-        if (AppearanceSystem.TryGetData<string>(uid, PlantHolderVisuals.FlowerRsi, out var flowerRsi, args.Component)
-            && AppearanceSystem.TryGetData<string>(uid, PlantHolderVisuals.FlowerState, out var flowerState, args.Component))
-        {
-            var flowerValid = !string.IsNullOrWhiteSpace(flowerState);
-
-            SpriteSystem.LayerSetVisible((uid, args.Sprite), PlantHolderLayers.Flower, flowerValid);
-
-            if (flowerValid)
-            {
-                SpriteSystem.LayerSetRsi((uid, args.Sprite), PlantHolderLayers.Flower, new ResPath(flowerRsi));
-                SpriteSystem.LayerSetRsiState((uid, args.Sprite), PlantHolderLayers.Flower, flowerState);
-
-                var color = AppearanceSystem.TryGetData<Color>(uid, PlantHolderVisuals.FlowerColor, out var flowerColor, args.Component)
-                    ? flowerColor
-                    : Color.White;
-                SpriteSystem.LayerSetColor((uid, args.Sprite), PlantHolderLayers.Flower, color);
-            }
-        }
     }
 }
 
 public enum PlantHolderLayers : byte
 {
     Plant,
-    Flower,
     HealthLight,
     WaterLight,
     NutritionLight,

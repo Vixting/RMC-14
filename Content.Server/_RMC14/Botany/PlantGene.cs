@@ -1,5 +1,5 @@
+using System.Linq;
 using Content.Shared.Atmos;
-using Content.Shared.Botany;
 using Content.Shared._RMC14.Botany;
 using Robust.Shared.Maths;
 using Robust.Shared.Utility;
@@ -25,12 +25,10 @@ public sealed class PlantGene
     public int? Carnivorous;
     public bool? Parasite;
 
-    public float? IdealHeat;
-    public float? HeatTolerance;
-    public float? IdealLight;
-    public float? LightTolerance;
-    public float? LowPressureTolerance;
-    public float? HighPressureTolerance;
+    public float? MinHeat;
+    public float? MaxHeat;
+    public float? MinPressure;
+    public float? MaxPressure;
 
     public float? ToxinsTolerance;
     public float? PestTolerance;
@@ -53,74 +51,118 @@ public sealed class PlantGene
     public Color? BioluminescentColor;
     public float? BioluminescentRadius;
 
-    public static PlantGene FromSeed(SeedData seed, PlantGeneType type)
+    public static PlantGene FromSnapshot(List<IComponent> snapshot, PlantGeneType type)
     {
         var gene = new PlantGene { Type = type };
+
+        var harvest = Get<RMCPlantHarvestComponent>(snapshot);
+        var chemicals = Get<RMCPlantChemicalsComponent>(snapshot);
+        var gas = Get<RMCConsumeExudeGasComponent>(snapshot);
+        var atmos = Get<RMCPlantAtmosphericComponent>(snapshot);
+        var metabolism = Get<RMCPlantMetabolismComponent>(snapshot);
+        var traits = Get<RMCPlantTraitsComponent>(snapshot);
+        var growth = Get<RMCPlantGrowthComponent>(snapshot);
+
         switch (type)
         {
             case PlantGeneType.Products:
-                gene.ProductPrototypes = new List<string>(seed.ProductPrototypes);
-                gene.Chemicals = new Dictionary<string, SeedChemQuantity>(seed.Chemicals);
-                gene.ExudeGasses = new Dictionary<Gas, float>(seed.ExudeGasses);
-                gene.AlterTemperature = seed.AlterTemperature;
-                gene.Potency = seed.Potency;
-                gene.HarvestRepeat = seed.HarvestRepeat;
+                if (harvest != null)
+                {
+                    gene.ProductPrototypes = new List<string>(harvest.ProductPrototypes);
+                    gene.HarvestRepeat = harvest.HarvestRepeat;
+                }
+                if (chemicals != null)
+                {
+                    gene.Chemicals = new Dictionary<string, SeedChemQuantity>(chemicals.Chemicals);
+                    gene.Potency = chemicals.Potency;
+                }
+                if (gas != null)
+                    gene.ExudeGasses = new Dictionary<Gas, float>(gas.ExudeGasses);
+                if (atmos != null)
+                    gene.AlterTemperature = atmos.AlterTemperature;
                 break;
+
             case PlantGeneType.Consumption:
-                gene.ConsumeGasses = new Dictionary<Gas, float>(seed.ConsumeGasses);
-                gene.NutrientConsumption = seed.NutrientConsumption;
-                gene.WaterConsumption = seed.WaterConsumption;
-                gene.Carnivorous = seed.Carnivorous;
-                gene.Parasite = seed.Parasite;
+                if (gas != null)
+                    gene.ConsumeGasses = new Dictionary<Gas, float>(gas.ConsumeGasses);
+                if (metabolism != null)
+                {
+                    gene.NutrientConsumption = metabolism.NutrientConsumption;
+                    gene.WaterConsumption = metabolism.WaterConsumption;
+                }
+                if (traits != null)
+                {
+                    gene.Carnivorous = traits.Carnivorous;
+                    gene.Parasite = traits.Parasite;
+                }
                 break;
+
             case PlantGeneType.Environment:
-                gene.IdealHeat = seed.IdealHeat;
-                gene.HeatTolerance = seed.HeatTolerance;
-                gene.IdealLight = seed.IdealLight;
-                gene.LightTolerance = seed.LightTolerance;
-                gene.LowPressureTolerance = seed.LowPressureTolerance;
-                gene.HighPressureTolerance = seed.HighPressureTolerance;
+                if (atmos != null)
+                {
+                    gene.MinHeat = atmos.MinHeat;
+                    gene.MaxHeat = atmos.MaxHeat;
+                    gene.MinPressure = atmos.MinPressure;
+                    gene.MaxPressure = atmos.MaxPressure;
+                }
                 break;
+
             case PlantGeneType.Resistance:
-                gene.ToxinsTolerance = seed.ToxinsTolerance;
-                gene.PestTolerance = seed.PestTolerance;
-                gene.WeedTolerance = seed.WeedTolerance;
+                if (traits != null)
+                {
+                    gene.ToxinsTolerance = traits.ToxinsTolerance;
+                    gene.PestTolerance = traits.PestTolerance;
+                    gene.WeedTolerance = traits.WeedTolerance;
+                }
                 break;
+
             case PlantGeneType.Vigour:
-                gene.Endurance = seed.Endurance;
-                gene.Yield = seed.Yield;
-                gene.Lifespan = seed.Lifespan;
-                gene.Maturation = seed.Maturation;
-                gene.Production = seed.Production;
+                if (growth != null)
+                {
+                    gene.Endurance = growth.Endurance;
+                    gene.Lifespan = growth.Lifespan;
+                    gene.Maturation = growth.Maturation;
+                    gene.Production = growth.Production;
+                }
+                if (harvest != null)
+                    gene.Yield = harvest.Yield;
                 break;
+
             case PlantGeneType.Flowers:
-                gene.PlantRsi = seed.PlantRsi;
-                gene.GrowthStages = seed.GrowthStages;
-                gene.PlantIconState = seed.PlantIconState;
-                gene.ProductColor = seed.ProductColor;
-                gene.HasFlowers = seed.Flowers;
-                gene.FlowerIcon = seed.FlowerIcon;
-                gene.FlowerColor = seed.FlowerColor;
-                gene.Bioluminescent = seed.Bioluminescent;
-                gene.BioluminescentColor = seed.BioluminescentColor;
-                gene.BioluminescentRadius = seed.BioluminescentRadius;
+                if (traits != null)
+                {
+                    gene.PlantRsi = traits.PlantRsi;
+                    gene.PlantIconState = traits.PlantIconState;
+                    gene.HasFlowers = traits.Flowers;
+                    gene.FlowerIcon = traits.FlowerIcon;
+                    gene.FlowerColor = traits.FlowerColor;
+                    gene.Bioluminescent = traits.Bioluminescent;
+                    gene.BioluminescentColor = traits.BioluminescentColor;
+                    gene.BioluminescentRadius = traits.BioluminescentRadius;
+                }
+                if (growth != null)
+                    gene.GrowthStages = growth.GrowthStages;
+                if (chemicals != null)
+                    gene.ProductColor = chemicals.ProductColor;
                 break;
         }
+
         return gene;
     }
 
-    public void ApplyTo(SeedData seed)
+    public void ApplyTo(List<IComponent> snapshot)
     {
         switch (Type)
         {
             case PlantGeneType.Products:
                 if (Chemicals != null)
                 {
+                    var chemicals = GetOrCreate<RMCPlantChemicalsComponent>(snapshot);
                     foreach (var (reagentId, incoming) in Chemicals)
                     {
-                        if (seed.Chemicals.TryGetValue(reagentId, out var existing))
+                        if (chemicals.Chemicals.TryGetValue(reagentId, out var existing))
                         {
-                            seed.Chemicals[reagentId] = new SeedChemQuantity
+                            chemicals.Chemicals[reagentId] = new SeedChemQuantity
                             {
                                 Min = Math.Max(1, (existing.Min + incoming.Min) / 2),
                                 Max = Math.Max(1, (existing.Max + incoming.Max) / 2),
@@ -130,84 +172,97 @@ public sealed class PlantGene
                         }
                         else
                         {
-                            seed.Chemicals[reagentId] = incoming;
+                            chemicals.Chemicals[reagentId] = incoming;
                         }
                     }
 
                     if (ProductPrototypes != null)
                     {
+                        var harvestProducts = GetOrCreate<RMCPlantHarvestComponent>(snapshot);
                         foreach (var product in ProductPrototypes)
                         {
-                            if (!seed.ProductPrototypes.Contains(product))
-                                seed.ProductPrototypes.Add(product);
+                            if (!harvestProducts.ProductPrototypes.Contains(product))
+                                harvestProducts.ProductPrototypes.Add(product);
                         }
                     }
 
                     if (ExudeGasses != null)
                     {
-                        foreach (var (gas, amount) in ExudeGasses)
-                            seed.ExudeGasses[gas] = MathF.Max(1f, amount * 0.8f);
+                        var gas = GetOrCreate<RMCConsumeExudeGasComponent>(snapshot);
+                        foreach (var (gasType, amount) in ExudeGasses)
+                            gas.ExudeGasses[gasType] = MathF.Max(1f, amount * 0.8f);
                     }
 
                     if (AlterTemperature is { } alterTemperature)
-                        seed.AlterTemperature = alterTemperature;
+                        GetOrCreate<RMCPlantAtmosphericComponent>(snapshot).AlterTemperature = alterTemperature;
 
                     if (Potency is { } potency)
-                        seed.Potency = potency;
+                        chemicals.Potency = potency;
 
                     // Penalty for splicing in foreign chemistry (-15% vigour stats).
-                    seed.Endurance = MathF.Max(1f, seed.Endurance * 0.85f);
-                    seed.Yield = Math.Max(1, (int)(seed.Yield * 0.85f));
-                    seed.Lifespan = MathF.Max(1f, seed.Lifespan * 0.85f);
+                    var growth = GetOrCreate<RMCPlantGrowthComponent>(snapshot);
+                    growth.Endurance = MathF.Max(1f, growth.Endurance * 0.85f);
+                    growth.Lifespan = MathF.Max(1f, growth.Lifespan * 0.85f);
+                    var harvestYield = GetOrCreate<RMCPlantHarvestComponent>(snapshot);
+                    harvestYield.Yield = Math.Max(1, (int)(harvestYield.Yield * 0.85f));
                 }
                 if (HarvestRepeat.HasValue)
-                    seed.HarvestRepeat = HarvestRepeat.Value;
+                    GetOrCreate<RMCPlantHarvestComponent>(snapshot).HarvestRepeat = HarvestRepeat.Value;
                 break;
+
             case PlantGeneType.Consumption:
+                var metabolism = GetOrCreate<RMCPlantMetabolismComponent>(snapshot);
                 if (ConsumeGasses != null)
-                    seed.ConsumeGasses = new Dictionary<Gas, float>(ConsumeGasses);
-                seed.NutrientConsumption = NutrientConsumption!.Value;
-                seed.WaterConsumption = WaterConsumption!.Value;
+                    GetOrCreate<RMCConsumeExudeGasComponent>(snapshot).ConsumeGasses = new Dictionary<Gas, float>(ConsumeGasses);
+                metabolism.NutrientConsumption = NutrientConsumption!.Value;
+                metabolism.WaterConsumption = WaterConsumption!.Value;
                 if (Carnivorous is { } carnivorous)
-                    seed.Carnivorous = carnivorous;
+                    GetOrCreate<RMCPlantTraitsComponent>(snapshot).Carnivorous = carnivorous;
                 if (Parasite is { } parasite)
-                    seed.Parasite = parasite;
+                    GetOrCreate<RMCPlantTraitsComponent>(snapshot).Parasite = parasite;
                 break;
+
             case PlantGeneType.Environment:
-                seed.IdealHeat = IdealHeat!.Value;
-                seed.HeatTolerance = HeatTolerance!.Value;
-                seed.IdealLight = IdealLight!.Value;
-                seed.LightTolerance = LightTolerance!.Value;
-                seed.LowPressureTolerance = LowPressureTolerance!.Value;
-                seed.HighPressureTolerance = HighPressureTolerance!.Value;
+                var atmos = GetOrCreate<RMCPlantAtmosphericComponent>(snapshot);
+                atmos.MinHeat = MinHeat!.Value;
+                atmos.MaxHeat = MaxHeat!.Value;
+                atmos.MinPressure = MinPressure!.Value;
+                atmos.MaxPressure = MaxPressure!.Value;
                 break;
+
             case PlantGeneType.Resistance:
-                seed.ToxinsTolerance = ToxinsTolerance!.Value;
-                seed.PestTolerance = PestTolerance!.Value;
-                seed.WeedTolerance = WeedTolerance!.Value;
+                var traits = GetOrCreate<RMCPlantTraitsComponent>(snapshot);
+                traits.ToxinsTolerance = ToxinsTolerance!.Value;
+                traits.PestTolerance = PestTolerance!.Value;
+                traits.WeedTolerance = WeedTolerance!.Value;
                 break;
+
             case PlantGeneType.Vigour:
-                seed.Endurance = Endurance!.Value;
-                seed.Yield = Yield!.Value;
-                seed.Lifespan = Lifespan!.Value;
-                seed.Maturation = Maturation!.Value;
-                seed.Production = Production!.Value;
+                var growthV = GetOrCreate<RMCPlantGrowthComponent>(snapshot);
+                growthV.Endurance = Endurance!.Value;
+                growthV.Lifespan = Lifespan!.Value;
+                growthV.Maturation = Maturation!.Value;
+                growthV.Production = Production!.Value;
+                GetOrCreate<RMCPlantHarvestComponent>(snapshot).Yield = Yield!.Value;
                 break;
+
             case PlantGeneType.Flowers:
-                seed.PlantRsi = PlantRsi!.Value;
-                seed.GrowthStages = GrowthStages!.Value;
-                seed.PlantIconState = PlantIconState!;
-                seed.ProductColor = ProductColor;
+                var traitsF = GetOrCreate<RMCPlantTraitsComponent>(snapshot);
+                traitsF.PlantRsi = PlantRsi!.Value;
+                traitsF.PlantIconState = PlantIconState!;
                 if (HasFlowers is { } hasFlowers)
-                    seed.Flowers = hasFlowers;
-                seed.FlowerIcon = FlowerIcon;
-                seed.FlowerColor = FlowerColor;
+                    traitsF.Flowers = hasFlowers;
+                traitsF.FlowerIcon = FlowerIcon;
+                traitsF.FlowerColor = FlowerColor;
                 if (Bioluminescent is { } bioluminescent)
-                    seed.Bioluminescent = bioluminescent;
+                    traitsF.Bioluminescent = bioluminescent;
                 if (BioluminescentColor is { } bioluminescentColor)
-                    seed.BioluminescentColor = bioluminescentColor;
+                    traitsF.BioluminescentColor = bioluminescentColor;
                 if (BioluminescentRadius is { } bioluminescentRadius)
-                    seed.BioluminescentRadius = bioluminescentRadius;
+                    traitsF.BioluminescentRadius = bioluminescentRadius;
+                GetOrCreate<RMCPlantGrowthComponent>(snapshot).GrowthStages = GrowthStages!.Value;
+                if (ProductColor != null)
+                    GetOrCreate<RMCPlantChemicalsComponent>(snapshot).ProductColor = ProductColor;
                 break;
         }
     }
@@ -215,5 +270,20 @@ public sealed class PlantGene
     public string GetLabel()
     {
         return DisplayLabel ?? Type.GetLabel();
+    }
+
+    private static T? Get<T>(List<IComponent> snapshot) where T : class, IComponent
+    {
+        return snapshot.OfType<T>().FirstOrDefault();
+    }
+
+    private static T GetOrCreate<T>(List<IComponent> snapshot) where T : class, IComponent, new()
+    {
+        if (Get<T>(snapshot) is { } existing)
+            return existing;
+
+        var created = new T();
+        snapshot.Add(created);
+        return created;
     }
 }
