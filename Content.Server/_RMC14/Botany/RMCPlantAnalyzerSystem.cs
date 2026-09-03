@@ -141,7 +141,9 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
                 Get<RMCPlantChemicalsComponent>(snapshot),
                 Get<RMCPlantTraitsComponent>(snapshot),
                 Get<RMCPlantAtmosphericComponent>(snapshot),
-                null);
+                null,
+                null,
+                snapshot);
         }
         else if (TryComp(target, out RMCPlantTrayComponent? tray))
         {
@@ -168,7 +170,8 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
                     Comp<RMCPlantChemicalsComponent>(plant),
                     Comp<RMCPlantTraitsComponent>(plant),
                     atmos,
-                    plantComp);
+                    plantComp,
+                    plant);
             }
         }
         else if (TryComp(target, out RMCProduceComponent? produce))
@@ -191,7 +194,9 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         RMCPlantChemicalsComponent? chemicals,
         RMCPlantTraitsComponent? traits,
         RMCPlantAtmosphericComponent? atmos,
-        RMCPlantComponent? plant)
+        RMCPlantComponent? plant,
+        EntityUid? live,
+        List<IComponent>? snapshot = null)
     {
         comp.HasPlantData = true;
 
@@ -219,7 +224,7 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
             comp.MaxPressure = atmos.MaxPressure;
         }
 
-        BuildTraitDescriptions(comp, traits, atmos);
+        BuildTraitDescriptions(comp, traits, atmos, live, snapshot);
     }
 
     private void AddChemicals(RMCPlantAnalyzerComponent comp, RMCPlantChemicalsComponent? chemicals)
@@ -236,7 +241,12 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         }
     }
 
-    private void BuildTraitDescriptions(RMCPlantAnalyzerComponent comp, RMCPlantTraitsComponent? traits, RMCPlantAtmosphericComponent? atmos)
+    private void BuildTraitDescriptions(
+        RMCPlantAnalyzerComponent comp,
+        RMCPlantTraitsComponent? traits,
+        RMCPlantAtmosphericComponent? atmos,
+        EntityUid? live,
+        List<IComponent>? snapshot)
     {
         if (traits == null)
             return;
@@ -256,7 +266,7 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
         else if (traits.WeedTolerance > 6)
             comp.Traits.Add("It is remarkably resistant to weeds.");
 
-        switch (traits.Carnivorous)
+        switch (GetTrait<RMCPlantTraitCarnivorousComponent>(live, snapshot)?.Level ?? 0)
         {
             case 1:
                 comp.Traits.Add("It is carnivorous and will eat tray pests for sustenance.");
@@ -266,18 +276,18 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
                 break;
         }
 
-        if (traits.Parasite)
+        if (GetTrait<RMCPlantTraitParasiteComponent>(live, snapshot) != null)
             comp.Traits.Add("It is capable of parasitizing and gaining sustenance from tray weeds.");
 
         if (atmos is { AlterTemperature: not 0 })
             comp.Traits.Add($"It will periodically alter the local temperature by {atmos.AlterTemperature} degrees Kelvin.");
 
-        if (traits.Bioluminescent)
-            comp.Traits.Add($"It is [color={traits.BioluminescentColor.ToHexNoAlpha()}]bio-luminescent[/color].");
+        if (GetTrait<RMCPlantTraitBioluminescentComponent>(live, snapshot) is { } bioluminescent)
+            comp.Traits.Add($"It is [color={bioluminescent.Color.ToHexNoAlpha()}]bio-luminescent[/color].");
 
-        if (traits.Flowers)
+        if (GetTrait<RMCPlantTraitFlowersComponent>(live, snapshot) is { } flowers)
         {
-            comp.Traits.Add(traits.FlowerColor is { } flowerColor
+            comp.Traits.Add(flowers.Color is { } flowerColor
                 ? $"It has [color={flowerColor.ToHexNoAlpha()}]flowers[/color]."
                 : "It has flowers.");
         }
@@ -286,5 +296,13 @@ public sealed class RMCPlantAnalyzerSystem : EntitySystem
     private static T? Get<T>(List<IComponent> snapshot) where T : class, IComponent
     {
         return snapshot.OfType<T>().FirstOrDefault();
+    }
+
+    private T? GetTrait<T>(EntityUid? live, List<IComponent>? snapshot) where T : class, IComponent
+    {
+        if (snapshot != null)
+            return snapshot.OfType<T>().FirstOrDefault();
+
+        return live != null ? CompOrNull<T>(live.Value) : null;
     }
 }

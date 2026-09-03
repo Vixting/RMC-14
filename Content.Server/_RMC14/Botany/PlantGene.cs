@@ -90,11 +90,8 @@ public sealed class PlantGene
                     gene.NutrientConsumption = metabolism.NutrientConsumption;
                     gene.WaterConsumption = metabolism.WaterConsumption;
                 }
-                if (traits != null)
-                {
-                    gene.Carnivorous = traits.Carnivorous;
-                    gene.Parasite = traits.Parasite;
-                }
+                gene.Carnivorous = Get<RMCPlantTraitCarnivorousComponent>(snapshot)?.Level ?? 0;
+                gene.Parasite = Get<RMCPlantTraitParasiteComponent>(snapshot) != null;
                 break;
 
             case PlantGeneType.Environment:
@@ -133,13 +130,18 @@ public sealed class PlantGene
                 {
                     gene.PlantRsi = traits.PlantRsi;
                     gene.PlantIconState = traits.PlantIconState;
-                    gene.HasFlowers = traits.Flowers;
-                    gene.FlowerIcon = traits.FlowerIcon;
-                    gene.FlowerColor = traits.FlowerColor;
-                    gene.Bioluminescent = traits.Bioluminescent;
-                    gene.BioluminescentColor = traits.BioluminescentColor;
-                    gene.BioluminescentRadius = traits.BioluminescentRadius;
                 }
+
+                var flowers = Get<RMCPlantTraitFlowersComponent>(snapshot);
+                gene.HasFlowers = flowers != null;
+                gene.FlowerIcon = flowers?.Icon;
+                gene.FlowerColor = flowers?.Color;
+
+                var bioluminescent = Get<RMCPlantTraitBioluminescentComponent>(snapshot);
+                gene.Bioluminescent = bioluminescent != null;
+                gene.BioluminescentColor = bioluminescent?.Color ?? Color.White;
+                gene.BioluminescentRadius = bioluminescent?.Radius ?? 2f;
+
                 if (growth != null)
                     gene.GrowthStages = growth.GrowthStages;
                 if (chemicals != null)
@@ -217,9 +219,19 @@ public sealed class PlantGene
                 metabolism.NutrientConsumption = NutrientConsumption!.Value;
                 metabolism.WaterConsumption = WaterConsumption!.Value;
                 if (Carnivorous is { } carnivorous)
-                    GetOrCreate<RMCPlantTraitsComponent>(snapshot).Carnivorous = carnivorous;
+                {
+                    if (carnivorous > 0)
+                        GetOrCreate<RMCPlantTraitCarnivorousComponent>(snapshot).Level = carnivorous;
+                    else
+                        Remove<RMCPlantTraitCarnivorousComponent>(snapshot);
+                }
                 if (Parasite is { } parasite)
-                    GetOrCreate<RMCPlantTraitsComponent>(snapshot).Parasite = parasite;
+                {
+                    if (parasite)
+                        GetOrCreate<RMCPlantTraitParasiteComponent>(snapshot);
+                    else
+                        Remove<RMCPlantTraitParasiteComponent>(snapshot);
+                }
                 break;
 
             case PlantGeneType.Environment:
@@ -250,16 +262,37 @@ public sealed class PlantGene
                 var traitsF = GetOrCreate<RMCPlantTraitsComponent>(snapshot);
                 traitsF.PlantRsi = PlantRsi!.Value;
                 traitsF.PlantIconState = PlantIconState!;
+
                 if (HasFlowers is { } hasFlowers)
-                    traitsF.Flowers = hasFlowers;
-                traitsF.FlowerIcon = FlowerIcon;
-                traitsF.FlowerColor = FlowerColor;
+                {
+                    if (hasFlowers)
+                    {
+                        var flowerComp = GetOrCreate<RMCPlantTraitFlowersComponent>(snapshot);
+                        flowerComp.Icon = FlowerIcon;
+                        flowerComp.Color = FlowerColor;
+                    }
+                    else
+                    {
+                        Remove<RMCPlantTraitFlowersComponent>(snapshot);
+                    }
+                }
+
                 if (Bioluminescent is { } bioluminescent)
-                    traitsF.Bioluminescent = bioluminescent;
-                if (BioluminescentColor is { } bioluminescentColor)
-                    traitsF.BioluminescentColor = bioluminescentColor;
-                if (BioluminescentRadius is { } bioluminescentRadius)
-                    traitsF.BioluminescentRadius = bioluminescentRadius;
+                {
+                    if (bioluminescent)
+                    {
+                        var biolumComp = GetOrCreate<RMCPlantTraitBioluminescentComponent>(snapshot);
+                        if (BioluminescentColor is { } bioluminescentColor)
+                            biolumComp.Color = bioluminescentColor;
+                        if (BioluminescentRadius is { } bioluminescentRadius)
+                            biolumComp.Radius = bioluminescentRadius;
+                    }
+                    else
+                    {
+                        Remove<RMCPlantTraitBioluminescentComponent>(snapshot);
+                    }
+                }
+
                 GetOrCreate<RMCPlantGrowthComponent>(snapshot).GrowthStages = GrowthStages!.Value;
                 if (ProductColor != null)
                     GetOrCreate<RMCPlantChemicalsComponent>(snapshot).ProductColor = ProductColor;
@@ -285,5 +318,10 @@ public sealed class PlantGene
         var created = new T();
         snapshot.Add(created);
         return created;
+    }
+
+    private static void Remove<T>(List<IComponent> snapshot) where T : class, IComponent
+    {
+        snapshot.RemoveAll(c => c is T);
     }
 }

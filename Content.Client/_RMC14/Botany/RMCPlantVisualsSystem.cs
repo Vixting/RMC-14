@@ -64,14 +64,15 @@ public sealed class RMCPlantVisualsSystem : EntitySystem
         _sprite.LayerSetRsi((uid, sprite), RMCPlantLayers.Plant, traits.PlantRsi);
         _sprite.LayerSetRsiState((uid, sprite), RMCPlantLayers.Plant, state);
 
-        var flowerValid = !plant.Dead && traits.Flowers && !string.IsNullOrEmpty(traits.FlowerIcon);
+        var flowers = CompOrNull<RMCPlantTraitFlowersComponent>(uid);
+        var flowerValid = !plant.Dead && flowers != null && !string.IsNullOrEmpty(flowers.Icon);
         _sprite.LayerSetVisible((uid, sprite), RMCPlantLayers.Flower, flowerValid);
 
         if (flowerValid)
         {
             _sprite.LayerSetRsi((uid, sprite), RMCPlantLayers.Flower, traits.PlantRsi);
-            _sprite.LayerSetRsiState((uid, sprite), RMCPlantLayers.Flower, traits.FlowerIcon!);
-            _sprite.LayerSetColor((uid, sprite), RMCPlantLayers.Flower, traits.FlowerColor ?? Color.White);
+            _sprite.LayerSetRsiState((uid, sprite), RMCPlantLayers.Flower, flowers!.Icon!);
+            _sprite.LayerSetColor((uid, sprite), RMCPlantLayers.Flower, flowers.Color ?? Color.White);
         }
     }
 

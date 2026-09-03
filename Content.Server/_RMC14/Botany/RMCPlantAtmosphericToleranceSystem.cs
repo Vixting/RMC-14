@@ -8,6 +8,20 @@ namespace Content.Server._RMC14.Botany;
 /// </summary>
 public sealed class RMCPlantAtmosphericToleranceSystem : EntitySystem
 {
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<RMCPlantComponent, RMCPlantGrowEvent>(OnPlantGrow);
+    }
+
+    private void OnPlantGrow(Entity<RMCPlantComponent> ent, ref RMCPlantGrowEvent args)
+    {
+        if (!TryComp(ent.Owner, out RMCPlantAtmosphericComponent? atmos))
+            return;
+
+        Tick(ent, Comp<RMCPlantTrayComponent>(args.Tray), atmos, args.Environment, args.HealthMod);
+    }
+
     public void Tick(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, RMCPlantAtmosphericComponent atmos, GasMixture environment, float healthMod)
     {
         var pressure = environment.Pressure;

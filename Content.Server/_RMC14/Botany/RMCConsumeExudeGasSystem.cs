@@ -10,6 +10,19 @@ public sealed class RMCConsumeExudeGasSystem : EntitySystem
 {
     public const float HydroponicsSpeedMultiplier = 1f;
 
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<RMCPlantComponent, RMCPlantGrowEvent>(OnPlantGrow);
+    }
+
+    private void OnPlantGrow(Entity<RMCPlantComponent> ent, ref RMCPlantGrowEvent args)
+    {
+        var tray = Comp<RMCPlantTrayComponent>(args.Tray);
+        TickConsume(ent, tray, args.Environment);
+        TickExude(ent, args.Environment);
+    }
+
     public void TickConsume(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, GasMixture environment)
     {
         tray.MissingGas = 0;
