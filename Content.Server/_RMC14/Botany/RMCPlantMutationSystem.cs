@@ -1,0 +1,546 @@
+using System.Linq;
+using Content.Shared._RMC14.Botany;
+using Content.Shared.Atmos;
+using Content.Shared.Random;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
+
+namespace Content.Server._RMC14.Botany;
+
+/// <summary>
+/// Random mutation & crosbreeding logic
+/// </summary>
+public sealed class RMCPlantMutationSystem : EntitySystem
+{
+    private static readonly ProtoId<WeightedRandomFillSolutionPrototype> RandomPickBotanyReagent = "RandomPickBotanyReagent";
+
+    [Dependency] private readonly IRobustRandom _robustRandom = default!;
+    [Dependency] private readonly IPrototypeManager _prototype = default!;
+
+    private static readonly Color[] BioluminescentColors =
+    [
+        Color.FromHex("#FF0000"), Color.FromHex("#FF7F00"), Color.FromHex("#FFFF00"),
+        Color.FromHex("#00FF00"), Color.FromHex("#0000FF"), Color.FromHex("#4B0082"),
+        Color.FromHex("#8F00FF"),
+    ];
+
+    private static class Slot
+    {
+        public const string PlantCancer = "Plant Cancer";
+        public const string Gluttony = "Gluttony";
+        public const string Endurance = "Endurance";
+        public const string ToxinTolerance = "Toxin Tolerance";
+        public const string WeedTolerance = "Weed Tolerance";
+        public const string Production = "Production";
+        public const string Lifespan = "Lifespan";
+        public const string Potency = "Potency";
+        public const string Maturity = "Maturity";
+        public const string Bioluminescence = "Bioluminescence";
+        public const string Flowers = "Flowers";
+        public const string NewChems = "New Chems";
+        public const string NewChems2 = "New Chems2";
+        public const string NewChems3 = "New Chems3";
+        public const string MutateSpecies = "Mutate Species";
+    }
+
+    private static readonly string[] MutationSlots =
+    [
+        Slot.PlantCancer,
+        Slot.Gluttony,
+        Slot.Endurance,
+        Slot.ToxinTolerance,
+        Slot.WeedTolerance,
+        Slot.Production,
+        Slot.Lifespan,
+        Slot.Potency,
+        Slot.Maturity,
+        Slot.Bioluminescence,
+        Slot.Flowers,
+        Slot.NewChems,
+        Slot.NewChems2,
+        Slot.NewChems3,
+    ];
+
+    /// <summary>
+    /// Picks a random target from the plants own MutationPrototypes list & changes species to it
+    /// </summary>
+    public void RandomSpeciesChange(EntityUid plant)
+    {
+        if (!TryComp(plant, out RMCPlantMutationComponent? mutation) || mutation.MutationPrototypes.Count == 0)
+            return;
+
+        var targetProto = _robustRandom.Pick(mutation.MutationPrototypes);
+        ChangeSpecies(plant, targetProto);
+    }
+
+    /// <summary>
+    ///     Applies 1-3 random mutations filtered by the plants mutations slots
+    /// </summary>
+    public void MutatePlant(EntityUid plant, float severity)
+    {
+        if (!TryComp(plant, out RMCPlantMutationComponent? mutation) || mutation.Immutable)
+            return;
+
+        var degree = severity <= 8f ? 1 : 2;
+        var controller = mutation.Slots;
+
+        var speciesVal = controller.GetValueOrDefault(Slot.MutateSpecies, 0f);
+        if (mutation.MutationPrototypes.Count > 0 && ((degree > 1 && speciesVal == 0f) || speciesVal > 0f))
+        {
+            var targetProto = _robustRandom.Pick(mutation.MutationPrototypes);
+            ChangeSpecies(plant, targetProto);
+            ResetController(mutation);
+            return;
+        }
+
+        var superAllowed = new List<string>();
+        var normalAllowed = new List<string>();
+        var cancelSlots = new HashSet<string>();
+
+        foreach (var slotName in MutationSlots)
+        {
+            var val = controller.GetValueOrDefault(slotName, 0f);
+
+            if (val > 0f)
+                superAllowed.Add(slotName);
+            else if (val >= -1f)
+            {
+                normalAllowed.Add(slotName);
+                if (val == -1f)
+                    cancelSlots.Add(slotName);
+            }
+            // val < -1 means suppressed — excluded from both lists
+        }
+
+        var candidates = superAllowed.Count > 0 ? superAllowed : normalAllowed;
+
+        if (candidates.Count == 0)
+        {
+            ResetController(mutation);
+            return;
+        }
+
+        var mutationLevel = TryComp(plant, out RMCPlantComponent? plantComp) ? plantComp.MutationLevel : 0f;
+        var iterations = _robustRandom.Next(1, degree + 2) + (int)MathF.Round(mutationLevel / 50f) + 1;
+
+        for (var i = 0; i < iterations; i++)
+        {
+            var slot = _robustRandom.Pick(candidates);
+
+            if (cancelSlots.Contains(slot))
+                return;
+
+            ApplyMutation(plant, slot, degree);
+        }
+
+        ResetController(mutation);
+    }
+
+    private void ResetController(RMCPlantMutationComponent mutation)
+    {
+        foreach (var key in mutation.Slots.Keys.ToList())
+        {
+            if (mutation.Slots[key] > -3f)
+                mutation.Slots[key] = 0f;
+        }
+    }
+
+    private void ApplyMutation(EntityUid plant, string slot, int degree)
+    {
+        switch (slot)
+        {
+            case Slot.PlantCancer:
+                if (TryComp(plant, out RMCPlantGrowthComponent? cancerGrowth))
+                {
+                    cancerGrowth.Lifespan = MathF.Max(0f, cancerGrowth.Lifespan - _robustRandom.Next(1, 6));
+                    cancerGrowth.Endurance = MathF.Max(0f, cancerGrowth.Endurance - _robustRandom.Next(10, 21));
+                }
+                break;
+
+            case Slot.Gluttony:
+                if (TryComp(plant, out RMCPlantMetabolismComponent? gluttony))
+                {
+                    gluttony.NutrientConsumption = Math.Clamp(
+                        gluttony.NutrientConsumption + _robustRandom.NextFloat(-degree * 0.1f, degree * 0.1f),
+                        0f, 5f);
+                    gluttony.WaterConsumption = Math.Clamp(
+                        gluttony.WaterConsumption + _robustRandom.NextFloat(-degree, degree),
+                        0f, 50f);
+                }
+                break;
+
+            case Slot.Endurance:
+                if (TryComp(plant, out RMCPlantGrowthComponent? enduranceGrowth))
+                {
+                    enduranceGrowth.Endurance = Math.Clamp(
+                        enduranceGrowth.Endurance + _robustRandom.Next(-5, 6) * degree,
+                        10f, 100f);
+                }
+                break;
+
+            case Slot.ToxinTolerance:
+                if (TryComp(plant, out RMCPlantTraitsComponent? toxinTraits))
+                {
+                    toxinTraits.ToxinsTolerance = Math.Clamp(
+                        toxinTraits.ToxinsTolerance + _robustRandom.Next(-2, 3) * degree,
+                        0f, 10f);
+                }
+                break;
+
+            case Slot.WeedTolerance:
+                if (TryComp(plant, out RMCPlantTraitsComponent? weedTraits))
+                {
+                    weedTraits.WeedTolerance = Math.Clamp(
+                        weedTraits.WeedTolerance + _robustRandom.Next(-2, 3) * degree,
+                        0f, 10f);
+                    if (_robustRandom.Prob(degree * 0.05f))
+                        weedTraits.Carnivorous = Math.Clamp(weedTraits.Carnivorous + _robustRandom.Next(-degree, degree + 1), 0, 2);
+                    else if (_robustRandom.Prob(degree * 0.05f))
+                        weedTraits.Parasite = !weedTraits.Parasite;
+                }
+                break;
+
+            case Slot.Production:
+                if (TryComp(plant, out RMCPlantGrowthComponent? productionGrowth))
+                {
+                    productionGrowth.Production = Math.Clamp(
+                        productionGrowth.Production + _robustRandom.Next(-1, 2) * degree,
+                        1f, 10f);
+                }
+                break;
+
+            case Slot.Lifespan:
+                if (TryComp(plant, out RMCPlantGrowthComponent? lifespanGrowth))
+                {
+                    lifespanGrowth.Lifespan = Math.Clamp(
+                        lifespanGrowth.Lifespan + _robustRandom.Next(-2, 3) * degree,
+                        10f, 30f);
+                }
+                if (TryComp(plant, out RMCPlantHarvestComponent? lifespanHarvest) && lifespanHarvest.Yield != -1)
+                {
+                    lifespanHarvest.Yield = Math.Clamp(lifespanHarvest.Yield + _robustRandom.Next(-2, 3) * degree, 0, 10);
+                }
+                break;
+
+            case Slot.Potency:
+                if (TryComp(plant, out RMCPlantChemicalsComponent? potencyChemicals))
+                {
+                    potencyChemicals.Potency = Math.Clamp(
+                        potencyChemicals.Potency + _robustRandom.Next(-20, 21) * degree,
+                        0f, 200f);
+                }
+                break;
+
+            case Slot.Maturity:
+                if (TryComp(plant, out RMCPlantGrowthComponent? maturityGrowth))
+                {
+                    maturityGrowth.Maturation = Math.Clamp(
+                        maturityGrowth.Maturation + _robustRandom.Next(-1, 2) * degree,
+                        0f, 30f);
+                }
+                if (_robustRandom.Prob(degree * 0.05f) && TryComp(plant, out RMCPlantHarvestComponent? maturityHarvest))
+                {
+                    maturityHarvest.HarvestRepeat = maturityHarvest.HarvestRepeat == HarvestType.NoRepeat
+                        ? HarvestType.Repeat
+                        : HarvestType.NoRepeat;
+                }
+                break;
+
+            case Slot.Bioluminescence:
+                if (_robustRandom.Prob(degree * 0.02f) && TryComp(plant, out RMCPlantTraitsComponent? biolumTraits))
+                {
+                    biolumTraits.Bioluminescent = !biolumTraits.Bioluminescent;
+                    if (biolumTraits.Bioluminescent && _robustRandom.Prob(degree * 0.02f))
+                        biolumTraits.BioluminescentColor = _robustRandom.Pick(BioluminescentColors);
+                }
+                break;
+
+            case Slot.Flowers:
+                if (_robustRandom.Prob(degree * 0.02f) && TryComp(plant, out RMCPlantTraitsComponent? flowerTraits))
+                {
+                    flowerTraits.Flowers = !flowerTraits.Flowers;
+                    if (flowerTraits.Flowers && _robustRandom.Prob(degree * 0.02f))
+                        flowerTraits.FlowerColor = _robustRandom.Pick(BioluminescentColors);
+                }
+                break;
+
+            case Slot.NewChems:
+            case Slot.NewChems2:
+            case Slot.NewChems3:
+                if (TryComp(plant, out RMCPlantChemicalsComponent? newChemsComp))
+                    AddRandomChem(newChemsComp);
+                break;
+        }
+    }
+
+    private void AddRandomChem(RMCPlantChemicalsComponent chemicals)
+    {
+        // 60u chem cap - no mutations after
+        if (ChemOutputFull(chemicals))
+            return;
+
+        if (chemicals.SpecialChemicals.Count > 0 && _robustRandom.Prob(0.4f))
+        {
+            var specialId = _robustRandom.Pick(chemicals.SpecialChemicals);
+            if (!chemicals.Chemicals.ContainsKey(specialId))
+            {
+                chemicals.Chemicals[specialId] = new SeedChemQuantity
+                {
+                    Min = 7,
+                    Max = 15,
+                    PotencyDivisor = _robustRandom.Next(5, 9),
+                    Inherent = false,
+                };
+            }
+
+            return;
+        }
+
+        var fills = _prototype.Index(RandomPickBotanyReagent).Fills;
+        if (fills.Count == 0)
+            return;
+
+        var pick = _robustRandom.Pick(fills);
+        if (pick.Reagents.Count == 0)
+            return;
+
+        var chemicalId = _robustRandom.Pick(pick.Reagents);
+        var amount = _robustRandom.Next(1, (int)pick.Quantity + 1);
+
+        SeedChemQuantity seedChemQuantity;
+        if (chemicals.Chemicals.TryGetValue(chemicalId, out var existing))
+            seedChemQuantity = new SeedChemQuantity { Min = existing.Min, Max = existing.Max + amount, Inherent = existing.Inherent };
+        else
+            seedChemQuantity = new SeedChemQuantity { Min = 1, Max = 1 + amount, Inherent = false };
+
+        seedChemQuantity.PotencyDivisor = (int)Math.Ceiling(100.0 / seedChemQuantity.Max);
+        chemicals.Chemicals[chemicalId] = seedChemQuantity;
+    }
+
+    private static bool ChemOutputFull(RMCPlantChemicalsComponent chemicals)
+    {
+        var total = 0f;
+        foreach (var (_, q) in chemicals.Chemicals)
+        {
+            var amount = (float)q.Min;
+            if (q.PotencyDivisor > 0 && chemicals.Potency > 0)
+                amount += chemicals.Potency / q.PotencyDivisor;
+            total += Math.Clamp(amount, q.Min, q.Max);
+        }
+
+        return total >= 60f;
+    }
+
+    /// <summary>
+    /// Swaps most of a plant's identity/cosmetic/product fields for the target species' while keeping
+    /// this plant's own accumulated stat mutations (endurance, tolerances, potency, chemicals, etc).
+    /// Entities can't literally re-prototype themselves, so this spawns a disposable instance of the
+    /// target species to read its default component values from, then discards it.
+    /// </summary>
+    private void ChangeSpecies(EntityUid plant, string targetProto)
+    {
+        if (!_prototype.HasIndex<EntityPrototype>(targetProto))
+            return;
+
+        var temp = Spawn(targetProto, Transform(plant).Coordinates);
+
+        if (TryComp(temp, out RMCPlantComponent? tempPlant) && TryComp(plant, out RMCPlantComponent? plantComp))
+        {
+            plantComp.Name = tempPlant.Name;
+            plantComp.Noun = tempPlant.Noun;
+            plantComp.DisplayName = tempPlant.DisplayName;
+            plantComp.Mysterious = tempPlant.Mysterious;
+        }
+
+        if (TryComp(temp, out RMCPlantHarvestComponent? tempHarvest) && TryComp(plant, out RMCPlantHarvestComponent? harvest))
+        {
+            harvest.PacketPrototype = tempHarvest.PacketPrototype;
+            harvest.ProductPrototypes = new List<string>(tempHarvest.ProductPrototypes);
+        }
+
+        if (TryComp(temp, out RMCPlantGrowthComponent? tempGrowth) && TryComp(plant, out RMCPlantGrowthComponent? growth))
+            growth.GrowthStages = tempGrowth.GrowthStages;
+
+        if (TryComp(temp, out RMCPlantTraitsComponent? tempTraits) && TryComp(plant, out RMCPlantTraitsComponent? traits))
+        {
+            traits.PlantRsi = tempTraits.PlantRsi;
+            traits.PlantIconState = tempTraits.PlantIconState;
+            traits.SplatPrototype = tempTraits.SplatPrototype;
+        }
+
+        if (TryComp(temp, out RMCPlantMutationComponent? tempMutation) && TryComp(plant, out RMCPlantMutationComponent? mutation))
+            mutation.MutationPrototypes = new List<string>(tempMutation.MutationPrototypes);
+
+        if (TryComp(temp, out RMCPlantChemicalsComponent? tempChemicals) && TryComp(plant, out RMCPlantChemicalsComponent? chemicals))
+        {
+            chemicals.SpecialChemicals = new List<string>(tempChemicals.SpecialChemicals);
+
+            // Adding the new chemicals from the new species
+            foreach (var (chem, quantity) in tempChemicals.Chemicals)
+                chemicals.Chemicals.TryAdd(chem, quantity);
+
+            // Removing inherent chemicals from the old species. Leaving mutated/crossbred ones intact
+            foreach (var chem in chemicals.Chemicals.Keys.ToList())
+            {
+                if (!tempChemicals.Chemicals.ContainsKey(chem) && chemicals.Chemicals[chem].Inherent)
+                    chemicals.Chemicals.Remove(chem);
+            }
+        }
+
+        QueueDel(temp);
+    }
+
+    /// <summary>
+    /// Cross pollinates plant <paramref name="b"/> with the genetic snapshot <paramref name="a"/>
+    /// (captured from another plant by a botany swab), mutating bs own components in place
+    /// </summary>
+    public void Cross(List<IComponent> a, EntityUid b)
+    {
+        if (Get<RMCPlantChemicalsComponent>(a) is { } aChem && TryComp(b, out RMCPlantChemicalsComponent? bChem))
+        {
+            CrossChemicals(bChem.Chemicals, aChem.Chemicals);
+            CrossFloat(ref bChem.Potency, aChem.Potency);
+        }
+
+        if (Get<RMCPlantMetabolismComponent>(a) is { } aMeta && TryComp(b, out RMCPlantMetabolismComponent? bMeta))
+        {
+            CrossFloat(ref bMeta.NutrientConsumption, aMeta.NutrientConsumption);
+            CrossFloat(ref bMeta.WaterConsumption, aMeta.WaterConsumption);
+        }
+
+        if (Get<RMCPlantAtmosphericComponent>(a) is { } aAtmos && TryComp(b, out RMCPlantAtmosphericComponent? bAtmos))
+        {
+            CrossFloat(ref bAtmos.MinHeat, aAtmos.MinHeat);
+            CrossFloat(ref bAtmos.MaxHeat, aAtmos.MaxHeat);
+            CrossFloat(ref bAtmos.MinPressure, aAtmos.MinPressure);
+            CrossFloat(ref bAtmos.MaxPressure, aAtmos.MaxPressure);
+        }
+
+        if (Get<RMCPlantTraitsComponent>(a) is { } aTraits && TryComp(b, out RMCPlantTraitsComponent? bTraits))
+        {
+            CrossFloat(ref bTraits.ToxinsTolerance, aTraits.ToxinsTolerance);
+            CrossFloat(ref bTraits.PestTolerance, aTraits.PestTolerance);
+            CrossFloat(ref bTraits.WeedTolerance, aTraits.WeedTolerance);
+            CrossBool(ref bTraits.Ligneous, aTraits.Ligneous);
+            CrossBool(ref bTraits.TurnIntoKudzu, aTraits.TurnIntoKudzu);
+            CrossBool(ref bTraits.CanScream, aTraits.CanScream);
+            CrossBool(ref bTraits.Parasite, aTraits.Parasite);
+            CrossInt(ref bTraits.Carnivorous, aTraits.Carnivorous);
+        }
+
+        if (Get<RMCPlantGrowthComponent>(a) is { } aGrowth && TryComp(b, out RMCPlantGrowthComponent? bGrowth))
+        {
+            CrossFloat(ref bGrowth.Endurance, aGrowth.Endurance);
+            CrossFloat(ref bGrowth.Lifespan, aGrowth.Lifespan);
+            CrossFloat(ref bGrowth.Maturation, aGrowth.Maturation);
+            CrossFloat(ref bGrowth.Production, aGrowth.Production);
+        }
+
+        if (Get<RMCPlantHarvestComponent>(a) is { } aHarvest && TryComp(b, out RMCPlantHarvestComponent? bHarvest))
+        {
+            CrossInt(ref bHarvest.Yield, aHarvest.Yield);
+            CrossBool(ref bHarvest.Seedless, aHarvest.Seedless);
+        }
+
+        if (Get<RMCConsumeExudeGasComponent>(a) is { } aGas && TryComp(b, out RMCConsumeExudeGasComponent? bGas))
+        {
+            CrossGasses(bGas.ExudeGasses, aGas.ExudeGasses);
+            CrossGasses(bGas.ConsumeGasses, aGas.ConsumeGasses);
+        }
+
+        if (Get<RMCPlantMutationComponent>(a) is { } aMutation && TryComp(b, out RMCPlantMutationComponent? bMutation))
+        {
+            bMutation.Mutations = bMutation.Mutations.Where(m => Random(0.5f))
+                .Union(aMutation.Mutations.Where(m => Random(0.5f)))
+                .DistinctBy(m => m.Name)
+                .ToList();
+        }
+
+        // Hybrids have a high chance of being seedless
+        if (Get<RMCPlantComponent>(a) is { } aPlant
+            && TryComp(b, out RMCPlantComponent? bPlant)
+            && aPlant.Name != bPlant.Name
+            && Random(0.7f)
+            && TryComp(b, out RMCPlantHarvestComponent? seedlessHarvest))
+        {
+            seedlessHarvest.Seedless = true;
+        }
+    }
+
+    private static T? Get<T>(List<IComponent> snapshot) where T : class, IComponent
+    {
+        return snapshot.OfType<T>().FirstOrDefault();
+    }
+
+    private void CrossChemicals(Dictionary<string, SeedChemQuantity> val, Dictionary<string, SeedChemQuantity> other)
+    {
+        // Go through chemicals from the pollen in swab
+        foreach (var otherChem in other)
+        {
+            // if both have same chemical, randomly pick potency ratio from the two.
+            if (val.ContainsKey(otherChem.Key))
+            {
+                val[otherChem.Key] = Random(0.5f) ? otherChem.Value : val[otherChem.Key];
+            }
+            // if target plant doesn't have this chemical, has 50% chance to add it.
+            else if (Random(0.5f))
+            {
+                var fixedChem = otherChem.Value;
+                fixedChem.Inherent = false;
+                val.Add(otherChem.Key, fixedChem);
+            }
+        }
+
+        // if the target plant has chemical that the pollen in swab does not, 50% chance to remove it.
+        foreach (var thisChem in val.ToList())
+        {
+            if (!other.ContainsKey(thisChem.Key) && Random(0.5f) && val.Count > 1)
+                val.Remove(thisChem.Key);
+        }
+    }
+
+    private void CrossGasses(Dictionary<Gas, float> val, Dictionary<Gas, float> other)
+    {
+        // Go through gasses from the pollen in swab
+        foreach (var otherGas in other)
+        {
+            // if both have same gas, randomly pick amount from the two.
+            if (val.ContainsKey(otherGas.Key))
+            {
+                val[otherGas.Key] = Random(0.5f) ? otherGas.Value : val[otherGas.Key];
+            }
+            // if target plant doesn't have this gas, has 50% chance to add it.
+            else if (Random(0.5f))
+            {
+                val.Add(otherGas.Key, otherGas.Value);
+            }
+        }
+
+        // if the target plant has gas that the pollen in swab does not, 50% chance to remove it.
+        foreach (var thisGas in val.ToList())
+        {
+            if (!other.ContainsKey(thisGas.Key) && Random(0.5f))
+                val.Remove(thisGas.Key);
+        }
+    }
+
+    private void CrossFloat(ref float val, float other)
+    {
+        val = Random(0.5f) ? val : other;
+    }
+
+    private void CrossInt(ref int val, int other)
+    {
+        val = Random(0.5f) ? val : other;
+    }
+
+    private void CrossBool(ref bool val, bool other)
+    {
+        val = Random(0.5f) ? val : other;
+    }
+
+    private bool Random(float p)
+    {
+        return _robustRandom.Prob(p);
+    }
+}
