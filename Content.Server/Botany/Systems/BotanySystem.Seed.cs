@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Botany.Components;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
 using Content.Server.Popups;
 using Content.Shared.Botany;
 using Content.Shared.Chemistry.EntitySystems;
@@ -182,9 +180,6 @@ public sealed partial class BotanySystem : EntitySystem
             ProduceGrown(entity, produce);
 
             _appearance.SetData(entity, ProduceVisuals.Potency, proto.Potency);
-
-            if (proto.ProductColor is { } productColor)
-                _appearance.SetData(entity, ProduceVisuals.Color, productColor);
 
             if (proto.Mysterious)
             {

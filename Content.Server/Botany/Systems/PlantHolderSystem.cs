@@ -1,7 +1,5 @@
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Botany.Components;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
 using Content.Server.Hands.Systems;
 using Content.Server.Kitchen.Components;
 using Content.Server.Popups;
@@ -43,7 +41,6 @@ public sealed class PlantHolderSystem : EntitySystem
     [Dependency] private readonly BotanySystem _botany = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly MutationSystem _mutation = default!;
-    [Dependency] private readonly PointLightSystem _pointLight = default!;
     [Dependency] private readonly AppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly HandsSystem _hands = default!;
@@ -290,10 +287,25 @@ public sealed class PlantHolderSystem : EntitySystem
                 return;
             }
 
+            if (GetCurrentGrowthStage(entity) <= 1)
+            {
+                _popup.PopupCursor(Loc.GetString("plant-holder-component-early-sample-message"), args.User);
+                return;
+            }
+
             component.Health -= (_random.Next(3, 5) * 10);
 
+            float? healthOverride;
+            if (component.Harvest)
+            {
+                healthOverride = null;
+            }
+            else
+            {
+                healthOverride = component.Health;
+            }
             var packetSeed = component.Seed;
-            var seed = _botany.SpawnSeedPacket(packetSeed, Transform(args.User).Coordinates, args.User, null);
+            var seed = _botany.SpawnSeedPacket(packetSeed, Transform(args.User).Coordinates, args.User, healthOverride);
             _randomHelper.RandomOffset(seed, 0.25f);
             var displayName = Loc.GetString(component.Seed.DisplayName);
             _popup.PopupCursor(Loc.GetString("plant-holder-component-take-sample-message",
@@ -378,20 +390,11 @@ public sealed class PlantHolderSystem : EntitySystem
 
         if (component.ForceUpdate)
             component.ForceUpdate = false;
-        else
+        else if (curTime < (component.LastCycle + component.CycleDelay))
         {
-            var adjustedDelay = component.CycleDelay + TimeSpan.FromSeconds(component.MetabolismAdjust);
-            if (curTime < (component.LastCycle + adjustedDelay))
-            {
-                if (component.UpdateSpriteAfterUpdate)
-                    UpdateSprite(uid, component);
-                return;
-            }
-
-            if (component.MetabolismAdjust > 0)
-                component.MetabolismAdjust = MathF.Max(0f, component.MetabolismAdjust - 5f);
-            else if (component.MetabolismAdjust < 0)
-                component.MetabolismAdjust = MathF.Min(0f, component.MetabolismAdjust + 5f);
+            if (component.UpdateSpriteAfterUpdate)
+                UpdateSprite(uid, component);
+            return;
         }
 
         component.LastCycle = curTime;
@@ -603,12 +606,8 @@ public sealed class PlantHolderSystem : EntitySystem
         // Weed levels.
         if (component.PestLevel > 0)
         {
-            if (component.Seed.Carnivorous > 0)
-            {
-                component.PestLevel -= HydroponicsSpeedMultiplier;
-                component.Health += HydroponicsSpeedMultiplier * 0.5f;
-            }
-            else if (component.PestLevel > component.Seed.PestTolerance)
+            // TODO: Carnivorous plants?
+            if (component.PestLevel > component.Seed.PestTolerance)
             {
                 component.Health -= HydroponicsSpeedMultiplier;
             }
@@ -620,11 +619,8 @@ public sealed class PlantHolderSystem : EntitySystem
         // Weed levels.
         if (component.WeedLevel > 0)
         {
-            if (component.Seed.Parasite)
-            {
-                component.Health += HydroponicsSpeedMultiplier * 0.5f;
-            }
-            else if (component.WeedLevel >= component.Seed.WeedTolerance)
+            // TODO: Parasitic plants.
+            if (component.WeedLevel >= component.Seed.WeedTolerance)
             {
                 component.Health -= HydroponicsSpeedMultiplier;
             }
@@ -954,26 +950,11 @@ public sealed class PlantHolderSystem : EntitySystem
                 _appearance.SetData(uid, PlantHolderVisuals.PlantRsi, component.Seed.PlantRsi.ToString(), app);
                 _appearance.SetData(uid, PlantHolderVisuals.PlantState, $"stage-{component.Seed.GrowthStages}", app);
             }
-
-            if (!component.Dead && component.Seed.Flowers && !string.IsNullOrEmpty(component.Seed.FlowerIcon))
-            {
-                _appearance.SetData(uid, PlantHolderVisuals.FlowerRsi, component.Seed.PlantRsi.ToString(), app);
-                _appearance.SetData(uid, PlantHolderVisuals.FlowerState, component.Seed.FlowerIcon, app);
-                _appearance.SetData(uid, PlantHolderVisuals.FlowerColor, component.Seed.FlowerColor ?? Color.White, app);
-            }
-            else
-            {
-                _appearance.SetData(uid, PlantHolderVisuals.FlowerState, "", app);
-            }
-
-            UpdateBioluminescence(uid, component.Seed.Bioluminescent && !component.Dead, component.Seed);
         }
         else
         {
             _appearance.SetData(uid, PlantHolderVisuals.PlantState, "", app);
-            _appearance.SetData(uid, PlantHolderVisuals.FlowerState, "", app);
             _appearance.SetData(uid, PlantHolderVisuals.HealthLight, false, app);
-            UpdateBioluminescence(uid, false, null);
         }
 
         if (!component.DrawWarnings)
@@ -985,22 +966,6 @@ public sealed class PlantHolderSystem : EntitySystem
             component.WeedLevel >= 5 || component.PestLevel >= 5 || component.Toxins >= 40 || component.ImproperHeat ||
             component.ImproperLight || component.ImproperPressure || component.MissingGas > 0, app);
         _appearance.SetData(uid, PlantHolderVisuals.HarvestLight, component.Harvest, app);
-    }
-
-    private void UpdateBioluminescence(EntityUid uid, bool enabled, SeedData? seed)
-    {
-        if (enabled && seed != null)
-        {
-            var light = _pointLight.EnsureLight(uid);
-            _pointLight.SetColor(uid, seed.BioluminescentColor, light);
-            _pointLight.SetRadius(uid, seed.BioluminescentRadius, light);
-            _pointLight.SetEnergy(uid, 1f, light);
-            _pointLight.SetEnabled(uid, true, light);
-        }
-        else if (_pointLight.TryGetLight(uid, out var light))
-        {
-            _pointLight.SetEnabled(uid, false, light);
-        }
     }
 
     /// <summary>

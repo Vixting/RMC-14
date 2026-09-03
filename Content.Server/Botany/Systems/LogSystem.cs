@@ -1,6 +1,4 @@
 using Content.Server.Botany.Components;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Kitchen.Components;

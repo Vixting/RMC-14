@@ -1,5 +1,4 @@
 using Content.Server.Botany.Systems;
-using Content.Shared.Botany;
 using Content.Shared.Botany.Components;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
