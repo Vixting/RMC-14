@@ -1,5 +1,5 @@
-﻿using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
+﻿using Content.Shared._RMC14.Botany;
+using Content.Shared._RMC14.Damage;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -25,10 +25,10 @@ public sealed partial class Anticorrosive : RMCChemicalEffect
                $"Critical overdoses cause [color=red]{PotencyPerSecond * 5}[/color] brute and [color=red]{PotencyPerSecond * 5}[/color] toxin damage";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (plant.Toxins > 0)
-            plant.Health += 0.75f * Potency;
+        if (GetTray(args.EntityManager, plant) is { Toxins: > 0 })
+            plant.Comp.Health += 0.75f * Potency * (float) args.Quantity;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

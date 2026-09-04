@@ -1,6 +1,6 @@
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
@@ -34,14 +34,14 @@ public sealed partial class Hemogenic : RMCChemicalEffect
             : baseText;
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (!plant.Sampled)
+        if (!plant.Comp.Sampled)
             return;
         var random = IoCManager.Resolve<IRobustRandom>();
         if (random.Prob(0.6f))
         {
-            plant.Sampled = false;
+            plant.Comp.Sampled = false;
             var popup = args.EntityManager.System<SharedPopupSystem>();
             popup.PopupEntity(Loc.GetString("plant-hemogenic-healed"), args.TargetEntity);
         }

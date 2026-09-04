@@ -1,6 +1,6 @@
 ﻿using Content.Shared._RMC14.Body;
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -24,10 +24,12 @@ public sealed partial class Antitoxic : RMCChemicalEffect
                $"Critical overdoses cause 30 seconds of drowsiness.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (plant.Toxins > 0)
-            plant.Toxins = MathF.Max(0f, plant.Toxins - (float) potency);
+        if (GetTray(args.EntityManager, plant) is not { } tray || tray.Toxins <= 0)
+            return;
+
+        tray.Toxins = MathF.Max(0f, tray.Toxins - 1.5f * Potency * (float) args.Quantity);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

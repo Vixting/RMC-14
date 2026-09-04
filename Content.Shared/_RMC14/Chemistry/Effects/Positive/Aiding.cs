@@ -1,7 +1,7 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Chemistry.Disabilities;
 using Content.Shared._RMC14.Damage;
 using Content.Shared._RMC14.Movement;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -29,11 +29,11 @@ public sealed partial class Aiding : RMCChemicalEffect
         RMCDisabilities.ClearAll(args.EntityManager, args.TargetEntity);
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        plant.MutationMod -= 4f * scaled;
-        plant.YieldMod -= (int) MathF.Round(4f * scaled);
+        plant.Comp.MutationMod -= 4f * scaled;
+        plant.Comp.YieldMod -= (int) MathF.Round(4f * scaled);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

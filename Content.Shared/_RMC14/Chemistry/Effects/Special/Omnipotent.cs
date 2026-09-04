@@ -1,5 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Chemistry.Disabilities;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
@@ -19,15 +19,20 @@ public sealed partial class Omnipotent : RMCChemicalEffect
         RMCDisabilities.ClearAll(args.EntityManager, args.TargetEntity);
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var amount = (float) potency;
-        plant.NutritionLevel += amount * 0.5f;
-        plant.WeedLevel -= amount * 2.5f;
-        plant.PestLevel -= amount * 2.5f;
-        plant.Health += amount;
-        plant.YieldMod += (int) MathF.Round(amount);
-        plant.MutationMod += amount;
+        var amount = Potency * (float) args.Quantity;
+
+        if (GetTray(args.EntityManager, plant) is { } tray)
+        {
+            tray.NutritionLevel += amount * 0.5f;
+            tray.WeedLevel -= amount * 2.5f;
+            tray.PestLevel -= amount * 2.5f;
+        }
+
+        plant.Comp.Health += amount;
+        plant.Comp.YieldMod += (int) MathF.Round(amount);
+        plant.Comp.MutationMod += amount;
     }
 
     // TODO RMC14: fully heals damage, cures diseases, clears stuns/confusion/jitteriness

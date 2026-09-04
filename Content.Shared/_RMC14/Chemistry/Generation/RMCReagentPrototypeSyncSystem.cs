@@ -70,6 +70,7 @@ public sealed class RMCReagentPrototypeSyncSystem : EntitySystem
             "  group: Generated",
             "  desc: " + YamlString(desc),
             "  physicalDesc: " + YamlString(desc),
+            "  creditReward: " + data.CreditReward,
         };
 
         if (!string.IsNullOrEmpty(data.Color))

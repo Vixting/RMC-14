@@ -1,5 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -27,11 +27,11 @@ public sealed partial class Oculopeutic : RMCChemicalEffect
         args.EntityManager.System<BlindableSystem>().AdjustEyeDamage(args.TargetEntity, -(int) (potency * 5f));
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        EnableMutationSlot(plant, "Potency", 1f);
-        EnableMutationSlot(plant, "Bioluminescence", 1f);
-        EnableMutationSlot(plant, "Flowers", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "Potency", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "Bioluminescence", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "Flowers", 1f);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

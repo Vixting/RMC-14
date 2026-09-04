@@ -1,4 +1,4 @@
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -16,11 +16,11 @@ public sealed partial class Cardiopeutic : RMCChemicalEffect
         return "Treats heart damage. Forces new chemical mutations to occur in plants.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        EnableMutationSlot(plant, "New Chems", 1f);
-        EnableMutationSlot(plant, "New Chems2", 1f);
-        EnableMutationSlot(plant, "New Chems3", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "New Chems", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "New Chems2", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "New Chems3", 1f);
     }
 
     // TODO RMC14: mob effect - heal heart organ damage, pain on critical overdos

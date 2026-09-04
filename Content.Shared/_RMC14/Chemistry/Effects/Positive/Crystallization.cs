@@ -1,6 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -27,34 +26,38 @@ public sealed partial class Crystallization : RMCChemicalEffect
         damageable.TryChangeDamage(args.TargetEntity, damage, true, interruptsDoAfters: false);
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (plant.Seed is not { } seed || seed.HarvestRepeat == HarvestType.Repeat)
+        if (!args.EntityManager.TryGetComponent<RMCPlantHarvestComponent>(plant.Owner, out var harvest) || harvest.HarvestRepeat == HarvestType.Repeat)
             return;
 
-        var amount = (float) args.Quantity;
-        plant.WeedLevel += amount * 0.25f;
-        plant.NutritionLevel -= amount * 0.25f;
-        plant.RepeatHarvestCounter += amount * 10f;
+        var amount = (float) ActualPotency * 2f * (float) args.Quantity;
+        if (GetTray(args.EntityManager, plant) is { } tray)
+        {
+            tray.WeedLevel += amount * 0.25f;
+            tray.NutritionLevel -= amount * 0.25f;
+        }
 
-        if (plant.RepeatHarvestCounter < 100f)
+        harvest.RepeatHarvestCounter += amount * 10f;
+
+        if (harvest.RepeatHarvestCounter < 100f)
             return;
 
         var random = IoCManager.Resolve<IRobustRandom>();
         if (random.Prob(0.5f))
         {
-            plant.RepeatHarvestCounter -= random.Next(20, 51);
+            harvest.RepeatHarvestCounter -= random.Next(20, 51);
             return;
         }
 
-        if (!seed.Unique)
-            plant.Seed = seed = seed.Clone();
+        harvest.HarvestRepeat = HarvestType.Repeat;
+        harvest.RepeatHarvestCounter = 0f;
 
-        seed.HarvestRepeat = HarvestType.Repeat;
-        plant.RepeatHarvestCounter = 0f;
+        if (args.EntityManager.TryGetComponent<RMCPlantChemicalsComponent>(plant.Owner, out var chemicals))
+            chemicals.PotencyCounter = 0f;
 
         var popup = args.EntityManager.System<SharedPopupSystem>();
-        popup.PopupEntity(Loc.GetString("plant-repeat-harvest-shimmer", ("name", Loc.GetString(seed.DisplayName))), args.TargetEntity);
+        popup.PopupEntity(Loc.GetString("plant-repeat-harvest-shimmer", ("name", Loc.GetString(plant.Comp.DisplayName))), args.TargetEntity);
     }
 
     // TODO RMC14: liver organ damage

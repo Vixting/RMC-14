@@ -1,5 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -20,9 +20,9 @@ public sealed partial class Neuropeutic : RMCChemicalEffect
 
     // TODO RMC14: mob effect - heal brain damage, brain damage on critical overdose
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        EnableMutationSlot(plant, "Mutate Species", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "Mutate Species", 1f);
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

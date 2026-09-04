@@ -14,4 +14,5 @@ public sealed record RMCGeneratedReagentData(
     int CriticalOverdose,
     List<RecipeCandidateIngredient> Ingredients,
     ChemClass ChemClass,
-    ReactionIndicator Indicator);
+    ReactionIndicator Indicator,
+    int CreditReward = 2);

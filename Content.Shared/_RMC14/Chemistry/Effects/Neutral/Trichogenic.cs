@@ -1,6 +1,6 @@
 using System.Linq;
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -63,12 +63,16 @@ public sealed partial class Trichogenic : RMCChemicalEffect
         popup.PopupEntity(Loc.GetString("chem-trichogenic-hair-change"), args.TargetEntity);
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        plant.YieldMod += (int) MathF.Round(0.2f * scaled);
-        plant.NutritionLevel -= 0.5f * scaled;
-        plant.WaterLevel -= 0.1f * scaled;
+        plant.Comp.YieldMod += (int) MathF.Round(0.2f * scaled);
+
+        if (GetTray(args.EntityManager, plant) is { } tray)
+        {
+            tray.NutritionLevel -= 0.5f * scaled;
+            tray.WaterLevel -= 0.1f * scaled;
+        }
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

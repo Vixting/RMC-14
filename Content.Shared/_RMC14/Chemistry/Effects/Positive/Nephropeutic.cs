@@ -1,5 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -17,14 +17,13 @@ public sealed partial class Nephropeutic : RMCChemicalEffect
         return "Treats kidney damage. Forces tolerance mutations to occur in plants.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        EnableMutationSlot(plant, "Light Tolerance", 1f);
-        EnableMutationSlot(plant, "Weed Tolerance", 1f);
-        EnableMutationSlot(plant, "Toxin Tolerance", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "Weed Tolerance", 1f);
+        EnableMutationSlot(args.EntityManager, plant, "Toxin Tolerance", 1f);
     }
 
-    // TODO RMC14: mob effect - heal kidney organ damage, damages kidneys on overdose
+    // TODO RMC14: heal kidney organ damage, damages kidneys on overdose
 
     protected override void TickCriticalOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
