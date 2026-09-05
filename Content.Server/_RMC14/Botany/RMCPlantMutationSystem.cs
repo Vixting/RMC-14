@@ -4,6 +4,7 @@ using Content.Shared.Atmos;
 using Content.Shared.Random;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Serialization.Manager;
 
 namespace Content.Server._RMC14.Botany;
 
@@ -16,6 +17,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
 
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private readonly ISerializationManager _serialization = default!;
 
     private static readonly Color[] BioluminescentColors =
     [
@@ -193,10 +195,22 @@ public sealed class RMCPlantMutationSystem : EntitySystem
                     weedTraits.WeedTolerance = Math.Clamp(
                         weedTraits.WeedTolerance + _robustRandom.Next(-2, 3) * degree,
                         0f, 10f);
-                    if (_robustRandom.Prob(degree * 0.05f))
-                        weedTraits.Carnivorous = Math.Clamp(weedTraits.Carnivorous + _robustRandom.Next(-degree, degree + 1), 0, 2);
-                    else if (_robustRandom.Prob(degree * 0.05f))
-                        weedTraits.Parasite = !weedTraits.Parasite;
+                }
+
+                if (_robustRandom.Prob(degree * 0.05f))
+                {
+                    var level = Math.Clamp(
+                        (CompOrNull<RMCPlantTraitCarnivorousComponent>(plant)?.Level ?? 0) + _robustRandom.Next(-degree, degree + 1),
+                        0, 2);
+                    if (level <= 0)
+                        RemComp<RMCPlantTraitCarnivorousComponent>(plant);
+                    else
+                        EnsureComp<RMCPlantTraitCarnivorousComponent>(plant).Level = level;
+                }
+                else if (_robustRandom.Prob(degree * 0.05f))
+                {
+                    if (!RemComp<RMCPlantTraitParasiteComponent>(plant))
+                        AddComp<RMCPlantTraitParasiteComponent>(plant);
                 }
                 break;
 
@@ -247,20 +261,20 @@ public sealed class RMCPlantMutationSystem : EntitySystem
                 break;
 
             case Slot.Bioluminescence:
-                if (_robustRandom.Prob(degree * 0.02f) && TryComp(plant, out RMCPlantTraitsComponent? biolumTraits))
+                if (_robustRandom.Prob(degree * 0.02f) && !RemComp<RMCPlantTraitBioluminescentComponent>(plant))
                 {
-                    biolumTraits.Bioluminescent = !biolumTraits.Bioluminescent;
-                    if (biolumTraits.Bioluminescent && _robustRandom.Prob(degree * 0.02f))
-                        biolumTraits.BioluminescentColor = _robustRandom.Pick(BioluminescentColors);
+                    var biolum = AddComp<RMCPlantTraitBioluminescentComponent>(plant);
+                    if (_robustRandom.Prob(degree * 0.02f))
+                        biolum.Color = _robustRandom.Pick(BioluminescentColors);
                 }
                 break;
 
             case Slot.Flowers:
-                if (_robustRandom.Prob(degree * 0.02f) && TryComp(plant, out RMCPlantTraitsComponent? flowerTraits))
+                if (_robustRandom.Prob(degree * 0.02f) && !RemComp<RMCPlantTraitFlowersComponent>(plant))
                 {
-                    flowerTraits.Flowers = !flowerTraits.Flowers;
-                    if (flowerTraits.Flowers && _robustRandom.Prob(degree * 0.02f))
-                        flowerTraits.FlowerColor = _robustRandom.Pick(BioluminescentColors);
+                    var flowers = AddComp<RMCPlantTraitFlowersComponent>(plant);
+                    if (_robustRandom.Prob(degree * 0.02f))
+                        flowers.Color = _robustRandom.Pick(BioluminescentColors);
                 }
                 break;
 
@@ -421,12 +435,9 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             CrossFloat(ref bTraits.ToxinsTolerance, aTraits.ToxinsTolerance);
             CrossFloat(ref bTraits.PestTolerance, aTraits.PestTolerance);
             CrossFloat(ref bTraits.WeedTolerance, aTraits.WeedTolerance);
-            CrossBool(ref bTraits.Ligneous, aTraits.Ligneous);
-            CrossBool(ref bTraits.TurnIntoKudzu, aTraits.TurnIntoKudzu);
-            CrossBool(ref bTraits.CanScream, aTraits.CanScream);
-            CrossBool(ref bTraits.Parasite, aTraits.Parasite);
-            CrossInt(ref bTraits.Carnivorous, aTraits.Carnivorous);
         }
+
+        CrossTraits(a, b);
 
         if (Get<RMCPlantGrowthComponent>(a) is { } aGrowth && TryComp(b, out RMCPlantGrowthComponent? bGrowth))
         {
@@ -470,6 +481,18 @@ public sealed class RMCPlantMutationSystem : EntitySystem
     private static T? Get<T>(List<IComponent> snapshot) where T : class, IComponent
     {
         return snapshot.OfType<T>().FirstOrDefault();
+    }
+
+    private void CrossTraits(List<IComponent> a, EntityUid b)
+    {
+        foreach (var trait in a.OfType<RMCPlantTraitComponent>())
+        {
+            if (HasComp(b, trait.GetType()))
+                continue;
+
+            if (Random(0.5f))
+                AddComp(b, _serialization.CreateCopy(trait, notNullableOverride: true));
+        }
     }
 
     private void CrossChemicals(Dictionary<string, SeedChemQuantity> val, Dictionary<string, SeedChemQuantity> other)

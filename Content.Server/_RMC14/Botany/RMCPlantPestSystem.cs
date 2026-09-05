@@ -12,8 +12,21 @@ public sealed class RMCPlantPestSystem : EntitySystem
 
     public const float HydroponicsSpeedMultiplier = 1f;
 
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<RMCPlantComponent, RMCPlantGrowEvent>(OnPlantGrow);
+    }
+
+    private void OnPlantGrow(Entity<RMCPlantComponent> ent, ref RMCPlantGrowEvent args)
+    {
+        var tray = Comp<RMCPlantTrayComponent>(args.Tray);
+        TickSpawn(tray);
+        Tick(ent, tray, Comp<RMCPlantTraitsComponent>(ent));
+    }
+
     /// <summary>
-    /// Small chance for the pest population to increase. Runs even on an empty/dead tray tick
+    /// Small chance for the pest population to increase. Only runs for a live, non-dead plant.
     /// </summary>
     public void TickSpawn(RMCPlantTrayComponent tray)
     {
@@ -30,7 +43,7 @@ public sealed class RMCPlantPestSystem : EntitySystem
         if (tray.PestLevel <= 0)
             return;
 
-        if (traits.Carnivorous > 0)
+        if (HasComp<RMCPlantTraitCarnivorousComponent>(plant.Owner))
         {
             tray.PestLevel -= HydroponicsSpeedMultiplier;
             plant.Comp.Health += HydroponicsSpeedMultiplier;
