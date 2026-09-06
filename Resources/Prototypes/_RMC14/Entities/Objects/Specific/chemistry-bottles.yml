@@ -42,3 +42,33 @@
         reagents:
         - ReagentId: RMCRobustHarvest
           Quantity: 30
+
+- type: entity
+  id: RMCChemistryBottleAmmonia
+  suffix: ammonia
+  parent: BaseChemistryBottleFilled
+  components:
+  - type: Label
+    currentLabel: reagent-name-rmcammonia
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 30
+        reagents:
+        - ReagentId: RMCAmmonia
+          Quantity: 30
+
+- type: entity
+  id: RMCChemistryBottleDiethylamine
+  suffix: diethylamine
+  parent: BaseChemistryBottleFilled
+  components:
+  - type: Label
+    currentLabel: reagent-name-rmcdiethylamine
+  - type: SolutionContainerManager
+    solutions:
+      drink:
+        maxVol: 30
+        reagents:
+        - ReagentId: RMCDiethylamine
+          Quantity: 30

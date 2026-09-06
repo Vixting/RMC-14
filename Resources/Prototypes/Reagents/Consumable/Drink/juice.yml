@@ -44,6 +44,7 @@
   flavor: bungo
   color: "#F9E43D"
 
+# TODO RMC14: heal eyes
 - type: reagent
   id: JuiceCarrot
   name: reagent-name-juice-carrot
@@ -96,14 +97,14 @@
   physicalDesc: reagent-physical-desc-citric
   flavor: sour
   color: "#99bb43"
-
-# /datum/reagent/drink/orangejuice/on_mob_life(var/mob/living/M)
-
-# if(..())
-# return 1
-
-# if(M.getToxLoss() && prob(20))
-# M.adjustToxLoss(-REM)
+  metabolisms:
+    Drink:
+      effects:
+      - !type:HealthChange
+        probability: 0.2
+        damage:
+          types:
+            Poison: -1
 
 - type: reagent
   id: JuiceOrange
@@ -119,6 +120,14 @@
   metamorphicMaxFillLevels: 5
   metamorphicFillBaseName: fill-
   metamorphicChangeColor: false
+  metabolisms:
+    Drink:
+      effects:
+      - !type:HealthChange
+        probability: 0.3
+        damage:
+          types:
+            Asphyxiation: -1
 
 - type: reagent
   id: JuicePineapple
@@ -146,6 +155,14 @@
   physicalDesc: reagent-physical-desc-saucey
   flavor: tomato
   color: "#731008"
+  metabolisms:
+    Drink:
+      effects:
+      - !type:HealthChange
+        probability: 0.2
+        damage:
+          types:
+            Heat: -1
 
 - type: reagent
   id: JuiceWatermelon

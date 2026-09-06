@@ -656,19 +656,16 @@
     RMCChemistryBottleEZNutrient: 35
     RMCChemistryBottleLeft4Zed: 25
     RMCChemistryBottleRobustHarvest: 15
-    WeedSpray: 20
     PestSpray: 20
-    PlantBGoneSpray: 5
     Syringe: 5
     RMCStoragePlantBag: 5
+    RMCChemistryBottleAmmonia: 10
+    RMCChemistryBottleDiethylamine: 5
     RMCToolMiniHoe: 3
-    RMCToolSpade: 3
     RMCToolHatchet: 3
+    RMCPlantAnalyzer: 2
     HydroponicsToolScythe: 3
     HydroponicsToolClippers: 3
-    ChemistryBottleAmmonia: 10
-    ChemistryBottleDiethylamine: 5
-    RMCPlantAnalyzer: 2
     RMCAutoHarvestUpgrade: 3
     RMCFloraDataDiscBox: 2
 
@@ -724,7 +721,7 @@
     RMCIcePepperSeeds: 3
     RMCGlowberrySeeds: 2
     RMCMoldSeeds: 2
-    RMCReishiSeeds: 2
+    RMCReishiSeeds: 3
     RMCGlowshroomSeeds: 2
     RMCPlastelliumSeeds: 2
     RMCHarebellSeeds: 2
@@ -732,22 +729,19 @@
     RMCBluespacetomaSeeds: 1
     RMCKudzuSeeds: 1
     RMCPoisonberrySeeds: 1
-    # Dont exist in CM just going to leave tho
-    CottonSeeds: 3
-    OatSeeds: 3
-    PineappleSeeds: 3
-    LingzhiSeeds: 3
-    GarlicSeeds: 3
-    OnionSeeds: 3
-    OnionRedSeeds: 3
-  emaggedInventory:
+    RMCCottonSeeds: 3
+    RMCOatSeeds: 3
+    RMCPineappleSeeds: 3
+    RMCGarlicSeeds: 3
+    RMCOnionSeeds: 3
+    RMCOnionRedSeeds: 3
+
+    # Emagg inventory in cm but I don't see why
     RMCLibertySeeds: 1
     RMCMtearSeeds: 1
     RMCAmbrosiaVulgarisSeeds: 1
     RMCNettleSeeds: 1
-    RMCDeathberrySeeds: 1
-    RMCAngelSeeds: 1
-    RMCWeedsSeeds: 1
+  emaggedInventory:
 
 
 # Dinnerware

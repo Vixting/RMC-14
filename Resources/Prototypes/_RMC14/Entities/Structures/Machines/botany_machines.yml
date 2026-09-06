@@ -113,7 +113,7 @@
         - MachineMask
         layer:
         - MachineLayer
-  - type: SeedExtractor
+  - type: RMCSeedExtractor
   - type: RMCPowerReceiver
     idleLoad: 5
     activeLoad: 50

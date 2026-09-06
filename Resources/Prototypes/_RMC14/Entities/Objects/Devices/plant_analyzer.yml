@@ -5,12 +5,16 @@
   description: A handheld device for analyzing plant genetics. Use it on a seed packet, hydroponics tray, or harvested produce to read detailed stats.
   components:
   - type: Sprite
-    sprite: Objects/Devices/forensic_scanner.rsi
+    sprite: _RMC14/Objects/Devices/plant_analyzer.rsi
     state: icon
   - type: Item
     size: Small
-    sprite: Objects/Devices/forensic_scanner.rsi
+    sprite: _RMC14/Objects/Devices/plant_analyzer.rsi
   - type: RMCPlantAnalyzer
+  - type: UserInterface
+    interfaces:
+      enum.RMCPlantAnalyzerUiKey.Key:
+        type: RMCPlantAnalyzerBui
   - type: Tag
     tags:
     - PlantAnalyzer

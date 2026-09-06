@@ -1,0 +1,16 @@
+- type: entity
+  abstract: true
+  id: BasePlant
+  components:
+  - type: Sprite
+    noRot: true
+  - type: RMCPlant
+  - type: RMCPlantGrowth
+  - type: RMCPlantChemicals
+  - type: RMCPlantHarvest
+  - type: RMCPlantAtmospheric
+  - type: RMCConsumeExudeGas
+  - type: RMCPlantTraits
+  - type: RMCPlantMutation
+  - type: RMCPlantMetabolism
+  - type: RMCPlantLog

@@ -16,7 +16,7 @@
     areaInsert: true
     whitelist:
       components:
-      - Produce
-      - Seed
+      - RMCProduce
+      - RMCPlantSeed
   - type: Dumpable
   - type: FixedItemSizeStorage

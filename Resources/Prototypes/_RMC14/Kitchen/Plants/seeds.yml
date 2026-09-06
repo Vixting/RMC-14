@@ -1,2005 +1,2733 @@
-
-- type: entity
+﻿- type: entity
   parent: SeedBase
   name: packet of plump spores
   id: RMCPlumpSeeds
   components:
-  - type: Seed
-    seedId: rmcplump
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcplump
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/plump.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of grass seeds
   id: RMCGrassSeeds
   components:
-  - type: Seed
-    seedId: rmcgrass
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcgrass
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/grass.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of white beet seeds
   id: RMCWhiteBeetSeeds
   components:
-  - type: Seed
-    seedId: rmcwhitebeet
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcwhitebeet
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/whitebeet.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of peanut seeds
   id: RMCPeanutSeeds
   components:
-  - type: Seed
-    seedId: rmcpeanut
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcpeanut
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/peanut.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of sunflower seeds
   id: RMCSunflowerSeeds
   components:
-  - type: Seed
-    seedId: rmcsunflower
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcsunflower
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/sunflower.rsi
-
-- type: seed
-  id: rmcplump
-  name: seeds-plump-name
-  noun: seeds-noun-spores
-  displayName: seeds-plump-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/plump.rsi
-  packetPrototype: RMCPlumpSeeds
-  productPrototypes:
-  - FoodMushroomPlump
-  lifespan: 25
-  maturation: 8
-  production: 7
-  yield: 4
-  potency: 1
-  growthStages: 3
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcpeanut
-  name: seeds-peanut-name
-  noun: seeds-noun-seeds
-  displayName: seeds-peanut-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/peanut.rsi
-  packetPrototype: RMCPeanutSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodPeanut
-  lifespan: 55
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcsunflower
-  name: seeds-sunflower-name
-  noun: seeds-noun-seeds
-  displayName: seeds-sunflower-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/sunflower.rsi
-  packetPrototype: RMCSunflowerSeeds
-  productPrototypes:
-  - FoodSunflower
-  lifespan: 25
-  maturation: 6
-  production: 7
-  yield: 5
-  potency: 1
-  growthStages: 3
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcwhitebeet
-  name: seeds-whitebeet-name
-  noun: seeds-noun-seeds
-  displayName: seeds-whitebeet-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/whitebeet.rsi
-  packetPrototype: RMCWhiteBeetSeeds
-  productPrototypes:
-  - FoodWhiteBeet
-  lifespan: 60
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-    RMCSugar:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 20
-
-- type: seed
-  id: rmcgrass
-  name: seeds-grass-name
-  noun: seeds-noun-seeds
-  displayName: seeds-grass-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/grass.rsi
-  packetPrototype: RMCGrassSeeds
-  productPrototypes:
-  - FoodGrass
-  lifespan: 60
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 2
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-
 - type: entity
   parent: SeedBase
   name: packet of S'randar's Hand seeds
   id: RMCShandSeeds
   components:
-    - type: Seed
-      seedId: rmcshand
-    - type: Sprite
-      sprite: _RMC14/Objects/Kitchen/Plants/shand.rsi
-
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcshand
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/shand.rsi
 - type: entity
   parent: SeedBase
   name: packet of Messa's Tear seeds
   id: RMCMtearSeeds
   components:
-    - type: Seed
-      seedId: rmcmtear
-    - type: Sprite
-      sprite: _RMC14/Objects/Kitchen/Plants/mtear.rsi
-
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcmtear
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/mtear.rsi
 - type: entity
   parent: SeedBase
   name: packet of mango seeds
   id: RMCMangoSeeds
   components:
-    - type: Seed
-      seedId: rmcmango
-    - type: Sprite
-      sprite: _RMC14/Objects/Kitchen/Plants/mango.rsi
-
-- type: seed
-  id: rmcshand
-  name: seeds-shand-name
-  noun: seeds-noun-seeds
-  displayName: seeds-shand-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/shand.rsi
-  packetPrototype: RMCShandSeeds
-  productPrototypes:
-    - FoodShand
-  lifespan: 40
-  maturation: 7
-  production: 7
-  yield: 3
-  potency: 10
-  growthStages: 3
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 295
-  chemicals:
-    CMBicaridine:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmcmtear
-  name: seeds-mtear-name
-  noun: seeds-noun-seeds
-  displayName: seeds-mtear-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/mtear.rsi
-  packetPrototype: RMCMtearSeeds
-  productPrototypes:
-    - FoodMtear
-  specialChemicals:
-  - RMCDigoxin
-  lifespan: 50
-  maturation: 8
-  production: 8
-  yield: 3
-  potency: 10
-  growthStages: 4
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 295
-  chemicals:
-    RMCHoney:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-    CMKelotane:
-      Min: 3
-      Max: 5
-      PotencyDivisor: 5
-
-- type: seed
-  id: rmcmango
-  name: seeds-mango-name
-  noun: seeds-noun-seeds
-  displayName: seeds-mango-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/mango.rsi
-  packetPrototype: RMCMangoSeeds
-  productPrototypes:
-    - RMCFoodMango
-  harvestRepeat: Repeat
-  lifespan: 55
-  maturation: 6
-  production: 6
-  yield: 3
-  potency: 10
-  idealLight: 8
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 20
-    Vitamin:
-      Min: 1
-      Max: 4
-      PotencyDivisor: 25
-
-# ── seed packet entities ─────────────────────────────────────────────────
-
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcmango
+  - type: Sprite
+    sprite: _RMC14/Objects/Kitchen/Plants/mango.rsi
 - type: entity
   parent: SeedBase
   name: packet of ice pepper seeds
   id: RMCIcePepperSeeds
   components:
-  - type: Seed
-    seedId: chiliice
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantChiliice
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/chiliice.rsi
-
+    sprite: Objects/Specific/Hydroponics/chilly.rsi
 - type: entity
   parent: SeedBase
   name: packet of glowberry seeds
   id: RMCGlowberrySeeds
   components:
-  - type: Seed
-    seedId: glowberry
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantGlowberry
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/glowberry.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of poisonberry seeds
   id: RMCPoisonberrySeeds
   components:
-  - type: Seed
-    seedId: poisonberry
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantPoisonberry
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/poisonberry.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of deathberry seeds
   id: RMCDeathberrySeeds
   components:
-  - type: Seed
-    seedId: deathberry
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantDeathberry
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/deathberry.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of bluespace tomato seeds
   id: RMCBluespacetomaSeeds
   components:
-  - type: Seed
-    seedId: bluespacetomato
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantBluespacetomato
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/bluespacetomato.rsi
-
+    sprite: Objects/Specific/Hydroponics/blue_tomato.rsi
 - type: entity
   parent: SeedBase
   name: packet of mold spores
   id: RMCMoldSeeds
   components:
-  - type: Seed
-    seedId: mold
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantMold
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/mold.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of reishi spores
   id: RMCReishiSeeds
   components:
-  - type: Seed
-    seedId: reishi
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantReishi
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/reishi.rsi
-
+    sprite: Objects/Specific/Hydroponics/lingzhi.rsi
 - type: entity
   parent: SeedBase
   name: packet of liberty cap spores
   id: RMCLibertySeeds
   components:
-  - type: Seed
-    seedId: liberty
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantLiberty
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/liberty.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of destroying angel spores
   id: RMCAngelSeeds
   components:
-  - type: Seed
-    seedId: angel
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantAngel
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/angel.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of glowshroom spores
   id: RMCGlowshroomSeeds
   components:
-  - type: Seed
-    seedId: glowshroom
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantGlowshroom
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/glowshroom.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of plastellium seeds
   id: RMCPlastelliumSeeds
   components:
-  - type: Seed
-    seedId: plastellium
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantPlastellium
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/plastellium.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of harebell seeds
   id: RMCHarebellSeeds
   components:
-  - type: Seed
-    seedId: harebell
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantHarebell
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/harebell.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of green grape seeds
   id: RMCGreengrapeSeeds
   components:
-  - type: Seed
-    seedId: greengrape
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantGreengrape
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/greengrape.rsi
-
+    sprite: Objects/Specific/Hydroponics/grape.rsi
 - type: entity
   parent: SeedBase
   name: packet of kudzu seeds
   id: RMCKudzuSeeds
   components:
-  - type: Seed
-    seedId: kudzu
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantKudzu
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/kudzu.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of weed seeds
   id: RMCWeedsSeeds
   components:
-  - type: Seed
-    seedId: weeds
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantWeeds
   - type: Sprite
     sprite: _RMC14/Objects/Kitchen/Plants/weeds.rsi
-
-# ── seed prototypes ──────────────────────────────────────────────────────
-
-- type: seed
-  id: chiliice
-  name: seeds-chiliice-name
-  noun: seeds-noun-seeds
-  displayName: seeds-chiliice-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/chiliice.rsi
-  packetPrototype: RMCIcePepperSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodIcePepper
-  lifespan: 45
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 278
-  chemicals:
-    FrostOil:
-      Min: 1
-      Max: 8
-      PotencyDivisor: 10
-    Nutriment:
-      Min: 1
-      Max: 3
-      PotencyDivisor: 25
-
-- type: seed
-  id: glowberry
-  name: seeds-glowberry-name
-  noun: seeds-noun-seeds
-  displayName: seeds-glowberry-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/glowberry.rsi
-  packetPrototype: RMCGlowberrySeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodGlowberry
-  mutationPrototypes:
-  - glowshroom
-  lifespan: 45
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    RMCUranium:
-      Min: 3
-      Max: 5
-      PotencyDivisor: 10
-
-- type: seed
-  id: poisonberry
-  name: seeds-poisonberry-name
-  noun: seeds-noun-seeds
-  displayName: seeds-poisonberry-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/poisonberry.rsi
-  packetPrototype: RMCPoisonberrySeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodPoisonberry
-  mutationPrototypes:
-  - deathberry
-  specialChemicals:
-  - RMCThymol
-  lifespan: 45
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-    RMCGenericToxin:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 10
-
-- type: seed
-  id: deathberry
-  name: seeds-deathberry-name
-  noun: seeds-noun-seeds
-  displayName: seeds-deathberry-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/deathberry.rsi
-  packetPrototype: RMCDeathberrySeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodDeathberry
-  specialChemicals:
-  - RMCThymol
-  lifespan: 45
-  maturation: 7
-  production: 7
-  yield: 5
-  potency: 10
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-    RMCLexorin:
-      Min: 1
-      Max: 3
-      PotencyDivisor: 5
-
-- type: seed
-  id: bluespacetomato
-  name: seeds-bluespacetomato-name
-  noun: seeds-noun-seeds
-  displayName: seeds-bluespacetomato-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/bluespacetomato.rsi
-  packetPrototype: RMCBluespacetomaSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodBluespaceTomato
-  lifespan: 55
-  maturation: 10
-  production: 10
-  yield: 4
-  potency: 15
-  growthStages: 6
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Singulo:
-      Min: 1
-      Max: 2
-      PotencyDivisor: 10
-    Nutriment:
-      Min: 1
-      Max: 3
-      PotencyDivisor: 25
-
-- type: seed
-  id: mold
-  name: seeds-mold-name
-  noun: seeds-noun-spores
-  displayName: seeds-mold-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/mold.rsi
-  packetPrototype: RMCMoldSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodMold
-  mutationPrototypes:
-  - reishi
-  lifespan: 30
-  maturation: 4
-  production: 4
-  yield: 5
-  potency: 10
-  growthStages: 3
-  lightTolerance: 2
-  waterConsumption: 0.50
-  nutrientConsumption: 0.40
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: reishi
-  name: seeds-reishi-name
-  noun: seeds-noun-spores
-  displayName: seeds-reishi-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/reishi.rsi
-  packetPrototype: RMCReishiSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodReishi
-  mutationPrototypes:
-  - liberty
-  specialChemicals:
-  - RMCZygacine
-  lifespan: 30
-  maturation: 5
-  production: 5
-  yield: 4
-  potency: 10
-  growthStages: 4
-  lightTolerance: 2
-  waterConsumption: 0.50
-  nutrientConsumption: 0.40
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-    RMCPsilocybin:
-      Min: 3
-      Max: 5
-      PotencyDivisor: 5
-    RMCAmatoxin:
-      Min: 3
-      Max: 10
-      PotencyDivisor: 5
-
-- type: seed
-  id: liberty
-  name: seeds-liberty-name
-  noun: seeds-noun-spores
-  displayName: seeds-liberty-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/liberty.rsi
-  packetPrototype: RMCLibertySeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodLiberty
-  mutationPrototypes:
-  - angel
-  lifespan: 25
-  maturation: 4
-  production: 5
-  yield: 4
-  potency: 10
-  growthStages: 3
-  lightTolerance: 2
-  waterConsumption: 0.50
-  nutrientConsumption: 0.40
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-    RMCSoporific:
-      Min: 3
-      Max: 3
-      PotencyDivisor: 5
-    RMCSpaceDrugs:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 5
-
-- type: seed
-  id: angel
-  name: seeds-angel-name
-  noun: seeds-noun-spores
-  displayName: seeds-angel-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/angel.rsi
-  packetPrototype: RMCAngelSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodAngel
-  lifespan: 30
-  maturation: 5
-  production: 6
-  yield: 3
-  potency: 10
-  growthStages: 3
-  lightTolerance: 2
-  waterConsumption: 0.50
-  nutrientConsumption: 0.40
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-    RMCAmatoxin:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 5
-    RMCPsilocybin:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 5
-
-- type: seed
-  id: glowshroom
-  name: seeds-glowshroom-name
-  noun: seeds-noun-spores
-  displayName: seeds-glowshroom-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/glowshroom.rsi
-  packetPrototype: RMCGlowshroomSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodGlowshroom
-  mutationPrototypes:
-  - glowberry
-  lifespan: 30
-  maturation: 5
-  production: 5
-  yield: 4
-  potency: 10
-  growthStages: 4
-  lightTolerance: 2
-  waterConsumption: 0.50
-  nutrientConsumption: 0.40
-  idealHeat: 288
-  chemicals:
-    RMCRadium:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 5
-
-- type: seed
-  id: plastellium
-  name: seeds-plastellium-name
-  noun: seeds-noun-seeds
-  displayName: seeds-plastellium-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/plastellium.rsi
-  packetPrototype: RMCPlastelliumSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodPlastellium
-  lifespan: 40
-  maturation: 7
-  production: 7
-  yield: 4
-  potency: 10
-  growthStages: 3
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    RMCPlasticide:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: harebell
-  name: seeds-harebell-name
-  noun: seeds-noun-seeds
-  displayName: seeds-harebell-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/harebell.rsi
-  packetPrototype: RMCHarebellSeeds
-  productPrototypes:
-  - RMCFoodHarebell
-  lifespan: 35
-  maturation: 5
-  production: 6
-  yield: 3
-  potency: 10
-  growthStages: 4
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 285
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-
-- type: seed
-  id: greengrape
-  name: seeds-greengrape-name
-  noun: seeds-noun-seeds
-  displayName: seeds-greengrape-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/greengrape.rsi
-  packetPrototype: RMCGreengrapeSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodGreengrape
-  lifespan: 40
-  maturation: 6
-  production: 6
-  yield: 6
-  potency: 10
-  growthStages: 2
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    CMKelotane:
-      Min: 3
-      Max: 5
-      PotencyDivisor: 5
-
-- type: seed
-  id: kudzu
-  name: seeds-kudzu-name
-  noun: seeds-noun-seeds
-  displayName: seeds-kudzu-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/kudzu.rsi
-  packetPrototype: RMCKudzuSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodKudzu
-  lifespan: 60
-  maturation: 5
-  production: 5
-  yield: 8
-  potency: 10
-  growthStages: 4
-  lightTolerance: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 295
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-    CMDylovene:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 5
-
-- type: seed
-  id: weeds
-  name: seeds-weeds-name
-  noun: seeds-noun-seeds
-  displayName: seeds-weeds-display-name
-  plantRsi: _RMC14/Objects/Kitchen/Plants/weeds.rsi
-  packetPrototype: RMCWeedsSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodWeeds
-  lifespan: 60
-  maturation: 4
-  production: 4
-  yield: 8
-  potency: 10
-  growthStages: 4
-  lightTolerance: 4
-  waterConsumption: 0.40
-  nutrientConsumption: 0.30
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 25
-
 - type: entity
   parent: SeedBase
   name: packet of nettle seeds
-  description: "Handle with gloves."
+  description: Handle with gloves.
   id: RMCNettleSeeds
   components:
-  - type: Seed
-    seedId: rmcnettle
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcnettle
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/nettle.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of death nettle seeds
-  description: "Handle with very thick gloves."
+  description: Handle with very thick gloves.
   id: RMCDeathNettleSeeds
   components:
-  - type: Seed
-    seedId: rmcdeathnettle
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcdeathnettle
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/death_nettle.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of ambrosia vulgaris seeds
-  description: "A medicinal plant for the common folk."
+  description: A medicinal plant for the common folk.
   id: RMCAmbrosiaVulgarisSeeds
   components:
-  - type: Seed
-    seedId: rmcambrosiavulgaris
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcambrosiavulgaris
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/ambrosia_vulgaris.rsi
-
-- type: seed
-  id: rmcnettle
-  name: seeds-nettle-name
-  noun: seeds-noun-seeds
-  displayName: seeds-nettle-display-name
-  plantRsi: Objects/Specific/Hydroponics/nettle.rsi
-  packetPrototype: RMCNettleSeeds
-  productPrototypes:
-  - Nettle
-  mutationPrototypes:
-  - rmcdeathnettle
-  lifespan: 25
-  maturation: 8
-  production: 6
-  yield: 2
-  potency: 20
-  growthStages: 5
-  idealLight: 8
-  waterConsumption: 0.60
-  idealHeat: 298
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 4
-    RMCSulphuricAcid:
-      Min: 0
-      Max: 1
-      PotencyDivisor: 20
-
-- type: seed
-  id: rmcdeathnettle
-  name: seeds-deathnettle-name
-  noun: seeds-noun-seeds
-  displayName: seeds-deathnettle-display-name
-  plantRsi: Objects/Specific/Hydroponics/death_nettle.rsi
-  packetPrototype: RMCDeathNettleSeeds
-  plantLogImpact: High
-  harvestLogImpact: High
-  productPrototypes:
-  - DeathNettle
-  specialChemicals:
-  - RMCUrishiol
-  lifespan: 25
-  maturation: 8
-  production: 6
-  yield: 2
-  potency: 20
-  growthStages: 5
-  idealLight: 8
-  waterConsumption: 0.70
-  nutrientConsumption: 0.80
-  idealHeat: 298
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 4
-
-- type: seed
-  id: rmcambrosiavulgaris
-  name: seeds-ambrosiavulgaris-name
-  noun: seeds-noun-seeds
-  displayName: seeds-ambrosiavulgaris-display-name
-  plantRsi: Objects/Specific/Hydroponics/ambrosia_vulgaris.rsi
-  packetPrototype: RMCAmbrosiaVulgarisSeeds
-  productPrototypes:
-  - FoodAmbrosiaVulgaris
-  lifespan: 25
-  maturation: 10
-  production: 3
-  yield: 3
-  potency: 10
-  growthStages: 6
-  waterConsumption: 0.60
-  idealHeat: 293
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 2
-      PotencyDivisor: 10
-    RMCSpaceDrugs:
-      Min: 1
-      Max: 8
-      PotencyDivisor: 10
-    CMKelotane:
-      Min: 1
-      Max: 8
-      PotencyDivisor: 10
-    CMBicaridine:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-    RMCGenericToxin:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
-# ── chems_special plant packets
-
 - type: entity
   parent: SeedBase
   name: packet of apple seeds
   id: RMCAppleSeeds
   components:
-  - type: Seed
-    seedId: rmcapple
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcapple
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/apple.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of poison apple seeds
-  description: "Handle with care."
+  description: Handle with care.
   id: RMCPoisonAppleSeeds
   components:
-  - type: Seed
-    seedId: rmcpoisonapple
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcpoisonapple
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/apple.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of cabbage seeds
   id: RMCCabbageSeeds
   components:
-  - type: Seed
-    seedId: rmccabbage
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmccabbage
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/cabbage.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of carrot seeds
   id: RMCCarrotSeeds
   components:
-  - type: Seed
-    seedId: rmccarrot
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmccarrot
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/carrot.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of poppy seeds
   id: RMCPoppySeeds
   components:
-  - type: Seed
-    seedId: rmcpoppy
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcpoppy
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/poppy.rsi
-
-# ── chems_special plants
-
-- type: seed
-  id: rmcapple
-  name: seeds-rmcapple-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcapple-display-name
-  plantRsi: Objects/Specific/Hydroponics/apple.rsi
-  packetPrototype: RMCAppleSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodApple
-  mutationPrototypes:
-  - rmcpoisonapple
-  - rmcgoldapple
-  lifespan: 55
-  maturation: 6
-  production: 6
-  yield: 5
-  potency: 10
-  growthStages: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcpoisonapple
-  name: seeds-poisonapple-name
-  noun: seeds-noun-seeds
-  displayName: seeds-poisonapple-display-name
-  plantRsi: Objects/Specific/Hydroponics/apple.rsi
-  packetPrototype: RMCPoisonAppleSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - RMCFoodPoisonApple
-  lifespan: 55
-  maturation: 6
-  production: 6
-  yield: 5
-  potency: 10
-  growthStages: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    RMCCyanide:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmccabbage
-  name: seeds-rmccabbage-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmccabbage-display-name
-  plantRsi: Objects/Specific/Hydroponics/cabbage.rsi
-  packetPrototype: RMCCabbageSeeds
-  productPrototypes:
-  - FoodCabbage
-  specialChemicals:
-  - RMCPsoralen
-  lifespan: 50
-  maturation: 3
-  production: 5
-  yield: 4
-  potency: 10
-  growthStages: 1
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmccarrot
-  name: seeds-carrot-name
-  noun: seeds-noun-seeds
-  displayName: seeds-carrot-display-name
-  plantRsi: Objects/Specific/Hydroponics/carrot.rsi
-  packetPrototype: RMCCarrotSeeds
-  productPrototypes:
-  - FoodCarrot
-  specialChemicals:
-  - RMCConiine
-  - RMCPhenol
-  lifespan: 25
-  maturation: 10
-  production: 1
-  yield: 5
-  potency: 10
-  growthStages: 3
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-    CMImidazoline:
-      Min: 3
-      Max: 5
-      PotencyDivisor: 5
-
-- type: seed
-  id: rmcpoppy
-  name: seeds-rmcpoppy-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcpoppy-display-name
-  plantRsi: Objects/Specific/Hydroponics/poppy.rsi
-  packetPrototype: RMCPoppySeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodPoppy
-  specialChemicals:
-  - RMCAtropine
-  lifespan: 25
-  maturation: 8
-  production: 6
-  yield: 6
-  potency: 20
-  growthStages: 3
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-    CMBicaridine:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
 - type: entity
   parent: SeedBase
   name: packet of berry seeds
   id: RMCBerriesSeeds
   components:
-  - type: Seed
-    seedId: rmcberries
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcberries
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/berries.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of golden apple seeds
   id: RMCGoldAppleSeeds
   components:
-  - type: Seed
-    seedId: rmcgoldapple
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcgoldapple
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/golden_apple.rsi
-
-- type: seed
-  id: rmcberries
-  name: seeds-rmcberries-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcberries-display-name
-  plantRsi: Objects/Specific/Hydroponics/berries.rsi
-  packetPrototype: RMCBerriesSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodBerries
-  mutationPrototypes:
-  - glowberry
-  - poisonberry
-  - deathberry
-  lifespan: 20
-  maturation: 5
-  production: 5
-  yield: 2
-  potency: 10
-  growthStages: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcgoldapple
-  name: seeds-goldapple-name
-  noun: seeds-noun-seeds
-  displayName: seeds-goldapple-display-name
-  plantRsi: Objects/Specific/Hydroponics/golden_apple.rsi
-  packetPrototype: RMCGoldAppleSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodGoldenApple
-  lifespan: 55
-  maturation: 10
-  production: 10
-  yield: 3
-  potency: 10
-  growthStages: 6
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    RMCGold:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 10
-
-# ── plant packets
-
 - type: entity
   parent: SeedBase
   name: packet of chili seeds
   id: RMCChiliSeeds
   components:
-  - type: Seed
-    seedId: rmcchili
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcchili
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/chili.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of tomato seeds
   id: RMCTomatoSeeds
   components:
-  - type: Seed
-    seedId: rmctomato
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmctomato
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/tomato.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of eggplant seeds
   id: RMCEggplantSeeds
   components:
-  - type: Seed
-    seedId: rmceggplant
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmceggplant
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/eggplant.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of chanterelle spores
   id: RMCChanterelleSeeds
   components:
-  - type: Seed
-    seedId: rmcchanterelle
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcchanterelle
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/chanterelle.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of banana seeds
   id: RMCBananaSeeds
   components:
-  - type: Seed
-    seedId: rmcbanana
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcbanana
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/banana.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of corn seeds
   id: RMCCornSeeds
   components:
-  - type: Seed
-    seedId: rmccorn
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmccorn
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/corn.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of potato seeds
   id: RMCPotatoSeeds
   components:
-  - type: Seed
-    seedId: rmcpotato
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcpotato
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/potato.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of soybean seeds
   id: RMCSoybeansSeeds
   components:
-  - type: Seed
-    seedId: rmcsoybeans
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcsoybeans
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/soybeans.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of wheat seeds
   id: RMCWheatSeeds
   components:
-  - type: Seed
-    seedId: rmcwheat
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcwheat
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/wheat.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of rice seeds
   id: RMCRiceSeeds
   components:
-  - type: Seed
-    seedId: rmcrice
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcrice
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/rice.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of sugarcane seeds
   id: RMCSugarcaneSeeds
   components:
-  - type: Seed
-    seedId: rmcsugarcane
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcsugarcane
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/sugarcane.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of watermelon seeds
   id: RMCWatermelonSeeds
   components:
-  - type: Seed
-    seedId: rmcwatermelon
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcwatermelon
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/watermelon.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of pumpkin seeds
   id: RMCPumpkinSeeds
   components:
-  - type: Seed
-    seedId: rmcpumpkin
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcpumpkin
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/pumpkin.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of lime seeds
   id: RMCLimeSeeds
   components:
-  - type: Seed
-    seedId: rmclime
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmclime
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/lime.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of lemon seeds
   id: RMCLemonSeeds
   components:
-  - type: Seed
-    seedId: rmclemon
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmclemon
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/lemon.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of orange seeds
   id: RMCOrangeSeeds
   components:
-  - type: Seed
-    seedId: rmcorange
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcorange
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/orange.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of cocoa seeds
   id: RMCCocoaSeeds
   components:
-  - type: Seed
-    seedId: rmccocoa
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmccocoa
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/cocoa.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of grape seeds
   id: RMCGrapeSeeds
   components:
-  - type: Seed
-    seedId: rmcgrape
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcgrape
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/grape.rsi
-
 - type: entity
   parent: SeedBase
   name: packet of cherry pits
   id: RMCCherrySeeds
   components:
-  - type: Seed
-    seedId: rmccherry
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmccherry
   - type: Sprite
     sprite: Objects/Specific/Hydroponics/cherry.rsi
 
-# ── food plant seeds
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcplump
+  name: plump helmet mushrooms
+  components:
+  - type: RMCPlant
+    displayName: seeds-plump-display-name
+    name: seeds-plump-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 7
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPlumpSeeds
+    productPrototypes:
+    - FoodMushroomPlump
+    yield: 4
+  - type: RMCPlantChemicals
+    potency: 1
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/plump.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcpeanut
+  name: peanut vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-peanut-display-name
+    name: seeds-peanut-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPeanutSeeds
+    productPrototypes:
+    - FoodPeanut
+    yield: 6
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/peanut.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcsunflower
+  name: sunflowers
+  components:
+  - type: RMCPlant
+    displayName: seeds-sunflower-display-name
+    name: seeds-sunflower-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 6
+    production: 7
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCSunflowerSeeds
+    productPrototypes:
+    - FoodSunflower
+    yield: 5
+  - type: RMCPlantChemicals
+    potency: 1
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/sunflower.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcwhitebeet
+  name: white beets
+  components:
+  - type: RMCPlant
+    displayName: seeds-whitebeet-display-name
+    name: seeds-whitebeet-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 60
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCWhiteBeetSeeds
+    productPrototypes:
+    - FoodWhiteBeet
+    yield: 6
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+      RMCSugar:
+        min: 1
+        max: 10
+        potencyDivisor: 20
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/whitebeet.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcgrass
+  name: grass
+  components:
+  - type: RMCPlant
+    displayName: seeds-grass-display-name
+    name: seeds-grass-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 60
+    maturation: 6
+    production: 6
+    growthStages: 2
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGrassSeeds
+    productPrototypes:
+    - FoodGrass
+    yield: 6
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/grass.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcshand
+  name: S'randar's Hand herbs
+  components:
+  - type: RMCPlant
+    displayName: seeds-shand-display-name
+    name: seeds-shand-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 40
+    maturation: 7
+    production: 7
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCShandSeeds
+    productPrototypes:
+    - FoodShand
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      CMBicaridine:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 285.0
+    maxHeat: 305.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/shand.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcmtear
+  name: Messa's Tear vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-mtear-display-name
+    name: seeds-mtear-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 8
+    production: 8
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCMtearSeeds
+    productPrototypes:
+    - FoodMtear
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      RMCHoney:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+      CMKelotane:
+        min: 3
+        max: 5
+        potencyDivisor: 5
+    specialChemicals:
+    - RMCDigoxin
+  - type: RMCPlantAtmospheric
+    minHeat: 285.0
+    maxHeat: 305.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/mtear.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcmango
+  name: mango trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-mango-display-name
+    name: seeds-mango-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCMangoSeeds
+    productPrototypes:
+    - RMCFoodMango
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 20
+      Vitamin:
+        min: 1
+        max: 4
+        potencyDivisor: 25
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/mango.rsi
+- type: entity
+  parent: BasePlant
+  id: RMCPlantChiliice
+  name: ice pepper plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-chiliice-display-name
+    name: seeds-chiliice-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 45
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCIcePepperSeeds
+    productPrototypes:
+    - RMCFoodIcePepper
+    yield: 6
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      FrostOil:
+        min: 1
+        max: 8
+        potencyDivisor: 10
+      Nutriment:
+        min: 1
+        max: 3
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 268.0
+    maxHeat: 288.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/chilly.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantGlowberry
+  name: glowberry bushes
+  components:
+  - type: RMCPlant
+    displayName: seeds-glowberry-display-name
+    name: seeds-glowberry-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 45
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGlowberrySeeds
+    productPrototypes:
+    - RMCFoodGlowberry
+    yield: 6
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      RMCUranium:
+        min: 3
+        max: 5
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/glowberry.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantGlowshroom
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantPoisonberry
+  name: poisonberry bushes
+  components:
+  - type: RMCPlant
+    displayName: seeds-poisonberry-display-name
+    name: seeds-poisonberry-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 45
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPoisonberrySeeds
+    productPrototypes:
+    - RMCFoodPoisonberry
+    yield: 6
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+      RMCGenericToxin:
+        min: 1
+        max: 5
+        potencyDivisor: 10
+    specialChemicals:
+    - RMCThymol
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/poisonberry.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantDeathberry
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantDeathberry
+  name: deathberry bushes
+  components:
+  - type: RMCPlant
+    displayName: seeds-deathberry-display-name
+    name: seeds-deathberry-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 45
+    maturation: 7
+    production: 7
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCDeathberrySeeds
+    productPrototypes:
+    - RMCFoodDeathberry
+    yield: 5
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+      RMCLexorin:
+        min: 1
+        max: 3
+        potencyDivisor: 5
+    specialChemicals:
+    - RMCThymol
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/deathberry.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantBluespacetomato
+  name: bluespace tomato vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-bluespacetomato-display-name
+    name: seeds-bluespacetomato-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 10
+    production: 10
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCBluespacetomaSeeds
+    productPrototypes:
+    - RMCFoodBluespaceTomato
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 15
+    chemicals:
+      Singulo:
+        min: 1
+        max: 2
+        potencyDivisor: 10
+      Nutriment:
+        min: 1
+        max: 3
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/blue_tomato.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantMold
+  name: mold colonies
+  components:
+  - type: RMCPlant
+    displayName: seeds-mold-display-name
+    name: seeds-mold-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 30
+    maturation: 4
+    production: 4
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCMoldSeeds
+    productPrototypes:
+    - RMCFoodMold
+    yield: 5
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/mold.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantReishi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantReishi
+  name: reishi clusters
+  components:
+  - type: RMCPlant
+    displayName: seeds-reishi-display-name
+    name: seeds-reishi-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 30
+    maturation: 5
+    production: 5
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCReishiSeeds
+    productPrototypes:
+    - RMCFoodReishi
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+      RMCPsilocybin:
+        min: 3
+        max: 5
+        potencyDivisor: 5
+      RMCAmatoxin:
+        min: 3
+        max: 10
+        potencyDivisor: 5
+    specialChemicals:
+    - RMCZygacine
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/lingzhi.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantLiberty
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantLiberty
+  name: liberty cap clusters
+  components:
+  - type: RMCPlant
+    displayName: seeds-liberty-display-name
+    name: seeds-liberty-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 4
+    production: 5
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCLibertySeeds
+    productPrototypes:
+    - RMCFoodLiberty
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+      RMCSoporific:
+        min: 3
+        max: 3
+        potencyDivisor: 5
+      RMCSpaceDrugs:
+        min: 1
+        max: 25
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/liberty.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantAngel
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantAngel
+  name: destroying angel clusters
+  components:
+  - type: RMCPlant
+    displayName: seeds-angel-display-name
+    name: seeds-angel-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 30
+    maturation: 5
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCAngelSeeds
+    productPrototypes:
+    - RMCFoodAngel
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+      RMCAmatoxin:
+        min: 1
+        max: 5
+        potencyDivisor: 5
+      RMCPsilocybin:
+        min: 1
+        max: 25
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/angel.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantGlowshroom
+  name: glowshroom clusters
+  components:
+  - type: RMCPlant
+    displayName: seeds-glowshroom-display-name
+    name: seeds-glowshroom-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 30
+    maturation: 5
+    production: 5
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGlowshroomSeeds
+    productPrototypes:
+    - RMCFoodGlowshroom
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      RMCRadium:
+        min: 1
+        max: 20
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/glowshroom.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantGlowberry
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantPlastellium
+  name: plastellium plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-plastellium-display-name
+    name: seeds-plastellium-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 40
+    maturation: 7
+    production: 7
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPlastelliumSeeds
+    productPrototypes:
+    - RMCFoodPlastellium
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      RMCPlasticide:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/plastellium.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantHarebell
+  name: harebell plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-harebell-display-name
+    name: seeds-harebell-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 35
+    maturation: 5
+    production: 6
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCHarebellSeeds
+    productPrototypes:
+    - RMCFoodHarebell
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 275.0
+    maxHeat: 295.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/harebell.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantGreengrape
+  name: green grape vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-greengrape-display-name
+    name: seeds-greengrape-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 40
+    maturation: 6
+    production: 6
+    growthStages: 2
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGreengrapeSeeds
+    productPrototypes:
+    - RMCFoodGreengrape
+    yield: 6
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      CMKelotane:
+        min: 3
+        max: 5
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/grape.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantKudzu
+  name: kudzu vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-kudzu-display-name
+    name: seeds-kudzu-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 60
+    maturation: 5
+    production: 5
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCKudzuSeeds
+    productPrototypes:
+    - RMCFoodKudzu
+    yield: 8
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+      CMDylovene:
+        min: 1
+        max: 25
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 285.0
+    maxHeat: 305.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/kudzu.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantWeeds
+  name: weed patches
+  components:
+  - type: RMCPlant
+    displayName: seeds-weeds-display-name
+    name: seeds-weeds-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 60
+    maturation: 4
+    production: 4
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCWeedsSeeds
+    productPrototypes:
+    - RMCFoodWeeds
+    yield: 8
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 5
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: _RMC14/Objects/Kitchen/Plants/weeds.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.3
+    waterConsumption: 0.4
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcnettle
+  name: seeds-nettle-display-name
+  components:
+  - type: RMCPlant
+    displayName: seeds-nettle-display-name
+    name: seeds-nettle-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+    growthStages: 5
+  - type: RMCPlantHarvest
+    packetPrototype: RMCNettleSeeds
+    productPrototypes:
+    - Nettle
+    yield: 2
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 4
+      RMCSulphuricAcid:
+        min: 0
+        max: 1
+        potencyDivisor: 20
+  - type: RMCPlantAtmospheric
+    minHeat: 288.0
+    maxHeat: 308.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/nettle.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantRmcdeathnettle
+  - type: RMCPlantMetabolism
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcdeathnettle
+  name: seeds-deathnettle-display-name
+  components:
+  - type: RMCPlant
+    displayName: seeds-deathnettle-display-name
+    name: seeds-deathnettle-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+    growthStages: 5
+  - type: RMCPlantHarvest
+    packetPrototype: RMCDeathNettleSeeds
+    productPrototypes:
+    - DeathNettle
+    yield: 2
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 4
+    specialChemicals:
+    - RMCUrishiol
+  - type: RMCPlantAtmospheric
+    minHeat: 288.0
+    maxHeat: 308.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/death_nettle.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.8
+    waterConsumption: 0.7
+  - type: RMCPlantLog
+    plantLogImpact: High
+    harvestLogImpact: High
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcambrosiavulgaris
+  name: seeds-ambrosiavulgaris-display-name
+  components:
+  - type: RMCPlant
+    displayName: seeds-ambrosiavulgaris-display-name
+    name: seeds-ambrosiavulgaris-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 10
+    production: 3
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCAmbrosiaVulgarisSeeds
+    productPrototypes:
+    - FoodAmbrosiaVulgaris
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 2
+        potencyDivisor: 10
+      RMCSpaceDrugs:
+        min: 1
+        max: 8
+        potencyDivisor: 10
+      CMKelotane:
+        min: 1
+        max: 8
+        potencyDivisor: 10
+      CMBicaridine:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+      RMCGenericToxin:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 283.0
+    maxHeat: 303.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/ambrosia_vulgaris.rsi
+  - type: RMCPlantMetabolism
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcapple
+  name: apple trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcapple-display-name
+    name: seeds-rmcapple-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCAppleSeeds
+    productPrototypes:
+    - FoodApple
+    yield: 5
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/apple.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantRmcpoisonapple
+    - RMCPlantRmcgoldapple
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcpoisonapple
+  name: poison apple trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-poisonapple-display-name
+    name: seeds-poisonapple-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPoisonAppleSeeds
+    productPrototypes:
+    - RMCFoodPoisonApple
+    yield: 5
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      RMCCyanide:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/apple.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmccabbage
+  name: cabbages
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmccabbage-display-name
+    name: seeds-rmccabbage-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 3
+    production: 5
+    growthStages: 1
+  - type: RMCPlantHarvest
+    packetPrototype: RMCCabbageSeeds
+    productPrototypes:
+    - FoodCabbage
+    yield: 4
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+    specialChemicals:
+    - RMCPsoralen
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/cabbage.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmccarrot
+  name: carrots
+  components:
+  - type: RMCPlant
+    displayName: seeds-carrot-display-name
+    name: seeds-carrot-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 10
+    production: 1
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCCarrotSeeds
+    productPrototypes:
+    - FoodCarrot
+    yield: 5
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+      CMImidazoline:
+        min: 3
+        max: 5
+        potencyDivisor: 5
+    specialChemicals:
+    - RMCConiine
+    - RMCPhenol
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/carrot.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcpoppy
+  name: poppies
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcpoppy-display-name
+    name: seeds-rmcpoppy-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPoppySeeds
+    productPrototypes:
+    - FoodPoppy
+    yield: 6
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+      CMBicaridine:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+    specialChemicals:
+    - RMCAtropine
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/poppy.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcberries
+  name: berry bushes
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcberries-display-name
+    name: seeds-rmcberries-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 20
+    maturation: 5
+    production: 5
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCBerriesSeeds
+    productPrototypes:
+    - FoodBerries
+    yield: 2
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/berries.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantGlowberry
+    - RMCPlantPoisonberry
+    - RMCPlantDeathberry
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcgoldapple
+  name: golden apple trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-goldapple-display-name
+    name: seeds-goldapple-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 10
+    production: 10
+    growthStages: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGoldAppleSeeds
+    productPrototypes:
+    - FoodGoldenApple
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      RMCGold:
+        min: 1
+        max: 5
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/golden_apple.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcchili
+  name: chili plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcchili-display-name
+    name: seeds-rmcchili-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 20
+    maturation: 5
+    production: 5
+  - type: RMCPlantHarvest
+    packetPrototype: RMCChiliSeeds
+    productPrototypes:
+    - FoodChiliPepper
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      RMCCapsaicin:
+        min: 3
+        max: 5
+        potencyDivisor: 5
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/chili.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantChiliice
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmctomato
+  name: tomato plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmctomato-display-name
+    name: seeds-rmctomato-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCTomatoSeeds
+    productPrototypes:
+    - FoodTomato
+    yield: 2
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      RMCKetchup:
+        min: 1
+        max: 5
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/tomato.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmceggplant
+  name: eggplants
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmceggplant-display-name
+    name: seeds-rmceggplant-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 6
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCEggplantSeeds
+    productPrototypes:
+    - FoodEggplant
+    yield: 2
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/eggplant.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcchanterelle
+  name: chanterelle mushrooms
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcchanterelle-display-name
+    name: seeds-rmcchanterelle-name
+    noun: seeds-noun-spores
+  - type: RMCPlantGrowth
+    lifespan: 35
+    maturation: 7
+    production: 1
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCChanterelleSeeds
+    productPrototypes:
+    - FoodMushroom
+    yield: 5
+  - type: RMCPlantChemicals
+    potency: 1
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/chanterelle.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantReishi
+    - RMCPlantRmcplump
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcbanana
+  name: banana trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcbanana-display-name
+    name: seeds-rmcbanana-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 6
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCBananaSeeds
+    productPrototypes:
+    - FoodBanana
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      RMCBanana:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/banana.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmccorn
+  name: ears of corn
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmccorn-display-name
+    name: seeds-rmccorn-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCCornSeeds
+    productPrototypes:
+    - FoodCorn
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      RMCCornOil:
+        min: 1
+        max: 5
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/corn.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcpotato
+  name: potatoes
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcpotato-display-name
+    name: seeds-rmcpotato-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 30
+    maturation: 10
+    production: 1
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPotatoSeeds
+    productPrototypes:
+    - FoodPotato
+    yield: 4
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/potato.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcsoybeans
+  name: soybeans
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcsoybeans-display-name
+    name: seeds-rmcsoybeans-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 4
+    production: 4
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCSoybeansSeeds
+    productPrototypes:
+    - FoodSoybeans
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 5
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+      RMCSoyMilk:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/soybeans.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcwheat
+  name: wheat stalks
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcwheat-display-name
+    name: seeds-rmcwheat-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 6
+    production: 1
+  - type: RMCPlantHarvest
+    packetPrototype: RMCWheatSeeds
+    productPrototypes:
+    - WheatBushel
+    yield: 4
+  - type: RMCPlantChemicals
+    potency: 5
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/wheat.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcrice
+  name: rice stalks
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcrice-display-name
+    name: seeds-rmcrice-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 6
+    production: 1
+    growthStages: 4
+  - type: RMCPlantHarvest
+    packetPrototype: RMCRiceSeeds
+    productPrototypes:
+    - RiceBushel
+    yield: 4
+  - type: RMCPlantChemicals
+    potency: 5
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 25
+        potencyDivisor: 25
+      RMCRice:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/rice.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcsugarcane
+  name: sugarcanes
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcsugarcane-display-name
+    name: seeds-rmcsugarcane-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 60
+    maturation: 3
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCSugarcaneSeeds
+    productPrototypes:
+    - Sugarcane
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      RMCSugar:
+        min: 4
+        max: 5
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/sugarcane.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcwatermelon
+  name: watermelon vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcwatermelon-display-name
+    name: seeds-rmcwatermelon-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 6
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCWatermelonSeeds
+    productPrototypes:
+    - FoodWatermelon
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 1
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 6
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/watermelon.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcpumpkin
+  name: pumpkin vines
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcpumpkin-display-name
+    name: seeds-rmcpumpkin-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 6
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPumpkinSeeds
+    productPrototypes:
+    - FoodPumpkin
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 6
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/pumpkin.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmclime
+  name: lime trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmclime-display-name
+    name: seeds-rmclime-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCLimeSeeds
+    productPrototypes:
+    - FoodLime
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 15
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/lime.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmclemon
+  name: lemon trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmclemon-display-name
+    name: seeds-rmclemon-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCLemonSeeds
+    productPrototypes:
+    - FoodLemon
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/lemon.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcorange
+  name: orange trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcorange-display-name
+    name: seeds-rmcorange-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 60
+    maturation: 6
+    production: 6
+  - type: RMCPlantHarvest
+    packetPrototype: RMCOrangeSeeds
+    productPrototypes:
+    - FoodOrange
+    yield: 5
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 1
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/orange.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmccocoa
+  name: cacao trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmccocoa-display-name
+    name: seeds-rmccocoa-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 20
+    maturation: 5
+    production: 5
+    growthStages: 5
+  - type: RMCPlantHarvest
+    packetPrototype: RMCCocoaSeeds
+    productPrototypes:
+    - FoodCocoaPod
+    yield: 2
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      RMCCoco:
+        min: 4
+        max: 5
+        potencyDivisor: 5
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/cocoa.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcgrape
+  name: grapevines
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmcgrape-display-name
+    name: seeds-rmcgrape-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 3
+    production: 5
+    growthStages: 2
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGrapeSeeds
+    productPrototypes:
+    - FoodGrape
+    yield: 4
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 25
+      RMCSugar:
+        min: 1
+        max: 5
+        potencyDivisor: 20
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/grape.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantGreengrape
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmccherry
+  name: cherry trees
+  components:
+  - type: RMCPlant
+    displayName: seeds-rmccherry-display-name
+    name: seeds-rmccherry-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 50
+    maturation: 5
+    production: 5
+    growthStages: 5
+  - type: RMCPlantHarvest
+    packetPrototype: RMCCherrySeeds
+    productPrototypes:
+    - FoodCherry
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 15
+        potencyDivisor: 25
+      RMCCherryJelly:
+        min: 1
+        max: 15
+        potencyDivisor: 10
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/cherry.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
 
-- type: seed
-  id: rmcchili
-  name: seeds-rmcchili-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcchili-display-name
-  plantRsi: Objects/Specific/Hydroponics/chili.rsi
-  packetPrototype: RMCChiliSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodChiliPepper
-  mutationPrototypes:
-  - chiliice
-  lifespan: 20
-  maturation: 5
-  production: 5
-  yield: 4
-  potency: 20
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    RMCCapsaicin:
-      Min: 3
-      Max: 5
-      PotencyDivisor: 5
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
+# RMC versions of vanilla seeds sold from CMVendorSeeds that weren't yet ported to the RMCPlant*
+# component system - the old vanilla Seed component isn't recognized by RMCPlantTraySystem, so
+# these packets couldn't actually be planted in an RMC hydroponics tray before this.
+- type: entity
+  parent: SeedBase
+  name: packet of oat seeds
+  id: RMCOatSeeds
+  components:
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcoat
+  - type: Sprite
+    sprite: Objects/Specific/Hydroponics/oat.rsi
+- type: entity
+  parent: SeedBase
+  name: packet of pineapple seeds
+  id: RMCPineappleSeeds
+  components:
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcpineapple
+  - type: Sprite
+    sprite: Objects/Specific/Hydroponics/pineapple.rsi
+- type: entity
+  parent: SeedBase
+  name: packet of garlic seeds
+  id: RMCGarlicSeeds
+  components:
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmcgarlic
+  - type: Sprite
+    sprite: Objects/Specific/Hydroponics/garlic.rsi
+- type: entity
+  parent: SeedBase
+  name: packet of onion seeds
+  id: RMCOnionSeeds
+  components:
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmconion
+  - type: Sprite
+    sprite: Objects/Specific/Hydroponics/onion.rsi
+- type: entity
+  parent: SeedBase
+  name: packet of red onion seeds
+  id: RMCOnionRedSeeds
+  components:
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmconionred
+  - type: Sprite
+    sprite: Objects/Specific/Hydroponics/onion_red.rsi
+- type: entity
+  parent: SeedBase
+  name: packet of cotton seeds
+  id: RMCCottonSeeds
+  components:
+  - type: RMCPlantSeed
+    plantPrototype: RMCPlantRmccotton
+  - type: Sprite
+    sprite: Objects/Specific/Hydroponics/cotton.rsi
 
-- type: seed
-  id: rmctomato
-  name: seeds-rmctomato-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmctomato-display-name
-  plantRsi: Objects/Specific/Hydroponics/tomato.rsi
-  packetPrototype: RMCTomatoSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodTomato
-  lifespan: 25
-  maturation: 8
-  production: 6
-  yield: 2
-  potency: 10
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    RMCKetchup:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmceggplant
-  name: seeds-rmceggplant-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmceggplant-display-name
-  plantRsi: Objects/Specific/Hydroponics/eggplant.rsi
-  packetPrototype: RMCEggplantSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodEggplant
-  lifespan: 25
-  maturation: 6
-  production: 6
-  yield: 2
-  potency: 20
-  growthStages: 3
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcchanterelle
-  name: seeds-rmcchanterelle-name
-  noun: seeds-noun-spores
-  displayName: seeds-rmcchanterelle-display-name
-  plantRsi: Objects/Specific/Hydroponics/chanterelle.rsi
-  packetPrototype: RMCChanterelleSeeds
-  productPrototypes:
-  - FoodMushroom
-  mutationPrototypes:
-  - reishi
-  - rmcplump
-  lifespan: 35
-  maturation: 7
-  production: 1
-  yield: 5
-  potency: 1
-  growthStages: 3
-  waterConsumption: 0.50
-  nutrientConsumption: 0.40
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcbanana
-  name: seeds-rmcbanana-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcbanana-display-name
-  plantRsi: Objects/Specific/Hydroponics/banana.rsi
-  packetPrototype: RMCBananaSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodBanana
-  lifespan: 50
-  maturation: 6
-  production: 6
-  yield: 3
-  potency: 10
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    RMCBanana:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmccorn
-  name: seeds-rmccorn-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmccorn-display-name
-  plantRsi: Objects/Specific/Hydroponics/corn.rsi
-  packetPrototype: RMCCornSeeds
-  productPrototypes:
-  - FoodCorn
-  lifespan: 25
-  maturation: 8
-  production: 6
-  yield: 3
-  potency: 20
-  growthStages: 3
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    RMCCornOil:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmcpotato
-  name: seeds-rmcpotato-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcpotato-display-name
-  plantRsi: Objects/Specific/Hydroponics/potato.rsi
-  packetPrototype: RMCPotatoSeeds
-  productPrototypes:
-  - FoodPotato
-  lifespan: 30
-  maturation: 10
-  production: 1
-  yield: 4
-  potency: 10
-  growthStages: 4
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcsoybeans
-  name: seeds-rmcsoybeans-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcsoybeans-display-name
-  plantRsi: Objects/Specific/Hydroponics/soybeans.rsi
-  packetPrototype: RMCSoybeansSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodSoybeans
-  lifespan: 25
-  maturation: 4
-  production: 4
-  yield: 3
-  potency: 5
-  growthStages: 4
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-    RMCSoyMilk:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmcwheat
-  name: seeds-rmcwheat-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcwheat-display-name
-  plantRsi: Objects/Specific/Hydroponics/wheat.rsi
-  packetPrototype: RMCWheatSeeds
-  productPrototypes:
-  - WheatBushel
-  lifespan: 25
-  maturation: 6
-  production: 1
-  yield: 4
-  potency: 5
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcrice
-  name: seeds-rmcrice-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcrice-display-name
-  plantRsi: Objects/Specific/Hydroponics/rice.rsi
-  packetPrototype: RMCRiceSeeds
-  productPrototypes:
-  - RiceBushel
-  lifespan: 25
-  maturation: 6
-  production: 1
-  yield: 4
-  potency: 5
-  growthStages: 4
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 25
-      PotencyDivisor: 25
-    RMCRice:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 10
-
-- type: seed
-  id: rmcsugarcane
-  name: seeds-rmcsugarcane-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcsugarcane-display-name
-  plantRsi: Objects/Specific/Hydroponics/sugarcane.rsi
-  packetPrototype: RMCSugarcaneSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - Sugarcane
-  lifespan: 60
-  maturation: 3
-  production: 6
-  yield: 4
-  potency: 10
-  growthStages: 3
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    RMCSugar:
-      Min: 4
-      Max: 5
-      PotencyDivisor: 5
-
-- type: seed
-  id: rmcwatermelon
-  name: seeds-rmcwatermelon-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcwatermelon-display-name
-  plantRsi: Objects/Specific/Hydroponics/watermelon.rsi
-  packetPrototype: RMCWatermelonSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodWatermelon
-  lifespan: 50
-  maturation: 6
-  production: 6
-  yield: 3
-  potency: 1
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 6
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcpumpkin
-  name: seeds-rmcpumpkin-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcpumpkin-display-name
-  plantRsi: Objects/Specific/Hydroponics/pumpkin.rsi
-  packetPrototype: RMCPumpkinSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodPumpkin
-  lifespan: 50
-  maturation: 6
-  production: 6
-  yield: 3
-  potency: 10
-  growthStages: 3
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 6
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmclime
-  name: seeds-rmclime-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmclime-display-name
-  plantRsi: Objects/Specific/Hydroponics/lime.rsi
-  packetPrototype: RMCLimeSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodLime
-  lifespan: 55
-  maturation: 6
-  production: 6
-  yield: 4
-  potency: 15
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmclemon
-  name: seeds-rmclemon-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmclemon-display-name
-  plantRsi: Objects/Specific/Hydroponics/lemon.rsi
-  packetPrototype: RMCLemonSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodLemon
-  lifespan: 55
-  maturation: 6
-  production: 6
-  yield: 4
-  potency: 10
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmcorange
-  name: seeds-rmcorange-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcorange-display-name
-  plantRsi: Objects/Specific/Hydroponics/orange.rsi
-  packetPrototype: RMCOrangeSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodOrange
-  lifespan: 60
-  maturation: 6
-  production: 6
-  yield: 5
-  potency: 1
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 20
-      PotencyDivisor: 25
-
-- type: seed
-  id: rmccocoa
-  name: seeds-rmccocoa-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmccocoa-display-name
-  plantRsi: Objects/Specific/Hydroponics/cocoa.rsi
-  packetPrototype: RMCCocoaSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodCocoaPod
-  lifespan: 20
-  maturation: 5
-  production: 5
-  yield: 2
-  potency: 10
-  growthStages: 5
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    RMCCoco:
-      Min: 4
-      Max: 5
-      PotencyDivisor: 5
-
-- type: seed
-  id: rmcgrape
-  name: seeds-rmcgrape-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmcgrape-display-name
-  plantRsi: Objects/Specific/Hydroponics/grape.rsi
-  packetPrototype: RMCGrapeSeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodGrape
-  mutationPrototypes:
-  - greengrape
-  lifespan: 50
-  maturation: 3
-  production: 5
-  yield: 4
-  potency: 10
-  growthStages: 2
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 10
-      PotencyDivisor: 25
-    RMCSugar:
-      Min: 1
-      Max: 5
-      PotencyDivisor: 20
-
-- type: seed
-  id: rmccherry
-  name: seeds-rmccherry-name
-  noun: seeds-noun-seeds
-  displayName: seeds-rmccherry-display-name
-  plantRsi: Objects/Specific/Hydroponics/cherry.rsi
-  packetPrototype: RMCCherrySeeds
-  harvestRepeat: Repeat
-  productPrototypes:
-  - FoodCherry
-  lifespan: 50
-  maturation: 5
-  production: 5
-  yield: 3
-  potency: 10
-  growthStages: 5
-  waterConsumption: 0.60
-  nutrientConsumption: 0.50
-  idealHeat: 288
-  chemicals:
-    Nutriment:
-      Min: 1
-      Max: 15
-      PotencyDivisor: 25
-    RMCCherryJelly:
-      Min: 1
-      Max: 15
-      PotencyDivisor: 10
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcoat
+  name: oat stalks
+  components:
+  - type: RMCPlant
+    displayName: seeds-oat-display-name
+    name: seeds-oat-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 6
+    production: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCOatSeeds
+    productPrototypes:
+    - OatBushel
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 5
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 20
+      Oats:
+        min: 5
+        max: 20
+        potencyDivisor: 20
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/oat.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.4
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcpineapple
+  name: pineapple plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-pineapple-display-name
+    name: seeds-pineapple-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 55
+    maturation: 6
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCPineappleSeeds
+    productPrototypes:
+    - FoodPineapple
+    yield: 3
+    harvestRepeat: Repeat
+  - type: RMCPlantChemicals
+    potency: 10
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 20
+        potencyDivisor: 20
+      Vitamin:
+        min: 1
+        max: 2
+        potencyDivisor: 50
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/pineapple.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmcgarlic
+  name: garlic heads
+  components:
+  - type: RMCPlant
+    displayName: seeds-garlic-display-name
+    name: seeds-garlic-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 5
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCGarlicSeeds
+    productPrototypes:
+    - FoodGarlic
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 25
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+      Vitamin:
+        min: 1
+        max: 4
+        potencyDivisor: 25
+      Allicin:
+        min: 1
+        max: 8
+        potencyDivisor: 25
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/garlic.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.5
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmconion
+  name: onions
+  components:
+  - type: RMCPlant
+    displayName: seeds-onion-display-name
+    name: seeds-onion-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCOnionSeeds
+    productPrototypes:
+    - FoodOnion
+    yield: 2
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+      Vitamin:
+        min: 1
+        max: 4
+        potencyDivisor: 25
+      Allicin:
+        min: 1
+        max: 4
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/onion.rsi
+  - type: RMCPlantMutation
+    mutationPrototypes:
+    - RMCPlantRmconionred
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmconionred
+  name: red onions
+  components:
+  - type: RMCPlant
+    displayName: seeds-onionred-display-name
+    name: seeds-onionred-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 6
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCOnionRedSeeds
+    productPrototypes:
+    - FoodOnionRed
+    yield: 2
+  - type: RMCPlantChemicals
+    potency: 20
+    chemicals:
+      Nutriment:
+        min: 1
+        max: 10
+        potencyDivisor: 10
+      Vitamin:
+        min: 1
+        max: 4
+        potencyDivisor: 25
+      Allicin:
+        min: 1
+        max: 4
+        potencyDivisor: 25
+  - type: RMCPlantAtmospheric
+    minHeat: 278.0
+    maxHeat: 298.0
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/onion_red.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6
+- type: entity
+  parent: BasePlant
+  id: RMCPlantRmccotton
+  name: cotton plants
+  components:
+  - type: RMCPlant
+    displayName: seeds-cotton-display-name
+    name: seeds-cotton-name
+    noun: seeds-noun-seeds
+  - type: RMCPlantGrowth
+    lifespan: 25
+    maturation: 8
+    production: 3
+    growthStages: 3
+  - type: RMCPlantHarvest
+    packetPrototype: RMCCottonSeeds
+    productPrototypes:
+    - CottonBol
+    yield: 3
+  - type: RMCPlantChemicals
+    potency: 5
+    chemicals:
+      Fiber:
+        min: 5
+        max: 10
+        potencyDivisor: 20
+  - type: RMCPlantTraits
+    plantRsi: Objects/Specific/Hydroponics/cotton.rsi
+  - type: RMCPlantMetabolism
+    nutrientConsumption: 0.5
+    waterConsumption: 0.6

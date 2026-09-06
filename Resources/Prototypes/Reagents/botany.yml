@@ -102,6 +102,11 @@
         conditions:
         - !type:OrganType
           type: Plant
+    Poison:
+      metabolismRate: 0.1
+      effects:
+      - !type:Toxic
+        potency: 4
 
 - type: reagent
   id: RobustHarvest

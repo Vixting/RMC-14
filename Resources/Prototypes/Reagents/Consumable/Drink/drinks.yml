@@ -7,6 +7,8 @@
   flavor: coffee
   color: "#664300"
   recognizable: true
+  overdose: 30
+  criticalOverdose: 180
   metabolisms:
     Drink:
       effects:
@@ -19,6 +21,19 @@
       - !type:AdjustReagent
         reagent: Theobromine
         amount: 0.05
+      - !type:AdjustReagent
+        reagent: FrostOil
+        amount: -0.5
+      - !type:Jitter
+        time: 5
+      # TODO RMC14: paralzyes & heart damage
+      - !type:HealthChange
+        conditions:
+        - !type:ReagentThreshold
+          min: 180
+        damage:
+          types:
+            Poison: 2
   metamorphicSprite:
     sprite: Objects/Consumable/Drinks/coffeeglass.rsi
     state: icon_empty
@@ -264,6 +279,14 @@
       effects:
       - !type:SatiateThirst
         factor: 4
+      - !type:HealthChange
+        probability: 0.2
+        damage:
+          groups:
+            Brute: -1
+      - !type:AdjustReagent
+        reagent: Hotsauce
+        amount: -0.5
 
 - type: reagent
   id: MilkGoat
@@ -346,12 +369,11 @@
         effectProto: StatusEffectDrowsiness
         time: 3
         type: Remove
-    Poison:
-      effects:
-      - !type:HealthChange
-        damage:
-          types:
-            Poison: 1
+      - !type:Jitter
+        time: 20
+      - !type:Hallucinogenic
+        potency: 6
+      # TODO RMC14: screen dizziness
   fizziness: 0.5
 
 - type: reagent
@@ -405,6 +427,11 @@
       - !type:AdjustReagent
         reagent: Theobromine
         amount: 0.05
+      - !type:HealthChange
+        probability: 0.2
+        damage:
+          types:
+            Poison: -1
   metamorphicSprite:
     sprite: Objects/Consumable/Drinks/teaglass.rsi
     state: icon_empty
@@ -511,6 +538,24 @@
       effects:
       - !type:SatiateHunger
         factor: 4
+
+- type: reagent
+  id: HellRamen
+  name: reagent-name-hell-ramen
+  parent: BaseDrink
+  desc: reagent-desc-hell-ramen
+  physicalDesc: reagent-physical-desc-wormy
+  flavor: cheapnoodles
+  color: "#664300"
+  metabolisms:
+    Food:
+      effects:
+      - !type:SatiateHunger
+        factor: 4
+    Poison:
+      effects:
+      - !type:Hyperthermic
+        potency: 4
 
 - type: reagent
   id: ArnoldPalmer

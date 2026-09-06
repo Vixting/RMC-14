@@ -64,6 +64,17 @@
     sprite: _RMC14/Markers/landmarks.rsi
     state: queen_spawn
 
+- type: entity
+  parent: MarkerBase
+  id: CMSpawnPointXenoForsaken
+  name: forsaken xeno spawn point
+  description: A RMC14 spawner. Used for Forsaken xeno reinforcements
+  components:
+  - type: XenoForsakenSpawnPoint
+  - type: Sprite
+    sprite: _RMC14/Markers/landmarks.rsi
+    state: xeno_spawn
+
 # Misc
 - type: job
   abstract: true

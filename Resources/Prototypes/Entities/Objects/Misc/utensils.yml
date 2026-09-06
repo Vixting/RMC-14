@@ -39,6 +39,7 @@
     tags:
     - Hoe
     - Metal
+  - type: RMCHoeTool #RMC
   - type: Sprite
     state: fork
   - type: Utensil

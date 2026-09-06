@@ -90,14 +90,79 @@
     Narcotic:
       metabolismRate: 0.0167
       effects:
-      - !type:MovespeedModifier
-        walkSpeedModifier: 1.3
-        sprintSpeedModifier: 1.3
-      - !type:GenericStatusEffect
-        key: StaminaModifier
-        component: StaminaModifier
-        time: 3
-        type: Add
+      - !type:Musclestimulating
+        potency: 40
+      - !type:Addictive
+        potency: 8
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCSpeedStimulant
+  chemClass: None
+  noGeneration: true
+  name: reagent-name-rmcspeedstimulant
+  desc: reagent-desc-rmcspeedstimulant
+  color: "#d4d42b"
+  overdose: 15
+  criticalOverdose: 25
+  metabolisms:
+    Narcotic:
+      metabolismRate: 0.0167
+      effects:
+      - !type:Musclestimulating
+        potency: 40
+      - !type:Painkilling
+        potency: 3
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCBrainStimulant
+  chemClass: None
+  noGeneration: true
+  name: reagent-name-rmcbrainstimulant
+  desc: reagent-desc-rmcbrainstimulant
+  color: "#7b23a9"
+  overdose: 15
+  criticalOverdose: 25
+  metabolisms:
+    Narcotic:
+      metabolismRate: 0.0167
+      effects:
+      - !type:Nervestimulating
+        potency: 30
+      - !type:Painkilling
+        potency: 6
+      - !type:Neuroshielding
+        potency: 13
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCRedemptionStimulant
+  chemClass: None
+  noGeneration: true
+  name: reagent-name-rmcredemptionstimulant
+  desc: reagent-desc-rmcredemptionstimulant
+  color: "#219f74"
+  overdose: 6
+  criticalOverdose: 10
+  metabolisms:
+    Narcotic:
+      metabolismRate: 0.0167
+      effects:
+      - !type:Nervestimulating
+        potency: 2
+      - !type:Musclestimulating
+        potency: 2
+      - !type:Painkilling
+        potency: 100
+      - !type:Bonemending
+        potency: 100
+      - !type:Organhealing
+        potency: 100
+      - !type:Hyperdensificating
+        potency: 1
+      - !type:Organstabilize
+        potency: 1
 
 - type: reagent
   parent: [ CMReagentMedicine, Cryoxadone ]
@@ -671,3 +736,36 @@
       effects:
       - !type:Unknown
         potency: 1
+
+- type: reagent
+  parent: CMReagent
+  id: RMCHostStabilizer
+  chemClass: None
+  noGeneration: true
+  name: reagent-name-rmchoststabilizer
+  desc: reagent-desc-rmchoststabilizer
+  physicalDesc: reagent-physical-desc-oily
+  color: "#bed700"
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Criticalstabilize
+        potency: 1
+      - !type:Crossmetabolizing
+        potency: 2
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCAdminordrazine
+  chemClass: None
+  name: reagent-name-rmcadminordrazine
+  desc: reagent-desc-rmcadminordrazine
+  physicalDesc: reagent-physical-desc-oily
+  color: "#dae63b"
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.1
+      effects:
+      - !type:Omnipotent
+        potency: 2

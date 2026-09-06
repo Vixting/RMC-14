@@ -339,6 +339,21 @@
     sprite: _RMC14/Structures/Storage/Lockers/medical_white.rsi
   - type: AccessReader
     access: [["CMAccessResearch"]]
+  - type: StorageFill
+    contents:
+      - id: RMCBackpackSprayer
+      - id: RMCBackpackSprayer
+      - id: RMCFloraDataDiscBox
+      - id: RMCFloraDataDiscBox
+      - id: RMCStoragePlantBag
+      - id: RMCStoragePlantBag
+      - id: RMCPlantAnalyzer
+      - id: RMCPlantAnalyzer
+      - id: RMCToolMiniHoe
+      - id: HydroponicsToolClippers
+      - id: RMCToolHatchet
+      - id: RMCToolSpade
+      - id: RMCBucket
 
 - type: entity
   parent: CMLockerBase
@@ -349,6 +364,15 @@
     sprite: _RMC14/Structures/Storage/Lockers/hydro.rsi
   - type: AccessReader
     access: [["CMAccessResearch"]]
+  - type: StorageFill
+    contents:
+      - id: RMCHydroApron
+      - id: RMCJumpsuitLiaisonGreenWorkwear
+      - id: RMCStoragePlantBag
+      - id: RMCPlantAnalyzer
+      - id: ClothingHeadBandBotany
+      - id: RMCToolMiniHoe
+      - id: RMCToolHatchet
 
 - type: entity
   parent: CMLockerBase

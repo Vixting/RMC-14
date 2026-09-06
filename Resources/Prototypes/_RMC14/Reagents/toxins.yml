@@ -196,6 +196,12 @@
   physicalDesc: reagent-physical-desc-oily
   color: "#CF3600"
   toxin: true
+  plantMetabolism:
+  - !type:Fertilizing
+    healthMod: 0
+    yieldMod: 0.05
+    nutrientMod: 2
+    potency: 4
   metabolisms:
     Poison:
       metabolismRate: 0.05
@@ -416,3 +422,43 @@
         potency: 2
       - !type:Painkilling
         potency: 5
+
+- type: reagent
+  parent: CMReagent
+  id: RMCSerotrotium
+  chemClass: Common
+  name: reagent-name-rmcserotrotium
+  desc: reagent-desc-rmcserotrotium
+  physicalDesc: reagent-physical-desc-oily
+  color: "#202040"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Poison:
+      metabolismRate: 0.05
+      effects:
+      - !type:Allergenic
+        potency: 2
+
+- type: reagent
+  parent: CMReagentMedicine
+  id: RMCRezadone
+  chemClass: Common
+  name: reagent-name-rmcrezadone
+  desc: reagent-desc-rmcrezadone
+  physicalDesc: reagent-physical-desc-powdery
+  color: "#669900"
+  overdose: 30
+  criticalOverdose: 50
+  metabolisms:
+    Medicine:
+      metabolismRate: 0.05
+      effects:
+      - !type:Neogenetic
+        potency: 1
+      - !type:Aiding
+        potency: 3
+      - !type:Toxic
+        potency: 2
+      - !type:Anticarcinogenic
+        potency: 2

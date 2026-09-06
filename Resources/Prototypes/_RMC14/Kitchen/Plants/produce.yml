@@ -15,8 +15,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/plump.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcplump
   - type: Tag
     tags:
     - Vegetable
@@ -44,8 +42,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/peanut.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcpeanut
   - type: Tag
     tags:
     - Vegetable
@@ -68,8 +64,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/whitebeet.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcwhitebeet
   - type: Tag
     tags:
     - Vegetable
@@ -90,8 +84,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/sunflower.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcsunflower
   - type: Tag
     tags:
     - Vegetable
@@ -111,8 +103,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/grass.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcgrass
   - type: Tag
     tags:
     - Vegetable
@@ -133,8 +123,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/shand.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcshand
   - type: Tag
     tags:
     - Vegetable
@@ -157,8 +145,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/mtear.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcmtear
   - type: Tag
     tags:
     - Vegetable
@@ -186,8 +172,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/mango.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: rmcmango
   - type: Extractable
     juiceSolution:
       reagents:
@@ -219,8 +203,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/chiliice.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: chiliice
   - type: Tag
     tags:
     - Fruit
@@ -243,8 +225,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/glowberry.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: glowberry
   - type: Tag
     tags:
     - Fruit
@@ -265,8 +245,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/poisonberry.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: poisonberry
   - type: Tag
     tags:
     - Fruit
@@ -289,8 +267,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/deathberry.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: deathberry
   - type: Tag
     tags:
     - Fruit
@@ -315,8 +291,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/bluespacetomato.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: bluespacetomato
   - type: Tag
     tags:
     - Fruit
@@ -337,8 +311,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/mold.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: mold
   - type: Tag
     tags:
     - Vegetable
@@ -361,8 +333,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/reishi.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: reishi
   - type: Tag
     tags:
     - Vegetable
@@ -383,8 +353,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/liberty.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: liberty
   - type: Tag
     tags:
     - Vegetable
@@ -405,8 +373,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/angel.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: angel
   - type: Tag
     tags:
     - Vegetable
@@ -429,8 +395,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/glowshroom.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: glowshroom
   - type: Tag
     tags:
     - Vegetable
@@ -451,8 +415,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/plastellium.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: plastellium
   - type: Tag
     tags:
     - Vegetable
@@ -473,8 +435,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/harebell.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: harebell
   - type: Tag
     tags:
     - Vegetable
@@ -497,8 +457,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/greengrape.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: greengrape
   - type: Tag
     tags:
     - Fruit
@@ -519,8 +477,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/kudzu.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: kudzu
   - type: Tag
     tags:
     - Vegetable
@@ -541,8 +497,6 @@
     sprite: _RMC14/Objects/Kitchen/Plants/weeds.rsi
   - type: Item
     heldPrefix: produce
-  - type: Produce
-    seedId: weeds
   - type: Tag
     tags:
     - Vegetable
@@ -552,6 +506,3 @@
   id: RMCFoodPoisonApple
   name: poison apple
   description: A crisp, sweet-smelling apple. Something about it feels wrong.
-  components:
-  - type: Produce
-    seedId: rmcpoisonapple

@@ -187,3 +187,21 @@
     collection: FootstepSlime
     params:
       volume: 6
+
+- type: reagent
+  id: ChocolateSyrup
+  name: reagent-name-chocolate-syrup
+  group: Foods
+  desc: reagent-desc-chocolate-syrup
+  flavor: chocolate
+  color: "#7B3F00"
+  recognizable: true
+  physicalDesc: reagent-physical-desc-sticky
+  viscosity: 0.55
+  tileReactions:
+    - !type:SpillTileReaction
+  metabolisms:
+    Food:
+      effects:
+      - !type:SatiateHunger
+        factor: 2.0
