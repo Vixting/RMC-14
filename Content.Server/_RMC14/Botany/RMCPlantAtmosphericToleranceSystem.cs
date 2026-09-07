@@ -11,15 +11,18 @@ public sealed class RMCPlantAtmosphericToleranceSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<RMCPlantComponent, RMCPlantGrowEvent>(OnPlantGrow);
+        SubscribeLocalEvent<RMCPlantGrowEvent>(OnPlantGrow);
     }
 
-    private void OnPlantGrow(Entity<RMCPlantComponent> ent, ref RMCPlantGrowEvent args)
+    private void OnPlantGrow(ref RMCPlantGrowEvent args)
     {
-        if (!TryComp(ent.Owner, out RMCPlantAtmosphericComponent? atmos))
+        if (!TryComp(args.Plant, out RMCPlantComponent? plantComp))
             return;
 
-        Tick(ent, Comp<RMCPlantTrayComponent>(args.Tray), atmos, args.Environment, args.HealthMod);
+        if (!TryComp(args.Plant, out RMCPlantAtmosphericComponent? atmos))
+            return;
+
+        Tick((args.Plant, plantComp), Comp<RMCPlantTrayComponent>(args.Tray), atmos, args.Environment, args.HealthMod);
     }
 
     public void Tick(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, RMCPlantAtmosphericComponent atmos, GasMixture environment, float healthMod)

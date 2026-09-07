@@ -44,18 +44,23 @@ public sealed class RMCPlantMetabolismSystem : EntitySystem
         }
     }
 
-    public void AdjustNutrient(RMCPlantTrayComponent tray, float amount)
+    public void AdjustNutrient(Entity<RMCPlantTrayComponent> tray, float amount)
     {
-        tray.NutritionLevel += amount;
+        tray.Comp.NutritionLevel += amount;
+        DirtyField(tray.Owner, tray.Comp, nameof(RMCPlantTrayComponent.NutritionLevel));
     }
 
-    public void AdjustWater(RMCPlantTrayComponent tray, float amount)
+    public void AdjustWater(Entity<RMCPlantTrayComponent> tray, float amount)
     {
-        tray.WaterLevel += amount;
+        tray.Comp.WaterLevel += amount;
+        DirtyField(tray.Owner, tray.Comp, nameof(RMCPlantTrayComponent.WaterLevel));
 
         // Water dilutes toxins
         if (amount > 0)
-            tray.Toxins -= amount * 4f;
+        {
+            tray.Comp.Toxins -= amount * 4f;
+            DirtyField(tray.Owner, tray.Comp, nameof(RMCPlantTrayComponent.Toxins));
+        }
     }
 
     public void UpdateReagents(EntityUid trayUid, RMCPlantTrayComponent tray, EntityUid? plant)

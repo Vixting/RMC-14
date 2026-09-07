@@ -14,4 +14,4 @@ public readonly record struct RMCPlantTrayGrowEvent(EntityUid Tray, EntityUid? P
 /// have run
 /// </summary>
 [ByRefEvent]
-public readonly record struct RMCPlantGrowEvent(EntityUid Tray, GasMixture Environment, float HealthMod);
+public readonly record struct RMCPlantGrowEvent(EntityUid Plant, EntityUid Tray, GasMixture Environment, float HealthMod);

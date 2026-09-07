@@ -13,14 +13,18 @@ public sealed class RMCConsumeExudeGasSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<RMCPlantComponent, RMCPlantGrowEvent>(OnPlantGrow);
+        SubscribeLocalEvent<RMCPlantGrowEvent>(OnPlantGrow);
     }
 
-    private void OnPlantGrow(Entity<RMCPlantComponent> ent, ref RMCPlantGrowEvent args)
+    private void OnPlantGrow(ref RMCPlantGrowEvent args)
     {
+        if (!TryComp(args.Plant, out RMCPlantComponent? plantComp))
+            return;
+
         var tray = Comp<RMCPlantTrayComponent>(args.Tray);
+        var ent = (args.Plant, plantComp);
         TickConsume(ent, tray, args.Environment);
-        TickExude(ent, args.Environment);
+        TickExude(args.Plant, args.Environment);
     }
 
     public void TickConsume(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, GasMixture environment)

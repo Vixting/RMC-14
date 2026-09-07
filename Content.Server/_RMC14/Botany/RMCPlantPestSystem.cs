@@ -15,14 +15,18 @@ public sealed class RMCPlantPestSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<RMCPlantComponent, RMCPlantGrowEvent>(OnPlantGrow);
+        SubscribeLocalEvent<RMCPlantGrowEvent>(OnPlantGrow);
     }
 
-    private void OnPlantGrow(Entity<RMCPlantComponent> ent, ref RMCPlantGrowEvent args)
+    private void OnPlantGrow(ref RMCPlantGrowEvent args)
     {
+        if (!TryComp(args.Plant, out RMCPlantComponent? plantComp))
+            return;
+
         var tray = Comp<RMCPlantTrayComponent>(args.Tray);
+        var ent = (args.Plant, plantComp);
         TickSpawn(tray);
-        Tick(ent, tray, Comp<RMCPlantTraitsComponent>(ent));
+        Tick(ent, tray, Comp<RMCPlantTraitsComponent>(args.Plant));
     }
 
     /// <summary>
