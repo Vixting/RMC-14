@@ -49,6 +49,12 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         if (args.EntityManager.TryGetComponent<RMCPlantComponent>(args.TargetEntity, out var plant))
         {
             TickHydroTray(new Entity<RMCPlantComponent>(args.TargetEntity, plant), scaledPotency, reagentArgs);
+
+            var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+            plantTray.DirtyPlant(args.TargetEntity);
+            if (plant.Tray is { } trayUid)
+                plantTray.DirtyTray(trayUid);
+
             return;
         }
 
