@@ -67,6 +67,15 @@ reagent-desc-cmtricordrazine = Tricordrazine is a highly potent stimulant, origi
 reagent-name-rmcultrazine = Ultrazine
 reagent-desc-rmcultrazine = A highly-potent, long-lasting combination CNS and muscle stimulant. Extremely addictive.
 
+reagent-name-rmcspeedstimulant = Speed Stimulant
+reagent-desc-rmcspeedstimulant = A highly experimental performance enhancement stimulant. It is not addictive.
+
+reagent-name-rmcbrainstimulant = Brain Stimulant
+reagent-desc-rmcbrainstimulant = A highly experimental CNS stimulant.
+
+reagent-name-rmcredemptionstimulant = Redemption Stimulant
+reagent-desc-rmcredemptionstimulant = A highly experimental bone, organ and muscle stimulant. Increases the durability of skin and bones as well as nullifying any pain. Pain is impossible to feel whilst this drug is in your system. During the metabolism of this drug, dysfunctional organs will work normally.
+
 reagent-name-cmmeralyne = Meralyne
 reagent-desc-cmmeralyne = Advanced analgesic medication used to treat extremely severe blunt trauma. Allows the body to quickly repair damaged tissue. Overdosing on Meralyne can cause severe corrosion to cell membranes.
 
@@ -125,3 +134,9 @@ reagent-desc-rmcantized = A chemical designed for use against Agent A0-3959X.91â
 
 reagent-name-rmclipozine = Lipozine
 reagent-desc-rmclipozine = Lowers satiation and reduces body weight by increasing ketosis and the rate of which fat is metabolized. Use to treat obesity. Large doses can cause extreme weight loss.
+
+reagent-name-rmchoststabilizer = Xenomorph Embryotic Secretion
+reagent-desc-rmchoststabilizer = A strange and unknown concoction of hormones and chemicals that xenomorph embryos secrete as they grow inside hosts to stabilize them.
+
+reagent-name-rmcadminordrazine = Adminordrazine
+reagent-desc-rmcadminordrazine = A magical substance created by gods to dissolve extreme amounts of salt.

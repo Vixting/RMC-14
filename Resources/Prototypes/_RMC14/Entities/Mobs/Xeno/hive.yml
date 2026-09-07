@@ -85,3 +85,124 @@
     banHiveAlliances: true
   - type: HiveSlot
     position: 7
+
+- type: entity
+  parent: CMXenoHive
+  id: CMXenoHiveForsaken
+  name: forsaken hive
+  components:
+  - type: Hive
+    color: "#cc8ec4"
+    lateJoinGainLarva: false
+  - type: HiveSlot
+    position: 8
+
+# xenoArmor 20, explosionArmor 40 -> +15/+30 = 35/70
+- type: entity
+  parent: CMXenoWarrior
+  id: RMCXenoWarriorForsaken
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Xeno
+    contributesToVictory: false
+  - type: TacticalMapUser
+    marines: true
+  - type: XenoEvolutionLocked
+  - type: CMArmor
+    xenoArmor: 35
+    explosionArmor: 70
+  - type: HiveStatModifier
+    damageIncrease:
+      groups:
+        Brute: 10
+    healthMultiplier: 1.25
+    plasmaGainMultiplier: 1.15
+    speedMultiplier: 0.8
+
+# xenoArmor 20, explosionArmor 20 -> +15/+30 = 35/50
+- type: entity
+  parent: CMXenoLurker
+  id: RMCXenoLurkerForsaken
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Xeno
+    contributesToVictory: false
+  - type: TacticalMapUser
+    marines: true
+  - type: XenoEvolutionLocked
+  - type: CMArmor
+    xenoArmor: 35
+    explosionArmor: 50
+  - type: HiveStatModifier
+    damageIncrease:
+      groups:
+        Brute: 10
+    healthMultiplier: 1.25
+    plasmaGainMultiplier: 1.15
+    speedMultiplier: 0.8
+
+# xenoArmor 15, explosionArmor 20 -> +15/+30 = 30/50
+- type: entity
+  parent: CMXenoSpitter
+  id: RMCXenoSpitterForsaken
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Xeno
+    contributesToVictory: false
+  - type: TacticalMapUser
+    marines: true
+  - type: XenoEvolutionLocked
+  - type: CMArmor
+    xenoArmor: 30
+    explosionArmor: 50
+  - type: HiveStatModifier
+    damageIncrease:
+      groups:
+        Brute: 10
+    healthMultiplier: 1.25
+    plasmaGainMultiplier: 1.15
+    speedMultiplier: 0.8
+
+# xenoArmor 0, explosionArmor 0 (inherited base_xeno default) -> +15/+30 = 15/30
+- type: entity
+  parent: CMXenoDrone
+  id: RMCXenoDroneForsaken
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Xeno
+    contributesToVictory: false
+  - type: TacticalMapUser
+    marines: true
+  - type: XenoEvolutionLocked
+  - type: CMArmor
+    xenoArmor: 15
+    explosionArmor: 30
+  - type: HiveStatModifier
+    damageIncrease:
+      groups:
+        Brute: 10
+    healthMultiplier: 1.25
+    plasmaGainMultiplier: 1.15
+    speedMultiplier: 0.8
+
+# xenoArmor 15, explosionArmor 10 -> +15/+30 = 30/40
+- type: entity
+  parent: CMXenoRunner
+  id: RMCXenoRunnerForsaken
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Xeno
+    contributesToVictory: false
+  - type: TacticalMapUser
+    marines: true
+  - type: XenoEvolutionLocked
+  - type: CMArmor
+    xenoArmor: 30
+    explosionArmor: 40
+  - type: HiveStatModifier
+    damageIncrease:
+      groups:
+        Brute: 10
+    healthMultiplier: 1.25
+    plasmaGainMultiplier: 1.15
+    speedMultiplier: 0.8

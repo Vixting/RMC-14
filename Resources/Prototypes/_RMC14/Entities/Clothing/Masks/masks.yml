@@ -328,6 +328,9 @@
     - Mask
   - type: Item
     size: Small
+  - type: Tag
+    tags:
+    - GasMask
 
 - type: entity
   parent: [CMBaseMask, RMCHelmetGarbToggleableBase]

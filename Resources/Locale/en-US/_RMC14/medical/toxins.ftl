@@ -59,3 +59,9 @@ reagent-desc-rmcpolytrinicacid = An extremely corrosive acid capable of dissolvi
 
 reagent-name-rmcsoporific = Soporific
 reagent-desc-rmcsoporific = An effective hypnotic used to treat insomnia. Concentrated soporific is used as a surgical anesthetic.
+
+reagent-name-rmcserotrotium = Serotrotium
+reagent-desc-rmcserotrotium = A chemical compound that promotes concentrated production of the serotonin neurotransmitter in humans.
+
+reagent-name-rmcrezadone = Rezadone
+reagent-desc-rmcrezadone = A powder derived from fish toxin, this substance can effectively treat genetic damage in humanoids. Causes toxin damage. Excessive consumption may cause disastrous side effects.

@@ -304,4 +304,7 @@
     components:
     - type: RMCImmuneToIgnition
     - type: RMCImmuneToFireTileDamage
+  - type: Tag
+    tags:
+    - GasMask
 # TODO: add advanced version of CBRN helmet

@@ -100,6 +100,7 @@ public sealed partial class XenoSystem : EntitySystem
     private EntityQuery<AffectableByWeedsComponent> _affectableQuery;
     private EntityQuery<DamageableComponent> _damageableQuery;
     private EntityQuery<HiveSlotComponent> _hiveSlotQuery;
+    private EntityQuery<HiveStatModifierComponent> _hiveStatModifierQuery;
     private EntityQuery<MobStateComponent> _mobStateQuery;
     private EntityQuery<MobThresholdsComponent> _mobThresholdsQuery;
     private EntityQuery<XenoFriendlyComponent> _xenoFriendlyQuery;
@@ -120,6 +121,7 @@ public sealed partial class XenoSystem : EntitySystem
         _affectableQuery = GetEntityQuery<AffectableByWeedsComponent>();
         _damageableQuery = GetEntityQuery<DamageableComponent>();
         _hiveSlotQuery = GetEntityQuery<HiveSlotComponent>();
+        _hiveStatModifierQuery = GetEntityQuery<HiveStatModifierComponent>();
         _mobStateQuery = GetEntityQuery<MobStateComponent>();
         _mobThresholdsQuery = GetEntityQuery<MobThresholdsComponent>();
         _xenoFriendlyQuery = GetEntityQuery<XenoFriendlyComponent>();
@@ -629,6 +631,9 @@ public sealed partial class XenoSystem : EntitySystem
                     if (_xenoPlasmaQuery.TryComp(uid, out var plasmaComp))
                     {
                         var amount = FixedPoint2.Max(plasmaComp.PlasmaRegenOffWeeds * plasmaComp.MaxPlasma / 100 / 2, 0.01);
+                        if (_hiveStatModifierQuery.TryComp(uid, out var offWeedsGain))
+                            amount *= offWeedsGain.PlasmaGainMultiplier;
+
                         _xenoPlasma.RegenPlasma((uid, plasmaComp), amount);
                     }
 
@@ -644,6 +649,9 @@ public sealed partial class XenoSystem : EntitySystem
                 if (_xenoPlasmaQuery.TryComp(uid, out var plasma))
                 {
                     var plasmaRestored = plasma.PlasmaRegenOnWeeds * plasma.MaxPlasma / 100 / 2;
+                    if (_hiveStatModifierQuery.TryComp(uid, out var onWeedsGain))
+                        plasmaRestored *= onWeedsGain.PlasmaGainMultiplier;
+
                     _xenoPlasma.RegenPlasma((uid, plasma), plasmaRestored);
 
                     if (_xenoRecoveryQuery.TryComp(uid, out var recovery))

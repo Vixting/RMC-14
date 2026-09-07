@@ -6,7 +6,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcplump
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/plump.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-plump
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of grass seeds
@@ -15,7 +21,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcgrass
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/grass.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-grass
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of white beet seeds
@@ -24,7 +36,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcwhitebeet
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/whitebeet.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-whitebeet
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of peanut seeds
@@ -33,7 +51,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcpeanut
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/peanut.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-peanut
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of sunflower seeds
@@ -42,7 +66,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcsunflower
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/sunflower.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-sunflower
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of S'randar's Hand seeds
@@ -51,7 +81,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcshand
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/shand.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-shand
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of Messa's Tear seeds
@@ -60,7 +96,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcmtear
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/mtear.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-mtear
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of mango seeds
@@ -78,7 +120,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantChiliice
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/chilly.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-icepepper
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of glowberry seeds
@@ -87,7 +135,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantGlowberry
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/glowberry.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-glowberry
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of poisonberry seeds
@@ -96,7 +150,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantPoisonberry
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/poisonberry.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-poisonberry
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of deathberry seeds
@@ -105,7 +165,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantDeathberry
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/deathberry.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-deathberry
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of bluespace tomato seeds
@@ -114,7 +180,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantBluespacetomato
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/blue_tomato.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-bluespacetomato
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of mold spores
@@ -132,7 +204,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantReishi
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/lingzhi.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-reishi
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of liberty cap spores
@@ -141,7 +219,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantLiberty
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/liberty.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-liberty
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of destroying angel spores
@@ -150,7 +234,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantAngel
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/angel.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-angel
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of glowshroom spores
@@ -159,7 +249,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantGlowshroom
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/glowshroom.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-glowshroom
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of plastellium seeds
@@ -168,7 +264,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantPlastellium
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/plastellium.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-plast
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of harebell seeds
@@ -177,7 +279,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantHarebell
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/harebell.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-harebell
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of green grape seeds
@@ -186,7 +294,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantGreengrape
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/grape.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-greengrapes
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of kudzu seeds
@@ -195,7 +309,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantKudzu
   - type: Sprite
-    sprite: _RMC14/Objects/Kitchen/Plants/kudzu.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-kudzu
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of weed seeds
@@ -214,7 +334,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcnettle
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/nettle.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-nettle
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of death nettle seeds
@@ -224,7 +350,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcdeathnettle
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/death_nettle.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-deathnettle
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of ambrosia vulgaris seeds
@@ -234,7 +366,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcambrosiavulgaris
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/ambrosia_vulgaris.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-ambrosiavulgaris
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of apple seeds
@@ -243,7 +381,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcapple
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/apple.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-apple
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of poison apple seeds
@@ -262,7 +406,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmccabbage
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/cabbage.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-cabbage
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of carrot seeds
@@ -271,7 +421,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmccarrot
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/carrot.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-carrot
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of poppy seeds
@@ -280,7 +436,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcpoppy
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/poppy.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-poppy
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of berry seeds
@@ -289,7 +451,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcberries
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/berries.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-berry
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of golden apple seeds
@@ -298,7 +466,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcgoldapple
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/golden_apple.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-goldapple
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of chili seeds
@@ -307,7 +481,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcchili
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/chili.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-chili
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of tomato seeds
@@ -316,7 +496,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmctomato
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/tomato.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-tomato
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of eggplant seeds
@@ -325,7 +511,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmceggplant
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/eggplant.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-eggplant
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of chanterelle spores
@@ -334,7 +526,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcchanterelle
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/chanterelle.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: mycelium-chanter
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of banana seeds
@@ -343,7 +541,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcbanana
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/banana.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-banana
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of corn seeds
@@ -352,7 +556,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmccorn
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/corn.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-corn
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of potato seeds
@@ -361,7 +571,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcpotato
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/potato.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-potato
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of soybean seeds
@@ -370,7 +586,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcsoybeans
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/soybeans.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-soybean
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of wheat seeds
@@ -379,7 +601,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcwheat
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/wheat.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-wheat
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of rice seeds
@@ -388,7 +616,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcrice
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/rice.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-rice
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of sugarcane seeds
@@ -397,7 +631,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcsugarcane
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/sugarcane.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-sugarcane
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of watermelon seeds
@@ -406,7 +646,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcwatermelon
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/watermelon.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-watermelon
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of pumpkin seeds
@@ -415,7 +661,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcpumpkin
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/pumpkin.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-pumpkin
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of lime seeds
@@ -424,7 +676,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmclime
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/lime.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-lime
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of lemon seeds
@@ -433,7 +691,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmclemon
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/lemon.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-lemon
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of orange seeds
@@ -442,7 +706,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcorange
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/orange.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-orange
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of cocoa seeds
@@ -451,7 +721,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmccocoa
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/cocoa.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-cocoapod
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of grape seeds
@@ -460,7 +736,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmcgrape
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/grape.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-grapes
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 - type: entity
   parent: SeedBase
   name: packet of cherry pits
@@ -469,7 +751,13 @@
   - type: RMCPlantSeed
     plantPrototype: RMCPlantRmccherry
   - type: Sprite
-    sprite: Objects/Specific/Hydroponics/cherry.rsi
+    sprite: _RMC14/Objects/Kitchen/Plants/seeds.rsi
+    layers:
+    - state: seed-cherry
+    - state: paper
+      visible: false
+      map: [ "enum.PaperLabelVisuals.Layer" ]
+      sprite: Objects/Specific/Hydroponics/seeds.rsi
 
 - type: entity
   parent: BasePlant

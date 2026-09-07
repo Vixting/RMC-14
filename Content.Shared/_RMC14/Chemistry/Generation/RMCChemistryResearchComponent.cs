@@ -60,6 +60,9 @@ public sealed partial class ContractSlot
 
     [DataField]
     public bool Taken;
+
+    [DataField]
+    public string? ExistingReagentId;
 }
 
 [DataDefinition, Serializable, NetSerializable]

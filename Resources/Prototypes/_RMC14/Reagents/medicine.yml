@@ -102,6 +102,7 @@
   noGeneration: true
   name: reagent-name-rmcspeedstimulant
   desc: reagent-desc-rmcspeedstimulant
+  physicalDesc: reagent-physical-desc-energizing
   color: "#d4d42b"
   overdose: 15
   criticalOverdose: 25
@@ -121,6 +122,7 @@
   noGeneration: true
   name: reagent-name-rmcbrainstimulant
   desc: reagent-desc-rmcbrainstimulant
+  physicalDesc: reagent-physical-desc-neural
   color: "#7b23a9"
   overdose: 15
   criticalOverdose: 25
@@ -142,6 +144,7 @@
   noGeneration: true
   name: reagent-name-rmcredemptionstimulant
   desc: reagent-desc-rmcredemptionstimulant
+  physicalDesc: reagent-physical-desc-vibrant
   color: "#219f74"
   overdose: 6
   criticalOverdose: 10
