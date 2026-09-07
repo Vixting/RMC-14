@@ -1,4 +1,4 @@
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
@@ -14,9 +14,9 @@ public sealed partial class Hypermetabolic : RMCChemicalEffect
     }
 
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var delta = Math.Clamp(-20f * (float) ActualPotency, -130f, 0f);
-        plant.MetabolismAdjust = MathF.Max(plant.MetabolismAdjust + delta, -130f);
+        plant.Comp.MetabolismAdjust = MathF.Max(plant.Comp.MetabolismAdjust + delta, -130f);
     }
 }

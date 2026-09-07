@@ -1,6 +1,5 @@
 using System.Linq;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
@@ -28,26 +27,24 @@ public sealed partial class AcidBloodMutating : RMCChemicalEffect
         return "Corrodes plants in a hydroponics tray and scrambles the chemicals they produce.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (plant.Seed is not { } seed)
+        if (!args.EntityManager.TryGetComponent<RMCPlantChemicalsComponent>(plant.Owner, out var chemicals))
             return;
 
         // cm toxins += 3*volume (royal 6), health -= volume (royal 4*volume)
-        var p = (float) potency;
-        plant.Toxins += (Royal ? 6f : 3f) * p;
-        plant.Health -= (Royal ? 4f : 1f) * p;
+        var p = (float) args.Quantity;
+        if (GetTray(args.EntityManager, plant) is { } tray)
+            tray.Toxins += (Royal ? 6f : 3f) * p;
+        plant.Comp.Health -= (Royal ? 4f : 1f) * p;
 
         var random = IoCManager.Resolve<IRobustRandom>();
         if (!random.Prob(MutateChance))
             return;
 
-        if (!seed.Unique)
-            plant.Seed = seed = seed.Clone();
-
         if (Royal)
         {
-            if (seed.Chemicals.Count > MaxChemicals)
+            if (chemicals.Chemicals.Count > MaxChemicals)
                 return;
 
             var prototype = IoCManager.Resolve<IPrototypeManager>();
@@ -60,16 +57,16 @@ public sealed partial class AcidBloodMutating : RMCChemicalEffect
                 return;
 
             var pick = random.Pick(hydro);
-            seed.Chemicals.TryAdd(pick, new SeedChemQuantity { Min = 1, Max = random.Next(2, 4), PotencyDivisor = 20, Inherent = false });
+            chemicals.Chemicals.TryAdd(pick, new SeedChemQuantity { Min = 1, Max = random.Next(2, 4), PotencyDivisor = 20, Inherent = false });
         }
-        else if (seed.Chemicals.Count > 1)
+        else if (chemicals.Chemicals.Count > 1)
         {
-            var removed = random.Pick(seed.Chemicals.Keys.ToList());
-            seed.Chemicals.Remove(removed);
+            var removed = random.Pick(chemicals.Chemicals.Keys.ToList());
+            chemicals.Chemicals.Remove(removed);
         }
         else
         {
-            seed.Chemicals.TryAdd(SelfChem, new SeedChemQuantity { Min = 1, Max = 2, PotencyDivisor = 20, Inherent = false });
+            chemicals.Chemicals.TryAdd(SelfChem, new SeedChemQuantity { Min = 1, Max = 2, PotencyDivisor = 20, Inherent = false });
         }
     }
 }

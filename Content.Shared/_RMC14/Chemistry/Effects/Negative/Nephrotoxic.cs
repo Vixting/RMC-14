@@ -1,5 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -17,12 +17,11 @@ public sealed partial class Nephrotoxic : RMCChemicalEffect
         return "Damages the kidneys. Prevents tolerance mutations from occurring in plants.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var suppress = -Potency;
-        SuppressMutationSlot(plant, "Light Tolerance", suppress);
-        SuppressMutationSlot(plant, "Weed Tolerance", suppress);
-        SuppressMutationSlot(plant, "Toxin Tolerance", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Weed Tolerance", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Toxin Tolerance", suppress);
     }
 
     // TODO RMC14: damage kidney

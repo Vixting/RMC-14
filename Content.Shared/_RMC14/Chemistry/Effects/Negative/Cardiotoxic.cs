@@ -1,4 +1,4 @@
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -16,12 +16,12 @@ public sealed partial class Cardiotoxic : RMCChemicalEffect
         return "Damages the heart. Prevents new chemical mutations from occurring in plants.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var suppress = -Potency;
-        SuppressMutationSlot(plant, "New Chems", suppress);
-        SuppressMutationSlot(plant, "New Chems2", suppress);
-        SuppressMutationSlot(plant, "New Chems3", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "New Chems", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "New Chems2", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "New Chems3", suppress);
     }
 
     // TODO RMC14: damage heart organ

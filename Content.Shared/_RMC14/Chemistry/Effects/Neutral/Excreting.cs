@@ -1,5 +1,5 @@
 using Content.Shared._RMC14.Body;
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
@@ -40,14 +40,21 @@ public sealed partial class Excreting : RMCChemicalEffect
         solutionContainer.RemoveEachReagent(solutionEnt, Potency);
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        plant.Toxins += ToxinsAmount * scaled;
-        plant.WeedLevel += WeedsAmount * scaled;
-        plant.PotencyCounter += CounterIncrement * scaled;
+        if (!args.EntityManager.TryGetComponent<RMCPlantChemicalsComponent>(plant.Owner, out var chemicals))
+            return;
 
-        if (plant.PotencyCounter < 100f || plant.Seed == null)
+        var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
+        if (GetTray(args.EntityManager, plant) is { } tray)
+        {
+            tray.Toxins += ToxinsAmount * scaled;
+            tray.WeedLevel += WeedsAmount * scaled;
+        }
+
+        chemicals.PotencyCounter += CounterIncrement * scaled;
+
+        if (chemicals.PotencyCounter < 100f)
             return;
 
         var random = IoCManager.Resolve<IRobustRandom>();
@@ -56,12 +63,12 @@ public sealed partial class Excreting : RMCChemicalEffect
         if (random.Next(0, level + 1) <= 0)
             return;
 
-        if (!plant.Seed.Unique)
-            plant.Seed = plant.Seed.Clone();
+        chemicals.Potency += random.Next(1, level + 1);
 
-        plant.Seed.Potency += random.Next(1, level + 1);
-        plant.Seed.NutrientConsumption += NutrientConsumptionIncrease * Potency;
-        plant.PotencyCounter = 0f;
+        if (args.EntityManager.TryGetComponent<RMCPlantMetabolismComponent>(plant.Owner, out var metabolism))
+            metabolism.NutrientConsumption += NutrientConsumptionIncrease * Potency;
+
+        chemicals.PotencyCounter = 0f;
         var popup = args.EntityManager.System<SharedPopupSystem>();
         popup.PopupEntity(Loc.GetString("plant-excreting-potency-boost"), args.TargetEntity);
     }

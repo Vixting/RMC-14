@@ -1,4 +1,4 @@
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
@@ -16,13 +16,17 @@ public sealed partial class Nutritious : RMCChemicalEffect
         return $"Restores [color=green]{updatedFactor * PotencyPerSecond}[/color] nutrients to the body and satiates hunger";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        plant.WeedLevel += scaled * 0.5f;
-        plant.PestLevel += scaled * 0.5f;
-        plant.NutritionLevel += scaled * 0.5f;
-        plant.Health += scaled * 0.5f;
+        if (GetTray(args.EntityManager, plant) is { } tray)
+        {
+            tray.WeedLevel += scaled * 0.5f;
+            tray.PestLevel += scaled * 0.5f;
+            tray.NutritionLevel += scaled * 0.5f;
+        }
+
+        plant.Comp.Health += scaled * 0.5f;
         AddYieldMod(plant, scaled * 0.05f);
     }
 

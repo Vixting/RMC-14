@@ -1,7 +1,8 @@
-﻿using Content.Shared.Botany.Components;
+﻿using Content.Shared._RMC14.Botany;
 using Content.Shared.Damage;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Random;
 
 namespace Content.Shared._RMC14.Chemistry.Effects;
@@ -45,9 +46,9 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         _moddedPotency = Potency + boost;
         var scaledPotency = PotencyPerSecond * scale;
 
-        if (args.EntityManager.TryGetComponent<PlantHolderComponent>(args.TargetEntity, out var plant))
+        if (args.EntityManager.TryGetComponent<RMCPlantComponent>(args.TargetEntity, out var plant))
         {
-            TickHydroTray(plant, scaledPotency, reagentArgs);
+            TickHydroTray(new Entity<RMCPlantComponent>(args.TargetEntity, plant), scaledPotency, reagentArgs);
             return;
         }
 
@@ -129,11 +130,19 @@ public abstract partial class RMCChemicalEffect : EntityEffect
     {
     }
 
-    protected virtual void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected virtual void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
     }
 
-    protected static void AddYieldMod(PlantHolderComponent plant, float delta)
+    protected static RMCPlantTrayComponent? GetTray(IEntityManager entityManager, Entity<RMCPlantComponent> plant)
+    {
+        if (plant.Comp.Tray is { } tray && entityManager.TryGetComponent<RMCPlantTrayComponent>(tray, out var trayComp))
+            return trayComp;
+
+        return null;
+    }
+
+    protected static void AddYieldMod(Entity<RMCPlantComponent> plant, float delta)
     {
         if (delta == 0f)
             return;
@@ -143,35 +152,31 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         if (remainder > 0f && IoCManager.Resolve<IRobustRandom>().Prob(remainder))
             whole += 1;
 
-        plant.YieldMod += whole;
+        plant.Comp.YieldMod += whole;
     }
 
-    protected static void SuppressMutationSlot(PlantHolderComponent plant, string slot, float value)
+    // The clone-on-write dance the old SeedData-sharing model needed is gone — each plant is its own
+    // entity with its own component instances, so mutating the mutation-controller dict directly is safe.
+    protected static void SuppressMutationSlot(IEntityManager entityManager, Entity<RMCPlantComponent> plant, string slot, float value)
     {
-        if (plant.Seed is not { } seed)
+        if (!entityManager.TryGetComponent<RMCPlantMutationComponent>(plant.Owner, out var mutation))
             return;
 
-        if (seed.MutationController.GetValueOrDefault(slot, 0f) <= value)
+        if (mutation.Slots.GetValueOrDefault(slot, 0f) <= value)
             return;
 
-        if (!seed.Unique)
-            plant.Seed = seed = seed.Clone();
-
-        seed.MutationController[slot] = value;
+        mutation.Slots[slot] = value;
     }
 
-    protected static void EnableMutationSlot(PlantHolderComponent plant, string slot, float value)
+    protected static void EnableMutationSlot(IEntityManager entityManager, Entity<RMCPlantComponent> plant, string slot, float value)
     {
-        if (plant.Seed is not { } seed)
+        if (!entityManager.TryGetComponent<RMCPlantMutationComponent>(plant.Owner, out var mutation))
             return;
 
-        if (seed.MutationController.GetValueOrDefault(slot, 0f) >= value)
+        if (mutation.Slots.GetValueOrDefault(slot, 0f) >= value)
             return;
 
-        if (!seed.Unique)
-            plant.Seed = seed = seed.Clone();
-
-        seed.MutationController[slot] = value;
+        mutation.Slots[slot] = value;
     }
 
     protected virtual void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

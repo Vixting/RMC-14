@@ -1,5 +1,5 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Damage;
-using Content.Shared.Botany.Components;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -20,11 +20,13 @@ public sealed partial class Carcinogenic : RMCChemicalEffect
                $"Critical overdoses cause [color=red]{PotencyPerSecond * 2}[/color] brute damage";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var amount = Potency * (float) args.Quantity;
-        plant.Toxins += 3f * amount;
-        plant.MutationLevel += 20f * amount + plant.MutationMod;
+        if (GetTray(args.EntityManager, plant) is { } tray)
+            tray.Toxins += 1.5f * amount;
+
+        plant.Comp.MutationLevel += 10f * amount + plant.Comp.MutationMod;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

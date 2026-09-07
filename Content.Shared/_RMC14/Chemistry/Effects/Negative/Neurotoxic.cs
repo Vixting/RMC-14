@@ -1,8 +1,8 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Slow;
 using Content.Shared._RMC14.Stun;
 using Content.Shared._RMC14.Synth;
 using Content.Shared._RMC14.Xenonids;
-using Content.Shared.Botany.Components;
 using Content.Shared.Chemistry;
 using Content.Shared.Clothing;
 using Content.Shared.Damage;
@@ -29,10 +29,10 @@ public sealed partial class Neurotoxic : RMCChemicalEffect
         return "Damages the brain. Prevents species mutation from occurring in plants.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var suppress = -Potency;
-        SuppressMutationSlot(plant, "Mutate Species", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Mutate Species", suppress);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

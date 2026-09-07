@@ -1,4 +1,4 @@
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.EntityEffects;
@@ -16,13 +16,13 @@ public sealed partial class Pneumotoxic : RMCChemicalEffect
         return "Damages the lungs. Prevents growth speed and lifespan mutations from occurring in plants.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var suppress = -Potency;
-        SuppressMutationSlot(plant, "Endurance", suppress);
-        SuppressMutationSlot(plant, "Production", suppress);
-        SuppressMutationSlot(plant, "Lifespan", suppress);
-        SuppressMutationSlot(plant, "Maturity", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Endurance", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Production", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Lifespan", suppress);
+        SuppressMutationSlot(args.EntityManager, plant, "Maturity", suppress);
     }
 
     // TODO RMC14: damage lung

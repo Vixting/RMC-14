@@ -1,10 +1,10 @@
+using Content.Shared._RMC14.Botany;
 using Content.Shared._RMC14.Chemistry.Buildup;
 using Content.Shared._RMC14.Emote;
 using Content.Shared._RMC14.Synth;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
-using Content.Shared.Botany.Components;
 using Content.Shared.Chat.Prototypes;
 using Content.Shared.Chemistry;
 using Content.Shared.Damage;
@@ -31,11 +31,11 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
         return "Causes hemorrhaging.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        var amount = 0.4f * Potency * (float) args.Quantity;
-        plant.Health -= amount;
-        plant.MutationMod += amount;
+        var amount = 0.2f * Potency * (float) args.Quantity;
+        plant.Comp.Health -= amount;
+        plant.Comp.MutationMod += amount;
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

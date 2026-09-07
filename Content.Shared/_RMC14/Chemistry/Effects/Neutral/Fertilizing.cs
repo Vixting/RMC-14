@@ -1,4 +1,4 @@
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Shared.EntityEffects;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
@@ -24,22 +24,19 @@ public sealed partial class Fertilizing : RMCChemicalEffect
         return "Acts as a potent fertilizer, feeding plants in a hydroponics tray while improving their health and yield.";
     }
 
-    protected override void TickHydroTray(PlantHolderComponent plant, FixedPoint2 potency, EntityEffectReagentArgs args)
+    protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (plant.Seed is not { } seed)
-            return;
-
         var amount = (float) potency;
-        plant.Health += amount * HealthMod;
+        plant.Comp.Health += amount * HealthMod;
         AddYieldMod(plant, amount * YieldMod);
-        plant.NutritionLevel += amount * NutrientMod;
+
+        if (GetTray(args.EntityManager, plant) is { } tray)
+            tray.NutritionLevel += amount * NutrientMod;
 
         if (LifespanMod == 0f)
             return;
 
-        if (!seed.Unique)
-            plant.Seed = seed = seed.Clone();
-
-        seed.Lifespan += amount * LifespanMod;
+        if (args.EntityManager.TryGetComponent<RMCPlantGrowthComponent>(plant.Owner, out var growth))
+            growth.Lifespan += amount * LifespanMod;
     }
 }
