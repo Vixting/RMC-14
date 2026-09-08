@@ -8,6 +8,8 @@ namespace Content.Server._RMC14.Botany;
 /// </summary>
 public sealed class RMCConsumeExudeGasSystem : EntitySystem
 {
+    [Dependency] private readonly RMCPlantTraySystem _plantTray = default!;
+
     public const float HydroponicsSpeedMultiplier = 1f;
 
     public override void Initialize()
@@ -21,35 +23,41 @@ public sealed class RMCConsumeExudeGasSystem : EntitySystem
         if (!TryComp(args.Plant, out RMCPlantComponent? plantComp))
             return;
 
-        var tray = Comp<RMCPlantTrayComponent>(args.Tray);
+        var tray = (args.Tray, Comp<RMCPlantTrayComponent>(args.Tray));
         var ent = (args.Plant, plantComp);
         TickConsume(ent, tray, args.Environment);
         TickExude(args.Plant, args.Environment);
     }
 
-    public void TickConsume(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, GasMixture environment)
+    public void TickConsume(Entity<RMCPlantComponent> plant, Entity<RMCPlantTrayComponent> tray, GasMixture environment)
     {
-        tray.MissingGas = 0;
+        var missingGas = 0;
 
         if (!TryComp(plant.Owner, out RMCConsumeExudeGasComponent? gas) || gas.ConsumeGasses.Count == 0)
+        {
+            _plantTray.SetMissingGas((tray.Owner, tray.Comp), missingGas);
             return;
+        }
 
         foreach (var (gasType, amount) in gas.ConsumeGasses)
         {
             if (environment.GetMoles(gasType) < amount)
             {
-                tray.MissingGas++;
+                missingGas++;
                 continue;
             }
 
             environment.AdjustMoles(gasType, -amount);
         }
 
-        if (tray.MissingGas > 0)
+        _plantTray.SetMissingGas((tray.Owner, tray.Comp), missingGas);
+
+        if (missingGas > 0)
         {
-            plant.Comp.Health -= tray.MissingGas * HydroponicsSpeedMultiplier;
-            if (tray.DrawWarnings)
-                tray.UpdateSpriteAfterUpdate = true;
+            var growth = Comp<RMCPlantGrowthComponent>(plant.Owner);
+            _plantTray.AdjustHealth((plant.Owner, plant.Comp, growth), -missingGas * HydroponicsSpeedMultiplier);
+            if (tray.Comp.DrawWarnings)
+                tray.Comp.UpdateSpriteAfterUpdate = true;
         }
     }
 

@@ -9,6 +9,7 @@ namespace Content.Server._RMC14.Botany;
 public sealed class RMCPlantPestSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RMCPlantTraySystem _plantTray = default!;
 
     public const float HydroponicsSpeedMultiplier = 1f;
 
@@ -23,7 +24,7 @@ public sealed class RMCPlantPestSystem : EntitySystem
         if (!TryComp(args.Plant, out RMCPlantComponent? plantComp))
             return;
 
-        var tray = Comp<RMCPlantTrayComponent>(args.Tray);
+        var tray = (args.Tray, Comp<RMCPlantTrayComponent>(args.Tray));
         var ent = (args.Plant, plantComp);
         TickSpawn(tray);
         Tick(ent, tray, Comp<RMCPlantTraitsComponent>(args.Plant));
@@ -32,32 +33,34 @@ public sealed class RMCPlantPestSystem : EntitySystem
     /// <summary>
     /// Small chance for the pest population to increase. Only runs for a live, non-dead plant.
     /// </summary>
-    public void TickSpawn(RMCPlantTrayComponent tray)
+    public void TickSpawn(Entity<RMCPlantTrayComponent> tray)
     {
         if (!_random.Prob(0.01f))
             return;
 
-        tray.PestLevel += 0.5f * HydroponicsSpeedMultiplier;
-        if (tray.DrawWarnings)
-            tray.UpdateSpriteAfterUpdate = true;
+        _plantTray.AdjustPestLevel((tray.Owner, tray.Comp), 0.5f * HydroponicsSpeedMultiplier);
+        if (tray.Comp.DrawWarnings)
+            tray.Comp.UpdateSpriteAfterUpdate = true;
     }
 
-    public void Tick(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, RMCPlantTraitsComponent traits)
+    public void Tick(Entity<RMCPlantComponent> plant, Entity<RMCPlantTrayComponent> tray, RMCPlantTraitsComponent traits)
     {
-        if (tray.PestLevel <= 0)
+        if (tray.Comp.PestLevel <= 0)
             return;
+
+        var growth = Comp<RMCPlantGrowthComponent>(plant.Owner);
 
         if (HasComp<RMCPlantTraitCarnivorousComponent>(plant.Owner))
         {
-            tray.PestLevel -= HydroponicsSpeedMultiplier;
-            plant.Comp.Health += HydroponicsSpeedMultiplier;
+            _plantTray.AdjustPestLevel((tray.Owner, tray.Comp), -HydroponicsSpeedMultiplier);
+            _plantTray.AdjustHealth((plant.Owner, plant.Comp, growth), HydroponicsSpeedMultiplier);
         }
-        else if (tray.PestLevel > traits.PestTolerance)
+        else if (tray.Comp.PestLevel > traits.PestTolerance)
         {
-            plant.Comp.Health -= HydroponicsSpeedMultiplier;
+            _plantTray.AdjustHealth((plant.Owner, plant.Comp, growth), -HydroponicsSpeedMultiplier);
         }
 
-        if (tray.DrawWarnings)
-            tray.UpdateSpriteAfterUpdate = true;
+        if (tray.Comp.DrawWarnings)
+            tray.Comp.UpdateSpriteAfterUpdate = true;
     }
 }

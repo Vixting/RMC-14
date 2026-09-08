@@ -23,24 +23,24 @@ public sealed class RMCPlantMetabolismSystem : EntitySystem
     /// <summary>
     /// Consumes nutrients/water
     /// </summary>
-    public void Tick(EntityUid plant, RMCPlantTrayComponent tray)
+    public void Tick(EntityUid plant, Entity<RMCPlantTrayComponent> tray)
     {
         if (!TryComp(plant, out RMCPlantMetabolismComponent? metabolism))
             return;
 
-        if (metabolism.NutrientConsumption > 0 && tray.NutritionLevel > 0 && _random.Prob(0.75f))
+        if (metabolism.NutrientConsumption > 0 && tray.Comp.NutritionLevel > 0 && _random.Prob(0.75f))
         {
-            tray.NutritionLevel -= MathF.Max(0f, metabolism.NutrientConsumption * HydroponicsSpeedMultiplier);
-            if (tray.DrawWarnings)
-                tray.UpdateSpriteAfterUpdate = true;
+            AdjustNutrient(tray, -MathF.Max(0f, metabolism.NutrientConsumption * HydroponicsSpeedMultiplier));
+            if (tray.Comp.DrawWarnings)
+                tray.Comp.UpdateSpriteAfterUpdate = true;
         }
 
-        if (metabolism.WaterConsumption > 0 && tray.WaterLevel > 0 && _random.Prob(0.75f))
+        if (metabolism.WaterConsumption > 0 && tray.Comp.WaterLevel > 0 && _random.Prob(0.75f))
         {
-            tray.WaterLevel -= MathF.Max(0f,
-                metabolism.WaterConsumption * HydroponicsConsumptionMultiplier * HydroponicsSpeedMultiplier);
-            if (tray.DrawWarnings)
-                tray.UpdateSpriteAfterUpdate = true;
+            AdjustWater(tray, -MathF.Max(0f,
+                metabolism.WaterConsumption * HydroponicsConsumptionMultiplier * HydroponicsSpeedMultiplier));
+            if (tray.Comp.DrawWarnings)
+                tray.Comp.UpdateSpriteAfterUpdate = true;
         }
     }
 

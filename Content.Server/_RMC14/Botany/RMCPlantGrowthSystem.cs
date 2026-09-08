@@ -9,6 +9,7 @@ namespace Content.Server._RMC14.Botany;
 public sealed class RMCPlantGrowthSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly RMCPlantTraySystem _plantTray = default!;
 
     public const float HydroponicsSpeedMultiplier = 1f;
 
@@ -21,14 +22,15 @@ public sealed class RMCPlantGrowthSystem : EntitySystem
     /// <summary>
     /// Advances age. Runs early in the tick, before the nutrient/water/tolerance/toxin/pest/weed formuls
     /// </summary>
-    public void TickAging(RMCPlantComponent comp)
+    public void TickAging(Entity<RMCPlantComponent> plant)
     {
+        var comp = plant.Comp;
         if (comp.SkipAging > 0)
-            comp.SkipAging--;
+            _plantTray.AdjustSkipAging((plant.Owner, comp), -1);
         else
         {
             if (_random.Prob(0.8f))
-                comp.Age += (int)(1 * HydroponicsSpeedMultiplier);
+                _plantTray.AdjustAge((plant.Owner, comp), (int)(1 * HydroponicsSpeedMultiplier));
 
             comp.UpdateSpriteAfterUpdate = true;
         }
@@ -44,7 +46,7 @@ public sealed class RMCPlantGrowthSystem : EntitySystem
 
         if (comp.Age > growth.Lifespan)
         {
-            comp.Health -= _random.Next(3, 5) * HydroponicsSpeedMultiplier;
+            _plantTray.AdjustHealth((plant.Owner, comp, growth), -(_random.Next(3, 5) * HydroponicsSpeedMultiplier));
             comp.UpdateSpriteAfterUpdate = true;
         }
         else if (comp.Age < 0)
@@ -58,14 +60,14 @@ public sealed class RMCPlantGrowthSystem : EntitySystem
             {
                 if (comp.Age - growth.LastProduce > growth.Production && !comp.Harvest)
                 {
-                    comp.Harvest = true;
-                    growth.LastProduce = comp.Age;
+                    _plantTray.SetHarvestReady((plant.Owner, comp), true);
+                    _plantTray.SetLastProduce((plant.Owner, growth), comp.Age);
                 }
             }
             else if (comp.Harvest)
             {
-                comp.Harvest = false;
-                growth.LastProduce = comp.Age;
+                _plantTray.SetHarvestReady((plant.Owner, comp), false);
+                _plantTray.SetLastProduce((plant.Owner, growth), comp.Age);
             }
         }
 
@@ -82,35 +84,38 @@ public sealed class RMCPlantGrowthSystem : EntitySystem
         if (amount > 0)
         {
             if (comp.Age < growth.Maturation)
-                comp.Age += amount;
+                _plantTray.AdjustAge((plant.Owner, comp), amount);
             else if (!comp.Harvest && growth.Production <= 0f)
-                growth.LastProduce -= amount;
+                _plantTray.SetLastProduce((plant.Owner, growth), growth.LastProduce - amount);
         }
         else
         {
             if (comp.Age < growth.Maturation)
-                comp.SkipAging++;
+                _plantTray.AdjustSkipAging((plant.Owner, comp), 1);
             else if (!comp.Harvest && growth.Production <= 0f)
-                growth.LastProduce += amount;
+                _plantTray.SetLastProduce((plant.Owner, growth), growth.LastProduce + amount);
         }
     }
 
     /// <summary>
     /// Decays MetabolismAdjust toward zero by 5 per tick. Called once per tray growth cycle.
     /// </summary>
-    public void DecayMetabolismAdjust(RMCPlantComponent comp)
+    public void DecayMetabolismAdjust(Entity<RMCPlantComponent> plant)
     {
+        var comp = plant.Comp;
         if (comp.MetabolismAdjust > 0)
-            comp.MetabolismAdjust = MathF.Max(0f, comp.MetabolismAdjust - 5f);
+            _plantTray.SetMetabolismAdjust((plant.Owner, comp), MathF.Max(0f, comp.MetabolismAdjust - 5f));
         else if (comp.MetabolismAdjust < 0)
-            comp.MetabolismAdjust = MathF.Min(0f, comp.MetabolismAdjust + 5f);
+            _plantTray.SetMetabolismAdjust((plant.Owner, comp), MathF.Min(0f, comp.MetabolismAdjust + 5f));
     }
 
-    public void CheckLevelSanity(RMCPlantComponent comp, RMCPlantGrowthComponent growth)
+    public void CheckLevelSanity(Entity<RMCPlantComponent, RMCPlantGrowthComponent> plant)
     {
-        comp.Health = MathHelper.Clamp(comp.Health, 0, growth.Endurance);
-        comp.MutationLevel = MathHelper.Clamp(comp.MutationLevel, 0f, 100f);
-        comp.YieldMod = MathHelper.Clamp(comp.YieldMod, 0, 2);
-        comp.MutationMod = MathHelper.Clamp(comp.MutationMod, 0f, 3f);
+        var (_, comp, growth) = plant;
+        if (comp.Health > growth.Endurance || comp.Health < 0f)
+            _plantTray.AdjustHealth((plant.Owner, comp, growth), 0f);
+        _plantTray.SetMutationLevel((plant.Owner, comp), MathHelper.Clamp(comp.MutationLevel, 0f, 100f));
+        _plantTray.SetYieldMod((plant.Owner, comp), MathHelper.Clamp(comp.YieldMod, 0, 2));
+        _plantTray.SetMutationMod((plant.Owner, comp), MathHelper.Clamp(comp.MutationMod, 0f, 3f));
     }
 }

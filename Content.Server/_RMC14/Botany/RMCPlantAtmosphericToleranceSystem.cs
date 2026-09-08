@@ -8,6 +8,8 @@ namespace Content.Server._RMC14.Botany;
 /// </summary>
 public sealed class RMCPlantAtmosphericToleranceSystem : EntitySystem
 {
+    [Dependency] private readonly RMCPlantTraySystem _plantTray = default!;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -22,35 +24,37 @@ public sealed class RMCPlantAtmosphericToleranceSystem : EntitySystem
         if (!TryComp(args.Plant, out RMCPlantAtmosphericComponent? atmos))
             return;
 
-        Tick((args.Plant, plantComp), Comp<RMCPlantTrayComponent>(args.Tray), atmos, args.Environment, args.HealthMod);
+        Tick((args.Plant, plantComp), (args.Tray, Comp<RMCPlantTrayComponent>(args.Tray)), atmos, args.Environment, args.HealthMod);
     }
 
-    public void Tick(Entity<RMCPlantComponent> plant, RMCPlantTrayComponent tray, RMCPlantAtmosphericComponent atmos, GasMixture environment, float healthMod)
+    public void Tick(Entity<RMCPlantComponent> plant, Entity<RMCPlantTrayComponent> tray, RMCPlantAtmosphericComponent atmos, GasMixture environment, float healthMod)
     {
+        var growth = Comp<RMCPlantGrowthComponent>(plant.Owner);
+
         var pressure = environment.Pressure;
         if (pressure < atmos.MinPressure || pressure > atmos.MaxPressure)
         {
-            plant.Comp.Health -= healthMod;
-            tray.ImproperPressure = true;
-            if (tray.DrawWarnings)
-                tray.UpdateSpriteAfterUpdate = true;
+            _plantTray.AdjustHealth((plant.Owner, plant.Comp, growth), -healthMod);
+            _plantTray.SetImproperPressure((tray.Owner, tray.Comp), true);
+            if (tray.Comp.DrawWarnings)
+                tray.Comp.UpdateSpriteAfterUpdate = true;
         }
         else
         {
-            tray.ImproperPressure = false;
+            _plantTray.SetImproperPressure((tray.Owner, tray.Comp), false);
         }
 
         var temperature = environment.Temperature;
         if (temperature < atmos.MinHeat || temperature > atmos.MaxHeat)
         {
-            plant.Comp.Health -= healthMod;
-            tray.ImproperHeat = true;
-            if (tray.DrawWarnings)
-                tray.UpdateSpriteAfterUpdate = true;
+            _plantTray.AdjustHealth((plant.Owner, plant.Comp, growth), -healthMod);
+            _plantTray.SetImproperHeat((tray.Owner, tray.Comp), true);
+            if (tray.Comp.DrawWarnings)
+                tray.Comp.UpdateSpriteAfterUpdate = true;
         }
         else
         {
-            tray.ImproperHeat = false;
+            _plantTray.SetImproperHeat((tray.Owner, tray.Comp), false);
         }
     }
 }

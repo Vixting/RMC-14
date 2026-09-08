@@ -74,9 +74,8 @@ public sealed class RMCPlantHarvestSystem : EntitySystem
             return;
         }
 
-        comp.Harvest = false;
-        growth.LastProduce = comp.Age;
-        _plantTray.DirtyPlant(plant);
+        _plantTray.SetHarvestReady((plant, comp), false);
+        _plantTray.SetLastProduce((plant, growth), comp.Age);
 
         _plantScream.DoScream(trayUid, plant);
 

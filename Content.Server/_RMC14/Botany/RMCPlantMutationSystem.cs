@@ -92,7 +92,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
         {
             var targetProto = _robustRandom.Pick(mutation.MutationPrototypes);
             ChangeSpecies(plant, targetProto);
-            ResetController(mutation);
+            ResetController((plant, mutation));
             return;
         }
 
@@ -119,8 +119,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
 
         if (candidates.Count == 0)
         {
-            ResetController(mutation);
-            _plantTray.DirtyPlant(plant);
+            ResetController((plant, mutation));
             return;
         }
 
@@ -132,25 +131,28 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             var slot = _robustRandom.Pick(candidates);
 
             if (cancelSlots.Contains(slot))
-            {
-                _plantTray.DirtyPlant(plant);
                 return;
-            }
 
             ApplyMutation(plant, slot, degree);
         }
 
-        ResetController(mutation);
-        _plantTray.DirtyPlant(plant);
+        ResetController((plant, mutation));
     }
 
-    private void ResetController(RMCPlantMutationComponent mutation)
+    private void ResetController(Entity<RMCPlantMutationComponent> mutation)
     {
-        foreach (var key in mutation.Slots.Keys.ToList())
+        var changed = false;
+        foreach (var key in mutation.Comp.Slots.Keys.ToList())
         {
-            if (mutation.Slots[key] > -3f)
-                mutation.Slots[key] = 0f;
+            if (mutation.Comp.Slots[key] > -3f)
+            {
+                mutation.Comp.Slots[key] = 0f;
+                changed = true;
+            }
         }
+
+        if (changed)
+            _plantTray.DirtyMutationSlots((mutation.Owner, mutation.Comp));
     }
 
     private void ApplyMutation(EntityUid plant, string slot, int degree)
@@ -160,7 +162,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             case Slot.PlantCancer:
                 if (TryComp(plant, out RMCPlantGrowthComponent? cancerGrowth))
                 {
-                    cancerGrowth.Lifespan = MathF.Max(0f, cancerGrowth.Lifespan - _robustRandom.Next(1, 6));
+                    _plantTray.SetLifespan((plant, cancerGrowth), MathF.Max(0f, cancerGrowth.Lifespan - _robustRandom.Next(1, 6)));
                     _plantTray.SetEndurance((plant, cancerGrowth), MathF.Max(0f, cancerGrowth.Endurance - _robustRandom.Next(10, 21)));
                 }
                 break;
@@ -168,12 +170,9 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             case Slot.Gluttony:
                 if (TryComp(plant, out RMCPlantMetabolismComponent? gluttony))
                 {
-                    gluttony.NutrientConsumption = Math.Clamp(
-                        gluttony.NutrientConsumption + _robustRandom.NextFloat(-degree * 0.1f, degree * 0.1f),
-                        0f, 5f);
-                    gluttony.WaterConsumption = Math.Clamp(
-                        gluttony.WaterConsumption + _robustRandom.NextFloat(-degree, degree),
-                        0f, 50f);
+                    _plantTray.SetMetabolismRates((plant, gluttony),
+                        Math.Clamp(gluttony.NutrientConsumption + _robustRandom.NextFloat(-degree * 0.1f, degree * 0.1f), 0f, 5f),
+                        Math.Clamp(gluttony.WaterConsumption + _robustRandom.NextFloat(-degree, degree), 0f, 50f));
                 }
                 break;
 
@@ -227,18 +226,18 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             case Slot.Production:
                 if (TryComp(plant, out RMCPlantGrowthComponent? productionGrowth))
                 {
-                    productionGrowth.Production = Math.Clamp(
+                    _plantTray.SetProduction((plant, productionGrowth), Math.Clamp(
                         productionGrowth.Production + _robustRandom.Next(-1, 2) * degree,
-                        1f, 10f);
+                        1f, 10f));
                 }
                 break;
 
             case Slot.Lifespan:
                 if (TryComp(plant, out RMCPlantGrowthComponent? lifespanGrowth))
                 {
-                    lifespanGrowth.Lifespan = Math.Clamp(
+                    _plantTray.SetLifespan((plant, lifespanGrowth), Math.Clamp(
                         lifespanGrowth.Lifespan + _robustRandom.Next(-2, 3) * degree,
-                        10f, 30f);
+                        10f, 30f));
                 }
                 if (TryComp(plant, out RMCPlantHarvestComponent? lifespanHarvest) && lifespanHarvest.Yield != -1)
                 {
@@ -292,13 +291,15 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             case Slot.NewChems2:
             case Slot.NewChems3:
                 if (TryComp(plant, out RMCPlantChemicalsComponent? newChemsComp))
-                    AddRandomChem(newChemsComp);
+                    AddRandomChem((plant, newChemsComp));
                 break;
         }
     }
 
-    private void AddRandomChem(RMCPlantChemicalsComponent chemicals)
+    private void AddRandomChem(Entity<RMCPlantChemicalsComponent> plant)
     {
+        var chemicals = plant.Comp;
+
         // 60u chem cap - no mutations after
         if (ChemOutputFull(chemicals))
             return;
@@ -315,6 +316,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
                     PotencyDivisor = _robustRandom.Next(5, 9),
                     Inherent = false,
                 };
+                _plantTray.DirtyChemicals((plant.Owner, plant.Comp));
             }
 
             return;
@@ -339,6 +341,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
 
         seedChemQuantity.PotencyDivisor = (int)Math.Ceiling(100.0 / seedChemQuantity.Max);
         chemicals.Chemicals[chemicalId] = seedChemQuantity;
+        _plantTray.DirtyChemicals((plant.Owner, plant.Comp));
     }
 
     private static bool ChemOutputFull(RMCPlantChemicalsComponent chemicals)
@@ -369,31 +372,19 @@ public sealed class RMCPlantMutationSystem : EntitySystem
         var temp = Spawn(targetProto, Transform(plant).Coordinates);
 
         if (TryComp(temp, out RMCPlantComponent? tempPlant) && TryComp(plant, out RMCPlantComponent? plantComp))
-        {
-            plantComp.Name = tempPlant.Name;
-            plantComp.Noun = tempPlant.Noun;
-            plantComp.DisplayName = tempPlant.DisplayName;
-            plantComp.Mysterious = tempPlant.Mysterious;
-        }
+            _plantTray.SetIdentity((plant, plantComp), tempPlant.Name, tempPlant.Noun, tempPlant.DisplayName, tempPlant.Mysterious);
 
         if (TryComp(temp, out RMCPlantHarvestComponent? tempHarvest) && TryComp(plant, out RMCPlantHarvestComponent? harvest))
-        {
-            harvest.PacketPrototype = tempHarvest.PacketPrototype;
-            harvest.ProductPrototypes = new List<string>(tempHarvest.ProductPrototypes);
-        }
+            _plantTray.SetHarvestProducts((plant, harvest), tempHarvest.PacketPrototype, new List<string>(tempHarvest.ProductPrototypes));
 
         if (TryComp(temp, out RMCPlantGrowthComponent? tempGrowth) && TryComp(plant, out RMCPlantGrowthComponent? growth))
-            growth.GrowthStages = tempGrowth.GrowthStages;
+            _plantTray.SetGrowthStages((plant, growth), tempGrowth.GrowthStages);
 
         if (TryComp(temp, out RMCPlantTraitsComponent? tempTraits) && TryComp(plant, out RMCPlantTraitsComponent? traits))
-        {
-            traits.PlantRsi = tempTraits.PlantRsi;
-            traits.PlantIconState = tempTraits.PlantIconState;
-            traits.SplatPrototype = tempTraits.SplatPrototype;
-        }
+            _plantTray.SetTraitCosmetics((plant, traits), tempTraits.PlantRsi, tempTraits.PlantIconState, tempTraits.SplatPrototype);
 
         if (TryComp(temp, out RMCPlantMutationComponent? tempMutation) && TryComp(plant, out RMCPlantMutationComponent? mutation))
-            mutation.MutationPrototypes = new List<string>(tempMutation.MutationPrototypes);
+            _plantTray.SetMutationPrototypes((plant, mutation), new List<string>(tempMutation.MutationPrototypes));
 
         if (TryComp(temp, out RMCPlantChemicalsComponent? tempChemicals) && TryComp(plant, out RMCPlantChemicalsComponent? chemicals))
         {
@@ -409,10 +400,11 @@ public sealed class RMCPlantMutationSystem : EntitySystem
                 if (!tempChemicals.Chemicals.ContainsKey(chem) && chemicals.Chemicals[chem].Inherent)
                     chemicals.Chemicals.Remove(chem);
             }
+
+            Dirty(plant, chemicals);
         }
 
         QueueDel(temp);
-        _plantTray.DirtyPlant(plant);
     }
 
     /// <summary>
@@ -425,12 +417,14 @@ public sealed class RMCPlantMutationSystem : EntitySystem
         {
             CrossChemicals(bChem.Chemicals, aChem.Chemicals);
             CrossFloat(ref bChem.Potency, aChem.Potency);
+            Dirty(b, bChem);
         }
 
         if (Get<RMCPlantMetabolismComponent>(a) is { } aMeta && TryComp(b, out RMCPlantMetabolismComponent? bMeta))
         {
             CrossFloat(ref bMeta.NutrientConsumption, aMeta.NutrientConsumption);
             CrossFloat(ref bMeta.WaterConsumption, aMeta.WaterConsumption);
+            Dirty(b, bMeta);
         }
 
         if (Get<RMCPlantAtmosphericComponent>(a) is { } aAtmos && TryComp(b, out RMCPlantAtmosphericComponent? bAtmos))
@@ -439,6 +433,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             CrossFloat(ref bAtmos.MaxHeat, aAtmos.MaxHeat);
             CrossFloat(ref bAtmos.MinPressure, aAtmos.MinPressure);
             CrossFloat(ref bAtmos.MaxPressure, aAtmos.MaxPressure);
+            Dirty(b, bAtmos);
         }
 
         if (Get<RMCPlantTraitsComponent>(a) is { } aTraits && TryComp(b, out RMCPlantTraitsComponent? bTraits))
@@ -446,6 +441,7 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             CrossFloat(ref bTraits.ToxinsTolerance, aTraits.ToxinsTolerance);
             CrossFloat(ref bTraits.PestTolerance, aTraits.PestTolerance);
             CrossFloat(ref bTraits.WeedTolerance, aTraits.WeedTolerance);
+            Dirty(b, bTraits);
         }
 
         CrossTraits(a, b);
@@ -456,26 +452,29 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             CrossFloat(ref bGrowth.Lifespan, aGrowth.Lifespan);
             CrossFloat(ref bGrowth.Maturation, aGrowth.Maturation);
             CrossFloat(ref bGrowth.Production, aGrowth.Production);
+            Dirty(b, bGrowth);
         }
 
         if (Get<RMCPlantHarvestComponent>(a) is { } aHarvest && TryComp(b, out RMCPlantHarvestComponent? bHarvest))
         {
             CrossInt(ref bHarvest.Yield, aHarvest.Yield);
             CrossBool(ref bHarvest.Seedless, aHarvest.Seedless);
+            Dirty(b, bHarvest);
         }
 
         if (Get<RMCConsumeExudeGasComponent>(a) is { } aGas && TryComp(b, out RMCConsumeExudeGasComponent? bGas))
         {
             CrossGasses(bGas.ExudeGasses, aGas.ExudeGasses);
             CrossGasses(bGas.ConsumeGasses, aGas.ConsumeGasses);
+            Dirty(b, bGas);
         }
 
         if (Get<RMCPlantMutationComponent>(a) is { } aMutation && TryComp(b, out RMCPlantMutationComponent? bMutation))
         {
-            bMutation.Mutations = bMutation.Mutations.Where(m => Random(0.5f))
+            _plantTray.SetMutations((b, bMutation), bMutation.Mutations.Where(m => Random(0.5f))
                 .Union(aMutation.Mutations.Where(m => Random(0.5f)))
                 .DistinctBy(m => m.Name)
-                .ToList();
+                .ToList());
         }
 
         // Hybrids have a high chance of being seedless
@@ -485,10 +484,8 @@ public sealed class RMCPlantMutationSystem : EntitySystem
             && Random(0.7f)
             && TryComp(b, out RMCPlantHarvestComponent? seedlessHarvest))
         {
-            seedlessHarvest.Seedless = true;
+            _plantTray.SetSeedless((b, seedlessHarvest), true);
         }
-
-        _plantTray.DirtyPlant(b);
     }
 
     private static T? Get<T>(List<IComponent> snapshot) where T : class, IComponent

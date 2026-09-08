@@ -40,7 +40,8 @@ public sealed class RMCPlantSampleSystem : EntitySystem
             return false;
         }
 
-        comp.Health -= _random.Next(3, 5) * 10;
+        var growth = Comp<RMCPlantGrowthComponent>(plant);
+        _plantTray.AdjustHealth((plant, comp, growth), -(_random.Next(3, 5) * 10));
 
         var packet = _plantSeed.SpawnSeedPacket(plant, Transform(user).Coordinates, user, null);
         _randomHelper.RandomOffset(packet, 0.25f);
@@ -51,7 +52,7 @@ public sealed class RMCPlantSampleSystem : EntitySystem
         _plantScream.DoScream(trayUid, plant);
 
         if (_random.Prob(0.3f))
-            comp.Sampled = true;
+            _plantTray.SetSampled((plant, comp));
 
         _plantTray.CheckLevelSanity(trayUid, tray);
         _plantTray.ForceUpdateByExternalCause(trayUid, tray);
