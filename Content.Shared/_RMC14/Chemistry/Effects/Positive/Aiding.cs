@@ -32,8 +32,9 @@ public sealed partial class Aiding : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        plant.Comp.MutationMod -= 4f * scaled;
-        plant.Comp.YieldMod -= (int) MathF.Round(4f * scaled);
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        plantTray.AdjustMutationMod((plant.Owner, plant.Comp), -4f * scaled);
+        plantTray.SetYieldMod((plant.Owner, plant.Comp), plant.Comp.YieldMod - (int) MathF.Round(4f * scaled));
     }
 
     protected override void TickOverdose(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

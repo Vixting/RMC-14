@@ -34,8 +34,9 @@ public sealed partial class Hemorrhaging : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var amount = 0.2f * Potency * (float) args.Quantity;
-        plant.Comp.Health -= amount;
-        plant.Comp.MutationMod += amount;
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        plantTray.AdjustHealth((plant.Owner, plant.Comp, null), -amount);
+        plantTray.AdjustMutationMod((plant.Owner, plant.Comp), amount);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

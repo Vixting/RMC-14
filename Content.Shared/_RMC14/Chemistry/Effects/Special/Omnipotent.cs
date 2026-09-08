@@ -22,17 +22,18 @@ public sealed partial class Omnipotent : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var amount = Potency * (float) args.Quantity;
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
 
-        if (GetTray(args.EntityManager, plant) is { } tray)
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
         {
-            tray.NutritionLevel += amount * 0.5f;
-            tray.WeedLevel -= amount * 2.5f;
-            tray.PestLevel -= amount * 2.5f;
+            plantTray.AdjustNutritionLevel((trayUid, tray), amount * 0.5f);
+            plantTray.AdjustWeedLevel((trayUid, tray), -amount * 2.5f);
+            plantTray.AdjustPestLevel((trayUid, tray), -amount * 2.5f);
         }
 
-        plant.Comp.Health += amount;
-        plant.Comp.YieldMod += (int) MathF.Round(amount);
-        plant.Comp.MutationMod += amount;
+        plantTray.AdjustHealth((plant.Owner, plant.Comp, null), amount);
+        plantTray.SetYieldMod((plant.Owner, plant.Comp), plant.Comp.YieldMod + (int) MathF.Round(amount));
+        plantTray.AdjustMutationMod((plant.Owner, plant.Comp), amount);
     }
 
     // TODO RMC14: fully heals damage, cures diseases, clears stuns/confusion/jitteriness

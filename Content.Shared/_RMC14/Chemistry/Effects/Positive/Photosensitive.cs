@@ -20,13 +20,14 @@ public sealed partial class Photosensitive : RMCChemicalEffect
             return;
 
         var amount = (float) ActualPotency * 2f * (float) args.Quantity;
-        if (GetTray(args.EntityManager, plant) is { } tray)
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
         {
-            tray.WeedLevel += amount * 0.25f;
-            tray.NutritionLevel -= amount * 0.25f;
+            plantTray.AdjustWeedLevel((trayUid, tray), amount * 0.25f);
+            plantTray.AdjustNutritionLevel((trayUid, tray), -amount * 0.25f);
         }
 
-        harvest.RepeatHarvestCounter += amount * 10f;
+        plantTray.SetRepeatHarvestCounter((plant.Owner, harvest), harvest.RepeatHarvestCounter + amount * 10f);
 
         if (harvest.RepeatHarvestCounter < 100f)
             return;
@@ -34,15 +35,15 @@ public sealed partial class Photosensitive : RMCChemicalEffect
         var random = IoCManager.Resolve<IRobustRandom>();
         if (random.Prob(0.5f))
         {
-            harvest.RepeatHarvestCounter -= random.Next(20, 51);
+            plantTray.SetRepeatHarvestCounter((plant.Owner, harvest), harvest.RepeatHarvestCounter - random.Next(20, 51));
             return;
         }
 
-        harvest.HarvestRepeat = HarvestType.Repeat;
-        harvest.RepeatHarvestCounter = 0f;
+        plantTray.SetHarvestRepeat((plant.Owner, harvest), HarvestType.Repeat);
+        plantTray.SetRepeatHarvestCounter((plant.Owner, harvest), 0f);
 
         if (args.EntityManager.TryGetComponent<RMCPlantChemicalsComponent>(plant.Owner, out var chemicals))
-            chemicals.PotencyCounter = 0f;
+            plantTray.SetPotencyCounter((plant.Owner, chemicals), 0f);
 
         var popup = args.EntityManager.System<SharedPopupSystem>();
         popup.PopupEntity(Loc.GetString("plant-repeat-harvest-shimmer", ("name", Loc.GetString(plant.Comp.DisplayName))), args.TargetEntity);

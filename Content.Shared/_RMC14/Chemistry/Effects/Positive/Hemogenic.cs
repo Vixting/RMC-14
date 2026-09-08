@@ -41,7 +41,7 @@ public sealed partial class Hemogenic : RMCChemicalEffect
         var random = IoCManager.Resolve<IRobustRandom>();
         if (random.Prob(0.6f))
         {
-            plant.Comp.Sampled = false;
+            args.EntityManager.System<SharedRMCPlantTraySystem>().SetSampled((plant.Owner, plant.Comp), false);
             var popup = args.EntityManager.System<SharedPopupSystem>();
             popup.PopupEntity(Loc.GetString("plant-hemogenic-healed"), args.TargetEntity);
         }

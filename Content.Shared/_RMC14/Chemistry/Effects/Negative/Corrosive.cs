@@ -157,14 +157,15 @@ public sealed partial class Corrosive : RMCChemicalEffect
 
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (GetTray(args.EntityManager, plant) is not { } tray)
+        if (plant.Comp.Tray is not { } trayUid || GetTray(args.EntityManager, plant) is not { } tray)
             return;
 
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
         var amount = Potency * (float) args.Quantity;
         if (tray.WeedLevel > 0)
-            tray.WeedLevel = MathF.Max(0f, tray.WeedLevel - amount);
+            plantTray.SetWeedLevel((trayUid, tray), MathF.Max(0f, tray.WeedLevel - amount));
 
         if (tray.PestLevel > 0)
-            tray.PestLevel = MathF.Max(0f, tray.PestLevel - amount);
+            plantTray.SetPestLevel((trayUid, tray), MathF.Max(0f, tray.PestLevel - amount));
     }
 }

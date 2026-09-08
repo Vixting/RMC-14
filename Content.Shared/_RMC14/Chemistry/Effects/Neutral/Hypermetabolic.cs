@@ -17,6 +17,7 @@ public sealed partial class Hypermetabolic : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var delta = Math.Clamp(-20f * (float) ActualPotency, -130f, 0f);
-        plant.Comp.MetabolismAdjust = MathF.Max(plant.Comp.MetabolismAdjust + delta, -130f);
+        args.EntityManager.System<SharedRMCPlantTraySystem>()
+            .SetMetabolismAdjust((plant.Owner, plant.Comp), MathF.Max(plant.Comp.MetabolismAdjust + delta, -130f));
     }
 }

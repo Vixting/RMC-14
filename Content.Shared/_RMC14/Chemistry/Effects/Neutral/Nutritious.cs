@@ -19,15 +19,16 @@ public sealed partial class Nutritious : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        if (GetTray(args.EntityManager, plant) is { } tray)
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
         {
-            tray.WeedLevel += scaled * 0.5f;
-            tray.PestLevel += scaled * 0.5f;
-            tray.NutritionLevel += scaled * 0.5f;
+            plantTray.AdjustWeedLevel((trayUid, tray), scaled * 0.5f);
+            plantTray.AdjustPestLevel((trayUid, tray), scaled * 0.5f);
+            plantTray.AdjustNutritionLevel((trayUid, tray), scaled * 0.5f);
         }
 
-        plant.Comp.Health += scaled * 0.5f;
-        AddYieldMod(plant, scaled * 0.05f);
+        plantTray.AdjustHealth((plant.Owner, plant.Comp, null), scaled * 0.5f);
+        AddYieldMod(args.EntityManager, plant, scaled * 0.05f);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

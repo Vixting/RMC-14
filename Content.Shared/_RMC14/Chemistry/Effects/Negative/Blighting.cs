@@ -28,10 +28,11 @@ public sealed partial class Blighting : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var amount = (float) potency;
-        if (GetTray(args.EntityManager, plant) is { } tray)
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
         {
-            tray.PestLevel += amount * PestMod;
-            tray.NutritionLevel -= amount * NutrientDrain;
+            plantTray.AdjustPestLevel((trayUid, tray), amount * PestMod);
+            plantTray.AdjustNutritionLevel((trayUid, tray), -amount * NutrientDrain);
         }
 
         if (!args.EntityManager.TryGetComponent<RMCPlantGrowthComponent>(plant.Owner, out var growth))
@@ -44,6 +45,6 @@ public sealed partial class Blighting : RMCChemicalEffect
         if (!IoCManager.Resolve<IRobustRandom>().Prob(amount / DivergeVolume))
             return;
 
-        growth.Production = MathF.Max(0f, growth.Production - 1f);
+        plantTray.SetProduction((plant.Owner, growth), MathF.Max(0f, growth.Production - 1f));
     }
 }

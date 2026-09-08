@@ -27,16 +27,17 @@ public sealed partial class Fertilizing : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var amount = (float) potency;
-        plant.Comp.Health += amount * HealthMod;
-        AddYieldMod(plant, amount * YieldMod);
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        plantTray.AdjustHealth((plant.Owner, plant.Comp, null), amount * HealthMod);
+        AddYieldMod(args.EntityManager, plant, amount * YieldMod);
 
-        if (GetTray(args.EntityManager, plant) is { } tray)
-            tray.NutritionLevel += amount * NutrientMod;
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
+            plantTray.AdjustNutritionLevel((trayUid, tray), amount * NutrientMod);
 
         if (LifespanMod == 0f)
             return;
 
         if (args.EntityManager.TryGetComponent<RMCPlantGrowthComponent>(plant.Owner, out var growth))
-            growth.Lifespan += amount * LifespanMod;
+            plantTray.SetLifespan((plant.Owner, growth), growth.Lifespan + amount * LifespanMod);
     }
 }

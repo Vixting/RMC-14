@@ -45,14 +45,15 @@ public sealed partial class Excreting : RMCChemicalEffect
         if (!args.EntityManager.TryGetComponent<RMCPlantChemicalsComponent>(plant.Owner, out var chemicals))
             return;
 
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        if (GetTray(args.EntityManager, plant) is { } tray)
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
         {
-            tray.Toxins += ToxinsAmount * scaled;
-            tray.WeedLevel += WeedsAmount * scaled;
+            plantTray.AdjustToxins((trayUid, tray), ToxinsAmount * scaled);
+            plantTray.AdjustWeedLevel((trayUid, tray), WeedsAmount * scaled);
         }
 
-        chemicals.PotencyCounter += CounterIncrement * scaled;
+        plantTray.SetPotencyCounter((plant.Owner, chemicals), chemicals.PotencyCounter + CounterIncrement * scaled);
 
         if (chemicals.PotencyCounter < 100f)
             return;
@@ -63,12 +64,15 @@ public sealed partial class Excreting : RMCChemicalEffect
         if (random.Next(0, level + 1) <= 0)
             return;
 
-        chemicals.Potency += random.Next(1, level + 1);
+        plantTray.SetPotency((plant.Owner, chemicals), chemicals.Potency + random.Next(1, level + 1));
 
         if (args.EntityManager.TryGetComponent<RMCPlantMetabolismComponent>(plant.Owner, out var metabolism))
-            metabolism.NutrientConsumption += NutrientConsumptionIncrease * Potency;
+        {
+            plantTray.SetMetabolismRates((plant.Owner, metabolism),
+                metabolism.NutrientConsumption + NutrientConsumptionIncrease * Potency, metabolism.WaterConsumption);
+        }
 
-        chemicals.PotencyCounter = 0f;
+        plantTray.SetPotencyCounter((plant.Owner, chemicals), 0f);
         var popup = args.EntityManager.System<SharedPopupSystem>();
         popup.PopupEntity(Loc.GetString("plant-excreting-potency-boost"), args.TargetEntity);
     }

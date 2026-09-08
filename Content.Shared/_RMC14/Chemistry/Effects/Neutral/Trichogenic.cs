@@ -66,12 +66,13 @@ public sealed partial class Trichogenic : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var scaled = (float) ActualPotency * 2f * (float) args.Quantity;
-        plant.Comp.YieldMod += (int) MathF.Round(0.2f * scaled);
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        plantTray.SetYieldMod((plant.Owner, plant.Comp), plant.Comp.YieldMod + (int) MathF.Round(0.2f * scaled));
 
-        if (GetTray(args.EntityManager, plant) is { } tray)
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
         {
-            tray.NutritionLevel -= 0.5f * scaled;
-            tray.WaterLevel -= 0.1f * scaled;
+            plantTray.AdjustNutritionLevel((trayUid, tray), -0.5f * scaled);
+            plantTray.AdjustWaterLevel((trayUid, tray), -0.1f * scaled);
         }
     }
 

@@ -26,10 +26,11 @@ public sealed partial class Antitoxic : RMCChemicalEffect
 
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
-        if (GetTray(args.EntityManager, plant) is not { } tray || tray.Toxins <= 0)
+        if (plant.Comp.Tray is not { } trayUid || GetTray(args.EntityManager, plant) is not { } tray || tray.Toxins <= 0)
             return;
 
-        tray.Toxins = MathF.Max(0f, tray.Toxins - 1.5f * Potency * (float) args.Quantity);
+        args.EntityManager.System<SharedRMCPlantTraySystem>()
+            .SetToxins((trayUid, tray), MathF.Max(0f, tray.Toxins - 1.5f * Potency * (float) args.Quantity));
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

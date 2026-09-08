@@ -29,10 +29,11 @@ public sealed partial class Toxic : RMCChemicalEffect
     protected override void TickHydroTray(Entity<RMCPlantComponent> plant, FixedPoint2 potency, EntityEffectReagentArgs args)
     {
         var amount = Potency * (float) args.Quantity;
-        plant.Comp.Health -= 1.5f * amount;
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
+        plantTray.AdjustHealth((plant.Owner, plant.Comp, null), -1.5f * amount);
 
-        if (GetTray(args.EntityManager, plant) is { } tray)
-            tray.Toxins += amount;
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
+            plantTray.AdjustToxins((trayUid, tray), amount);
     }
 
     protected override void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)
