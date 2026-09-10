@@ -324,21 +324,91 @@ public sealed class RMCChemistryResearchSystem : EntitySystem
             return false;
 
         var slot = research.Comp.Contracts[slotIndex];
-        if (slot.Taken || !_contractStats.TryGetValue(slotIndex, out var stats))
+        if (slot.Taken)
             return false;
 
-        var (reagentId, ingredients) = _generator.FinalizeContract(stats, slot.Tier);
+        ProtoId<ReagentPrototype> reagentId;
+        List<(string Id, int Amount, bool Catalyst)> ingredients;
+        List<(ChemGeneratorPropertyPrototype Property, int Level)> properties;
+
+        if (slot.ExistingReagentId is { } existingId)
+        {
+            if (!_rmcReagent.TryIndex(existingId, out var reagent) ||
+                !_generator.TryGetRecipeReactants(existingId, out ingredients))
+            {
+                return false;
+            }
+
+            reagentId = existingId;
+            properties = _generator.GetProperties(reagent);
+        }
+        else if (_contractStats.TryGetValue(slotIndex, out var stats))
+        {
+            (reagentId, ingredients) = _generator.FinalizeContract(stats, slot.Tier);
+            properties = stats.Properties;
+        }
+        else
+        {
+            return false;
+        }
 
         slot.Taken = true;
         research.Comp.PickedThisCycle = true;
         research.Comp.NextReroll = _timing.CurTime + ContractRerollPicked;
 
         var notes = Spawn(ContractNotesProto, spawnAt);
-        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, stats.Properties));
+        _paper.SetContent(notes, FormatContractNotes(reagentId, ingredients, properties));
         _audio.PlayPvs("/Audio/_RMC14/Machines/fax.ogg", notes);
         research.Comp.LastPickedContractReagent = reagentId.Id;
 
         Dirty(research);
+        return true;
+    }
+
+    public bool AddContractForReagent(ProtoId<ReagentPrototype> reagentId, int tier)
+    {
+        tier = Math.Clamp(tier, 1, 3);
+        var research = EnsureResearch();
+
+        if (!_rmcReagent.TryIndex(reagentId, out var reagent))
+            return false;
+
+        var properties = _generator.GetProperties(reagent);
+        if (!_generator.TryGetRecipeReactants(reagentId, out var ingredients))
+            ingredients = new();
+
+        var propertyHintId = properties.Count > 0 ? _random.Pick(properties).Property.ID : string.Empty;
+        var ingredientHintId = ingredients.Count > 0 ? _random.Pick(ingredients).Id : string.Empty;
+
+        var slotIndex = research.Comp.Contracts.FindIndex(c => !c.Taken);
+        if (slotIndex == -1)
+            slotIndex = 0;
+
+        var slot = new ContractSlot
+        {
+            Name = reagent.LocalizedName,
+            Tier = tier,
+            PropertyHintId = propertyHintId,
+            IngredientHintId = ingredientHintId,
+            Taken = false,
+            ExistingReagentId = reagentId,
+        };
+
+        if (slotIndex < research.Comp.Contracts.Count)
+            research.Comp.Contracts[slotIndex] = slot;
+        else
+            research.Comp.Contracts.Add(slot);
+
+        _contractStats.Remove(slotIndex);
+        Dirty(research);
+
+        var computers = EntityQueryEnumerator<RMCResearchComputerComponent>();
+        while (computers.MoveNext(out var computerId, out _))
+        {
+            _popup.PopupEntity("Chemical contracts have been updated!", computerId, PopupType.Medium);
+            _audio.PlayPvs("/Audio/Machines/twobeep.ogg", computerId);
+        }
+
         return true;
     }
 

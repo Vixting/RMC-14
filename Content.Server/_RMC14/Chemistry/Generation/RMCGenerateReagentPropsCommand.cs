@@ -76,6 +76,7 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
 
         var generator = _entitySystems.GetEntitySystem<RMCChemicalGeneratorSystem>();
         var rmcReagent = _entitySystems.GetEntitySystem<RMCReagentSystem>();
+        var research = _entitySystems.GetEntitySystem<RMCChemistryResearchSystem>();
 
         Reagent reagentProto;
         ProtoId<ReagentPrototype> reagentId;
@@ -89,6 +90,11 @@ public sealed class RMCGenerateReagentPropsCommand : IConsoleCommand
             shell.WriteError($"Generation failed: {e}");
             return;
         }
+
+        if (research.AddContractForReagent(reagentId, tier))
+            shell.WriteLine("Added a matching research contract for it.");
+        else
+            shell.WriteError("Could not add a research contract for it.");
 
         shell.WriteLine($"Generated reagent: {reagentId} (\"{reagentProto.LocalizedName}\")");
         shell.WriteLine($"  Color: {reagentProto.SubstanceColor}");

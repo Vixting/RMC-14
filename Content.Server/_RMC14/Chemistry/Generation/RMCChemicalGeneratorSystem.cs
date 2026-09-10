@@ -29,7 +29,8 @@ public sealed record ContractStats(
     int Overdose,
     int CriticalOverdose,
     string PropertyHintId,
-    string IngredientHintId);
+    string IngredientHintId,
+    int CreditReward);
 
 public sealed class RMCChemicalGeneratorSystem : EntitySystem
 {
@@ -160,7 +161,8 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         int criticalOverdose,
         List<(string Id, int Amount, bool Catalyst)> ingredients,
         ChemClass chemClass,
-        ReactionIndicator indicator)
+        ReactionIndicator indicator,
+        int creditReward = 2)
     {
         var data = new RMCGeneratedReagentData(
             id,
@@ -172,7 +174,8 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
             criticalOverdose,
             ingredients.Select(i => new RecipeCandidateIngredient { Id = i.Id, Amount = i.Amount, Catalyst = i.Catalyst }).ToList(),
             chemClass,
-            indicator);
+            indicator,
+            creditReward);
 
         _protoSync.Broadcast(data);
 
@@ -276,7 +279,15 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
             ingredientPool = pools.Where(p => p.Key != ChemClass.None).SelectMany(p => p.Value).Distinct().ToList();
         var ingredientHintId = ingredientPool.Count > 0 ? _random.Pick(ingredientPool) : string.Empty;
 
-        return new ContractStats(name, color, physicalDesc, properties, overdose, criticalOverdose, propertyHintId, ingredientHintId);
+        // cm: credit_reward = 3/5/7 for easy/medium/hard contracts (reroll_chemicals())
+        var creditReward = tier switch
+        {
+            1 => 3,
+            2 => 5,
+            _ => 7,
+        };
+
+        return new ContractStats(name, color, physicalDesc, properties, overdose, criticalOverdose, propertyHintId, ingredientHintId, creditReward);
     }
 
     public (ProtoId<ReagentPrototype> Id, List<(string Id, int Amount, bool Catalyst)> Ingredients) FinalizeContract(ContractStats stats, int tier)
@@ -288,7 +299,7 @@ public sealed class RMCChemicalGeneratorSystem : EntitySystem
         var ingredients = PickRecipeIngredients(tier, id, forcedFirst);
         var indicator = RollReactionIndicator();
 
-        BroadcastGenerated(id, stats.Name, stats.Color, stats.PhysicalDesc, stats.Properties, stats.Overdose, stats.CriticalOverdose, ingredients, ChemClass.Special, indicator);
+        BroadcastGenerated(id, stats.Name, stats.Color, stats.PhysicalDesc, stats.Properties, stats.Overdose, stats.CriticalOverdose, ingredients, ChemClass.Special, indicator, stats.CreditReward);
         AppendToClassPoolCache(ChemClass.Special, id);
         CacheRecipeReactants(id, ingredients);
         _generatedTiers[id] = tier;
