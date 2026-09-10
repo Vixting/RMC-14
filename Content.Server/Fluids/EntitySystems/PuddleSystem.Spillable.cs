@@ -49,15 +49,13 @@ public sealed partial class PuddleSystem
         if (!_solutionContainerSystem.TryGetDrainableSolution(entity.Owner, out var soln, out var solution) ||
             solution.Volume <= FixedPoint2.Zero)
         {
+            args.Handled = entity.Comp.PreventMelee;
             return;
         }
 
         if (args.HitEntities.Count == 0)
         {
-            args.Handled = entity.Comp.PreventMelee;
-
-            var splashedOnGround = _solutionContainerSystem.SplitSolution(soln.Value, solution.Volume);
-            TrySplashSpillAt(entity.Owner, Transform(args.User).Coordinates, splashedOnGround, out _);
+            // Swung and hit nothing (e.g. the floor) - don't dump the contents into a puddle.
             return;
         }
 
