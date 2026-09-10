@@ -33,10 +33,11 @@ public sealed partial class AcidBloodMutating : RMCChemicalEffect
             return;
 
         // cm toxins += 3*volume (royal 6), health -= volume (royal 4*volume)
+        var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
         var p = (float) args.Quantity;
-        if (GetTray(args.EntityManager, plant) is { } tray)
-            tray.Toxins += (Royal ? 6f : 3f) * p;
-        plant.Comp.Health -= (Royal ? 4f : 1f) * p;
+        if (plant.Comp.Tray is { } trayUid && GetTray(args.EntityManager, plant) is { } tray)
+            plantTray.AdjustToxins((trayUid, tray), (Royal ? 6f : 3f) * p);
+        plantTray.AdjustHealth((plant.Owner, plant.Comp, null), -(Royal ? 4f : 1f) * p);
 
         var random = IoCManager.Resolve<IRobustRandom>();
         if (!random.Prob(MutateChance))
@@ -58,15 +59,18 @@ public sealed partial class AcidBloodMutating : RMCChemicalEffect
 
             var pick = random.Pick(hydro);
             chemicals.Chemicals.TryAdd(pick, new SeedChemQuantity { Min = 1, Max = random.Next(2, 4), PotencyDivisor = 20, Inherent = false });
+            plantTray.DirtyChemicals((plant.Owner, chemicals));
         }
         else if (chemicals.Chemicals.Count > 1)
         {
             var removed = random.Pick(chemicals.Chemicals.Keys.ToList());
             chemicals.Chemicals.Remove(removed);
+            plantTray.DirtyChemicals((plant.Owner, chemicals));
         }
         else
         {
             chemicals.Chemicals.TryAdd(SelfChem, new SeedChemQuantity { Min = 1, Max = 2, PotencyDivisor = 20, Inherent = false });
+            plantTray.DirtyChemicals((plant.Owner, chemicals));
         }
     }
 }

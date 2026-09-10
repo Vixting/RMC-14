@@ -49,12 +49,6 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         if (args.EntityManager.TryGetComponent<RMCPlantComponent>(args.TargetEntity, out var plant))
         {
             TickHydroTray(new Entity<RMCPlantComponent>(args.TargetEntity, plant), scaledPotency, reagentArgs);
-
-            var plantTray = args.EntityManager.System<SharedRMCPlantTraySystem>();
-            plantTray.DirtyPlant(args.TargetEntity);
-            if (plant.Tray is { } trayUid)
-                plantTray.DirtyTray(trayUid);
-
             return;
         }
 
@@ -148,7 +142,7 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         return null;
     }
 
-    protected static void AddYieldMod(Entity<RMCPlantComponent> plant, float delta)
+    protected static void AddYieldMod(IEntityManager entityManager, Entity<RMCPlantComponent> plant, float delta)
     {
         if (delta == 0f)
             return;
@@ -158,7 +152,7 @@ public abstract partial class RMCChemicalEffect : EntityEffect
         if (remainder > 0f && IoCManager.Resolve<IRobustRandom>().Prob(remainder))
             whole += 1;
 
-        plant.Comp.YieldMod += whole;
+        entityManager.System<SharedRMCPlantTraySystem>().SetYieldMod((plant.Owner, plant.Comp), plant.Comp.YieldMod + whole);
     }
 
     // The clone-on-write dance the old SeedData-sharing model needed is gone — each plant is its own
@@ -172,6 +166,7 @@ public abstract partial class RMCChemicalEffect : EntityEffect
             return;
 
         mutation.Slots[slot] = value;
+        entityManager.System<SharedRMCPlantTraySystem>().DirtyMutationSlots((plant.Owner, mutation));
     }
 
     protected static void EnableMutationSlot(IEntityManager entityManager, Entity<RMCPlantComponent> plant, string slot, float value)
@@ -183,6 +178,7 @@ public abstract partial class RMCChemicalEffect : EntityEffect
             return;
 
         mutation.Slots[slot] = value;
+        entityManager.System<SharedRMCPlantTraySystem>().DirtyMutationSlots((plant.Owner, mutation));
     }
 
     protected virtual void Tick(DamageableSystem damageable, FixedPoint2 potency, EntityEffectReagentArgs args)

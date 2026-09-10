@@ -1,7 +1,5 @@
 using System.Numerics;
-using Content.Server.Botany.Components;
-using Content.Shared.Botany;
-using Content.Shared.Botany.Components;
+using Content.Shared._RMC14.Botany;
 using Content.Server.Fluids.EntitySystems;
 using Content.Server.Materials;
 using Content.Server.Power.Components;
@@ -220,7 +218,7 @@ namespace Content.Server.Medical.BiomassReclaimer
             }
 
             var expectedYield = physics.FixturesMass * component.YieldPerUnitMass;
-            if (HasComp<ProduceComponent>(toProcess))
+            if (HasComp<RMCProduceComponent>(toProcess))
                 expectedYield *= component.ProduceYieldMultiplier;
             component.CurrentExpectedYield += expectedYield;
 
@@ -240,7 +238,7 @@ namespace Content.Server.Medical.BiomassReclaimer
             if (HasComp<ActiveBiomassReclaimerComponent>(reclaimer))
                 return false;
 
-            bool isPlant = HasComp<ProduceComponent>(dragged);
+            bool isPlant = HasComp<RMCProduceComponent>(dragged);
             if (!isPlant && !HasComp<MobStateComponent>(dragged))
                 return false;
 

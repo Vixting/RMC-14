@@ -31,6 +31,10 @@ namespace Content.Server.Fluids.EntitySystems;
 /// </summary>
 public sealed class SmokeSystem : EntitySystem
 {
+    // RMC14 - cm13 smoke puffs render at alpha 100/255 and fade to 0 over the final 20% of their lifetime.
+    private const float SmokeAlpha = 100f / 255f;
+    private const float FadeFraction = 0.2f;
+
     // If I could do it all again this could probably use a lot more of puddles.
     [Dependency] private readonly IAdminLogManager _logger = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -77,6 +81,16 @@ public sealed class SmokeSystem : EntitySystem
 
             smoke.NextSecond += TimeSpan.FromSeconds(6); // RMC14 change smoke reaction rate
             SmokeReact(uid, smoke.SmokeEntity);
+        }
+
+        // RMC14 - keep the fade-out smooth while a puff is in its final 20% of lifetime.
+        var fadeQuery = EntityQueryEnumerator<SmokeComponent, TimedDespawnComponent>();
+        while (fadeQuery.MoveNext(out var uid, out var smokeComp, out var timer))
+        {
+            if (smokeComp.Duration <= 0 || timer.Lifetime / smokeComp.Duration >= FadeFraction)
+                continue;
+
+            UpdateVisuals((uid, smokeComp));
         }
     }
 
@@ -387,6 +401,15 @@ public sealed class SmokeSystem : EntitySystem
             return;
 
         var color = solution.GetColor(_prototype);
-        _appearance.SetData(smoke.Owner, SmokeVisuals.Color, color, smoke.Comp2);
+
+        var alpha = SmokeAlpha;
+        if (TryComp<TimedDespawnComponent>(smoke.Owner, out var timer) && smoke.Comp1.Duration > 0)
+        {
+            var remainingFraction = Math.Clamp(timer.Lifetime / smoke.Comp1.Duration, 0f, 1f);
+            if (remainingFraction < FadeFraction)
+                alpha *= remainingFraction / FadeFraction;
+        }
+
+        _appearance.SetData(smoke.Owner, SmokeVisuals.Color, color.WithAlpha(alpha), smoke.Comp2);
     }
 }

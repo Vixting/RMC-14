@@ -210,10 +210,16 @@ public sealed class EntityEffectSystem : EntitySystem
         return true;
     }
 
-    private bool TryGetTray(RMCPlantComponent plantComponent, [NotNullWhen(true)] out RMCPlantTrayComponent? tray)
+    private bool TryGetTray(RMCPlantComponent plantComponent, out EntityUid trayUid, [NotNullWhen(true)] out RMCPlantTrayComponent? tray)
     {
         tray = null;
-        return plantComponent.Tray is { } trayUid && TryComp(trayUid, out tray);
+        trayUid = default;
+
+        if (plantComponent.Tray is not { } uid || !TryComp(uid, out tray))
+            return false;
+
+        trayUid = uid;
+        return true;
     }
 
     private void OnExecutePlantAdjustHealth(ref ExecuteEntityEffectEvent<PlantAdjustHealth> args)
@@ -221,7 +227,7 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp))
             return;
 
-        plantComp.Health += args.Effect.Amount;
+        _plantTray.AdjustHealth((args.Args.TargetEntity, plantComp, null), args.Effect.Amount);
 
         if (plantComp.Tray is { } tray && TryComp(tray, out RMCPlantTrayComponent? trayComp))
             _plantTray.CheckHealth(tray, trayComp, args.Args.TargetEntity);
@@ -232,7 +238,7 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp))
             return;
 
-        plantComp.MutationLevel += args.Effect.Amount * plantComp.MutationMod;
+        _plantTray.AdjustMutationLevel((args.Args.TargetEntity, plantComp), args.Effect.Amount * plantComp.MutationMod);
     }
 
     private void OnExecutePlantAdjustMutationMod(ref ExecuteEntityEffectEvent<PlantAdjustMutationMod> args)
@@ -240,7 +246,7 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp))
             return;
 
-        plantComp.MutationMod += args.Effect.Amount;
+        _plantTray.AdjustMutationMod((args.Args.TargetEntity, plantComp), args.Effect.Amount);
     }
 
     private void OnExecutePlantAdjustNutrition(ref ExecuteEntityEffectEvent<PlantAdjustNutrition> args)
@@ -248,8 +254,8 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp, mustHaveAlivePlant: false))
             return;
 
-        if (TryGetTray(plantComp, out var tray))
-            _plantMetabolism.AdjustNutrient(tray, args.Effect.Amount);
+        if (TryGetTray(plantComp, out var trayUid, out var tray))
+            _plantMetabolism.AdjustNutrient((trayUid, tray), args.Effect.Amount);
     }
 
     private void OnExecutePlantAdjustPests(ref ExecuteEntityEffectEvent<PlantAdjustPests> args)
@@ -257,8 +263,8 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp))
             return;
 
-        if (TryGetTray(plantComp, out var tray))
-            tray.PestLevel += args.Effect.Amount;
+        if (TryGetTray(plantComp, out var trayUid, out var tray))
+            _plantTray.AdjustPestLevel((trayUid, tray), args.Effect.Amount);
     }
 
     private void OnExecutePlantAdjustPotency(ref ExecuteEntityEffectEvent<PlantAdjustPotency> args)
@@ -269,7 +275,7 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!TryComp(args.Args.TargetEntity, out RMCPlantChemicalsComponent? chemicals))
             return;
 
-        chemicals.Potency = Math.Max(chemicals.Potency + args.Effect.Amount, 1);
+        _plantTray.SetPotency((args.Args.TargetEntity, chemicals), Math.Max(chemicals.Potency + args.Effect.Amount, 1));
     }
 
     private void OnExecutePlantAdjustToxins(ref ExecuteEntityEffectEvent<PlantAdjustToxins> args)
@@ -277,8 +283,8 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp))
             return;
 
-        if (TryGetTray(plantComp, out var tray))
-            tray.Toxins += args.Effect.Amount;
+        if (TryGetTray(plantComp, out var trayUid, out var tray))
+            _plantTray.AdjustToxins((trayUid, tray), args.Effect.Amount);
     }
 
     private void OnExecutePlantAdjustWater(ref ExecuteEntityEffectEvent<PlantAdjustWater> args)
@@ -286,8 +292,8 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp, mustHaveAlivePlant: false))
             return;
 
-        if (TryGetTray(plantComp, out var tray))
-            _plantMetabolism.AdjustWater(tray, args.Effect.Amount);
+        if (TryGetTray(plantComp, out var trayUid, out var tray))
+            _plantMetabolism.AdjustWater((trayUid, tray), args.Effect.Amount);
     }
 
     private void OnExecutePlantAdjustWeeds(ref ExecuteEntityEffectEvent<PlantAdjustWeeds> args)
@@ -295,8 +301,8 @@ public sealed class EntityEffectSystem : EntitySystem
         if (!CanMetabolizePlant(args.Args.TargetEntity, out var plantComp))
             return;
 
-        if (TryGetTray(plantComp, out var tray))
-            tray.WeedLevel += args.Effect.Amount;
+        if (TryGetTray(plantComp, out var trayUid, out var tray))
+            _plantTray.AdjustWeedLevel((trayUid, tray), args.Effect.Amount);
     }
 
     private void OnExecutePlantAffectGrowth(ref ExecuteEntityEffectEvent<PlantAffectGrowth> args)
@@ -378,12 +384,6 @@ public sealed class EntityEffectSystem : EntitySystem
         val = valMutated;
     }
 
-    /// <summary>
-    /// Field-name-driven mutation now has no single "seed" object to reflect against, since the old
-    /// SeedData fields are spread across several components. Scan the known mutable plant components in
-    /// order for the first one exposing a field matching TargetValue, instead of building a separate
-    /// field-name -> component lookup table to keep in sync (another manually-maintained parity list).
-    /// </summary>
     private static readonly Type[] PlantChangeStatComponentTypes =
     {
         typeof(RMCPlantGrowthComponent),
@@ -409,6 +409,7 @@ public sealed class EntityEffectSystem : EntitySystem
                 continue;
 
             ApplyPlantChangeStat(args, comp, member);
+            DirtyField(args.Args.TargetEntity, (IComponentDelta)comp, member.Name);
             return;
         }
 
@@ -453,9 +454,9 @@ public sealed class EntityEffectSystem : EntitySystem
             ? (int) Math.Max(growth.Maturation - 1, plantComp.Age - _random.Next(7, 10))
             : (int) (growth.Maturation / growth.GrowthStages);
 
-        plantComp.Age -= deviation;
-        growth.LastProduce = plantComp.Age;
-        plantComp.SkipAging++;
+        _plantTray.AdjustAge((args.Args.TargetEntity, plantComp), -deviation);
+        _plantTray.SetLastProduce((args.Args.TargetEntity, growth), plantComp.Age);
+        _plantTray.AdjustSkipAging((args.Args.TargetEntity, plantComp), 1);
 
         if (plantComp.Tray is { } tray && TryComp(tray, out RMCPlantTrayComponent? trayComp))
             trayComp.ForceUpdate = true;
@@ -477,6 +478,7 @@ public sealed class EntityEffectSystem : EntitySystem
                 PopupType.SmallCaution
             );
             harvest.Seedless = true;
+            DirtyField(args.Args.TargetEntity, harvest, nameof(RMCPlantHarvestComponent.Seedless));
         }
     }
 
@@ -489,10 +491,10 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         if (_random.Prob(0.1f))
-            growth.Lifespan++;
+            _plantTray.SetLifespan((args.Args.TargetEntity, growth), growth.Lifespan + 1);
 
         if (_random.Prob(0.1f))
-            growth.Endurance++;
+            _plantTray.SetEndurance((args.Args.TargetEntity, growth), growth.Endurance + 1);
     }
 
     private void OnExecutePlantPhalanximine(ref ExecuteEntityEffectEvent<PlantPhalanximine> args)
@@ -501,7 +503,10 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         if (TryComp(args.Args.TargetEntity, out RMCPlantGrowthComponent? growth))
+        {
             growth.Viable = true;
+            DirtyField(args.Args.TargetEntity, growth, nameof(RMCPlantGrowthComponent.Viable));
+        }
     }
 
     private void OnExecutePlantRestoreSeeds(ref ExecuteEntityEffectEvent<PlantRestoreSeeds> args)
@@ -516,6 +521,7 @@ public sealed class EntityEffectSystem : EntitySystem
         {
             _popup.PopupEntity(Loc.GetString("botany-plant-seedsrestored"), args.Args.TargetEntity);
             harvest.Seedless = false;
+            DirtyField(args.Args.TargetEntity, harvest, nameof(RMCPlantHarvestComponent.Seedless));
         }
     }
 
@@ -532,17 +538,18 @@ public sealed class EntityEffectSystem : EntitySystem
 
         if (chemicals.Potency < args.Effect.PotencyLimit)
         {
-            chemicals.Potency = Math.Min(chemicals.Potency + args.Effect.PotencyIncrease, args.Effect.PotencyLimit);
+            _plantTray.SetPotency((args.Args.TargetEntity, chemicals),
+                Math.Min(chemicals.Potency + args.Effect.PotencyIncrease, args.Effect.PotencyLimit));
 
             if (chemicals.Potency > args.Effect.PotencySeedlessThreshold)
             {
-                harvest.Seedless = true;
+                _plantTray.SetSeedless((args.Args.TargetEntity, harvest), true);
             }
         }
         else if (harvest.Yield > 1 && _random.Prob(0.1f))
         {
             // Too much of a good thing reduces yield
-            harvest.Yield--;
+            _plantTray.SetYield((args.Args.TargetEntity, harvest), harvest.Yield - 1);
         }
     }
 
@@ -926,12 +933,9 @@ public sealed class EntityEffectSystem : EntitySystem
             var potencyDivisor = (int)Math.Ceiling(100.0f / seedChemQuantity.Max);
             seedChemQuantity.PotencyDivisor = potencyDivisor;
             chemicals[chemicalId] = seedChemQuantity;
+            DirtyField(args.Args.TargetEntity, chemicalsComp, nameof(RMCPlantChemicalsComponent.Chemicals));
         }
     }
-
-    // NOTE: these two handlers' names are swapped relative to what they actually touch in the original
-    // code (ConsumeGasses handler mutates ExudeGasses and vice versa) — preserved verbatim, not "fixed",
-    // since this is existing behavior rather than something introduced by this port.
     private void OnExecutePlantMutateConsumeGasses(ref ExecuteEntityEffectEvent<PlantMutateConsumeGasses> args)
     {
         if (!TryComp(args.Args.TargetEntity, out RMCConsumeExudeGasComponent? gasComp))
@@ -939,7 +943,6 @@ public sealed class EntityEffectSystem : EntitySystem
 
         var gasses = gasComp.ExudeGasses;
 
-        // Add a random amount of a random gas to this gas dictionary
         float amount = _random.NextFloat(args.Effect.MinValue, args.Effect.MaxValue);
         Gas gas = _random.Pick(Enum.GetValues(typeof(Gas)).Cast<Gas>().ToList());
         if (gasses.ContainsKey(gas))
@@ -950,6 +953,8 @@ public sealed class EntityEffectSystem : EntitySystem
         {
             gasses.Add(gas, amount);
         }
+
+        DirtyField(args.Args.TargetEntity, gasComp, nameof(RMCConsumeExudeGasComponent.ExudeGasses));
     }
 
     private void OnExecutePlantMutateExudeGasses(ref ExecuteEntityEffectEvent<PlantMutateExudeGasses> args)
@@ -970,6 +975,8 @@ public sealed class EntityEffectSystem : EntitySystem
         {
             gasses.Add(gas, amount);
         }
+
+        DirtyField(args.Args.TargetEntity, gasComp, nameof(RMCConsumeExudeGasComponent.ConsumeGasses));
     }
 
     private void OnExecutePlantMutateHarvest(ref ExecuteEntityEffectEvent<PlantMutateHarvest> args)
@@ -978,9 +985,9 @@ public sealed class EntityEffectSystem : EntitySystem
             return;
 
         if (harvest.HarvestRepeat == HarvestType.NoRepeat)
-            harvest.HarvestRepeat = HarvestType.Repeat;
+            _plantTray.SetHarvestRepeat((args.Args.TargetEntity, harvest), HarvestType.Repeat);
         else if (harvest.HarvestRepeat == HarvestType.Repeat)
-            harvest.HarvestRepeat = HarvestType.SelfHarvest;
+            _plantTray.SetHarvestRepeat((args.Args.TargetEntity, harvest), HarvestType.SelfHarvest);
     }
 
     private void OnExecutePlantSpeciesChange(ref ExecuteEntityEffectEvent<PlantSpeciesChange> args)
@@ -1028,5 +1035,7 @@ public sealed class EntityEffectSystem : EntitySystem
                     controller[slot] = args.Effect.SuppressValue;
             }
         }
+
+        DirtyField(args.Args.TargetEntity, mutation, nameof(RMCPlantMutationComponent.Slots));
     }
 }
