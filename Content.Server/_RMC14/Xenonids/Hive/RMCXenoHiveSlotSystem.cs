@@ -16,6 +16,7 @@ public sealed class RMCXenoHiveSlotSystem : EntitySystem
         "CMXenoHiveCharlie",
         "CMXenoHiveDelta",
         "CMXenoHiveRenegade",
+        "CMXenoHiveForsaken",
     ];
 
     public override void Initialize()
