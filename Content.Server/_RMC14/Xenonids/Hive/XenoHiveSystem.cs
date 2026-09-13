@@ -46,7 +46,6 @@ public sealed class XenoHiveSystem : SharedXenoHiveSystem
     [Dependency] private readonly XenoAnnounceSystem _xenoAnnounce = default!;
 
     private readonly List<string> _announce = [];
-    private readonly HashSet<EntityUid> _populatedHives = new();
     private readonly EntProtoId _defaultHive = "CMXenoHive";
 
     private TimeSpan _lateJoinsPerBurrowedLarvaEarlyThreshold;
@@ -176,21 +175,9 @@ public sealed class XenoHiveSystem : SharedXenoHiveSystem
     private void UpdateHives()
     {
         var roundTime = _gameTicker.RoundDuration();
-
-        _populatedHives.Clear();
-        var members = EntityQueryEnumerator<HiveMemberComponent>();
-        while (members.MoveNext(out _, out var member))
-        {
-            if (member.Hive is { } memberHive)
-                _populatedHives.Add(memberHive);
-        }
-
         var hives = EntityQueryEnumerator<HiveComponent>();
         while (hives.MoveNext(out var hiveId, out var hive))
         {
-            if (!_populatedHives.Contains(hiveId))
-                continue;
-
             _announce.Clear();
 
             for (var i = 0; i < hive.AnnouncementsLeft.Count; i++)

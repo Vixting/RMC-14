@@ -67,7 +67,6 @@
     requiredTriggeredSpeed: 0
     intersectRatio: 0.5
   - type: RMCNightVisionVisible
-  - type: HiveColored
     priority: -1
   - type: Corrodible
     isCorrodible: false

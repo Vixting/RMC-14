@@ -54,7 +54,6 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     [Dependency] private readonly SharedXenoConstructionSystem _xenoConstruction = default!;
-    [Dependency] private readonly SharedXenoHiveSystem _hive = default!;
 
     private EntityUid? _currentGhost;
     private string? _currentGhostStructure;
@@ -306,7 +305,7 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
         var ghost = Spawn("XenoConstructionGhost", playerCoords);
         var actualPrototype = GetActualBuildPrototype(player, structurePrototype);
 
-        ConfigureGhostSprite(player, ghost, actualPrototype);
+        ConfigureGhostSprite(ghost, actualPrototype);
 
         _currentGhost = ghost;
         _currentGhostStructure = structurePrototype; // Keep original for comparison
@@ -339,26 +338,25 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
         };
     }
 
-    private void ConfigureGhostSprite(EntityUid player, EntityUid ghost, string structurePrototype)
+    private void ConfigureGhostSprite(EntityUid ghost, string structurePrototype)
     {
         if (!TryComp(ghost, out SpriteComponent? sprite))
             return;
 
-        var color = GetGhostColor(player, true);
-        sprite.Color = color;
+        sprite.Color = new Color(48, 255, 48, 128);
         sprite.DrawDepth = 9;
         sprite.Visible = true;
 
         if (!_prototypeManager.TryIndex<EntityPrototype>(structurePrototype, out var prototype))
             return;
 
-        if (TryConfigureIconSmoothSprite(sprite, prototype, color))
+        if (TryConfigureIconSmoothSprite(sprite, prototype))
             return;
 
         if (prototype.TryGetComponent<SpriteComponent>(out var prototypeSprite, _compFactory))
         {
             sprite.CopyFrom(prototypeSprite);
-            sprite.Color = color;
+            sprite.Color = new Color(48, 255, 48, 128);
             sprite.DrawDepth = 9;
 
             for (var i = 0; i < sprite.AllLayers.Count(); i++)
@@ -369,7 +367,7 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
         }
     }
 
-    private bool TryConfigureIconSmoothSprite(SpriteComponent sprite, EntityPrototype prototype, Color color)
+    private bool TryConfigureIconSmoothSprite(SpriteComponent sprite, EntityPrototype prototype)
     {
         if (!prototype.TryGetComponent(out IconSmoothComponent? iconSmooth, _compFactory) ||
             !prototype.TryGetComponent(out SpriteComponent? prototypeSprite, _compFactory) ||
@@ -388,7 +386,7 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
                 sprite.LayerSetState(0, iconSmooth.StateBase);
                 sprite.LayerSetShader(0, "unshaded");
                 sprite.LayerSetVisible(0, true);
-                sprite.Color = color;
+                sprite.Color = new Color(48, 255, 48, 128);
                 return true;
             }
             else
@@ -400,13 +398,6 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
         {
             return false;
         }
-    }
-
-    private Color GetGhostColor(EntityUid player, bool valid)
-    {
-        var hiveColor = _hive.GetMemberColor(player);
-        var validity = valid ? new Color(48, 255, 48, 128) : new Color(255, 48, 48, 128);
-        return new Color(hiveColor.R * validity.R, hiveColor.G * validity.G, hiveColor.B * validity.B, validity.A);
     }
 
     private void UpdateGhostPosition()
@@ -431,7 +422,9 @@ public sealed class XenoConstructionGhostSystem : EntitySystem
 
         if (TryComp(_currentGhost.Value, out SpriteComponent? sprite))
         {
-            sprite.Color = GetGhostColor(player.Value, IsValidConstructionLocation(player.Value, coords));
+            sprite.Color = IsValidConstructionLocation(player.Value, coords)
+                ? new Color(48, 255, 48, 128)
+                : new Color(255, 48, 48, 128);
         }
     }
 

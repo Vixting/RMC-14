@@ -40,7 +40,6 @@
   - type: DeletedByWeedKiller
   - type: XenoFriendly
   - type: RMCTrackable
-  - type: HiveColored
 
 - type: entity
   parent: XenoTunnel

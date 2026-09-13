@@ -39,7 +39,6 @@
         Heat: 3.8
   - type: QueenEyeVision
   - type: XenoChargeDontHit
-  - type: HiveColored
 
 - type: entity
   abstract: true
@@ -60,4 +59,3 @@
     transparency: 0.1
   - type: DeletedByWeedKiller
   - type: XenoChargeDontHit
-  - type: HiveColored

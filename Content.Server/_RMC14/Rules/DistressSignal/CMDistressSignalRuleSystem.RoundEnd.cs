@@ -51,7 +51,6 @@ public sealed partial class CMDistressSignalRuleSystem
 
         UpdateHijackState(distress);
         RefreshAlmayerMaps();
-        CheckForsakenXenos(distress);
 
         var time = Timing.CurTime;
         var xenosAlive = CheckAliveXenos(distress, time);

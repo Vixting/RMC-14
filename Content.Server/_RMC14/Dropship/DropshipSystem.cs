@@ -19,10 +19,8 @@ using Content.Shared._RMC14.Explosion;
 using Content.Shared._RMC14.Marines;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared._RMC14.Rules;
-using Content.Shared._RMC14.Weapons.Ranged.IFF;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Announce;
-using Content.Shared._RMC14.Xenonids.IffTag;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CCVar;
 using Content.Shared.Coordinates;
@@ -41,7 +39,6 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Player;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Server._RMC14.Dropship;
@@ -55,7 +52,6 @@ public sealed class DropshipSystem : SharedDropshipSystem
     [Dependency] private readonly DoorSystem _door = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
-    [Dependency] private readonly RMCXenoIffTagSystem _iffTag = default!;
     [Dependency] private readonly MarineAnnounceSystem _marineAnnounce = default!;
     [Dependency] private readonly PhysicsSystem _physics = default!;
     [Dependency] private readonly PointLightSystem _pointLight = default!;
@@ -84,7 +80,6 @@ public sealed class DropshipSystem : SharedDropshipSystem
     private bool _hijack;
 
     private const float DepartureLocationSearchRange = 12;
-    private static readonly EntProtoId<IFFFactionComponent> MarineIffFaction = "FactionMarine";
 
     public override void Initialize()
     {
@@ -135,7 +130,7 @@ public sealed class DropshipSystem : SharedDropshipSystem
         RelayToMountedEntities(ent, args);
         RelayToDropshipDepartureLocation(ent, args);
 
-        if (!_hijack) // TODO RMC14: Check for locked dropship by queen
+        if (!_hijack) // TODO RMC14: Check for locked dropship by queen and friendliness of xenos onboard
         {
             int xenoCount = 0;
             string dropshipName = string.Empty;
@@ -143,9 +138,7 @@ public sealed class DropshipSystem : SharedDropshipSystem
             var xenoQuery = EntityQueryEnumerator<XenoComponent, MobStateComponent, TransformComponent>();
             while (xenoQuery.MoveNext(out var uid, out _, out var mobState, out var xform))
             {
-                if (xform.GridUid == _dropshipId &&
-                    mobState.CurrentState != MobState.Dead &&
-                    !_iffTag.HasFaction(uid, MarineIffFaction))
+                if (xform.GridUid == _dropshipId && mobState.CurrentState != MobState.Dead)
                 {
                     xenoCount++;
                     if (string.IsNullOrEmpty(dropshipName) && _area.TryGetArea(uid, out _, out var areaProto))

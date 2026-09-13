@@ -1,7 +1,5 @@
 using Content.Client._RMC14.Xenonids.UI;
 using Content.Shared._RMC14.Xenonids.Construction;
-using Content.Shared._RMC14.Xenonids.Hive;
-using Content.Shared.Prototypes;
 using JetBrains.Annotations;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
@@ -13,10 +11,8 @@ namespace Content.Client._RMC14.Xenonids.Construction;
 [UsedImplicitly]
 public sealed class XenoChooseStructureBui : BoundUserInterface
 {
-    [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
-    private readonly SharedXenoHiveSystem _hive;
     private readonly SpriteSystem _sprite;
     private readonly SharedXenoConstructionSystem _xenoConstruction;
 
@@ -27,8 +23,6 @@ public sealed class XenoChooseStructureBui : BoundUserInterface
 
     public XenoChooseStructureBui(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
-        IoCManager.InjectDependencies(this);
-        _hive = EntMan.System<SharedXenoHiveSystem>();
         _sprite = EntMan.System<SpriteSystem>();
         _xenoConstruction = EntMan.System<SharedXenoConstructionSystem>();
     }
@@ -43,7 +37,6 @@ public sealed class XenoChooseStructureBui : BoundUserInterface
         if (EntMan.TryGetComponent(Owner, out XenoConstructionComponent? xeno))
         {
             var hasBoost = EntMan.HasComponent<QueenBuildingBoostComponent>(Owner);
-            var hiveColor = _hive.GetMemberColor(Owner);
 
             foreach (var structureId in xeno.CanBuild)
             {
@@ -74,10 +67,6 @@ public sealed class XenoChooseStructureBui : BoundUserInterface
                 }
 
                 control.Set(displayName, _sprite.Frame0(_prototype.Index(displayId)));
-
-                if (_prototype.Index(displayId).HasComponent<HiveColoredComponent>(_compFactory))
-                    control.Texture.ModulateSelfOverride = hiveColor;
-
                 control.Button.OnPressed += _ =>
                 {
                     SendPredictedMessage(new XenoChooseStructureBuiMsg(structureId));

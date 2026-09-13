@@ -57,7 +57,6 @@
         Slash: 45
   - type: StickyResinSurgeBlocker
   - type: DeletedByWeedKiller
-  - type: HiveColored
   - type: Flammable
     fireSpread: false
     maximumFireStacks: 0.5
