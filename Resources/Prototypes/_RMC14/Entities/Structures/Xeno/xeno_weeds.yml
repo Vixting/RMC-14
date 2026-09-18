@@ -282,7 +282,7 @@
   - type: XenoWeeds
     range: 6
     spawns: XenoHiveWeedsCluster
-    level: 3
+    level: 4
 
 - type: entity
   parent: XenoHiveWeeds

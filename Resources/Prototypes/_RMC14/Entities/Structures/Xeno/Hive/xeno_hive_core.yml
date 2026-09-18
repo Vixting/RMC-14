@@ -160,7 +160,7 @@
   - type: XenoWeeds
     range: 5
     spawns: XenoHiveWeedsCluster
-    level: 3
+    level: 4
     blockOtherWeeds: true
   - type: GhostRole
     name: roles-lesser-drone-name
