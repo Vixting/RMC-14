@@ -654,7 +654,7 @@ public abstract partial class SharedGunSystem : EntitySystem
                         else
                         {
                             MuzzleFlash(gunUid, cartridge, mapDirection.ToAngle(), user);
-                            Audio.PlayPredicted(gun.SoundGunshotModified, gunUid, user);
+                            PlayGunshotSound(gunUid, gun, user);
                         }
                     }
                     else
@@ -683,7 +683,7 @@ public abstract partial class SharedGunSystem : EntitySystem
                     else
                     {
                         MuzzleFlash(gunUid, newAmmo, mapDirection.ToAngle(), user);
-                        Audio.PlayPredicted(gun.SoundGunshotModified, gunUid, user);
+                        PlayGunshotSound(gunUid, gun, user);
                     }
 
                     Recoil(user, mapDirection, gun.CameraRecoilScalarModified);
@@ -793,7 +793,7 @@ public abstract partial class SharedGunSystem : EntitySystem
                         FireEffects(fromEffect, hitscan.MaxLength, dir.ToAngle(), hitscan);
                     }
 
-                    Audio.PlayPredicted(gun.SoundGunshotModified, gunUid, user);
+                    PlayGunshotSound(gunUid, gun, user);
                     Recoil(user, mapDirection, gun.CameraRecoilScalarModified);
                     break;
                 case RMCFlamerAmmoProviderComponent flamer:
@@ -848,7 +848,7 @@ public abstract partial class SharedGunSystem : EntitySystem
             }
 
             MuzzleFlash(gunUid, ammoComp, mapDirection.ToAngle(), user);
-            Audio.PlayPredicted(gun.SoundGunshotModified, gunUid, user);
+            PlayGunshotSound(gunUid, gun, user);
         }
 
         Logs.Add(LogType.RMCGunShot, LogImpact.Low, $"{ToPrettyString(user)} shot {ToPrettyString(gunUid)} with {shotProjectiles.Count} projectiles aiming at {TransformSystem.ToMapCoordinates(toCoordinates)}.");
@@ -892,6 +892,29 @@ public abstract partial class SharedGunSystem : EntitySystem
         }
         ShootProjectile(uid, mapDirection, gunVelocity, gunUid, user, gun.ProjectileSpeedModified);
     }
+
+    // RMC14
+    private void PlayGunshotSound(EntityUid gunUid, GunComponent gun, EntityUid? user)
+    {
+        var ammoEv = new GetAmmoCountEvent();
+        RaiseLocalEvent(gunUid, ref ammoEv);
+
+        if (ammoEv.Capacity > 0 && (float) ammoEv.Count / ammoEv.Capacity <= gun.LowAmmoThreshold)
+        {
+            if (gun.SoundGunshotLowAmmo != null)
+            {
+                Audio.PlayPredicted(gun.SoundGunshotLowAmmo, gunUid, user);
+                return;
+            }
+
+            var lowAmmoParams = (gun.SoundGunshotModified?.Params ?? AudioParams.Default).WithPitchScale(1.25f);
+            Audio.PlayPredicted(gun.SoundGunshotModified, gunUid, user, lowAmmoParams);
+            return;
+        }
+
+        Audio.PlayPredicted(gun.SoundGunshotModified, gunUid, user);
+    }
+    // RMC14
 
     #region Hitscan effects
 

@@ -31,6 +31,14 @@ public sealed partial class GunComponent : Component
     [DataField]
     public SoundSpecifier? SoundEmpty = new SoundPathSpecifier("/Audio/Weapons/Guns/Empty/empty.ogg");
 
+    // RMC14
+    [DataField]
+    public SoundSpecifier? SoundGunshotLowAmmo;
+
+    /// RMC14
+    [DataField]
+    public float LowAmmoThreshold = 0.25f;
+
     /// <summary>
     /// Sound played when toggling the <see cref="SelectedMode"/> for this gun.
     /// </summary>
