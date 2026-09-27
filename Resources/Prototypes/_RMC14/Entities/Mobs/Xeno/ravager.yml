@@ -120,7 +120,7 @@
         components:
         - XenoHeavy
   - type: RMCSize
-    size: Big
+    size: Immobile
   - type: RMCXenoDamageVisuals
     prefix: ravager
   - type: RMCFireArmorDebuffModifier
