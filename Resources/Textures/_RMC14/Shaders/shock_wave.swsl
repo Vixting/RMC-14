@@ -1,40 +1,32 @@
 uniform sampler2D SCREEN_TEXTURE;
-uniform highp vec2 renderScale;
 uniform lowp int count;
 uniform highp vec2[10] position;
+uniform highp float[10] radius;
 uniform highp float[10] sharpness;
 uniform highp float[10] width;
 uniform highp float[10] falloffPower;
 
 void fragment() {
-    highp vec2 coord = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
-    highp float ratio = SCREEN_PIXEL_SIZE.y / SCREEN_PIXEL_SIZE.x * 0.6;
+    highp vec2 uv = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
+    highp float aspect = SCREEN_PIXEL_SIZE.x / SCREEN_PIXEL_SIZE.y;
+    highp vec2 coord = uv;
+    highp float brighten = 0.0;
 
     for (int i = 0; i < count; ++i) {
         highp vec2 WaveCentre = position[i];
+        highp vec2 Delta = vec2(uv.x - WaveCentre.x, (uv.y - WaveCentre.y) * aspect);
+        highp float Dist = length(Delta);
+        highp float Diff = Dist - radius[i];
 
-        highp float Dist = distance(
-            vec2(coord.x, coord.y * ratio),
-            vec2(WaveCentre.x, WaveCentre.y * ratio)
-        );
-        
-        // removes the first few frames of the "animation"
-        Dist = max(Dist, 0.13);
-        
-        highp float offset = (TIME - floor(TIME)) / TIME;
-        highp float CurrentTime = TIME * offset;
-
-        if (Dist <= (CurrentTime + 0.1) && Dist >= (CurrentTime - 0.1)) {
-            highp float Diff = Dist - CurrentTime;
+        if (Dist > 0.0001 && abs(Diff * sharpness[i]) < 1.0) {
             highp float ScaleDiff = 1.0 - pow(abs(Diff * sharpness[i]), width[i]);
-            highp float DiffTime = Diff * ScaleDiff;
-            highp vec2 DiffTexCoord = normalize(coord - WaveCentre);
-            coord += (DiffTexCoord * DiffTime) / (CurrentTime * Dist * falloffPower[i]);
-            highp vec4 Color = zTextureSpec(SCREEN_TEXTURE, coord);
-            Color += (Color * ScaleDiff) / (CurrentTime * Dist * 40.0);
-            COLOR = Color;
-        } else {
-            COLOR = zTextureSpec(SCREEN_TEXTURE, UV);
+            highp float Scale = max(radius[i], 0.13) * max(Dist, 0.13);
+            highp vec2 DiffTexCoord = normalize(uv - WaveCentre);
+            coord += (DiffTexCoord * Diff * ScaleDiff) / (Scale * falloffPower[i]);
+            brighten += ScaleDiff / (Scale * 40.0);
         }
     }
+
+    highp vec4 Color = zTextureSpec(SCREEN_TEXTURE, coord);
+    COLOR = Color + Color * brighten;
 }

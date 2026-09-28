@@ -1,17 +1,19 @@
 using System.Numerics;
-using Content.Shared._RMC14.Explosion.Components;
+using Content.Client.Explosion;
+using Content.Shared._RMC14.Explosion;
+using Content.Shared.Explosion.Components;
 using Robust.Client.Graphics;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Client._RMC14.Explosion;
 
 public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscriber
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-
-    private SharedTransformSystem? _xformSystem;
 
     public override OverlaySpace Space => OverlaySpace.WorldSpace;
     public override bool RequestScreenTexture => true;
@@ -23,6 +25,16 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
     /// </summary>
     public const int MaxCount = 10;
 
+    private const float ExplosionMinPower = RMCExplosionVisuals.ShockWaveMinPower;
+    private const float ExplosionPowerPerRadius = RMCExplosionVisuals.ShockWavePowerPerRadius;
+    private const double ExplosionSecondsPerRadius = RMCExplosionVisuals.ShockWaveSecondsPerRadius;
+    private const float ExplosionStartRadius = 0.5f;
+    private const float ExplosionEndRadiusMultiplier = 0.75f;
+
+    private const float ExplosionFalloffPower = 40;
+    private const float ExplosionSharpness = 10;
+    private const float ExplosionWidth = 0.8f;
+
     public RMCExplosionShockWaveOverlay()
     {
         IoCManager.InjectDependencies(this);
@@ -30,6 +42,7 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
     }
 
     private readonly Vector2[] _positions = new Vector2[MaxCount];
+    private readonly float[] _radii = new float[MaxCount];
     private readonly float[] _falloffPower = new float[MaxCount];
     private readonly float[] _sharpness = new float[MaxCount];
     private readonly float[] _width = new float[MaxCount];
@@ -37,37 +50,52 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
     {
-        if (args.Viewport.Eye == null || _xformSystem is null && !_entMan.TrySystem(out _xformSystem))
+        if (args.Viewport.Eye == null)
             return false;
 
-        var query = _entMan.EntityQueryEnumerator<RMCExplosionShockWaveComponent, TransformComponent>();
-
         _count = 0;
+        var time = _timing.CurTime;
 
-        while (query.MoveNext(out var uid, out var distortion, out var xform))
+        var explosions = _entMan.EntityQueryEnumerator<ExplosionVisualsComponent, ExplosionVisualsTexturesComponent>();
+        while (_count < MaxCount && explosions.MoveNext(out _, out var visuals, out var textures))
         {
-            if (xform.MapID != args.MapId)
+            if (textures.RMCPowerPerIntensity <= 0 ||
+                visuals.Intensity.Count == 0 ||
+                visuals.Epicenter.MapId != args.MapId)
+            {
+                continue;
+            }
+
+            var power = visuals.Intensity[0] * textures.RMCPowerPerIntensity;
+            if (power < ExplosionMinPower)
                 continue;
 
-            var mapPos = _xformSystem.GetWorldPosition(uid);
+            var radius = power / ExplosionPowerPerRadius;
+            var duration = radius * ExplosionSecondsPerRadius;
+            var progress = (time - textures.RMCStartTime).TotalSeconds / duration;
+            if (progress is < 0 or >= 1)
+                continue;
 
-            var tempCoords = args.Viewport.WorldToLocal(mapPos);
-
-            // normalized coords, 0 - 1 plane. This is pure hell, we subtract 1 because fragment calculates from the bottom and local goes from the top of the viewport
-            tempCoords.Y = 1 - (tempCoords.Y / args.Viewport.Size.Y);
-            tempCoords.X /= args.Viewport.Size.X;
-
-            _positions[_count] = tempCoords;
-            _falloffPower[_count] = distortion.FalloffPower;
-            _sharpness[_count] = distortion.Sharpness;
-            _width[_count] = distortion.Width;
-            _count++;
-
-            if (_count == MaxCount)
-                break;
+            var ringRadius = ExplosionStartRadius + (radius * ExplosionEndRadiusMultiplier - ExplosionStartRadius) * (float) progress;
+            AddWave(args, visuals.Epicenter.Position, ringRadius);
         }
 
         return _count > 0;
+    }
+
+    private void AddWave(in OverlayDrawArgs args, Vector2 worldPos, float radius)
+    {
+        var viewportSize = args.Viewport.Size;
+        var local = args.Viewport.WorldToLocal(worldPos);
+        var edge = args.Viewport.WorldToLocal(worldPos + new Vector2(radius, 0));
+
+        // normalized coords, 0 - 1 plane. This is pure hell, we subtract 1 because fragment calculates from the bottom and local goes from the top of the viewport
+        _positions[_count] = new Vector2(local.X / viewportSize.X, 1 - local.Y / viewportSize.Y);
+        _radii[_count] = (edge - local).Length() / viewportSize.X;
+        _falloffPower[_count] = ExplosionFalloffPower;
+        _sharpness[_count] = ExplosionSharpness;
+        _width[_count] = ExplosionWidth;
+        _count++;
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -75,13 +103,13 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
         if (ScreenTexture == null || args.Viewport.Eye == null)
             return;
 
-        _shader?.SetParameter("renderScale", args.Viewport.RenderScale * args.Viewport.Eye.Scale);
-        _shader?.SetParameter("count", _count);
-        _shader?.SetParameter("position", _positions);
-        _shader?.SetParameter("falloffPower", _falloffPower);
-        _shader?.SetParameter("sharpness", _sharpness);
-        _shader?.SetParameter("width", _width);
-        _shader?.SetParameter("SCREEN_TEXTURE", ScreenTexture);
+        _shader.SetParameter("count", _count);
+        _shader.SetParameter("position", _positions);
+        _shader.SetParameter("radius", _radii);
+        _shader.SetParameter("falloffPower", _falloffPower);
+        _shader.SetParameter("sharpness", _sharpness);
+        _shader.SetParameter("width", _width);
+        _shader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
 
         var worldHandle = args.WorldHandle;
         worldHandle.UseShader(_shader);
