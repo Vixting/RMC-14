@@ -132,13 +132,10 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         Dirty(ent);
 
         if (!_prototypeManager.TryIndex(ent.Comp.ExplosionType, out ExplosionPrototype? type) ||
-            type.RMCPowerPerIntensity <= 0)
+            type.PowerPerIntensity <= 0)
         {
             return;
         }
-
-        if (RMCExplosionVisuals.EpicenterPower(ent.Comp.Intensity, type.RMCPowerPerIntensity) >= RMCExplosionVisuals.SparkMinPower)
-            SpawnShrapnelSparks(ent.Comp.Epicenter);
 
         var noise = new FastNoiseLite(_random.Next());
         noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
@@ -152,7 +149,7 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
                 if (iteration >= ent.Comp.Intensity.Count)
                     continue;
 
-                var power = ent.Comp.Intensity[iteration] * type.RMCPowerPerIntensity;
+                var power = ent.Comp.Intensity[iteration] * type.PowerPerIntensity;
                 var at = time + TimeSpan.FromSeconds(ExplosionScorchRingSeconds * iteration);
                 var core = iteration <= ExplosionScorchCoreRings;
                 foreach (var tile in tiles)
@@ -169,7 +166,7 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         if (!_prototypeManager.TryIndex(ent.Comp.ExplosionType, out ExplosionPrototype? type))
             return;
 
-        var visualLifetime = RMCExplosionVisuals.VisualLifetime(ent.Comp.Intensity, type.RMCPowerPerIntensity);
+        var visualLifetime = RMCExplosionVisuals.VisualLifetime(ent.Comp.Intensity, type.PowerPerIntensity);
         var remaining = visualLifetime - (_timing.CurTime - ent.Comp.RMCStartTime).TotalSeconds;
         args.Lifetime = Math.Max(args.Lifetime, (float) remaining);
     }

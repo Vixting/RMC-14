@@ -13,7 +13,6 @@ public static class RMCExplosionVisuals
     public const float ShockWavePowerPerRadius = 60;
     public const double ShockWaveSecondsPerRadius = 0.05;
 
-    public const float SparkMinPower = 100;
     public const float BigSoundMinPower = 300;
     public const float SparkStreakMinPower = 300;
     public const double SparkStreakSeconds = 0.15;

@@ -32,6 +32,11 @@ public sealed partial class ExplosionSystem
             tileLists,
             component.SpaceMatrix,
             component.SpaceTileSize);
+
+        // RMC14
+        if (args.State is ExplosionVisualsState rmcState)
+            rmcState.RMCStartTime = component.RMCStartTime;
+        // RMC14
     }
 
     /// <summary>

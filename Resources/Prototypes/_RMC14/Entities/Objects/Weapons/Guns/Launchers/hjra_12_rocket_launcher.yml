@@ -231,7 +231,6 @@
     sound:
       path: /Audio/_RMC14/Weapons/Guns/Flamer/gun_flamethrower3.ogg
   - type: CMExplosionEffect
-  - type: RMCScorchEffect
   - type: PointLight
     radius: 3.5
     color: orange

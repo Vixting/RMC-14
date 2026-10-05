@@ -5,6 +5,8 @@ using Robust.Client.ResourceManagement;
 using Robust.Shared.GameStates;
 using Robust.Shared.Graphics.RSI;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing; // RMC14
+using Robust.Shared.Utility; // RMC14
 
 namespace Content.Client.Explosion;
 
@@ -20,6 +22,7 @@ public sealed class ExplosionOverlaySystem : EntitySystem
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly IGameTiming _timing = default!; // RMC14
 
     public override void Initialize()
     {
@@ -49,6 +52,12 @@ public sealed class ExplosionOverlaySystem : EntitySystem
         component.ExplosionType = state.ExplosionType;
         component.SpaceMatrix = state.SpaceMatrix;
         component.SpaceTileSize = state.SpaceTileSize;
+        component.RMCStartTime = state.RMCStartTime; // RMC14
+
+        // RMC14
+        if (TryComp(uid, out ExplosionVisualsTexturesComponent? textures) && state.RMCStartTime > TimeSpan.Zero)
+            textures.RMCStartTime = state.RMCStartTime;
+        // RMC14
     }
 
     private void OnCompRemove(EntityUid uid, ExplosionVisualsComponent component, ComponentRemove args)
@@ -83,6 +92,28 @@ public sealed class ExplosionOverlaySystem : EntitySystem
 
         textures.FireColor = type.FireColor;
         textures.IntensityPerState = type.IntensityPerState;
+        // RMC14
+        textures.RMCPowerPerIntensity = type.PowerPerIntensity;
+        textures.RMCStartTime = component.RMCStartTime > TimeSpan.Zero ? component.RMCStartTime : _timing.CurTime;
+        textures.RMCHeatColor = type.LightColor;
+        textures.RMCSeed = uid.Id;
+        if (type.PowerPerIntensity > 0)
+        {
+            AddAllFrames(textures.RMCSmokeFrames, type.TexturePath);
+            if (type.CoreTexturePath is { } corePath)
+                AddAllFrames(textures.RMCCoreFrames, corePath);
+
+            if (type.SparkTexturePath is { } sparkPath)
+            {
+                var sparkRsi = _resCache.GetResource<RSIResource>(sparkPath).RSI;
+                foreach (var sparkState in type.SparkStates)
+                {
+                    if (sparkRsi.TryGetState(sparkState, out var state))
+                        textures.RMCSparkFrames.Add(state.GetFrames(RsiDirection.South));
+                }
+            }
+        }
+        // RMC14
 
         var fireRsi = _resCache.GetResource<RSIResource>(type.TexturePath).RSI;
         foreach (var state in fireRsi)
@@ -92,6 +123,20 @@ public sealed class ExplosionOverlaySystem : EntitySystem
                 break;
         }
     }
+
+    // RMC14
+    private void AddAllFrames(List<Texture> frames, ResPath path)
+    {
+        var rsi = _resCache.GetResource<RSIResource>(path).RSI;
+        foreach (var state in rsi)
+        {
+            foreach (var direction in state.Icons)
+            {
+                frames.AddRange(direction);
+            }
+        }
+    }
+    // RMC14
 
     public override void Shutdown()
     {

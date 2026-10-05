@@ -1,5 +1,6 @@
 ﻿- type: explosion
   id: RMC
+  powerPerIntensity: 10
   damagePerIntensity:
     types:
       Blunt: 5
@@ -8,10 +9,17 @@
   tileBreakIntensity: [0, 10, 30]
   tileBreakRerollReduction: 20
   lightColor: Orange
-  texturePath: /Textures/Effects/fire.rsi
-  fireColor: Transparent
+  texturePath: /Textures/_RMC14/Effects/grenade_smoke.rsi
+  coreTexturePath: /Textures/_RMC14/Effects/smoke.rsi
+  sparkTexturePath: /Textures/_RMC14/Objects/Weapons/shrapnel.rsi
+  sparkStates: [ shrapnel_bright1, shrapnel_bright2 ]
+  bigSound:
+    collection: RMCExplosionBig
+    params:
+      volume: -3
+  fireStates: 1
   sound:
-    collection: CMExplosion # TODO RMC14 bigboom
+    collection: CMExplosion
     params:
       volume: -3
   smallSound:
@@ -22,6 +30,7 @@
 
 - type: explosion
   id: RMCLTBCannon
+  powerPerIntensity: 40
   damagePerIntensity:
     types:
       Blunt: 20
@@ -31,10 +40,17 @@
   tileBreakIntensity: [0, 8, 20]
   tileBreakRerollReduction: 20
   lightColor: Orange
-  texturePath: /Textures/Effects/fire.rsi
-  fireColor: Transparent
+  texturePath: /Textures/_RMC14/Effects/grenade_smoke.rsi
+  coreTexturePath: /Textures/_RMC14/Effects/smoke.rsi
+  sparkTexturePath: /Textures/_RMC14/Objects/Weapons/shrapnel.rsi
+  sparkStates: [ shrapnel_bright1, shrapnel_bright2 ]
+  bigSound:
+    collection: RMCExplosionBig
+    params:
+      volume: -3
+  fireStates: 1
   sound:
-    collection: CMExplosion # TODO RMC14 bigboom
+    collection: CMExplosion
     params:
       volume: 0
   smallSound:
@@ -52,6 +68,7 @@
 
 - type: explosion
   id: RMCMortar
+  powerPerIntensity: 12.5
   damagePerIntensity:
     types:
       Blunt: 6.25
@@ -61,10 +78,17 @@
   tileBreakIntensity: [0, 10, 30]
   tileBreakRerollReduction: 20
   lightColor: Orange
-  texturePath: /Textures/Effects/fire.rsi
-  fireColor: Transparent
+  texturePath: /Textures/_RMC14/Effects/grenade_smoke.rsi
+  coreTexturePath: /Textures/_RMC14/Effects/smoke.rsi
+  sparkTexturePath: /Textures/_RMC14/Objects/Weapons/shrapnel.rsi
+  sparkStates: [ shrapnel_bright1, shrapnel_bright2 ]
+  bigSound:
+    collection: RMCExplosionBig
+    params:
+      volume: -3
+  fireStates: 1
   sound:
-    collection: CMExplosion # TODO RMC14 bigboom
+    collection: CMExplosion
     params:
       volume: -3
   smallSound:
@@ -74,6 +98,7 @@
 
 - type: explosion
   id: RMCOB
+  powerPerIntensity: 10
   damagePerIntensity:
     types:
       Blunt: 5
@@ -83,8 +108,11 @@
   tileBreakIntensity: [0, 10, 30]
   tileBreakRerollReduction: 20
   lightColor: Orange
-  texturePath: /Textures/Effects/fire.rsi
-  fireColor: Transparent
+  texturePath: /Textures/_RMC14/Effects/grenade_smoke.rsi
+  coreTexturePath: /Textures/_RMC14/Effects/smoke.rsi
+  sparkTexturePath: /Textures/_RMC14/Objects/Weapons/shrapnel.rsi
+  sparkStates: [ shrapnel_bright1, shrapnel_bright2 ]
+  fireStates: 1
   sound:
     collection: RMCExplosionBig
     params:
@@ -96,6 +124,7 @@
 
 - type: explosion
   id: RMCOBXenoTunnel # This one also destroys xeno tunnels.
+  powerPerIntensity: 10
   damagePerIntensity:
     types:
       Blunt: 5
@@ -105,8 +134,11 @@
   tileBreakIntensity: [0, 10, 30]
   tileBreakRerollReduction: 20
   lightColor: Orange
-  texturePath: /Textures/Effects/fire.rsi
-  fireColor: Transparent
+  texturePath: /Textures/_RMC14/Effects/grenade_smoke.rsi
+  coreTexturePath: /Textures/_RMC14/Effects/smoke.rsi
+  sparkTexturePath: /Textures/_RMC14/Objects/Weapons/shrapnel.rsi
+  sparkStates: [ shrapnel_bright1, shrapnel_bright2 ]
+  fireStates: 1
   sound:
     collection: RMCExplosionBig
     params:

@@ -10,8 +10,12 @@ using Content.Shared.Coordinates;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Explosion;
 using Content.Shared.FixedPoint;
+using Content.Shared.Flash;
 using Content.Shared.Flash.Components;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Inventory;
+using Content.Shared.Item;
+using Content.Shared.Popups;
 using Content.Shared.Standing;
 using Content.Shared.StatusEffect;
 using Content.Shared.Sticky.Components;
@@ -23,6 +27,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using System.Numerics;
 
 namespace Content.Shared._RMC14.Explosion;
 
@@ -33,6 +38,11 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly EntityWhitelistSystem _entityWhitelist = default!;
+    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private readonly SharedItemSystem _item = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly RMCSizeStunSystem _sizeStun = default!;
     [Dependency] private readonly StandingStateSystem _standing = default!;
@@ -49,7 +59,10 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
     private static readonly ProtoId<StatusEffectPrototype> FlashedKey = "Flashed";
     private static readonly ProtoId<StatusEffectPrototype> BlindKey = "Blinded";
 
+    private const int ItemDestroyedMessages = 6;
+
     private readonly HashSet<Entity<RMCWallExplosionDeletableComponent>> _walls = new();
+    private readonly List<EntityUid> _heldItems = new();
 
     public override void Initialize()
     {
@@ -58,6 +71,8 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
         SubscribeLocalEvent<RMCExplosiveDeleteComponent, CMExplosiveTriggeredEvent>(OnDeleteWallsTriggered);
 
         SubscribeLocalEvent<ExplosionRandomResistanceComponent, GetExplosionResistanceEvent>(OnExplosionRandomResistanceGet);
+
+        SubscribeLocalEvent<ExplosionProneResistanceComponent, GetExplosionResistanceEvent>(OnExplosionProneResistanceGet);
 
         SubscribeLocalEvent<StunOnExplosionReceivedComponent, ExplosionReceivedEvent>(OnStunOnExplosionReceivedBeforeExplode);
 
@@ -99,6 +114,19 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
         args.DamageCoefficient *= resistance;
     }
 
+    // TODO RMC14 dense mobs absorb blast power in cm13 (20 humanoid/xeno, 40 big)
+    private void OnExplosionProneResistanceGet(Entity<ExplosionProneResistanceComponent> ent, ref GetExplosionResistanceEvent args)
+    {
+        if (args.Epicenter is not { } epicenter ||
+            !_standing.IsDown(ent) ||
+            IsOnEpicenterTile(ent, epicenter))
+        {
+            return;
+        }
+
+        args.DamageCoefficient *= ent.Comp.Multiplier;
+    }
+
     public void ChangeExplosionStunResistance(EntityUid ent, StunOnExplosionReceivedComponent? comp, bool isStunnable)
     {
         if (!Resolve(ent, ref comp, false))
@@ -112,10 +140,6 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
         var damage = args.Damage.GetTotal();
         var factor = Math.Round(damage.Double() * 0.05) / 2;
         factor = Math.Min(20, factor);
-
-        // TODO RMC14 don't reduce if explosion is on same tile
-        if (_standing.IsDown(ent))
-            factor *= 0.5;
 
         _sizeStun.TryGetSize(ent, out var size);
 
@@ -132,7 +156,15 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
             var bombArmorMult = (100 - ev.ExplosionArmor) * 0.01;
             var severity = factor * 5;
 
-            _statusEffects.TryAddStatusEffect<FlashedComponent>(ent, FlashedKey, ent.Comp.BlindTime * bombArmorMult, true);
+            if (damage >= ent.Comp.FlashThreshold)
+            {
+                var flashAttempt = new FlashAttemptEvent(ent, null, null);
+                RaiseLocalEvent(ent, ref flashAttempt, true);
+                if (!flashAttempt.Cancelled)
+                    _statusEffects.TryAddStatusEffect<FlashedComponent>(ent, FlashedKey, ent.Comp.BlindTime * bombArmorMult, true);
+            }
+
+            // TODO RMC14 ear damage, cm13 adds severity * 0.15
             _deafness.TryDeafen(ent, TimeSpan.FromSeconds(severity * 0.5), true);
 
             var knockBackDistance = (float) Math.Clamp(severity / 5 / dir.Length(), 0.5, Math.Max(severity / 10, 0.5));
@@ -143,9 +175,17 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
             var knockdownValue = severity * 0.1;
             var knockoutValue = damage.Double() * 0.1;
 
+            _heldItems.Clear();
+            _heldItems.AddRange(_hands.EnumerateHeld(ent.Owner));
+
             var knockdownMinusArmor = Math.Max(knockdownValue * bombArmorMult, 1);
             var knockdownTime = TimeSpan.FromSeconds(knockdownMinusArmor);
             _stun.TryParalyze(ent, knockdownTime, false);
+
+            foreach (var held in _heldItems)
+            {
+                ExplosionThrowItem(held, args.Epicenter, damage.Double());
+            }
 
             var knockoutMinusArmor = Math.Max(knockoutValue * bombArmorMult * 0.5, 0.5);
             var knockoutTime = TimeSpan.FromSeconds(knockoutMinusArmor);
@@ -225,6 +265,12 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
         if (_acid.TryConsumeGunSecondWind(ent))
             return;
 
+        if (damage <= ent.Comp.LowIntensityDamageThreshold || damage > ent.Comp.HighIntensityDamageThreshold)
+        {
+            var msg = Loc.GetString($"rmc-explosion-item-destroyed-{_random.Next(1, ItemDestroyedMessages + 1)}", ("item", ent.Owner));
+            _popup.PopupCoordinates(msg, Transform(ent).Coordinates, PopupType.MediumCaution);
+        }
+
         QueueDel(ent);
     }
 
@@ -252,11 +298,59 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
             _body.GibBody(ent, true);
     }
 
+    private void ExplosionThrowItem(EntityUid item, MapCoordinates epicenter, double severity)
+    {
+        if (TerminatingOrDeleted(item) ||
+            !TryComp(item, out ItemComponent? itemComp) ||
+            _container.IsEntityInContainer(item))
+        {
+            return;
+        }
+
+        var xform = Transform(item);
+        if (xform.Anchored)
+            return;
+
+        var weightClass = Math.Log2(_item.GetSizePrototype(itemComp.Size).Weight) + 1;
+        var range = Math.Min(Math.Round(severity / weightClass * 0.2, MidpointRounding.AwayFromZero), 14);
+
+        var direction = _transform.GetWorldPosition(xform) - epicenter.Position;
+        if (IsOnEpicenterTile(item, epicenter) || direction.LengthSquared() == 0)
+        {
+            direction = _random.NextAngle().ToVec();
+            range = Math.Round(range / 2, MidpointRounding.AwayFromZero);
+        }
+
+        if (range < 1)
+            return;
+
+        var target = Vector2.Normalize(direction) * (float) range;
+        if (range >= 2)
+        {
+            var scatter = range / 4;
+            target += new Vector2(
+                (float) Math.Round(_random.NextDouble(-scatter, scatter), MidpointRounding.AwayFromZero),
+                (float) Math.Round(_random.NextDouble(-scatter, scatter), MidpointRounding.AwayFromZero));
+        }
+
+        var speed = (float) Math.Max(range * 2.5, 4);
+        _throwing.TryThrow(item, target, speed);
+    }
+
+    private bool IsOnEpicenterTile(EntityUid ent, MapCoordinates epicenter)
+    {
+        var coordinates = _transform.GetMapCoordinates(ent);
+        if (coordinates.MapId != epicenter.MapId)
+            return false;
+
+        if (_mapManager.TryFindGridAt(epicenter, out var gridUid, out var grid))
+            return _map.TileIndicesFor(gridUid, grid, coordinates) == _map.TileIndicesFor(gridUid, grid, epicenter);
+
+        return Vector2Helpers.Floored(coordinates.Position) == Vector2Helpers.Floored(epicenter.Position);
+    }
+
     public void DoEffect(Entity<CMExplosionEffectComponent> ent)
     {
-        if (ent.Comp.ShockWave is { } shockwave)
-            SpawnNextToOrDrop(shockwave, ent);
-
         if (ent.Comp.Explosion is { } explosion)
             SpawnNextToOrDrop(explosion, ent);
 

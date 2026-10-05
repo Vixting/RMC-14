@@ -388,18 +388,6 @@
     lifetime: 2.5
   - type: CMExplosionEffect
     explosion: null
-    shockWave: RMCExplosionEffectClusterOBShockWave
-
-- type: entity
-  id: RMCExplosionEffectClusterOBShockWave
-  categories: [ HideSpawnMenu ]
-  components:
-  - type: TimedDespawn
-    lifetime: 1
-  - type: RMCExplosionShockWave
-    falloffPower: 50
-    sharpness: 25
-    width: 0.7
 
 # Tray
 - type: entity

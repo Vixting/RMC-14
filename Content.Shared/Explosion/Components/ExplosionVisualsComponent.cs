@@ -30,6 +30,7 @@ public sealed class ExplosionVisualsState : ComponentState
     public string ExplosionType = string.Empty;
     public Matrix3x2 SpaceMatrix;
     public ushort SpaceTileSize;
+    public TimeSpan RMCStartTime; // RMC14
 
     public ExplosionVisualsState(
         MapCoordinates epicenter,

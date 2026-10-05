@@ -25,7 +25,7 @@
   - type: Appearance
   - type: Sealable
   - type: Destructible
-    thresholds: [] # TODO RMC14 destroy on explosion unless inside a container
+    thresholds: []
   - type: InteractedBlacklist
     blacklist:
       components:

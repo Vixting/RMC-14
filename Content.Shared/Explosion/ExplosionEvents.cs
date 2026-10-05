@@ -1,5 +1,6 @@
 using Content.Shared.Damage;
 using Content.Shared.Inventory;
+using Robust.Shared.Map; // RMC14
 
 namespace Content.Shared.Explosion;
 
@@ -16,6 +17,10 @@ public record struct GetExplosionResistanceEvent(string ExplosionPrototype) : II
     public float DamageCoefficient = 1;
 
     public readonly string ExplosionPrototype = ExplosionPrototype;
+
+    // RMC14
+    public MapCoordinates? Epicenter = null;
+    // RMC14
 
     SlotFlags IInventoryRelayEvent.TargetSlots =>  ~SlotFlags.POCKET;
 }

@@ -15,7 +15,6 @@
     totalIntensity: 800
     canCreateVacuum: false
   - type: CMExplosionEffect
-  - type: RMCScorchEffect
   - type: MortarShell
   - type: ActivateMortarShellOnSpawn
 
@@ -36,7 +35,6 @@
   - type: TileFireOnTrigger
     spawn: RMCTileFireGreen
     range: 5
-  - type: RMCScorchEffect
   - type: MortarShell
   - type: ActivateMortarShellOnSpawn
 

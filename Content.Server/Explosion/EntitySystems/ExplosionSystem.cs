@@ -4,6 +4,7 @@ using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NPC.Pathfinding;
+using Content.Server._RMC14.Explosion; // RMC14
 using Content.Shared._RMC14.Explosion;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Camera;
@@ -347,6 +348,11 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
 
         var visualEnt = CreateExplosionVisualEntity(pos, queued.Proto.ID, spaceMatrix, spaceData, gridData.Values, iterationIntensity);
 
+        // RMC14
+        var rmcSpawnedEv = new RMCExplosionSpawnedEvent();
+        RaiseLocalEvent(visualEnt, ref rmcSpawnedEv);
+        // RMC14
+
         // camera shake
         CameraShake(iterationIntensity.Count * 4f, pos, queued.TotalIntensity);
 
@@ -369,6 +375,16 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             ? queued.Proto.SmallSound
             : queued.Proto.Sound;
 
+        // RMC14
+        var rmcPowered = queued.Proto.PowerPerIntensity > 0;
+        if (rmcPowered &&
+            queued.Proto.BigSound is { } rmcBigSound &&
+            RMCExplosionVisuals.EpicenterPower(iterationIntensity, queued.Proto.PowerPerIntensity) >= RMCExplosionVisuals.BigSoundMinPower)
+        {
+            sound = rmcBigSound;
+        }
+        // RMC14
+
         _audio.PlayStatic(sound, filter, mapEntityCoords, true, sound.Params);
 
         // play far sound
@@ -378,6 +394,14 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         var farSound = iterationIntensity.Count < queued.Proto.SmallSoundIterationThreshold
             ? queued.Proto.SmallSoundFar
             : queued.Proto.SoundFar;
+
+        // RMC14
+        if (rmcPowered)
+        {
+            farFilter = Filter.BroadcastMap(pos.MapId).RemoveInRange(pos, audioRange);
+            farSound = queued.Proto.SoundFar;
+        }
+        // RMC14
 
         _audio.PlayGlobal(farSound, farFilter, true, farSound.Params);
 

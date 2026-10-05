@@ -44,7 +44,6 @@ public sealed class XenoFortifySystem : EntitySystem
 
     public override void Initialize()
     {
-        // TODO RMC14 resist knockback from small explosives
         SubscribeLocalEvent<XenoFortifyComponent, XenoFortifyActionEvent>(OnXenoFortifyAction);
         SubscribeLocalEvent<XenoFortifyComponent, PlayerDetachedEvent>(OnXenoFortifyPlayerDetached, before: [typeof(XenoSystem)]);
 

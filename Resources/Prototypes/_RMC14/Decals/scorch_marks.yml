@@ -33,6 +33,33 @@
   sprite:
     sprite: _RMC14/Decals/scorch.rsi
     state: scorch4
+
+- type: decal
+  id: RMCScorch5
+  parent: CMDecalBase
+  tags: ["RMCScorch"]
+  defaultCustomColor: true
+  sprite:
+    sprite: _RMC14/Decals/scorch.rsi
+    state: scorchb1
+
+- type: decal
+  id: RMCScorch6
+  parent: CMDecalBase
+  tags: ["RMCScorch"]
+  defaultCustomColor: true
+  sprite:
+    sprite: _RMC14/Decals/scorch.rsi
+    state: scorchb2
+
+- type: decal
+  id: RMCScorch7
+  parent: CMDecalBase
+  tags: ["RMCScorch"]
+  defaultCustomColor: true
+  sprite:
+    sprite: _RMC14/Decals/scorch.rsi
+    state: scorchb3
     
 - type: decal
   id: RMCScorchSmall1

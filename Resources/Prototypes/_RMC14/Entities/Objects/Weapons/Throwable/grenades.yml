@@ -92,7 +92,6 @@
   - type: Ammo
   - type: CMExplosionEffect
   - type: CMVocalizeTrigger
-  - type: RMCScorchEffect
   - type: Tag
     tags:
     - Grenade
@@ -426,7 +425,6 @@
       cluster-payload: !type:Container
   - type: CMExplosionEffect
   - type: CMVocalizeTrigger
-  - type: RMCScorchEffect
   - type: Tag
     tags:
     - Grenade
@@ -448,7 +446,6 @@
     spawn: RMCTileFire
   - type: Ammo
   - type: CMVocalizeTrigger
-  - type: RMCScorchEffect
   - type: Tag
     tags:
     - Grenade
@@ -475,7 +472,6 @@
   - type: Ammo
   - type: CMExplosionEffect
   - type: CMVocalizeTrigger
-  - type: RMCScorchEffect
   - type: Tag
     tags:
     - Grenade
@@ -491,14 +487,6 @@
     state: grenade
   - type: TimedDespawn
     lifetime: 0.6
-
-- type: entity
-  id: RMCExplosionEffectGrenadeShockWave
-  categories: [ HideSpawnMenu ]
-  components:
-  - type: TimedDespawn
-    lifetime: 0.5
-  - type: RMCExplosionShockWave
 
 - type: entity
   id: CMExplosionEffectShrapnel1

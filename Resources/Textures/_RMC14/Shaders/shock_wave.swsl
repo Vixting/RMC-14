@@ -5,6 +5,7 @@ uniform highp float[10] radius;
 uniform highp float[10] sharpness;
 uniform highp float[10] width;
 uniform highp float[10] falloffPower;
+uniform highp float[10] strength;
 
 void fragment() {
     highp vec2 uv = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
@@ -22,8 +23,8 @@ void fragment() {
             highp float ScaleDiff = 1.0 - pow(abs(Diff * sharpness[i]), width[i]);
             highp float Scale = max(radius[i], 0.13) * max(Dist, 0.13);
             highp vec2 DiffTexCoord = normalize(uv - WaveCentre);
-            coord += (DiffTexCoord * Diff * ScaleDiff) / (Scale * falloffPower[i]);
-            brighten += ScaleDiff / (Scale * 40.0);
+            coord += (DiffTexCoord * Diff * ScaleDiff * strength[i]) / (Scale * falloffPower[i]);
+            brighten += ScaleDiff * strength[i] / (Scale * 40.0);
         }
     }
 

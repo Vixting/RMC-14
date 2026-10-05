@@ -180,7 +180,6 @@
     totalIntensity: 290
     maxTileBreak: 0
   - type: CMExplosionEffect
-  - type: RMCScorchEffect
   - type: PointLight
     radius: 3.5
     color: orange

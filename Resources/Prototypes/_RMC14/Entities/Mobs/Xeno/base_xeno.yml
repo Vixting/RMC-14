@@ -335,6 +335,7 @@
   - type: RMCWeaponAccuracy # This is so projectiles fired by xenos get a correctly-generated seed for RNG.
   - type: StunOnExplosionReceived
     weak: true
+  - type: ExplosionProneResistance
   - type: AssignXenoName
   - type: MobGibbedByExplosionType
   - type: TileFirePatter

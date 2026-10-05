@@ -34,7 +34,6 @@
   - type: ClusterLimitHits
   - type: CMExplosionEffect
     maxShrapnel: 0
-  - type: RMCScorchEffect
 
 - type: Tag
   id: RMCSwordHEFA

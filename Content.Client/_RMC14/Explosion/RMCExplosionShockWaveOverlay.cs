@@ -34,6 +34,9 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
     private const float ExplosionFalloffPower = 40;
     private const float ExplosionSharpness = 10;
     private const float ExplosionWidth = 0.8f;
+    private const float ExplosionDampStartPower = 300;
+    private const float ExplosionDampFullPower = 1000;
+    private const float ExplosionMinStrength = 0.35f;
 
     public RMCExplosionShockWaveOverlay()
     {
@@ -46,6 +49,7 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
     private readonly float[] _falloffPower = new float[MaxCount];
     private readonly float[] _sharpness = new float[MaxCount];
     private readonly float[] _width = new float[MaxCount];
+    private readonly float[] _strength = new float[MaxCount];
     private int _count;
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)
@@ -77,13 +81,15 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
                 continue;
 
             var ringRadius = ExplosionStartRadius + (radius * ExplosionEndRadiusMultiplier - ExplosionStartRadius) * (float) progress;
-            AddWave(args, visuals.Epicenter.Position, ringRadius);
+            var damp = Math.Clamp((power - ExplosionDampStartPower) / (ExplosionDampFullPower - ExplosionDampStartPower), 0, 1);
+            var strength = MathHelper.Lerp(1, ExplosionMinStrength, damp);
+            AddWave(args, visuals.Epicenter.Position, ringRadius, strength);
         }
 
         return _count > 0;
     }
 
-    private void AddWave(in OverlayDrawArgs args, Vector2 worldPos, float radius)
+    private void AddWave(in OverlayDrawArgs args, Vector2 worldPos, float radius, float strength)
     {
         var viewportSize = args.Viewport.Size;
         var local = args.Viewport.WorldToLocal(worldPos);
@@ -95,6 +101,7 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
         _falloffPower[_count] = ExplosionFalloffPower;
         _sharpness[_count] = ExplosionSharpness;
         _width[_count] = ExplosionWidth;
+        _strength[_count] = strength;
         _count++;
     }
 
@@ -109,6 +116,7 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
         _shader.SetParameter("falloffPower", _falloffPower);
         _shader.SetParameter("sharpness", _sharpness);
         _shader.SetParameter("width", _width);
+        _shader.SetParameter("strength", _strength);
         _shader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
 
         var worldHandle = args.WorldHandle;

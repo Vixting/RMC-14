@@ -27,7 +27,7 @@
     maxFillLevels: 3
     fillBaseName: icon-
   - type: Destructible
-    thresholds: [] # TODO RMC14 destroy on explosion unless inside a container
+    thresholds: []
   - type: InteractedBlacklist
     blacklist:
       components:

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Content.Server.Atmos.EntitySystems;
+using Content.Server._RMC14.Explosion; // RMC14
 using Content.Shared._RMC14.Explosion;
 using Content.Shared.CCVar;
 using Content.Shared.Damage;
@@ -147,6 +148,12 @@ public sealed partial class ExplosionSystem
             {
                 var comp = EnsureComp<TimedDespawnComponent>(_activeExplosion.VisualEnt);
                 comp.Lifetime = _cfg.GetCVar(CCVars.ExplosionPersistence);
+
+                // RMC14
+                var rmcFinishedEv = new RMCExplosionFinishedEvent(comp.Lifetime);
+                RaiseLocalEvent(_activeExplosion.VisualEnt, ref rmcFinishedEv);
+                comp.Lifetime = rmcFinishedEv.Lifetime;
+                // RMC14
                 _appearance.SetData(_activeExplosion.VisualEnt, ExplosionAppearanceData.Progress, int.MaxValue);
                 _activeExplosion = null;
             }
@@ -260,8 +267,11 @@ public sealed partial class ExplosionSystem
             }
         }
 
-        if (!tileBlocked)
+        if (!tileBlocked &&
+            !(_prototypeManager.TryIndex<ExplosionPrototype>(id, out var rmcType) && rmcType.PowerPerIntensity > 0)) // RMC14
+        {
             Spawn(ShockwaveSmoke, new EntityCoordinates(grid.Owner, tile));
+        }
 
         // Next, we get the intersecting entities AGAIN, but purely for throwing. This way, glass shards spawned from
         // windows will be flung outwards, and not stay where they spawned. This is however somewhat unnecessary, and a
@@ -388,11 +398,11 @@ public sealed partial class ExplosionSystem
     }
 
     private DamageSpecifier GetDamage(EntityUid uid,
-        string id, DamageSpecifier damage)
+        string id, DamageSpecifier damage, MapCoordinates? epicenter = null) // RMC14
     {
         // TODO Explosion Performance
         // Cache this? I.e., instead of raising an event, check for a component?
-        var resistanceEv = new GetExplosionResistanceEvent(id);
+        var resistanceEv = new GetExplosionResistanceEvent(id) { Epicenter = epicenter }; // RMC14
         RaiseLocalEvent(uid, ref resistanceEv);
         resistanceEv.DamageCoefficient = Math.Max(0, resistanceEv.DamageCoefficient);
 
@@ -403,12 +413,12 @@ public sealed partial class ExplosionSystem
         return damage;
     }
 
-    private void GetEntitiesToDamage(EntityUid uid, DamageSpecifier originalDamage, string prototype)
+    private void GetEntitiesToDamage(EntityUid uid, DamageSpecifier originalDamage, string prototype, MapCoordinates? epicenter = null) // RMC14
     {
         _toDamage.Clear();
 
         // don't raise BeforeExplodeEvent if the entity is completely immune to explosions
-        var thisDamage = GetDamage(uid, prototype, originalDamage);
+        var thisDamage = GetDamage(uid, prototype, originalDamage, epicenter); // RMC14
         if (thisDamage.Empty)
             return;
 
@@ -458,7 +468,7 @@ public sealed partial class ExplosionSystem
 
         if (originalDamage != null)
         {
-            GetEntitiesToDamage(uid, originalDamage, id);
+            GetEntitiesToDamage(uid, originalDamage, id, epicenter); // RMC14
             foreach (var (entity, damage) in _toDamage)
             {
                 if (damage.GetTotal() > 0 && TryComp<ActorComponent>(entity, out var actorComponent))
