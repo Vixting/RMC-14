@@ -35,7 +35,7 @@ public sealed partial class ParticleSystem : EntitySystem
 
     private ParticleOverlay _overlay = default!;
     private int _liveParticleCount;
-    private readonly Dictionary<string, (Texture[] Frames, float[] Delays)> _frameCache = new();
+    private readonly Dictionary<string, (Texture[] Frames, float[] Delays, Texture[][] Alternates)> _frameCache = new();
     private readonly HashSet<string> _frameResolveFailures = new();
     private int _quality;
     private int _globalBudget;
@@ -182,6 +182,10 @@ public sealed partial class ParticleSystem : EntitySystem
         dst.Duration = src.Duration ?? dst.Duration;
         dst.SpreadAngle = src.SpreadAngle ?? dst.SpreadAngle;
         dst.SpawnOffset = src.SpawnOffset ?? dst.SpawnOffset;
+        dst.ShapeRadius = src.ShapeRadius ?? dst.ShapeRadius;
+
+        if (src.Intensity is { } intensity)
+            emitter.Intensity = intensity;
 
         if (src.EmitAngle is { } emitAngle)
         {
@@ -531,7 +535,8 @@ public sealed partial class ParticleSystem : EntitySystem
         var angle = emitter.EffectiveEmitAngle + _random.NextFloat(-spreadAngle * 0.5f, spreadAngle * 0.5f);
         var speed = Math.Max(speed0 + _random.NextFloat(-speedVar, speedVar), 0f);
         p.Velocity = new Vector2(MathF.Sin(angle), MathF.Cos(angle)) * speed;
-        p.LocalOffset = SampleEmissionShape(proto.Shape);
+        p.LocalOffset = SampleEmissionShape(proto.Shape, emitter.Overrides?.ShapeRadius);
+        p.Variant = emitter.AlternateFrames.Length > 0 ? _random.Next(emitter.AlternateFrames.Length + 1) : 0;
 
         var spawnOffset = emitter.Overrides?.SpawnOffset ?? emitter.SpawnOffset;
         if (spawnOffset != default)
@@ -551,7 +556,7 @@ public sealed partial class ParticleSystem : EntitySystem
         }
 
         if (proto.WorldSpace)
-            p.SpawnOrigin = emitter.MapCoords.Position + (emitter.Overrides?.SpawnOffset ?? emitter.SpawnOffset);
+            p.SpawnOrigin = emitter.MapCoords.Position;
 
         p.SpawnSpeed = speed;
         p.SpawnIntensity = emitter.Intensity;
@@ -652,16 +657,39 @@ public sealed partial class ParticleSystem : EntitySystem
         {
             emitter.Frames = cached.Frames;
             emitter.Delays = cached.Delays;
+            emitter.AlternateFrames = cached.Alternates;
             return;
         }
 
         if (_frameResolveFailures.Contains(protoId))
             return;
 
-        Texture[] frames = Array.Empty<Texture>();
-        float[] delays = Array.Empty<float>();
+        if (!TryResolveSprite(emitter.Proto.Sprite, out var frames, out var delays))
+        {
+            _frameResolveFailures.Add(protoId);
+            return;
+        }
 
-        switch (emitter.Proto.Sprite)
+        var alternates = new List<Texture[]>();
+        foreach (var sprite in emitter.Proto.AlternateSprites)
+        {
+            if (TryResolveSprite(sprite, out var altFrames, out _) && altFrames.Length > 0)
+                alternates.Add(altFrames);
+        }
+
+        var alternateArray = alternates.ToArray();
+        _frameCache[protoId] = (frames, delays, alternateArray);
+        emitter.Frames = frames;
+        emitter.Delays = delays;
+        emitter.AlternateFrames = alternateArray;
+    }
+
+    private bool TryResolveSprite(SpriteSpecifier sprite, out Texture[] frames, out float[] delays)
+    {
+        frames = Array.Empty<Texture>();
+        delays = Array.Empty<float>();
+
+        switch (sprite)
         {
             case SpriteSpecifier.Rsi rsi:
             {
@@ -675,49 +703,51 @@ public sealed partial class ParticleSystem : EntitySystem
                 }
                 catch
                 {
-                    _frameResolveFailures.Add(protoId);
-                    return;
+                    return false;
                 }
 
                 if (!resource.TryGetState(rsi.RsiState, out var state))
-                {
-                    _frameResolveFailures.Add(protoId);
-                    return;
-                }
+                    return false;
 
                 frames = state.GetFrames(RsiDirection.South);
                 delays = state.GetDelays();
-                break;
+                return true;
             }
             case SpriteSpecifier.Texture tex:
             {
-                try { frames = new[] { _spriteSystem.Frame0(tex) }; }
+                try
+                {
+                    frames = new[] { _spriteSystem.Frame0(tex) };
+                }
                 catch
                 {
-                    _frameResolveFailures.Add(protoId);
-                    return;
+                    return false;
                 }
-                break;
+
+                return true;
             }
             default:
-                _frameResolveFailures.Add(protoId);
-                return;
+                return false;
         }
-
-        _frameCache[protoId] = (frames, delays);
-        emitter.Frames = frames;
-        emitter.Delays = delays;
     }
 
-    private Vector2 SampleEmissionShape(EmissionShapeData shape)
+    private Vector2 SampleEmissionShape(EmissionShapeData shape, float? radiusOverride = null)
     {
+        var radius = radiusOverride ?? shape.Radius;
         return shape.Type switch
         {
-            EmissionShapeType.CircleEdge => new Vector2(MathF.Cos(_random.NextFloat(0f, MathF.PI * 2f)), MathF.Sin(_random.NextFloat(0f, MathF.PI * 2f))) * shape.Radius,
-            EmissionShapeType.CircleFill => new Vector2(MathF.Cos(_random.NextFloat(0f, MathF.PI * 2f)), MathF.Sin(_random.NextFloat(0f, MathF.PI * 2f))) * (shape.Radius * MathF.Sqrt(_random.NextFloat(0f, 1f))),
+            EmissionShapeType.CircleEdge => RandomUnitVector() * radius,
+            EmissionShapeType.CircleFill => RandomUnitVector() * (radius * MathF.Sqrt(_random.NextFloat(0f, 1f))),
+            EmissionShapeType.Sphere => RandomUnitVector() * (radius * MathF.Sqrt(1f - MathF.Pow(_random.NextFloat(-1f, 1f), 2))),
             EmissionShapeType.Box => new Vector2(_random.NextFloat(-shape.BoxExtents.X, shape.BoxExtents.X), _random.NextFloat(-shape.BoxExtents.Y, shape.BoxExtents.Y)),
             _ => Vector2.Zero,
         };
+    }
+
+    private Vector2 RandomUnitVector()
+    {
+        var angle = _random.NextFloat(0f, MathF.PI * 2f);
+        return new Vector2(MathF.Cos(angle), MathF.Sin(angle));
     }
 
     public static float SampleCurve(List<ParticleCurveKey> curve, float t)

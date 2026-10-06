@@ -19,6 +19,7 @@ public sealed class ParticleData
     public bool Alive;
     public float SizeMultiplier = 1f;
     public Vector2 NoiseOffset;
+    public int Variant;
 
     public float AgeRatio => Lifetime > TimeSpan.Zero
         ? Math.Clamp((float)(Age.TotalSeconds / Lifetime.TotalSeconds), 0f, 1f)
@@ -38,5 +39,6 @@ public sealed class ParticleData
         Alive = false;
         SizeMultiplier = 1f;
         NoiseOffset = default;
+        Variant = 0;
     }
 }

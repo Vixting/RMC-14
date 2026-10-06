@@ -55,8 +55,8 @@ public sealed class ParticleOverlay : Overlay
         {
             var proto = emitter.Proto;
             var ovr = emitter.Overrides;
-            var tex = emitter.Frames[emitter.AnimFrame];
             var baseHalfSize = (ovr?.ParticleSize ?? proto.ParticleSize) * 0.5f;
+            var pivot = proto.Pivot;
 
             string? wantedShader = ovr?.Shader ?? (string.IsNullOrEmpty(proto.Shader) ? null : proto.Shader);
             if (wantedShader != activeShader)
@@ -85,6 +85,12 @@ public sealed class ParticleOverlay : Overlay
             {
                 if (!particle.Alive) continue;
 
+                var frames = particle.Variant > 0 && particle.Variant <= emitter.AlternateFrames.Length
+                    ? emitter.AlternateFrames[particle.Variant - 1]
+                    : emitter.Frames;
+                var tex = frames[emitter.AnimFrame % frames.Length];
+                var aspect = tex.Width > 0 ? tex.Height / (float) tex.Width : 1f;
+
                 var t = particle.AgeRatio;
 
                 Color color;
@@ -111,6 +117,8 @@ public sealed class ParticleOverlay : Overlay
                 if (proto.SizeOverLifetime.Count > 0)
                     halfSize *= ParticleSystem.SampleCurve(proto.SizeOverLifetime, t);
 
+                var halfHeight = halfSize * aspect;
+
                 var local = particle.LocalOffset;
                 var worldOffset = new Vector2(local.X * cosR - local.Y * sinR,
                                               local.X * sinR + local.Y * cosR);
@@ -131,7 +139,7 @@ public sealed class ParticleOverlay : Overlay
                         var cV = cosR * uy - sinR * ux;
                         var sV = sinR * uy + cosR * ux;
                         handle.SetTransform(new Matrix3x2(cV, sV, -sV, cV, worldPos.X, worldPos.Y));
-                        handle.DrawTextureRect(tex, new Box2(-halfSize, -halfSize * stretchY, halfSize, halfSize * stretchY), color);
+                        handle.DrawTextureRect(tex, PivotQuad(halfSize, halfHeight * stretchY, pivot), color);
                         continue;
                     }
                 }
@@ -147,7 +155,7 @@ public sealed class ParticleOverlay : Overlay
                         var cos = cosR * uy - sinR * ux;
                         var sin = sinR * uy + cosR * ux;
                         handle.SetTransform(new Matrix3x2(cos, sin, -sin, cos, worldPos.X, worldPos.Y));
-                        handle.DrawTextureRect(tex, new Box2(-halfSize, -halfSize, halfSize, halfSize), color);
+                        handle.DrawTextureRect(tex, PivotQuad(halfSize, halfHeight, pivot), color);
                         continue;
                     }
                 }
@@ -156,11 +164,17 @@ public sealed class ParticleOverlay : Overlay
                 var cosP = MathF.Cos(totalRotation);
                 var sinP = MathF.Sin(totalRotation);
                 handle.SetTransform(new Matrix3x2(cosP, sinP, -sinP, cosP, worldPos.X, worldPos.Y));
-                handle.DrawTextureRect(tex, new Box2(-halfSize, -halfSize, halfSize, halfSize), color);
+                handle.DrawTextureRect(tex, PivotQuad(halfSize, halfHeight, pivot), color);
             }
         }
 
         handle.SetTransform(Matrix3x2.Identity);
         handle.UseShader(null);
+    }
+
+    private static Box2 PivotQuad(float halfWidth, float halfHeight, Vector2 pivot)
+    {
+        var offset = new Vector2(-pivot.X * halfWidth, -pivot.Y * halfHeight);
+        return new Box2(-halfWidth + offset.X, -halfHeight + offset.Y, halfWidth + offset.X, halfHeight + offset.Y);
     }
 }

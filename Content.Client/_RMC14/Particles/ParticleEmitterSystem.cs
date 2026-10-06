@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Content.Shared._RMC14.Particles;
 
 namespace Content.Client._RMC14.Particles;
@@ -39,6 +40,11 @@ public sealed class ParticleEmitterSystem : EntitySystem
             emitter.SpawnOffset = ent.Comp.SpawnOffset;
 
         _activeEmitters[ent.Owner] = emitter;
+    }
+
+    public bool TryGetEmitter(EntityUid uid, [NotNullWhen(true)] out ActiveEmitter? emitter)
+    {
+        return _activeEmitters.TryGetValue(uid, out emitter);
     }
 
     private void OnCompShutdown(Entity<ParticleEmitterComponent> ent, ref ComponentShutdown args)

@@ -1,3 +1,4 @@
+using Content.Client._RMC14.Weapons.Ranged;
 using Content.Shared._RMC14.Particles;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Ranged.Events;
@@ -7,6 +8,7 @@ namespace Content.Client._RMC14.Particles;
 public sealed class ParticleOnEventSystem : EntitySystem
 {
     [Dependency] private readonly ParticleSystem _particles = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private readonly Dictionary<EntityUid, ActiveEmitter> _thrownEmitters = new();
 
@@ -17,6 +19,7 @@ public sealed class ParticleOnEventSystem : EntitySystem
         SubscribeLocalEvent<ParticleOnThrownComponent, LandEvent>(OnThrownLanded);
         SubscribeLocalEvent<ParticleOnThrownComponent, ComponentShutdown>(OnThrownShutdown);
         SubscribeLocalEvent<ParticleOnGunShotProjectileComponent, AmmoShotEvent>(OnGunShotProjectile);
+        SubscribeLocalEvent<ParticleOnMuzzleFlashComponent, RMCMuzzleFlashCreatedEvent>(OnMuzzleFlash);
     }
 
     private void OnThrown(Entity<ParticleOnThrownComponent> ent, ref ThrownEvent args)
@@ -43,5 +46,12 @@ public sealed class ParticleOnEventSystem : EntitySystem
     {
         foreach (var projectile in args.FiredProjectiles)
             _particles.CreateParticle(ent.Comp.Effect, projectile, ent.Comp.ColorOverride);
+    }
+
+    private void OnMuzzleFlash(Entity<ParticleOnMuzzleFlashComponent> ent, ref RMCMuzzleFlashCreatedEvent args)
+    {
+        var coords = _transform.GetMapCoordinates(args.Flash);
+        var direction = ent.Comp.Reverse ? args.Angle + Math.PI : args.Angle;
+        _particles.CreateParticle(ent.Comp.Effect, coords, direction, ent.Comp.ColorOverride);
     }
 }

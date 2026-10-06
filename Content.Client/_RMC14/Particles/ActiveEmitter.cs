@@ -38,6 +38,7 @@ public sealed class ActiveEmitter
     public readonly List<bool> FiredBursts = new();
 
     public Texture[] Frames = Array.Empty<Texture>();
+    public Texture[][] AlternateFrames = Array.Empty<Texture[]>();
     public float[] Delays = Array.Empty<float>();
     public int AnimFrame;
     public float AnimTimer;
