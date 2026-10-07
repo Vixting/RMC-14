@@ -18,6 +18,6 @@ public sealed class SpawnParticleEffectSystem : EntitySystem
 
     private void OnExecute(ref ExecuteEntityEffectEvent<SpawnParticleEffect> args)
     {
-        _particles.CreateParticle(args.Effect.Effect, args.Args.TargetEntity, args.Effect.ColorOverride);
+        _particles.CreateParticle(args.Effect.Particle, args.Args.TargetEntity, args.Effect.ColorOverride);
     }
 }

@@ -74,6 +74,8 @@ public sealed partial class ParticleSystem : EntitySystem
 
     public IReadOnlyList<ActiveEmitter> GetEmitters() => _emitters;
 
+    public int LiveParticleCount => _liveParticleCount;
+
     public int KillAll()
     {
         var count = _emitters.Count;
@@ -488,7 +490,8 @@ public sealed partial class ParticleSystem : EntitySystem
         var proto = emitter.Proto;
         var eyeAngle = (float)_eye.CurrentEye.Rotation;
         var qualityMult = proto.IgnoreQualitySettings ? 1f : QualityMultipliers[Math.Clamp(_quality, 0, QualityMultipliers.Length - 1)];
-        var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(proto.MaxCount, IgnoreQualityMaxParticles) : proto.MaxCount;
+        var maxCount = emitter.Overrides?.MaxCount ?? proto.MaxCount;
+        var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(maxCount, IgnoreQualityMaxParticles) : maxCount;
         var count = (int)Math.Ceiling(Math.Min(effectiveMax, HardMaxParticles) * qualityMult * emitter.Intensity);
         for (int i = 0; i < count && _liveParticleCount < _globalBudget; i++)
             EmitParticle(emitter, eyeAngle);

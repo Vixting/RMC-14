@@ -1,5 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using Content.Shared._RMC14.Particles;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._RMC14.Particles;
 
@@ -11,7 +11,7 @@ public sealed class ParticleEmitterSystem : EntitySystem
     [Dependency] private readonly ParticleSystem _particles = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
-    private readonly Dictionary<EntityUid, ActiveEmitter> _activeEmitters = new();
+    private readonly Dictionary<EntityUid, List<ActiveEmitter>> _activeEmitters = new();
 
     public override void Initialize()
     {
@@ -22,14 +22,23 @@ public sealed class ParticleEmitterSystem : EntitySystem
 
     private void OnCompInit(Entity<ParticleEmitterComponent> ent, ref ComponentInit args)
     {
-        if (_activeEmitters.TryGetValue(ent.Owner, out var old))
+        RemoveEmitters(ent.Owner);
+
+        var emitters = new List<ActiveEmitter>();
+        SpawnEmitter(ent, ent.Comp.Effect, emitters);
+        foreach (var extra in ent.Comp.ExtraEffects)
         {
-            _particles.RemoveParticle(old);
-            _activeEmitters.Remove(ent.Owner);
+            SpawnEmitter(ent, extra, emitters);
         }
 
+        if (emitters.Count > 0)
+            _activeEmitters[ent.Owner] = emitters;
+    }
+
+    private void SpawnEmitter(Entity<ParticleEmitterComponent> ent, ProtoId<ParticleEffectPrototype> effect, List<ActiveEmitter> emitters)
+    {
         var coords = _transform.GetMapCoordinates(ent.Owner);
-        var emitter = _particles.SpawnEffect(ent.Comp.Effect, coords, ent.Owner, ent.Comp.ColorOverride);
+        var emitter = _particles.SpawnEffect(effect, coords, ent.Owner, ent.Comp.ColorOverride);
         if (emitter == null)
             return;
 
@@ -39,17 +48,27 @@ public sealed class ParticleEmitterSystem : EntitySystem
         if (ent.Comp.SpawnOffset != default)
             emitter.SpawnOffset = ent.Comp.SpawnOffset;
 
-        _activeEmitters[ent.Owner] = emitter;
+        emitters.Add(emitter);
     }
 
-    public bool TryGetEmitter(EntityUid uid, [NotNullWhen(true)] out ActiveEmitter? emitter)
+    public IReadOnlyList<ActiveEmitter> GetEmitters(EntityUid uid)
     {
-        return _activeEmitters.TryGetValue(uid, out emitter);
+        return _activeEmitters.TryGetValue(uid, out var emitters) ? emitters : Array.Empty<ActiveEmitter>();
     }
 
     private void OnCompShutdown(Entity<ParticleEmitterComponent> ent, ref ComponentShutdown args)
     {
-        if (_activeEmitters.Remove(ent.Owner, out var emitter))
+        RemoveEmitters(ent.Owner);
+    }
+
+    private void RemoveEmitters(EntityUid uid)
+    {
+        if (!_activeEmitters.Remove(uid, out var emitters))
+            return;
+
+        foreach (var emitter in emitters)
+        {
             _particles.RemoveParticle(emitter);
+        }
     }
 }
