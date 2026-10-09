@@ -19,12 +19,25 @@ public sealed class ParticleOverlay : Overlay
         (a, b) => (a.Overrides?.RenderLayer ?? a.Proto.RenderLayer)
             .CompareTo(b.Overrides?.RenderLayer ?? b.Proto.RenderLayer);
 
+    private const float CullMargin = 2f;
+
     public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     public ParticleOverlay(ParticleSystem system)
     {
         IoCManager.InjectDependencies(this);
         _system = system;
+    }
+
+    private static bool IsEmitterVisible(ActiveEmitter emitter, Box2 worldAABB, float eyeAngle)
+    {
+        var origin = emitter.MapCoords.Position;
+        var bounds = new Box2(origin, origin);
+        var spawnOffset = emitter.Overrides?.SpawnOffset ?? emitter.SpawnOffset;
+        if (spawnOffset != Vector2.Zero)
+            bounds = bounds.ExtendToContain(origin + new Angle(eyeAngle).RotateVec(spawnOffset));
+
+        return worldAABB.Intersects(bounds.Enlarged(CullMargin));
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -39,7 +52,7 @@ public sealed class ParticleOverlay : Overlay
         foreach (var emitter in _system.GetEmitters())
         {
             if (emitter.MapCoords.MapId != mapId) continue;
-            if (!args.WorldBounds.Contains(emitter.MapCoords.Position)) continue;
+            if (!IsEmitterVisible(emitter, args.WorldAABB, eyeAngle)) continue;
             if (emitter.Frames.Length == 0) continue;
             _sortBuffer.Add(emitter);
         }

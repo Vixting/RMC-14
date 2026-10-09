@@ -18,6 +18,7 @@ using Content.Shared._RMC14.Dropship.Utility.Components;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared._RMC14.Marines;
 using Content.Shared._RMC14.Marines.Skills;
+using Content.Shared._RMC14.Particles;
 using Content.Shared._RMC14.Rules;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Announce;
@@ -37,8 +38,10 @@ using Robust.Server.Containers;
 using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Server._RMC14.Dropship;
@@ -80,6 +83,10 @@ public sealed class DropshipSystem : SharedDropshipSystem
     private bool _hijack;
 
     private const float DepartureLocationSearchRange = 12;
+
+    private static readonly ProtoId<ParticleEffectPrototype> LandingDust = "RMCDropshipLandingDust";
+    private static readonly TimeSpan LandingDustCutoff = TimeSpan.FromSeconds(0.9);
+    private const float LandingDustRadiusPerTile = 0.375f;
 
     public override void Initialize()
     {
@@ -343,6 +350,18 @@ public sealed class DropshipSystem : SharedDropshipSystem
             {
                 ent.Comp.ArrivalSoundEntity = audio.Value.Entity;
                 Dirty(ent);
+            }
+
+            var dustTime = ftl.StateTime.End - _timing.CurTime - LandingDustCutoff;
+            if (dustTime > TimeSpan.Zero)
+            {
+                var coords = _transform.GetMapCoordinates(destination);
+                float? radius = null;
+                if (TryComp(ent.Comp.Ship, out MapGridComponent? shipGrid))
+                    radius = Math.Max(shipGrid.LocalAABB.Width, shipGrid.LocalAABB.Height) * LandingDustRadiusPerTile;
+
+                var dustEv = new RMCParticleEffectEvent([LandingDust], coords, duration: dustTime, radius: radius);
+                RaiseNetworkEvent(dustEv, Filter.Pvs(coords));
             }
         }
 

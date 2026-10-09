@@ -1,14 +1,21 @@
-﻿using Content.Shared._RMC14.Mortar;
+﻿using Content.Client._RMC14.Particles;
+using Content.Shared._RMC14.Mortar;
+using Content.Shared._RMC14.Particles;
 using Robust.Client.Animations;
 using Robust.Client.GameObjects;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._RMC14.Mortar;
 
 public sealed class MortarSystem : SharedMortarSystem
 {
     [Dependency] private readonly AnimationPlayerSystem _animation = default!;
+    [Dependency] private readonly ParticleSystem _particles = default!;
 
     private const string AnimationKey = "rmc_mortar_fire";
+
+    private static readonly ProtoId<ParticleEffectPrototype> LaunchSmoke = "RMCMortarLaunchSmoke";
+    private static readonly ProtoId<ParticleEffectPrototype> LaunchFlash = "RMCGauFlash";
 
     public override void Initialize()
     {
@@ -25,6 +32,9 @@ public sealed class MortarSystem : SharedMortarSystem
         {
             return;
         }
+
+        _particles.CreateParticle(LaunchSmoke, mortarId.Value, attach: false);
+        _particles.CreateParticle(LaunchFlash, mortarId.Value, attach: false);
 
         if (_animation.HasRunningAnimation(mortarId.Value, AnimationKey))
             return;

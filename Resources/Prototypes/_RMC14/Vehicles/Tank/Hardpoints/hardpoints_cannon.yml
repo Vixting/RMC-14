@@ -4,6 +4,13 @@
   name: LTB cannon
   description: A light tank cannon hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
+  - type: ParticleOnHardpointDamage
+    damagedEffects:
+    - RMCVehicleDamagedSmoke
+    destroyedEffects:
+    - RMCVehicleWreckSmoke
   - type: Sprite
     state: ltb_cannon
   - type: HardpointItem
@@ -71,6 +78,13 @@
   name: LTAAAP minigun
   description: A light anti-air minigun hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
+  - type: ParticleOnHardpointDamage
+    damagedEffects:
+    - RMCVehicleDamagedSmoke
+    destroyedEffects:
+    - RMCVehicleWreckSmoke
   - type: Sprite
     state: ltaaap_minigun
   - type: HardpointItem
@@ -162,6 +176,13 @@
   name: ACE autocannon
   description: An ACE autocannon hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
+  - type: ParticleOnHardpointDamage
+    damagedEffects:
+    - RMCVehicleDamagedSmoke
+    destroyedEffects:
+    - RMCVehicleWreckSmoke
   - type: Sprite
     state: ace_autocannon
   - type: HardpointItem
@@ -230,6 +251,11 @@
   name: DRGN flamer
   description: A DRGN flamer hardpoint.
   components:
+  - type: ParticleOnHardpointDamage
+    damagedEffects:
+    - RMCVehicleDamagedSmoke
+    destroyedEffects:
+    - RMCVehicleWreckSmoke
   - type: Sprite
     state: drgn_flamer
   - type: HardpointItem

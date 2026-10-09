@@ -4,6 +4,7 @@ using Content.Client._RMC14.ItemPickup;
 using Content.Client._RMC14.Movement;
 // RMC14
 using Content.Client._RMC14.Vehicle;
+using Content.Client._RMC14.Weapons.Ranged;
 using Content.Client._RMC14.Weapons.Ranged.Prediction;
 // RMC14
 using Content.Client.Animations;
@@ -312,6 +313,9 @@ public sealed partial class GunSystem : SharedGunSystem
             track.Offset = offset; // RMC14
             track.OriginOffset = originOffset; // RMC14
         }
+
+        var rmcFlashEv = new RMCMuzzleFlashCreatedEvent(ent, message.Angle);
+        RaiseLocalEvent(gunUid, ref rmcFlashEv);
         // RMC14
 
         var lifetime = 0.4f;
