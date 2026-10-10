@@ -35,7 +35,10 @@ public sealed partial class ExplosionSystem
 
         // RMC14
         if (args.State is ExplosionVisualsState rmcState)
+        {
             rmcState.RMCStartTime = component.RMCStartTime;
+            rmcState.RMCTinyParticles = component.RMCTinyParticles;
+        }
         // RMC14
     }
 

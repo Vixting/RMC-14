@@ -322,7 +322,8 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
             TileBreakScale = tileBreakScale,
             MaxTileBreak = maxTileBreak,
             CanCreateVacuum = canCreateVacuum,
-            Cause = cause
+            Cause = cause,
+            RMCTinyParticles = cause != null && HasComp<RMCTinyExplosionParticlesComponent>(cause.Value), // RMC14
         };
         _explosionQueue.Enqueue(boom);
         _queuedExplosions.Add(boom);
@@ -349,7 +350,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         var visualEnt = CreateExplosionVisualEntity(pos, queued.Proto.ID, spaceMatrix, spaceData, gridData.Values, iterationIntensity);
 
         // RMC14
-        var rmcSpawnedEv = new RMCExplosionSpawnedEvent();
+        var rmcSpawnedEv = new RMCExplosionSpawnedEvent(queued.RMCTinyParticles);
         RaiseLocalEvent(visualEnt, ref rmcSpawnedEv);
         // RMC14
 
