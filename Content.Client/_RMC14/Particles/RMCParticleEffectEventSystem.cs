@@ -1,4 +1,5 @@
 using Content.Shared._RMC14.Particles;
+using Content.Shared.GameTicking;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
@@ -24,6 +25,8 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
         base.Initialize();
         SubscribeAllEvent<RMCParticleEffectEvent>(OnParticleEffect);
         SubscribeAllEvent<RMCParticleEffectStopEvent>(OnParticleEffectStop);
+        SubscribeNetworkEvent<RMCParticleEffectBatchEvent>(OnParticleEffectBatch);
+        SubscribeNetworkEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
         SubscribeAllEvent<ProjectileImpactParticlesEvent>(OnProjectileImpacts);
     }
 
@@ -58,7 +61,30 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
 
     private void OnParticleEffectStop(RMCParticleEffectStopEvent ev)
     {
-        if (!_bySource.Remove(ev.Source, out var emitters))
+        StopSource(ev.Source);
+    }
+
+    private void OnParticleEffectBatch(RMCParticleEffectBatchEvent ev)
+    {
+        foreach (var source in ev.Stops)
+        {
+            StopSource(source);
+        }
+
+        foreach (var effect in ev.Effects)
+        {
+            OnParticleEffect(effect);
+        }
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
+    {
+        _bySource.Clear();
+    }
+
+    private void StopSource(NetEntity source)
+    {
+        if (!_bySource.Remove(source, out var emitters))
             return;
 
         foreach (var emitter in emitters)

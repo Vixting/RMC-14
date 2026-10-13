@@ -53,6 +53,7 @@ public sealed class ExplosionOverlaySystem : EntitySystem
         component.SpaceMatrix = state.SpaceMatrix;
         component.SpaceTileSize = state.SpaceTileSize;
         component.RMCStartTime = state.RMCStartTime; // RMC14
+        component.RMCParticlesOverride = state.RMCParticlesOverride; // RMC14
 
         // RMC14
         if (TryComp(uid, out ExplosionVisualsTexturesComponent? textures) && state.RMCStartTime > TimeSpan.Zero)

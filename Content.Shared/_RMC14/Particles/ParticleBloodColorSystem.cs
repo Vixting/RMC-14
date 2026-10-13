@@ -25,4 +25,15 @@ public sealed class ParticleBloodColorSystem : EntitySystem
         color = default;
         return false;
     }
+
+    public bool TryGetHitBloodColor(EntityUid uid, out Color color)
+    {
+        if (TryComp(uid, out ParticleBloodColorComponent? blood) && !blood.SplatterOnHit)
+        {
+            color = default;
+            return false;
+        }
+
+        return TryGetBloodColor(uid, out color);
+    }
 }

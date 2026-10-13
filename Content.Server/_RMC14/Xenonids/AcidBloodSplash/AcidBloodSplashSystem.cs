@@ -18,12 +18,15 @@ using Content.Server.Spawners.Components;
 using Content.Shared.Body.Events;
 using Content.Shared.Effects;
 using Content.Shared._RMC14.Stun;
+using Content.Shared._RMC14.Particles;
 
 namespace Content.Server._RMC14.Xenonids.AcidBloodSplash;
 
 public sealed class AcidBloodSplashSystem : EntitySystem
 {
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly ParticleBloodColorSystem _bloodColor = default!;
+    [Dependency] private readonly DamageBloodParticleSystem _bloodParticles = default!;
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
     [Dependency] private readonly SharedRMCEmoteSystem _emote = default!;
@@ -153,6 +156,9 @@ public sealed class AcidBloodSplashSystem : EntitySystem
 
         if (_random.NextFloat() > triggerProbability)
             return;
+
+        if (_bloodColor.TryGetBloodColor(ent, out var blood))
+            _bloodParticles.PlayBlood(ent, args.Origin, args.DamageDelta.GetTotal(), blood, false);
 
         ActivateSplash(ent, ent.Comp.StandardSplashRadius);
     }

@@ -81,6 +81,13 @@
       - RMCExplosionWaterSplashLarge
 
 - type: entity
+  parent: RMCExplosionParticlesDefault
+  id: RMCExplosionParticlesGrenade
+  components:
+  - type: ExplosionParticles
+    tiers: []
+
+- type: entity
   id: RMCExplosionParticlesGau
   categories: [ HideSpawnMenu ]
   components:

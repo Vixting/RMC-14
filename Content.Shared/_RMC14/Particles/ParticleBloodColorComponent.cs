@@ -8,4 +8,7 @@ public sealed partial class ParticleBloodColorComponent : Component
 {
     [DataField(required: true)]
     public Color Color;
+
+    [DataField]
+    public bool SplatterOnHit = true;
 }

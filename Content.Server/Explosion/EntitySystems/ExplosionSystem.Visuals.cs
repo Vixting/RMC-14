@@ -37,6 +37,7 @@ public sealed partial class ExplosionSystem
         if (args.State is ExplosionVisualsState rmcState)
         {
             rmcState.RMCStartTime = component.RMCStartTime;
+            rmcState.RMCParticlesOverride = component.RMCParticlesOverride?.Id;
         }
         // RMC14
     }

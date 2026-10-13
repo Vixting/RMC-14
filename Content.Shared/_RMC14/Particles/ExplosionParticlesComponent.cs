@@ -10,7 +10,7 @@ namespace Content.Shared._RMC14.Particles;
 public sealed partial class ExplosionParticlesComponent : Component
 {
     /// <summary>
-    /// Used for explosions flagged as tiny & for anything below the weakest tier.
+    /// Used for anything below the weakest tier.
     /// </summary>
     [DataField(required: true)]
     public ExplosionParticleTier Tiny = new();

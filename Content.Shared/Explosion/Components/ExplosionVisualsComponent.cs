@@ -31,6 +31,7 @@ public sealed class ExplosionVisualsState : ComponentState
     public Matrix3x2 SpaceMatrix;
     public ushort SpaceTileSize;
     public TimeSpan RMCStartTime; // RMC14
+    public string? RMCParticlesOverride; // RMC14
 
     public ExplosionVisualsState(
         MapCoordinates epicenter,

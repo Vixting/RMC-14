@@ -40,7 +40,7 @@ public sealed class ExplosionParticleSystem : EntitySystem
     private void OnExplosionStartup(Entity<ExplosionVisualsComponent> ent, ref ComponentStartup args)
     {
         if (!_prototype.TryIndex<ExplosionPrototype>(ent.Comp.ExplosionType, out var type) ||
-            type.Particles is not { } particlesId ||
+            (ent.Comp.RMCParticlesOverride ?? type.Particles) is not { } particlesId ||
             !particlesId.TryGet(out var particles, _prototype, _compFactory) ||
             ent.Comp.Intensity.Count == 0)
         {

@@ -2,6 +2,7 @@ using Content.Shared._RMC14.Projectiles.Penetration;
 using Content.Shared._RMC14.Weapons.Ranged.Prediction;
 using Content.Shared._RMC14.Xenonids.Projectile;
 using Content.Shared.Damage;
+using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Projectiles;
 using Content.Shared.Weapons.Ranged.Systems;
@@ -97,7 +98,7 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
         }
 
         var coords = _transform.GetMapCoordinates(ent);
-        var intensity = Math.Clamp(MathF.Sqrt(ent.Comp.Damage.GetTotal().Float() / settings.ReferenceDamage), settings.MinIntensity, settings.MaxIntensity);
+        var intensity = GetIntensity(settings, ent.Comp.Damage.GetTotal());
         var mob = HasComp<MobStateComponent>(target);
         if (HasComp<ParticleProjectileImpactComponent>(ent))
         {
@@ -109,7 +110,7 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
 
         if (mob)
         {
-            if (!_bloodColor.TryGetBloodColor(target, out var blood))
+            if (!_bloodColor.TryGetHitBloodColor(target, out var blood))
                 return null;
 
             return new ProjectileImpactParticles(coords, direction, blood, null, intensity);
@@ -126,6 +127,31 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
         }
 
         return new ProjectileImpactParticles(coords, direction, null, debris, intensity);
+    }
+
+    public void QueueImpact(ProjectileImpactParticles impact, ICommonSession? excluded)
+    {
+        if (_net.IsClient)
+            return;
+
+        _pending.Add((impact, excluded));
+    }
+
+    public bool TryGetIntensity(FixedPoint2 damage, out float intensity)
+    {
+        if (!Settings.TryGet(out var settings, _prototype, _compFactory))
+        {
+            intensity = default;
+            return false;
+        }
+
+        intensity = GetIntensity(settings, damage);
+        return true;
+    }
+
+    private static float GetIntensity(ProjectileImpactParticleSettingsComponent settings, FixedPoint2 damage)
+    {
+        return Math.Clamp(MathF.Sqrt(damage.Float() / settings.ReferenceDamage), settings.MinIntensity, settings.MaxIntensity);
     }
 
     private Angle? GetTravelDirection(Entity<ProjectileComponent> ent, EntityUid target)

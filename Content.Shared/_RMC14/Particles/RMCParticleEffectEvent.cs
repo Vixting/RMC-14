@@ -52,3 +52,16 @@ public sealed class RMCParticleEffectStopEvent : EntityEventArgs
         Source = source;
     }
 }
+
+[Serializable, NetSerializable]
+public sealed class RMCParticleEffectBatchEvent : EntityEventArgs
+{
+    public List<NetEntity> Stops;
+    public List<RMCParticleEffectEvent> Effects;
+
+    public RMCParticleEffectBatchEvent(List<NetEntity> stops, List<RMCParticleEffectEvent> effects)
+    {
+        Stops = stops;
+        Effects = effects;
+    }
+}

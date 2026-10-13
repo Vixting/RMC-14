@@ -5,6 +5,8 @@
   name: grenade
   description: Duck and cover.
   components:
+  - type: RMCExplosionParticlesOverride
+    particles: RMCExplosionParticlesGrenade
   - type: Explosive
     explosionType: RMC
   - type: ExplosionResistance

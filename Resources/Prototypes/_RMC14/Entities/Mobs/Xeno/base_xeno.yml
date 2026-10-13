@@ -85,6 +85,7 @@
     speciesType: Xeno
   - type: ParticleBloodColor
     color: "#DFFC00"
+    splatterOnHit: false
   - type: AcidBloodSplash
     closeSplashRadius: 0.5
     standardSplashRadius: 1.5

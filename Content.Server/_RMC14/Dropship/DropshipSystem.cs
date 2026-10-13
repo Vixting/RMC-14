@@ -56,6 +56,7 @@ public sealed class DropshipSystem : SharedDropshipSystem
     [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly MarineAnnounceSystem _marineAnnounce = default!;
+    [Dependency] private readonly RMCParticleEffectSystem _particleEffects = default!;
     [Dependency] private readonly PhysicsSystem _physics = default!;
     [Dependency] private readonly PointLightSystem _pointLight = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
@@ -361,7 +362,7 @@ public sealed class DropshipSystem : SharedDropshipSystem
                     radius = Math.Max(shipGrid.LocalAABB.Width, shipGrid.LocalAABB.Height) * LandingDustRadiusPerTile;
 
                 var dustEv = new RMCParticleEffectEvent([LandingDust], coords, duration: dustTime, radius: radius);
-                RaiseNetworkEvent(dustEv, Filter.Pvs(coords));
+                _particleEffects.PlayPvs(dustEv);
             }
         }
 

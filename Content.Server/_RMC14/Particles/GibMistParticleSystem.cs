@@ -1,7 +1,6 @@
 using Content.Shared._RMC14.Particles;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
-using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._RMC14.Particles;
@@ -9,6 +8,7 @@ namespace Content.Server._RMC14.Particles;
 public sealed class GibMistParticleSystem : EntitySystem
 {
     [Dependency] private readonly ParticleBloodColorSystem _bloodColor = default!;
+    [Dependency] private readonly RMCParticleEffectSystem _particleEffects = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private static readonly ProtoId<ParticleEffectPrototype> Mist = "RMCGibBloodCloud";
@@ -27,6 +27,6 @@ public sealed class GibMistParticleSystem : EntitySystem
 
         var coords = _transform.GetMapCoordinates(ent);
         var ev = new RMCParticleEffectEvent(new List<ProtoId<ParticleEffectPrototype>> { Mist, Chunks }, coords, color: color);
-        RaiseNetworkEvent(ev, Filter.Pvs(ent.Owner));
+        _particleEffects.PlayPvs(ev);
     }
 }
