@@ -1,5 +1,6 @@
 using Content.Shared._RMC14.Particles;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.Client._RMC14.Particles;
 
@@ -16,10 +17,13 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
     private static readonly ProtoId<ParticleEffectPrototype> BloodPuffEdge = "RMCBloodSplatterEdge";
     private static readonly ProtoId<ParticleEffectPrototype> BloodSpray = "RMCBloodSplatterSpray";
 
+    private readonly Dictionary<NetEntity, List<ActiveEmitter>> _bySource = new();
+
     public override void Initialize()
     {
         base.Initialize();
         SubscribeAllEvent<RMCParticleEffectEvent>(OnParticleEffect);
+        SubscribeAllEvent<RMCParticleEffectStopEvent>(OnParticleEffectStop);
         SubscribeAllEvent<ProjectileImpactParticlesEvent>(OnProjectileImpacts);
     }
 
@@ -33,13 +37,33 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
             color = new Color(tileColor.R * ev.Brightness, tileColor.G * ev.Brightness, tileColor.B * ev.Brightness);
         }
 
+        List<ActiveEmitter>? sourceEmitters = null;
+        if (ev.Source is { } source)
+        {
+            sourceEmitters = _bySource.GetOrNew(source);
+            sourceEmitters.RemoveAll(e => e.Exhausted);
+        }
+
         foreach (var effect in ev.Effects)
         {
             var overrides = GetOverrides(ev);
-            if (ev.Direction is { } direction)
-                _particles.CreateParticle(effect, ev.Coords, direction, color, overrides);
-            else
-                _particles.CreateParticle(effect, ev.Coords, color, overrides);
+            var emitter = ev.Direction is { } direction
+                ? _particles.CreateParticle(effect, ev.Coords, direction, color, overrides)
+                : _particles.CreateParticle(effect, ev.Coords, color, overrides);
+
+            if (emitter != null)
+                sourceEmitters?.Add(emitter);
+        }
+    }
+
+    private void OnParticleEffectStop(RMCParticleEffectStopEvent ev)
+    {
+        if (!_bySource.Remove(ev.Source, out var emitters))
+            return;
+
+        foreach (var emitter in emitters)
+        {
+            emitter.Exhausted = true;
         }
     }
 

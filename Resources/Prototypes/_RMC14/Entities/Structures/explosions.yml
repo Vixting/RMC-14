@@ -36,6 +36,7 @@
     canCreateVacuum: false
   - type: CMExplosionEffect
   - type: MortarShell
+    fallEffect: RMCMortarShellFallingHE
   - type: ActivateMortarShellOnSpawn
 
 - type: entity
@@ -56,6 +57,7 @@
     spawn: RMCTileFireGreen
     range: 5
   - type: MortarShell
+    fallEffect: RMCMortarShellFallingIncendiary
   - type: ActivateMortarShellOnSpawn
 
 - type: entity
@@ -97,7 +99,7 @@
       params:
         volume: -6
     impactEffects:
-    - RMCEffectExplosionParticle
+    - RMCEffectGauImpact
 
 - type: entity
   parent: RMCDropshipGauBurst
@@ -153,6 +155,7 @@
   components:
   - type: ActivateDropshipWeaponOnSpawn
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFalling
     rounds: 1
     maxRounds: 1
     roundsPerShot: 1
@@ -182,6 +185,7 @@
   name: GBU-67 'Keeper II' explosion
   components:
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingKeeper
     travelTime: 2
     explosion:
       total: 905
@@ -194,6 +198,7 @@
   name: AGM-99 'Napalm' explosion
   components:
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingNapalm
     travelTime: 6
     explosion:
       total: 1780
@@ -210,6 +215,7 @@
   name: AGM-184 'Harpoon II' explosion
   components:
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingHarpoon
     travelTime: 5
     explosion:
       total: 1850
@@ -222,6 +228,7 @@
   name: BLU-200 'Dragon's Breath' explosion
   components:
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingThermobaric
     travelTime: 5
     implosion:
       pullRange: 5.5
@@ -241,6 +248,7 @@
   name: AGM-227 'Banshee' explosion
   components:
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingBanshee
     travelTime: 6
     explosion:
       total: 2000
@@ -260,6 +268,7 @@
   components:
   - type: ActivateDropshipWeaponOnSpawn
   - type: DropshipAmmo
+    fallEffect: RMCDropshipMiniRocketFalling
     rounds: 6
     maxRounds: 6
     roundsPerShot: 1
@@ -289,6 +298,7 @@
   name: AGR-59-I 'Mini-Mike' explosion
   components:
   - type: DropshipAmmo
+    fallEffect: RMCDropshipMiniRocketFallingIncendiary
     fire:
       type: RMCTileFireMiniMike
       range: 1

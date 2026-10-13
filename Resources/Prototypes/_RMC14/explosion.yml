@@ -1,6 +1,7 @@
 ﻿- type: explosion
   id: RMC
   powerPerIntensity: 10
+  particles: RMCExplosionParticlesDefault
   damagePerIntensity:
     types:
       Blunt: 5
@@ -31,6 +32,7 @@
 - type: explosion
   id: RMCLTBCannon
   powerPerIntensity: 40
+  particles: RMCExplosionParticlesDefault
   damagePerIntensity:
     types:
       Blunt: 20
@@ -69,6 +71,7 @@
 - type: explosion
   id: RMCMortar
   powerPerIntensity: 12.5
+  particles: RMCExplosionParticlesDefault
   damagePerIntensity:
     types:
       Blunt: 6.25
@@ -99,6 +102,7 @@
 - type: explosion
   id: RMCOB
   powerPerIntensity: 10
+  particles: RMCExplosionParticlesDefault
   damagePerIntensity:
     types:
       Blunt: 5
@@ -125,6 +129,7 @@
 - type: explosion
   id: RMCOBXenoTunnel # This one also destroys xeno tunnels.
   powerPerIntensity: 10
+  particles: RMCExplosionParticlesDefault
   damagePerIntensity:
     types:
       Blunt: 5

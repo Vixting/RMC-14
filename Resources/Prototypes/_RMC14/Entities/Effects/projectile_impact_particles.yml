@@ -1,0 +1,17 @@
+- type: entity
+  id: RMCProjectileImpactParticleSettings
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: ProjectileImpactParticleSettings
+    referenceDamage: 40
+    minIntensity: 0.5
+    maxIntensity: 1.6
+    metalDebris: RMCImpactDebrisSparks
+    metalModifierSets:
+    - Metallic
+    - StructuralMetallic
+    - StructuralMarine
+    - VehicleFrameTank
+    - VehicleFrameAPC
+    - VehicleFrameARC
+    - VehicleFrameCLFVan

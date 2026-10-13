@@ -739,6 +739,8 @@
   name: rock wall
   description: A rough wall of hardened rock.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisRock
   - type: Sprite
     sprite: _RMC14/Structures/Walls/cave.rsi
     color: "#826161"
@@ -800,6 +802,8 @@
   name: wood wall
   description: A wooden wall used to separate rooms.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisWood
   - type: Sprite
     sprite: _RMC14/Structures/Walls/wood.rsi
   - type: Icon
@@ -832,6 +836,8 @@
   name: jungle vegetation
   description: Exceptionally dense vegetation that you can't see through.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisLeaf
   - type: Sprite
     sprite: _RMC14/Structures/Walls/jungle.rsi
   - type: Icon
@@ -894,6 +900,8 @@
   name: rock columns
   description: Exceptionally dense rock formations.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisRock
   - type: Sprite
     sprite: _RMC14/Structures/Walls/rock_forest.rsi
     state: rock_forest

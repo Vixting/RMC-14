@@ -11,6 +11,8 @@
   id: CMGirder
   name: girder
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisSparks
   - type: Transform
     anchored: true
   - type: Physics

@@ -45,6 +45,13 @@
   name: spit
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#3CC864"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
+    surfaceEffects:
+    - RMCAcidSizzle
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -67,6 +74,13 @@
   id: XenoChargedSpitProjectile
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#B8C85A"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
+    surfaceEffects:
+    - RMCAcidSizzle
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -97,6 +111,11 @@
   name: slowing spit
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#F4B733"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -116,6 +135,11 @@
   name: neurotoxic spit
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#F4B733"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -138,6 +162,11 @@
   name: scattered spit
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#F4B733"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -158,6 +187,13 @@
   name: shotgun spit
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#B8C85A"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
+    surfaceEffects:
+    - RMCAcidSizzle
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -379,6 +415,13 @@
   id: XenoSpitProjectilePraetorian
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#B8C85A"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
+    surfaceEffects:
+    - RMCAcidSizzle
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:
@@ -400,6 +443,13 @@
   id: XenoSpitProjectilePraetorianWarden
   categories: [ HideSpawnMenu ]
   components:
+  - type: ParticleProjectileImpact
+    color: "#B8C85A"
+    effects:
+    - RMCSpitSplash
+    - RMCSpitSplashBlobs
+    surfaceEffects:
+    - RMCAcidSizzle
   - type: Sprite
     sprite: _RMC14/Objects/Xeno/xeno_projectiles.rsi
     layers:

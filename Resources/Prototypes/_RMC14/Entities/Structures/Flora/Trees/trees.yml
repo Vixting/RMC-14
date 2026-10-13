@@ -3,6 +3,8 @@
   description: Yep, it's a tree.
   abstract: true
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisWood
   - type: VehicleSmashable
     minDestroyWeightClass: Light
     slowdownBelowWeightClass: Medium

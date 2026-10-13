@@ -39,6 +39,7 @@ public enum EmissionShapeType : byte
     CircleEdge,
     CircleFill,
     Box,
+    Sphere,
 }
 
 [DataDefinition]
@@ -62,6 +63,10 @@ public sealed partial class ParticleEffectPrototype : IPrototype, IInheritingPro
     public bool Abstract { get; private set; }
 
     [DataField(required: true)] public SpriteSpecifier Sprite { get; private set; } = default!;
+
+    [DataField] public List<SpriteSpecifier> AlternateSprites { get; private set; } = new();
+
+    [DataField] public Vector2 Pivot { get; private set; }
     [DataField] public Color StartColor { get; private set; } = Color.White;
     [DataField] public Color EndColor { get; private set; } = Color.Transparent;
     [DataField] public List<ColorCurveKey> ColorOverLifetime { get; private set; } = new();

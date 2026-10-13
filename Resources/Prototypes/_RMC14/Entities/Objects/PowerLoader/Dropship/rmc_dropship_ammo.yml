@@ -50,7 +50,7 @@
       params:
         volume: -6
     impactEffects:
-    - RMCEffectExplosionParticle
+    - RMCEffectGauImpact
 
 - type: entity
   parent: RMCDropshipAttachmentAmmoGAU
@@ -95,6 +95,29 @@
     randomRotation: true
 
 - type: entity
+  id: RMCEffectGauImpact
+  name: explosion
+  components:
+  - type: Transform
+    anchored: true
+  - type: TimedDespawn
+    lifetime: 0.3
+  - type: PointLight
+    radius: 2
+    energy: 2.5
+    color: "#FF9A3C"
+    netsync: false
+  - type: LightFade
+    duration: 0.25
+  - type: RMCScorchEffectOnSpawn
+    probability: 0.5
+    tileLimit: 4
+    scatter: true
+    randomRotation: true
+  - type: ParticleExplosionOnSpawn
+    particles: RMCExplosionParticlesGau
+
+- type: entity
   abstract: true
   parent: RMCDropshipAttachmentAmmo
   id: RMCDropshipAttachmentAmmoRocket
@@ -120,6 +143,7 @@
   - type: DropshipFabricatorPrintable
     cost: 300
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFalling
     rounds: 1
     maxRounds: 1
     roundsPerShot: 1
@@ -160,6 +184,7 @@
   - type: DropshipFabricatorPrintable
     cost: 300
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingKeeper
     travelTime: 2
     explosion:
       total: 905
@@ -179,6 +204,7 @@
   - type: DropshipFabricatorPrintable
     cost: 500
   - type: DropshipAmmo # TODO RMC14 not usable in fire mission, only direct bombardment
+    fallEffect: RMCDropshipRocketFallingNapalm
     travelTime: 6
     explosion:
       total: 1780
@@ -202,6 +228,7 @@
   - type: DropshipFabricatorPrintable
     cost: 200
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingHarpoon
     travelTime: 5
     explosion:
       total: 1850
@@ -221,6 +248,7 @@
   - type: DropshipFabricatorPrintable
     cost: 300
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingThermobaric
     travelTime: 5
     implosion:
       pullRange: 5.5
@@ -247,6 +275,7 @@
   - type: DropshipFabricatorPrintable
     cost: 300
   - type: DropshipAmmo
+    fallEffect: RMCDropshipRocketFallingBanshee
     travelTime: 6
     explosion:
       total: 2000
@@ -270,6 +299,7 @@
   - type: DropshipFabricatorPrintable
     cost: 300
   - type: DropshipAmmo
+    fallEffect: RMCDropshipMiniRocketFalling
     rounds: 6
     maxRounds: 6
     roundsPerShot: 1
@@ -311,6 +341,7 @@
   - type: DropshipFabricatorPrintable
     cost: 500
   - type: DropshipAmmo
+    fallEffect: RMCDropshipMiniRocketFallingIncendiary
     ammoType: minirocket_inc
     fire:
       type: RMCTileFireMiniMike

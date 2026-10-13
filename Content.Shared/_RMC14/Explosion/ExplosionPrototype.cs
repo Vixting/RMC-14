@@ -1,4 +1,6 @@
+using Content.Shared._RMC14.Particles;
 using Robust.Shared.Audio;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 // ReSharper disable CheckNamespace
@@ -24,4 +26,7 @@ public sealed partial class ExplosionPrototype
 
     [DataField]
     public List<string> SparkStates = new();
+
+    [DataField]
+    public EntProtoId<ExplosionParticlesComponent>? Particles;
 }

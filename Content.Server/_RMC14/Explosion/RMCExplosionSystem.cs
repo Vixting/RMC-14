@@ -129,7 +129,6 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
     private void OnExplosionSpawned(Entity<ExplosionVisualsComponent> ent, ref RMCExplosionSpawnedEvent args)
     {
         ent.Comp.RMCStartTime = _timing.CurTime;
-        ent.Comp.RMCTinyParticles = args.TinyParticles;
         Dirty(ent);
 
         if (!_prototypeManager.TryIndex(ent.Comp.ExplosionType, out ExplosionPrototype? type) ||

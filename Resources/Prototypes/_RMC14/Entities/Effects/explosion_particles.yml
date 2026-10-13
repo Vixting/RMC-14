@@ -1,0 +1,115 @@
+
+- type: entity
+  id: RMCExplosionParticlesDefault
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: ExplosionParticles
+    tiny:
+      effects:
+      - RMCExplosionSmokeTiny
+      tileColorEffects:
+      - effect: RMCExplosionFallingDebrisTiny
+        brightness: 0.7
+        fallback: "#5E4A30"
+      - effect: RMCExplosionDirtKickupTiny
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      waterEffects:
+      - RMCExplosionWaterSmokeTiny
+      - RMCExplosionWaterFallingTiny
+      - RMCExplosionWaterSplashTiny
+    tiers:
+    - minPower: 100
+      flash: RMCExplosionFlash
+      effects:
+      - RMCExplosionSmokeWaveSmall
+      - RMCExplosionSmokeSmall
+      tileColorEffects:
+      - effect: RMCExplosionDirtKickup
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      - effect: RMCExplosionFallingDebrisSmall
+        brightness: 0.7
+        fallback: "#5E4A30"
+      - effect: RMCExplosionDirtKickupLargeSmall
+        brightness: 1.4
+      waterEffects:
+      - RMCExplosionWaterWaveSmall
+      - RMCExplosionWaterSmoke
+      - RMCExplosionWaterSplash
+      - RMCExplosionWaterFalling
+      - RMCExplosionWaterSplashLarge
+    - minPower: 100.001
+      flash: RMCExplosionFlash
+      effects:
+      - RMCExplosionSmokeWave
+      - RMCExplosionSmoke
+      tileColorEffects:
+      - effect: RMCExplosionDirtKickup
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      - effect: RMCExplosionFallingDebris
+        brightness: 0.7
+        fallback: "#5E4A30"
+      - effect: RMCExplosionDirtKickupLarge
+        brightness: 1.4
+      waterEffects:
+      - RMCExplosionWaterWave
+      - RMCExplosionWaterSmoke
+      - RMCExplosionWaterSplash
+      - RMCExplosionWaterFalling
+      - RMCExplosionWaterSplashLarge
+    - minPower: 300.001
+      flash: RMCExplosionFlash
+      effects:
+      - RMCExplosionSmokeWaveDeva
+      - RMCExplosionSmokeDeva
+      tileColorEffects:
+      - effect: RMCExplosionDirtKickup
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      - effect: RMCExplosionFallingDebris
+        brightness: 0.7
+        fallback: "#5E4A30"
+      - effect: RMCExplosionDirtKickupLargeDeva
+        brightness: 1.4
+      waterEffects:
+      - RMCExplosionWaterWaveDeva
+      - RMCExplosionWaterSmoke
+      - RMCExplosionWaterSplash
+      - RMCExplosionWaterFalling
+      - RMCExplosionWaterSplashLarge
+
+- type: entity
+  id: RMCExplosionParticlesGau
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: ExplosionParticles
+    tiny:
+      effects:
+      - RMCGauFlash
+      - RMCGauSmoke
+      tileColorEffects:
+      - effect: RMCGauDirtSpike
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      - effect: RMCGauDebris
+        brightness: 0.7
+        fallback: "#5E4A30"
+      waterEffects:
+      - RMCGauFlash
+      - RMCGauWaterSpike
+      - RMCGauWaterDroplets
+      surfaces:
+      - tiles:
+        - RMCPlanetSnow0
+        - RMCPlanetSnow1
+        - RMCPlanetSnow2
+        - RMCPlanetSnow3
+        - RMCPlanetSnow4
+        - RMCPlanetSnow1Brown
+        effects:
+        - RMCGauFlash
+        - RMCGauSnowSpike
+        - RMCGauSnowDebris
+        - RMCGauSmoke

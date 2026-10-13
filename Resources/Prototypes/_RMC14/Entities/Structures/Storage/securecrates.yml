@@ -216,6 +216,8 @@
   name: large crate
   description: A hefty wooden crate.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisWood
   - type: Sprite
     sprite: _RMC14/Structures/Storage/Crates/densecrate.rsi
     noRot: true

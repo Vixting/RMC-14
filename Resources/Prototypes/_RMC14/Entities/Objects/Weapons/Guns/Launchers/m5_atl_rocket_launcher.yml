@@ -3,6 +3,9 @@
   id: RMCBaseWeaponLauncher
   abstract: true
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCRocketBackblast
+    reverse: true
   - type: GuideHelp
     guides:
     - RMCGuideRoleSpecDemo

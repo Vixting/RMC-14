@@ -1,0 +1,19 @@
+- type: entity
+  id: RMCExplosionFlash
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _RMC14/Effects/explosion_flash.rsi
+    drawdepth: Effects
+    layers:
+    - state: explosion
+      shader: unshaded
+  - type: PointLight
+    radius: 5
+    energy: 2
+    color: "#C48A18"
+    netsync: false
+  - type: LightFade
+    duration: 1.4
+  - type: TimedDespawn
+    lifetime: 1.35

@@ -34,4 +34,7 @@ public sealed partial class ActiveMortarShellComponent : Component
 
     [DataField, AutoNetworkedField]
     public TimeSpan LandAt;
+
+    [DataField, AutoNetworkedField]
+    public bool FallSpawned;
 }

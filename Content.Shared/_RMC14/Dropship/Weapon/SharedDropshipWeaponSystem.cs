@@ -18,6 +18,7 @@ using Content.Shared._RMC14.OnCollide;
 using Content.Shared._RMC14.PowerLoader;
 using Content.Shared._RMC14.Rangefinder;
 using Content.Shared._RMC14.Rules;
+using Content.Shared._RMC14.Sprite;
 using Content.Shared._RMC14.Weapons.Ranged;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Coordinates;
@@ -93,6 +94,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
     [Dependency] private readonly RMCImplosionSystem _rmcImplosion = default!;
     [Dependency] private readonly SharedRMCOrbitalDeployerSystem _rmcOrbitalDeployable = default!;
     [Dependency] private readonly SkillsSystem _skills = default!;
+    [Dependency] private readonly RMCSpriteDescentSystem _spriteDescent = default!;
     [Dependency] private readonly SquadSystem _squad = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
@@ -103,6 +105,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
     private EntityQuery<RMCWallExplosionDeletableComponent> _wallDeletableQuery;
 
     private static readonly EntProtoId DropshipTargetMarker = "RMCLaserDropshipTarget";
+    private static readonly TimeSpan MarkerImpactDelay = TimeSpan.FromSeconds(1);
     private const string SpotlightState = "spotlights_";
 
     public bool CasDebug { get; private set; }
@@ -730,7 +733,8 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
             ammo.Comp.Explosion,
             ammo.Comp.Implosion,
             ammo.Comp.Fire,
-            ammo.Comp.SoundEveryShots
+            ammo.Comp.SoundEveryShots,
+            ammo.Comp.FallEffect
         );
         RaiseLocalEvent(dropship, ref ev);
 
@@ -772,6 +776,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
             Implosion = ev.Implosion,
             Fire = ev.Fire,
             SoundEveryShots = ev.SoundEveryShots,
+            FallEffect = ev.FallEffect,
         };
 
         AddComp(inFlight, inFlightComp, true);
@@ -815,6 +820,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
             Implosion = ammo.Implosion,
             Fire = ammo.Fire,
             SoundEveryShots = ammo.SoundEveryShots,
+            FallEffect = ammo.FallEffect,
         };
 
         AddComp(inFlight, inFlightComp, true);
@@ -1466,6 +1472,15 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
                 }
             }
 
+            if (!flight.FallSpawned &&
+                flight.FallEffect is { } fallEffect &&
+                time >= flight.MarkerAt + MarkerImpactDelay - _spriteDescent.GetDuration(fallEffect))
+            {
+                flight.FallSpawned = true;
+                Dirty(uid, flight);
+                SpawnAtPosition(fallEffect, flight.Target.SnapToGrid(EntityManager, _mapManager));
+            }
+
             if (flight.MarkerAt > time)
                 continue;
 
@@ -1483,7 +1498,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
                 flight.WarningMarker = null;
             }
 
-            if (flight.MarkerAt.Add(TimeSpan.FromSeconds(1)) > time)
+            if (flight.MarkerAt + MarkerImpactDelay > time)
                 continue;
 
             if (flight.Marker != null)
@@ -1515,7 +1530,11 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
 
                 foreach (var effect in flight.ImpactEffects)
                 {
-                    Spawn(effect, targetMap, rotation: _random.NextAngle());
+                    var impact = Spawn(effect, targetMap);
+                    var rotation = HasComp<OccluderComponent>(impact)
+                        ? Angle.FromDegrees(_random.Next(4) * 90)
+                        : _random.NextAngle();
+                    _transform.SetLocalRotation(impact, rotation);
                 }
 
                 if (flight.Damage != null)
@@ -1875,7 +1894,8 @@ public record struct DropshipWeaponShotEvent(
     RMCExplosion? Explosion,
     RMCImplosion? Implosion,
     RMCFire? Fire,
-    int SoundEveryShots
+    int SoundEveryShots,
+    EntProtoId? FallEffect
 );
 
 [Serializable, NetSerializable]

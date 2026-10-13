@@ -9,6 +9,8 @@
     snap:
     - Wall
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisSparks
   - type: Transform
     anchored: true
   - type: Physics

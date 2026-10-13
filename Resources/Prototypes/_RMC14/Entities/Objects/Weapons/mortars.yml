@@ -139,6 +139,7 @@
     canCreateVacuum: false
   - type: CMExplosionEffect
   - type: MortarShell
+    fallEffect: RMCMortarShellFallingHE
 
 - type: entity
   parent: RMCMortarShellBase
@@ -158,6 +159,7 @@
     totalIntensity: 0
     canCreateVacuum: false
   - type: MortarShell
+    fallEffect: RMCMortarShellFallingIncendiary
   - type: TileFireOnTrigger
     spawn: RMCTileFireGreen
     range: 5
@@ -181,6 +183,21 @@
   name: illumination flare
   description: It's really bright, and unreachable.
   components:
+  - type: Sprite
+    sprite: _RMC14/Particles/flare.rsi
+    drawdepth: Effects
+    noRot: true
+    color: "#FFFFFFE1"
+    layers:
+    - state: flare
+      shader: unshaded
+  - type: ParticleEmitter
+    effect: RMCMortarFlareSmoke
+    extraEffects:
+    - RMCMortarFlareSparks
+  - type: RMCSpriteDescent
+    startOffset: 0, 4.7
+    duration: 180
   - type: ExpendableLight
     startsActivated: true
     glowDuration: 150

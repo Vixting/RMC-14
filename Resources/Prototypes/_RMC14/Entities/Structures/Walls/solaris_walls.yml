@@ -62,6 +62,8 @@
   name: rock wall
   description: Tough looking walls that have been blasted by sand since the day they were erected. A testament to human willpower.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisRock
   - type: Sprite
     sprite: _RMC14/Structures/Walls/solaris_rock.rsi
     state: solaris_rock

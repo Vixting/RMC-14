@@ -5,6 +5,8 @@
   name: black ice slabs
   description: Slabs on slabs of dirty black ice crusted over ancient rock formations. The permafrost fluctuates between 20in and 12in during the summer months.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisIce
   - type: Sprite
     sprite: _RMC14/Structures/Walls/shiva_ice.rsi
   - type: Icon

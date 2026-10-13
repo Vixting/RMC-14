@@ -43,4 +43,7 @@ public sealed class ParticleRuntimeOverrides
     public Angle? EmitAngle;
 
     public Vector2? SpawnOffset;
+    public float? ShapeRadius;
+
+    public float? Intensity;
 }

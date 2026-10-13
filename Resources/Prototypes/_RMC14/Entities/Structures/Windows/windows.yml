@@ -7,6 +7,8 @@
     snap:
     - Wall
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisGlass
   - type: Transform
     anchored: true
   - type: Sprite

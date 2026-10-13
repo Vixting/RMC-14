@@ -71,6 +71,8 @@
   id: RMCBaseRockIndistructable
   abstract: true
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisRock
   - type: Clickable
   - type: Sprite
     noRot: true

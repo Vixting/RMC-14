@@ -15,6 +15,7 @@ using Content.Shared._RMC14.Marines.Squads;
 using Content.Shared._RMC14.Mortar;
 using Content.Shared._RMC14.PowerLoader;
 using Content.Shared._RMC14.Rules;
+using Content.Shared._RMC14.Sprite;
 using Content.Shared._RMC14.Vehicle;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chat;
@@ -60,6 +61,7 @@ public sealed class OrbitalCannonSystem : EntitySystem
     [Dependency] private readonly RMCMapSystem _rmcMap = default!;
     [Dependency] private readonly RMCPlanetSystem _rmcPlanet = default!;
     [Dependency] private readonly SharedRMCPvsSystem _rmcPvs = default!;
+    [Dependency] private readonly RMCSpriteDescentSystem _spriteDescent = default!;
     [Dependency] private readonly TagSystem _tags = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
@@ -918,6 +920,9 @@ public sealed class OrbitalCannonSystem : EntitySystem
             {
                 explosion.Laser = true;
                 Spawn(OrbitalTargetMarker, _transform.GetMapCoordinates(uid));
+
+                if (explosion.FallEffect is { } fallEffect)
+                    SpawnAtPosition(fallEffect, _transform.GetMoverCoordinates(uid));
             }
 
             if (explosion.Current == default && explosion.LastAt == default)
@@ -926,14 +931,31 @@ public sealed class OrbitalCannonSystem : EntitySystem
                 Dirty(uid, explosion);
             }
 
+            for (var i = 0; i < explosion.Pending.Count; i++)
+            {
+                var impact = explosion.Pending[i];
+                if (time < impact.At)
+                    continue;
+
+                explosion.Pending.RemoveAt(i);
+                i--;
+                DetonateStep(uid, impact.Step, impact.MapCoordinates, impact.Coordinates);
+            }
+
             if (explosion.Current >= explosion.Steps.Count)
             {
-                QueueDel(uid);
+                if (explosion.Pending.Count == 0)
+                    QueueDel(uid);
+
                 continue;
             }
 
             var step = explosion.Steps[explosion.Current];
-            if (time >= explosion.LastAt + step.Delay)
+            var stepTime = time;
+            if (step.SubmunitionFallEffect is { } submunitionFall)
+                stepTime += _spriteDescent.GetDuration(submunitionFall);
+
+            if (stepTime >= explosion.LastAt + step.Delay)
             {
                 if (step.Times <= 1)
                 {
@@ -942,11 +964,11 @@ public sealed class OrbitalCannonSystem : EntitySystem
                 }
                 else
                 {
-                    if (time < explosion.LastStepAt + step.DelayPer)
+                    if (stepTime < explosion.LastStepAt + step.DelayPer)
                         continue;
 
                     explosion.Step++;
-                    explosion.LastStepAt = time;
+                    explosion.LastStepAt = stepTime;
                     if (explosion.Step >= step.Times)
                     {
                         explosion.Current++;
@@ -971,19 +993,31 @@ public sealed class OrbitalCannonSystem : EntitySystem
                     if (step.CheckProtectionPer && !_area.CanOrbitalBombard(coordinates, out _))
                         continue;
 
-                    if (step.ExplosionEffect != null)
+                    if (step.SubmunitionFallEffect is { } fallEffect)
                     {
-                        var effect = Spawn(step.ExplosionEffect.Value, mapCoordinates);
-                        _rmcExplosion.TryDoEffect(effect);
+                        SpawnAtPosition(fallEffect, coordinates);
+                        explosion.Pending.Add(new OrbitalCannonPendingImpact(stepTime, step, mapCoordinates, coordinates));
+                        continue;
                     }
 
-                    if (step.Type is { } type)
-                        _rmcExplosion.QueueExplosion(mapCoordinates, type, step.Total, step.Slope, step.Max, uid, canCreateVacuum: false);
-
-                    if (step.Fire is { } fire && step.FireRange > 0)
-                        _rmcFlammable.SpawnFireDiamond(fire, coordinates, step.FireRange);
+                    DetonateStep(uid, step, mapCoordinates, coordinates);
                 }
             }
         }
+    }
+
+    private void DetonateStep(EntityUid uid, OrbitalCannonExplosion step, MapCoordinates mapCoordinates, EntityCoordinates coordinates)
+    {
+        if (step.ExplosionEffect != null)
+        {
+            var effect = Spawn(step.ExplosionEffect.Value, mapCoordinates);
+            _rmcExplosion.TryDoEffect(effect);
+        }
+
+        if (step.Type is { } type)
+            _rmcExplosion.QueueExplosion(mapCoordinates, type, step.Total, step.Slope, step.Max, uid, canCreateVacuum: false);
+
+        if (step.Fire is { } fire && step.FireRange > 0)
+            _rmcFlammable.SpawnFireDiamond(fire, coordinates, step.FireRange);
     }
 }

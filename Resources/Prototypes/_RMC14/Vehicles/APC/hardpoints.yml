@@ -32,6 +32,8 @@
   name: APC frontal cannon
   description: A fixed forward cannon for an APC hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
   - type: Sprite
     state: front_cannon
   - type: HardpointItem
@@ -77,6 +79,13 @@
   name: APC dual cannon
   description: A dual cannon turret for an APC hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
+  - type: ParticleOnHardpointDamage
+    damagedEffects:
+    - RMCVehicleDamagedSmoke
+    destroyedEffects:
+    - RMCVehicleWreckSmoke
   - type: Sprite
     state: dual_cannon
   - type: HardpointItem

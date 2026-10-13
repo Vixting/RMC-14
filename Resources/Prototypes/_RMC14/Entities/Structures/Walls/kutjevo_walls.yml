@@ -4,6 +4,8 @@
   name: rock wall
   description: Tall sandy rocks. Imposing. Impressive. Attention grabbing.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisRock
   - type: Sprite
     sprite: _RMC14/Structures/Walls/kutjevo_rock.rsi
     state: rock

@@ -3,6 +3,8 @@
   id: RMCBookcase
   name: bookcase
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisPaper
   - type: Sprite
     sprite: _RMC14/Structures/Furniture/bookshelf.rsi
     snapCardinals: true

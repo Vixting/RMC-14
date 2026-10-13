@@ -4,6 +4,8 @@
   name: sandstone wall
   description: A wall with sandstone plating.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisRock
   - type: Sprite
     sprite: _RMC14/Structures/Walls/stone.rsi
     state: stone

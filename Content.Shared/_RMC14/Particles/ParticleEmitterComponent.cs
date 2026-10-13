@@ -10,6 +10,9 @@ public sealed partial class ParticleEmitterComponent : Component
     public ProtoId<ParticleEffectPrototype> Effect;
 
     [DataField]
+    public List<ProtoId<ParticleEffectPrototype>> ExtraEffects = new();
+
+    [DataField]
     public Color? ColorOverride;
 
     [DataField]

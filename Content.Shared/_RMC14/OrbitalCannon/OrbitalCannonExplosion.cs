@@ -52,4 +52,7 @@ public sealed partial class OrbitalCannonExplosion
 
     [DataField]
     public EntProtoId? ExplosionEffect;
+
+    [DataField]
+    public EntProtoId? SubmunitionFallEffect;
 }

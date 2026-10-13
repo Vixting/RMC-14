@@ -62,6 +62,8 @@
   name: skeletal resin
   description: A wall made of molted old resin. This place is more alive than you are.
   components:
+  - type: ParticleDebris
+    effect: null
   - type: Sprite
     sprite: _RMC14/Structures/Walls/bone_resin.rsi
     state: bone_resin

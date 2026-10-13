@@ -97,4 +97,10 @@ public sealed partial class AmmoInFlightComponent : Component
 
     [DataField, AutoNetworkedField]
     public RMCFire? Fire;
+
+    [DataField, AutoNetworkedField]
+    public EntProtoId? FallEffect;
+
+    [DataField, AutoNetworkedField]
+    public bool FallSpawned;
 }

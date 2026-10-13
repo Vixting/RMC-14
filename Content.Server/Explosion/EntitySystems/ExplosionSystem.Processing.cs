@@ -951,5 +951,4 @@ public sealed class QueuedExplosion(ExplosionPrototype proto)
     public int MaxTileBreak;
     public bool CanCreateVacuum;
     public EntityUid? Cause; // The entity that exploded, for logging purposes.
-    public bool RMCTinyParticles; // RMC14
 }

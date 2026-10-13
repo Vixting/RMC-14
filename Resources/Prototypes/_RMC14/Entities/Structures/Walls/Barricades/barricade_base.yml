@@ -11,6 +11,8 @@
   parent: CMBaseStructureCorrodible
   id: CMBarricadeBase
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisSparks
   - type: GuideHelp
     guides:
     - RMCGuideRoleCombatTechnician

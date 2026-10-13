@@ -84,6 +84,9 @@ public sealed partial class DropshipAmmoComponent : Component
 
     [DataField, AutoNetworkedField]
     public bool MarkerWarning;
+
+    [DataField, AutoNetworkedField]
+    public EntProtoId? FallEffect;
 }
 
 [Serializable, NetSerializable]

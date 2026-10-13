@@ -4,6 +4,8 @@
   name: deployable barrier
   description: A deployable barrier. Swipe your ID card to lock/unlock it.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisSparks
   - type: Sprite
     sprite: _RMC14/Structures/Walls/barrier.rsi
     layers:

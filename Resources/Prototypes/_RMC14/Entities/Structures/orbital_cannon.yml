@@ -180,6 +180,7 @@
     mode: SnapgridCenter
   components:
   - type: OrbitalCannonExplosion
+    fallEffect: RMCOrbitalCannonWarheadFallingExplosive
     steps:
     - type: RMCOBXenoTunnel
       total: 5000
@@ -209,6 +210,7 @@
     mode: SnapgridCenter
   components:
   - type: OrbitalCannonExplosion
+    fallEffect: RMCOrbitalCannonWarheadFallingAegis
     steps:
     - type: RMCOBXenoTunnel
       total: 5000
@@ -239,6 +241,7 @@
     mode: SnapgridCenter
   components:
   - type: OrbitalCannonExplosion
+    fallEffect: RMCOrbitalCannonWarheadFallingIncendiary
     steps:
     - type: RMCOB
       total: 5000
@@ -271,6 +274,7 @@
       spread: 12
       checkProtectionPer: true
       explosionEffect: RMCExplosionEffectClusterOB
+      submunitionFallEffect: RMCOrbitalCannonClusterSubmunitionFalling
   - type: WarpPoint
     location: 1 orbital bombardment
 

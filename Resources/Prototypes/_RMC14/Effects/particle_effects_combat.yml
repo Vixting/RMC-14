@@ -1,0 +1,2294 @@
+
+- type: particleEffect
+  id: RMCExplosionSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_64.rsi
+    state: smoke
+  colorOverLifetime:
+    - time: 0
+      color: "#909090FF"
+    - time: 0.972
+      color: "#FFFFFFFF"
+    - time: 1
+      color: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.0
+  renderLayer: 1
+  lifetime: 2.0
+  lifetimeVariance: 0.5
+  speed: 7.812
+  speedVariance: 4.687
+  drag: 7.985
+  constantForce: 3.125, 9.375
+  noiseStrength: 0.105
+  noiseFrequency: 10
+  particleSize: 1.0
+  sizeVariance: 0.25
+  maxCount: 40
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCExplosionSmokeDeva
+  sprite:
+    sprite: _RMC14/Particles/smoke_64.rsi
+    state: smoke
+  colorOverLifetime:
+    - time: 0
+      color: "#909090FF"
+    - time: 0.972
+      color: "#FFFFFFFF"
+    - time: 1
+      color: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.0
+  renderLayer: 1
+  lifetime: 2.0
+  lifetimeVariance: 0.5
+  speed: 10.938
+  speedVariance: 6.563
+  drag: 7.985
+  constantForce: 3.125, 9.375
+  noiseStrength: 0.105
+  noiseFrequency: 10
+  particleSize: 1.5
+  sizeVariance: 0.25
+  maxCount: 50
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCExplosionSmokeSmall
+  sprite:
+    sprite: _RMC14/Particles/smoke_64.rsi
+    state: smoke
+  colorOverLifetime:
+    - time: 0
+      color: "#909090FF"
+    - time: 0.972
+      color: "#FFFFFFFF"
+    - time: 1
+      color: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.25
+  renderLayer: 1
+  lifetime: 2.0
+  lifetimeVariance: 0.5
+  speed: 7.812
+  speedVariance: 4.687
+  drag: 7.985
+  constantForce: 3.125, 9.375
+  noiseStrength: 0.105
+  noiseFrequency: 10
+  particleSize: 1.6
+  sizeVariance: 0.25
+  maxCount: 20
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCExplosionSmokeTiny
+  sprite:
+    sprite: _RMC14/Particles/smoke_64.rsi
+    state: smoke
+  colorOverLifetime:
+    - time: 0
+      color: "#909090FF"
+    - time: 1
+      color: "#E6E6E6FF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.6
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.25
+  renderLayer: 1
+  lifetime: 1.5
+  lifetimeVariance: 0.375
+  speed: 4.688
+  speedVariance: 2.813
+  drag: 7.985
+  constantForce: 3.125, 9.375
+  noiseStrength: 0.105
+  noiseFrequency: 10
+  particleSize: 0.6
+  sizeVariance: 0.25
+  maxCount: 30
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCExplosionSmokeWave
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke3
+  colorOverLifetime:
+    - time: 0
+      color: "#808080FF"
+    - time: 1
+      color: "#D6D6D6FF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.333
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.636
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 7.812
+  speedVariance: 0
+  drag: 2.877
+  noiseStrength: 0.156
+  noiseFrequency: 10
+  particleSize: 0.825
+  sizeVariance: 0.273
+  maxCount: 75
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 45
+
+- type: particleEffect
+  id: RMCExplosionSmokeWaveDeva
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke3
+  colorOverLifetime:
+    - time: 0
+      color: "#808080FF"
+    - time: 1
+      color: "#D6D6D6FF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.333
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.636
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 10.938
+  speedVariance: 0
+  drag: 2.877
+  noiseStrength: 0.156
+  noiseFrequency: 10
+  particleSize: 0.825
+  sizeVariance: 0.273
+  maxCount: 75
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 45
+
+- type: particleEffect
+  id: RMCExplosionSmokeWaveSmall
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke3
+  colorOverLifetime:
+    - time: 0
+      color: "#808080FF"
+    - time: 1
+      color: "#D6D6D6FF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.333
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 7.0
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 9.375
+  speedVariance: 0
+  drag: 2.877
+  noiseStrength: 0.156
+  noiseFrequency: 10
+  particleSize: 0.225
+  sizeVariance: 0.333
+  maxCount: 45
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 45
+
+- type: particleEffect
+  id: RMCExplosionDirtKickup
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: dirt
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.2
+      value: 1.0
+    - time: 0.467
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.909
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 3.75
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -3.906
+  particleSize: 0.495
+  sizeVariance: 0.09
+  emissionRate: 100
+  maxCount: 80
+  duration: 1.0
+  spreadAngle: 0
+  shape:
+    type: Sphere
+    radius: 4.688
+
+- type: particleEffect
+  id: RMCExplosionDirtKickupTiny
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: dirt
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.2
+      value: 1.0
+    - time: 0.467
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.909
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 3.75
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -3.906
+  particleSize: 0.495
+  sizeVariance: 0.09
+  emissionRate: 20
+  maxCount: 16
+  duration: 1.0
+  spreadAngle: 0
+  shape:
+    type: Sphere
+    radius: 2.0
+
+- type: particleEffect
+  id: RMCExplosionWaterSplash
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: water
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.125
+      value: 0.547
+    - time: 0.2
+      value: 0.8
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.909
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 3.75
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -3.906
+  particleSize: 0.495
+  sizeVariance: 0.09
+  emissionRate: 100
+  maxCount: 80
+  duration: 1.0
+  spreadAngle: 0
+  shape:
+    type: Sphere
+    radius: 4.688
+
+- type: particleEffect
+  id: RMCExplosionWaterSplashTiny
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: water
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.125
+      value: 0.547
+    - time: 0.2
+      value: 0.8
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.909
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 3.75
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -3.906
+  particleSize: 0.495
+  sizeVariance: 0.09
+  emissionRate: 20
+  maxCount: 16
+  duration: 1.0
+  spreadAngle: 0
+  shape:
+    type: Sphere
+    radius: 2.0
+
+- type: particleEffect
+  id: RMCExplosionDirtKickupLarge
+  sprite:
+    sprite: _RMC14/Particles/plume_tall.rsi
+    state: dirt
+  colorOverLifetime:
+    - time: 0
+      color: "#C0C0C0FF"
+    - time: 0.25
+      color: "#FFFFFFFF"
+    - time: 1
+      color: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.175
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.588
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 7.188
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -5.469
+  particleSize: 2.55
+  sizeVariance: 0.412
+  emissionRate: 50
+  maxCount: 20
+  duration: 0.5
+  spreadAngle: 0
+  startRotationVariance: 85
+  shape:
+    type: Box
+    boxExtents: 0.125, 0.08
+
+- type: particleEffect
+  id: RMCExplosionDirtKickupLargeDeva
+  sprite:
+    sprite: _RMC14/Particles/plume_tall.rsi
+    state: dirt
+  colorOverLifetime:
+    - time: 0
+      color: "#C0C0C0FF"
+    - time: 0.25
+      color: "#FFFFFFFF"
+    - time: 1
+      color: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.175
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.444
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 9.375
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -5.469
+  particleSize: 4.05
+  sizeVariance: 0.259
+  emissionRate: 50
+  maxCount: 20
+  duration: 0.5
+  spreadAngle: 0
+  startRotationVariance: 85
+  shape:
+    type: Box
+    boxExtents: 0.125, 0.08
+
+- type: particleEffect
+  id: RMCExplosionDirtKickupLargeSmall
+  sprite:
+    sprite: _RMC14/Particles/plume_tall.rsi
+    state: dirt
+  colorOverLifetime:
+    - time: 0
+      color: "#C0C0C0FF"
+    - time: 0.25
+      color: "#FFFFFFFF"
+    - time: 1
+      color: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.175
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.909
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 7.188
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -5.469
+  particleSize: 1.65
+  sizeVariance: 0.455
+  emissionRate: 50
+  maxCount: 20
+  duration: 0.5
+  spreadAngle: 0
+  startRotationVariance: 85
+  shape:
+    type: Box
+    boxExtents: 0.125, 0.08
+
+- type: particleEffect
+  id: RMCExplosionWaterSplashLarge
+  sprite:
+    sprite: _RMC14/Particles/plume_tall.rsi
+    state: water
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.8
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.588
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 7.188
+  speedVariance: 0
+  drag: 1.625
+  constantForce: 0, -5.469
+  particleSize: 2.55
+  sizeVariance: 0.412
+  emissionRate: 50
+  maxCount: 20
+  duration: 0.5
+  spreadAngle: 0
+  startRotationVariance: 85
+  shape:
+    type: Box
+    boxExtents: 0.125, 0.08
+
+- type: particleEffect
+  id: RMCExplosionFallingDebris
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.75
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 8.125
+  speedVariance: 3.25
+  drag: 0.202
+  constantForce: 0, -9.375
+  noiseStrength: 0.741
+  noiseFrequency: 10
+  particleSize: 0.18
+  sizeVariance: 0.3
+  maxCount: 50
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: Sphere
+    radius: 0.5
+
+- type: particleEffect
+  id: RMCExplosionFallingDebrisSmall
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 6.875
+  speedVariance: 2.75
+  drag: 0.202
+  constantForce: 0, -9.375
+  noiseStrength: 0.741
+  noiseFrequency: 10
+  particleSize: 0.16
+  sizeVariance: 0.3
+  maxCount: 28
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: Sphere
+    radius: 0.5
+
+- type: particleEffect
+  id: RMCExplosionFallingDebrisTiny
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.25
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 5.938
+  speedVariance: 2.375
+  drag: 0.202
+  constantForce: 0, -9.375
+  noiseStrength: 0.741
+  noiseFrequency: 10
+  particleSize: 0.13
+  sizeVariance: 0.3
+  maxCount: 14
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: Sphere
+    radius: 0.5
+
+- type: particleEffect
+  id: RMCExplosionWaterFalling
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: pixel
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.75
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 8.125
+  speedVariance: 3.25
+  drag: 0.202
+  constantForce: 0, -9.375
+  noiseStrength: 0.741
+  noiseFrequency: 10
+  particleSize: 1
+  sizeVariance: 0.3
+  maxCount: 75
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: Sphere
+    radius: 0.5
+
+- type: particleEffect
+  id: RMCExplosionWaterFallingTiny
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: pixel
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.25
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 5.938
+  speedVariance: 2.375
+  drag: 0.202
+  constantForce: 0, -9.375
+  noiseStrength: 0.741
+  noiseFrequency: 10
+  particleSize: 0.5
+  sizeVariance: 0.3
+  maxCount: 20
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: Sphere
+    radius: 0.5
+
+# Explosions on water
+
+- type: particleEffect
+  id: RMCExplosionWaterSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  alternateSprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.571
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 9.0
+  renderLayer: 1
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 4.688
+  speedVariance: 2.813
+  drag: 3.567
+  constantForce: 3.125, 9.375
+  noiseStrength: 0.143
+  noiseFrequency: 10
+  particleSize: 0.375
+  sizeVariance: 0.25
+  maxCount: 40
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCExplosionWaterSmokeTiny
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  alternateSprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.6
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.125
+  renderLayer: 1
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 2.5
+  speedVariance: 1.5
+  drag: 3.567
+  constantForce: 3.125, 9.375
+  noiseStrength: 0.143
+  noiseFrequency: 10
+  particleSize: 0.6000000000000001
+  sizeVariance: 0.25
+  maxCount: 30
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCExplosionWaterWave
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.5
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.636
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 7.812
+  speedVariance: 0
+  drag: 2.877
+  noiseStrength: 0.156
+  noiseFrequency: 10
+  particleSize: 0.825
+  sizeVariance: 0.273
+  maxCount: 75
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 45
+
+- type: particleEffect
+  id: RMCExplosionWaterWaveDeva
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.5
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.636
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 10.938
+  speedVariance: 0
+  drag: 2.877
+  noiseStrength: 0.156
+  noiseFrequency: 10
+  particleSize: 0.825
+  sizeVariance: 0.273
+  maxCount: 75
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 45
+
+- type: particleEffect
+  id: RMCExplosionWaterWaveSmall
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.5
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.636
+  lifetime: 1.5
+  lifetimeVariance: 0
+  speed: 9.375
+  speedVariance: 0
+  drag: 2.877
+  noiseStrength: 0.156
+  noiseFrequency: 10
+  particleSize: 0.825
+  sizeVariance: 0.273
+  maxCount: 75
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 45
+
+# Projectile impacts
+
+- type: particleEffect
+  id: RMCImpactSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#E0DCD4FF"
+  endColor: "#E0DCD4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.08
+      value: 0.3
+    - time: 0.35
+      value: 0.2
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.8
+  lifetime: 0.6
+  lifetimeVariance: 0.15
+  speed: 5.5
+  speedVariance: 1.5
+  drag: 6.5
+  constantForce: 0, 0.35
+  noiseStrength: 0.9
+  noiseFrequency: 6
+  particleSize: 0.35
+  sizeVariance: 0.25
+  maxCount: 5
+  burst: true
+  spreadAngle: 90
+  startRotationVariance: 180
+  rotationSpeedVariance: 90
+
+- type: particleEffect
+  id: RMCImpactFlash
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFD98AFF"
+  endColor: "#FFD98AFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.85
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 0.35
+  shader: unshaded
+  lifetime: 0.12
+  lifetimeVariance: 0.03
+  speed: 0
+  speedVariance: 0
+  particleSize: 0.26
+  sizeVariance: 0.2
+  maxCount: 2
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCImpactDebrisSparks
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: spark
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 8
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisWood
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: wood
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisRock
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: rock
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisGlass
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: glass
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisLeaf
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: leaf
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisSnow
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: snow
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisPaper
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: paper
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCImpactDebrisIce
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: ice
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 1.0
+    - time: 0.5
+      value: 1.0
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.4
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.048
+  noiseFrequency: 10
+  particleSize: 1.0
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+# Dropship GAU impacts
+
+- type: particleEffect
+  id: RMCGauFlash
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFC468FF"
+  endColor: "#FFC468FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.95
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 0.4
+  shader: unshaded
+  lifetime: 0.14
+  lifetimeVariance: 0.03
+  speed: 0
+  speedVariance: 0
+  particleSize: 0.7
+  sizeVariance: 0.2
+  maxCount: 2
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCGauSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#D8D0C0FF"
+  endColor: "#D8D0C0FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.1
+      value: 0.3
+    - time: 0.4
+      value: 0.18
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.6
+  lifetime: 0.6
+  lifetimeVariance: 0.12
+  speed: 2.5
+  speedVariance: 1.2
+  drag: 4
+  constantForce: 0, 0.4
+  noiseStrength: 0.6
+  noiseFrequency: 6
+  particleSize: 0.5
+  sizeVariance: 0.25
+  maxCount: 3
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 90
+
+- type: particleEffect
+  id: RMCGauDirtSpike
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: dirt
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.12
+      value: 1.0
+    - time: 0.45
+      value: 0.7
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 0.6
+    - time: 0.3
+      value: 1.0
+    - time: 1
+      value: 1.2
+  lifetime: 0.45
+  lifetimeVariance: 0.08
+  speed: 3
+  speedVariance: 1
+  drag: 3
+  constantForce: 0, -4
+  particleSize: 1.0
+  sizeVariance: 0.2
+  maxCount: 2
+  burst: true
+  spreadAngle: 40
+  spawnOffset: 0, 0.47
+  startRotationVariance: 20
+  shape:
+    type: CircleFill
+    radius: 0.12
+
+- type: particleEffect
+  id: RMCGauSnowSpike
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: dirt
+  startColor: "#D6DEE6FF"
+  endColor: "#D6DEE6FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.12
+      value: 1.0
+    - time: 0.45
+      value: 0.7
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 0.6
+    - time: 0.3
+      value: 1.0
+    - time: 1
+      value: 1.2
+  lifetime: 0.45
+  lifetimeVariance: 0.08
+  speed: 3
+  speedVariance: 1
+  drag: 3
+  constantForce: 0, -4
+  particleSize: 1.0
+  sizeVariance: 0.2
+  maxCount: 2
+  burst: true
+  spreadAngle: 40
+  spawnOffset: 0, 0.47
+  startRotationVariance: 20
+  shape:
+    type: CircleFill
+    radius: 0.12
+
+- type: particleEffect
+  id: RMCGauWaterSpike
+  sprite:
+    sprite: _RMC14/Particles/plume.rsi
+    state: water
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.12
+      value: 1.0
+    - time: 0.45
+      value: 0.7
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 0.6
+    - time: 0.3
+      value: 1.0
+    - time: 1
+      value: 1.2
+  lifetime: 0.45
+  lifetimeVariance: 0.08
+  speed: 3
+  speedVariance: 1
+  drag: 3
+  constantForce: 0, -4
+  particleSize: 1.0
+  sizeVariance: 0.2
+  maxCount: 2
+  burst: true
+  spreadAngle: 40
+  spawnOffset: 0, 0.47
+  startRotationVariance: 20
+  shape:
+    type: CircleFill
+    radius: 0.12
+
+- type: particleEffect
+  id: RMCGauDebris
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.65
+      value: 1.0
+    - time: 1
+      value: 0.0
+  lifetime: 1.0
+  lifetimeVariance: 0.25
+  speed: 4.5
+  speedVariance: 1.8
+  drag: 0.2
+  constantForce: 0, -9.4
+  noiseStrength: 0.5
+  noiseFrequency: 10
+  particleSize: 0.2
+  sizeVariance: 0.4
+  maxCount: 7
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 360
+  shape:
+    type: Sphere
+    radius: 0.2
+
+- type: particleEffect
+  id: RMCGauSnowDebris
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#E8EEF4FF"
+  endColor: "#E8EEF4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.65
+      value: 1.0
+    - time: 1
+      value: 0.0
+  lifetime: 1.0
+  lifetimeVariance: 0.25
+  speed: 4.5
+  speedVariance: 1.8
+  drag: 0.2
+  constantForce: 0, -9.4
+  noiseStrength: 0.5
+  noiseFrequency: 10
+  particleSize: 0.2
+  sizeVariance: 0.4
+  maxCount: 7
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 360
+  shape:
+    type: Sphere
+    radius: 0.2
+
+- type: particleEffect
+  id: RMCGauWaterDroplets
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: pixel
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.65
+      value: 1.0
+    - time: 1
+      value: 0.0
+  lifetime: 1.0
+  lifetimeVariance: 0.25
+  speed: 4.5
+  speedVariance: 1.8
+  drag: 0.2
+  constantForce: 0, -9.4
+  noiseStrength: 0.5
+  noiseFrequency: 10
+  particleSize: 1.8
+  sizeVariance: 0.4
+  maxCount: 7
+  burst: true
+  spreadAngle: 110
+  startRotationVariance: 180
+  rotationSpeedVariance: 360
+  shape:
+    type: Sphere
+    radius: 0.2
+
+# Xeno spit impacts
+
+- type: particleEffect
+  id: RMCSpitSplash
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.7
+    - time: 0.4
+      value: 0.45
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.0
+  lifetime: 0.35
+  lifetimeVariance: 0.08
+  speed: 2.5
+  speedVariance: 1
+  drag: 6
+  particleSize: 0.35
+  sizeVariance: 0.25
+  maxCount: 6
+  burst: true
+  spreadAngle: 140
+  startRotationVariance: 180
+  rotationSpeedVariance: 90
+  shape:
+    type: CircleFill
+    radius: 0.08
+
+- type: particleEffect
+  id: RMCSpitSplashBlobs
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.5
+      value: 0.8
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 0.4
+  lifetime: 0.3
+  lifetimeVariance: 0.08
+  speed: 3
+  speedVariance: 1.2
+  drag: 8
+  particleSize: 0.12
+  sizeVariance: 0.35
+  maxCount: 5
+  burst: true
+  spreadAngle: 150
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCAcidSizzle
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#E8FFE8FF"
+  endColor: "#E8FFE8FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.2
+      value: 0.5
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.5
+  lifetime: 0.9
+  lifetimeVariance: 0.2
+  speed: 0.4
+  speedVariance: 0.2
+  drag: 1
+  constantForce: 0, 1.2
+  noiseStrength: 0.6
+  noiseFrequency: 4
+  particleSize: 0.25
+  sizeVariance: 0.3
+  emissionRate: 14
+  maxCount: 15
+  duration: 0.9
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+  shape:
+    type: CircleFill
+    radius: 0.15
+
+# Digging
+
+- type: particleEffect
+  id: RMCDigDirt
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.7
+      value: 1.0
+    - time: 1
+      value: 0.0
+  lifetime: 0.6
+  lifetimeVariance: 0.15
+  speed: 3
+  speedVariance: 1
+  drag: 0.5
+  constantForce: 0, -9
+  particleSize: 0.13
+  sizeVariance: 0.4
+  emissionRate: 12
+  maxCount: 14
+  duration: 1
+  spreadAngle: 100
+  startRotationVariance: 180
+  rotationSpeedVariance: 360
+  shape:
+    type: CircleFill
+    radius: 0.25
+
+- type: particleEffect
+  id: RMCDigDirtBurst
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: impact
+  alternateSprites:
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_2
+  - sprite: _RMC14/Particles/debris.rsi
+    state: impact_3
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.7
+      value: 1.0
+    - time: 1
+      value: 0.0
+  lifetime: 0.7
+  lifetimeVariance: 0.15
+  speed: 3.5
+  speedVariance: 1.4
+  drag: 0.5
+  constantForce: 0, -9
+  particleSize: 0.15
+  sizeVariance: 0.4
+  maxCount: 12
+  burst: true
+  spreadAngle: 140
+  startRotationVariance: 180
+  rotationSpeedVariance: 360
+  shape:
+    type: CircleFill
+    radius: 0.3
+
+# Structure destruction
+
+- type: particleEffect
+  id: RMCDestructionDust
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#A8A49CFF"
+  endColor: "#A8A49CFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.1
+      value: 0.5
+    - time: 0.45
+      value: 0.3
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.8
+  lifetime: 1.3
+  lifetimeVariance: 0.3
+  speed: 1.5
+  speedVariance: 0.8
+  drag: 2
+  noiseStrength: 0.4
+  noiseFrequency: 3
+  particleSize: 0.55
+  sizeVariance: 0.3
+  maxCount: 9
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 40
+  shape:
+    type: CircleFill
+    radius: 0.35
+
+# Mortar launch
+
+- type: particleEffect
+  id: RMCMortarLaunchSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  alternateSprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  startColor: "#D2CDC4FF"
+  endColor: "#D2CDC4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.06
+      value: 0.55
+    - time: 0.4
+      value: 0.35
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.2
+  lifetime: 1.6
+  lifetimeVariance: 0.4
+  speed: 3
+  speedVariance: 1.2
+  drag: 3
+  constantForce: 0.3, 0.8
+  noiseStrength: 0.5
+  noiseFrequency: 3
+  particleSize: 0.45
+  sizeVariance: 0.3
+  maxCount: 12
+  burst: true
+  spreadAngle: 35
+  spawnOffset: 0, 0.3
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+
+# Blood & gibs
+
+- type: particleEffect
+  id: RMCBloodSplatterEdge
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#8C8C8CFF"
+  endColor: "#8C8C8CFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.686
+    - time: 0.125
+      value: 0.525
+    - time: 0.25
+      value: 0.386
+    - time: 0.375
+      value: 0.268
+    - time: 0.5
+      value: 0.172
+    - time: 0.625
+      value: 0.097
+    - time: 0.75
+      value: 0.043
+    - time: 0.875
+      value: 0.011
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.5
+  lifetimeVariance: 0
+  speed: 5.0
+  speedVariance: 2.0
+  drag: 5.978
+  noiseStrength: 0.699
+  noiseFrequency: 10
+  particleSize: 0.9
+  sizeVariance: 0.25
+  maxCount: 7
+  burst: true
+  spreadAngle: 60
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleEdge
+    radius: 0.2
+
+- type: particleEffect
+  id: RMCBloodSplatter
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.686
+    - time: 0.125
+      value: 0.525
+    - time: 0.25
+      value: 0.386
+    - time: 0.375
+      value: 0.268
+    - time: 0.5
+      value: 0.172
+    - time: 0.625
+      value: 0.097
+    - time: 0.75
+      value: 0.043
+    - time: 0.875
+      value: 0.011
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.5
+  lifetimeVariance: 0
+  speed: 6.25
+  speedVariance: 1.875
+  drag: 5.978
+  noiseStrength: 0.699
+  noiseFrequency: 10
+  particleSize: 0.6
+  sizeVariance: 0.2
+  maxCount: 5
+  burst: true
+  spreadAngle: 20
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.08
+
+- type: particleEffect
+  id: RMCBloodSplatterSpray
+  sprite:
+    sprite: _RMC14/Particles/blood_splatter.rsi
+    state: splatter1
+  alternateSprites:
+  - sprite: _RMC14/Particles/blood_splatter.rsi
+    state: splatter2
+  - sprite: _RMC14/Particles/blood_splatter.rsi
+    state: splatter3
+  - sprite: _RMC14/Particles/blood_splatter.rsi
+    state: splatter4
+  - sprite: _RMC14/Particles/blood_splatter.rsi
+    state: splatter5
+  - sprite: _RMC14/Particles/blood_splatter.rsi
+    state: splatter6
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.686
+    - time: 1.0
+      value: 0.0
+  lifetime: 0.5
+  lifetimeVariance: 0
+  speed: 1.5
+  speedVariance: 0
+  drag: 6
+  particleSize: 1.0
+  maxCount: 1
+  burst: true
+  spreadAngle: 0
+
+- type: particleEffect
+  id: RMCGibBloodCloud
+  sprite:
+    sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.294
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.75
+  lifetime: 0.7
+  lifetimeVariance: 0
+  speed: 3.75
+  speedVariance: 2.625
+  drag: 5.108
+  particleSize: 0.4
+  sizeVariance: 0.3
+  maxCount: 45
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 0.188
+
+- type: particleEffect
+  id: RMCGibChunks
+  sprite:
+    sprite: _RMC14/Particles/gibs.rsi
+    state: mgibbl3
+  alternateSprites:
+  - sprite: _RMC14/Particles/gibs.rsi
+    state: mgibbl5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.118
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.444
+  lifetime: 1.0
+  lifetimeVariance: 0
+  speed: 4.375
+  speedVariance: 0
+  drag: 1.335
+  constantForce: 0, -9.375
+  noiseStrength: 0.663
+  noiseFrequency: 10
+  particleSize: 1.125
+  sizeVariance: 0.111
+  maxCount: 22
+  burst: true
+  spreadAngle: 0
+  startRotationVariance: 10
+  rotationSpeedVariance: 100
+  shape:
+    type: CircleEdge
+    radius: 0.281
+
+# Weapons & vehicles
+
+- type: particleEffect
+  id: RMCGunFiringSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.125
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 5.0
+  lifetime: 0.5
+  lifetimeVariance: 0
+  speed: 12.5
+  speedVariance: 0
+  drag: 5.978
+  noiseStrength: 1.863
+  noiseFrequency: 10
+  particleSize: 0.45
+  maxCount: 5
+  burst: true
+  spreadAngle: 0
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCRocketBackblast
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  alternateSprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  startColor: "#D8D4CCFF"
+  endColor: "#D8D4CCFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.06
+      value: 0.3
+    - time: 0.4
+      value: 0.18
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.5
+  lifetime: 0.9
+  lifetimeVariance: 0.25
+  speed: 7.5
+  speedVariance: 4
+  drag: 4.5
+  constantForce: 0, 0.3
+  noiseStrength: 0.8
+  noiseFrequency: 4
+  particleSize: 0.4
+  sizeVariance: 0.3
+  maxCount: 18
+  burst: true
+  spreadAngle: 45
+  startRotationVariance: 180
+  rotationSpeedVariance: 90
+
+- type: particleEffect
+  id: RMCVehicleWreckSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke3
+  alternateSprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  colorOverLifetime:
+    - time: 0
+      color: "#262626FF"
+    - time: 1
+      color: "#434343FF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.15
+      value: 0.378
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 11.0
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 1.562
+  speedVariance: 0.6
+  drag: 3.567
+  constantForce: 3.125, 6.25
+  noiseStrength: 0.143
+  noiseFrequency: 10
+  particleSize: 0.3
+  sizeVariance: 0.25
+  emissionRate: 100
+  maxCount: 160
+  duration: 0
+  spreadAngle: 360
+  spawnOffset: 0, 0.6
+  startRotationVariance: 180
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCVehicleDamagedSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#C8C8C8FF"
+  endColor: "#C8C8C8FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.15
+      value: 0.45
+    - time: 0.5
+      value: 0.3
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.0
+  lifetime: 1.6
+  lifetimeVariance: 0.4
+  speed: 0.6
+  speedVariance: 0.3
+  drag: 1
+  constantForce: 3.125, 6.25
+  noiseStrength: 0.5
+  noiseFrequency: 3
+  particleSize: 0.35
+  sizeVariance: 0.25
+  emissionRate: 12
+  maxCount: 30
+  duration: 0
+  spreadAngle: 360
+  spawnOffset: 0, 0.4
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+  shape:
+    type: CircleFill
+    radius: 0.25
+
+# Mortar flare
+
+- type: particleEffect
+  id: RMCMortarFlareSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.125
+      value: 0.125
+    - time: 0.25
+      value: 0.214
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 4.333
+  lifetime: 2.0
+  lifetimeVariance: 0
+  speed: 0.781
+  speedVariance: 0
+  drag: 0.101
+  constantForce: 0, 0.469
+  noiseStrength: 0.124
+  noiseFrequency: 10
+  particleSize: 0.3
+  emissionRate: 30
+  maxCount: 1000
+  duration: 0
+  spreadAngle: 0
+  startRotationVariance: 20
+  rotationSpeedVariance: 200
+
+- type: particleEffect
+  id: RMCMortarFlareSparks
+  sprite:
+    sprite: _RMC14/Particles/debris.rsi
+    state: spark
+  startColor: "#FFE9B0FF"
+  endColor: "#FFE9B0FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 0.5
+      value: 0.9
+    - time: 1
+      value: 0.0
+  shader: unshaded
+  lifetime: 0.6
+  lifetimeVariance: 0.2
+  speed: 0.6
+  speedVariance: 0.4
+  drag: 1
+  constantForce: 0, -4
+  noiseStrength: 0.4
+  noiseFrequency: 6
+  particleSize: 1.6
+  sizeVariance: 0.3
+  emissionRate: 12
+  maxCount: 20
+  duration: 0
+  spreadAngle: 360
+  shape:
+    type: CircleFill
+    radius: 0.08
+
+# Dropship landing
+
+- type: particleEffect
+  id: RMCDropshipLandingDust
+  sprite:
+    sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#FFFFFFFF"
+  endColor: "#FFFFFFFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.16
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.6
+  lifetime: 0.8
+  lifetimeVariance: 0
+  speed: 0
+  speedVariance: 0
+  particleSize: 1.5
+  sizeVariance: 0.333
+  emissionRate: 200
+  maxCount: 1000
+  duration: 10
+  spreadAngle: 0
+  rotationSpeedVariance: 200
+  shape:
+    type: CircleFill
+    radius: 4
+
+- type: particleEffect
+  id: RMCFallingOrdnanceTrail
+  sprite:
+    sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#C8C8C8FF"
+  endColor: "#8C8C8CFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.6
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.0
+  lifetime: 1.2
+  lifetimeVariance: 0.2
+  speed: 0.2
+  speedVariance: 0.1
+  drag: 0.5
+  noiseStrength: 0.1
+  noiseFrequency: 10
+  particleSize: 0.25
+  emissionRate: 60
+  maxCount: 200
+  duration: 0
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 120

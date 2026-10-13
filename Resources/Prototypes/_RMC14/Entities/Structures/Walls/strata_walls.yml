@@ -61,6 +61,8 @@
   name: ice columns
   description: An absolutely massive collection of columns made of ice. The longer you stare, the deeper the ice seems to go.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisIce
   - type: Sprite
     sprite: _RMC14/Structures/Walls/strata_ice.rsi
     state: strata_ice

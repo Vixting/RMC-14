@@ -8,6 +8,7 @@ using Content.Shared._RMC14.Map;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared._RMC14.Rangefinder;
 using Content.Shared._RMC14.Rules;
+using Content.Shared._RMC14.Sprite;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Chat;
@@ -56,6 +57,7 @@ public abstract class SharedMortarSystem : EntitySystem
     [Dependency] private readonly RMCMapSystem _rmcMap = default!;
     [Dependency] private readonly RMCPlanetSystem _rmcPlanet = default!;
     [Dependency] private readonly SkillsSystem _skills = default!;
+    [Dependency] private readonly RMCSpriteDescentSystem _spriteDescent = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
@@ -380,7 +382,8 @@ public abstract class SharedMortarSystem : EntitySystem
         }
 
         var coords = _transform.ToMapCoordinates(args.Coordinates);
-        Spawn(ent.Comp.Flare, coords);
+        // TODO RMC14: make this effect look good then uncomment
+        // Spawn(ent.Comp.Flare, coords);
         var camera = Spawn(ent.Comp.Camera, coords);
 
         if (_rmcPlanet.TryGetOffset(coords, out var offset))
@@ -600,6 +603,16 @@ public abstract class SharedMortarSystem : EntitySystem
                     active.WarnRange,
                     "rmc-mortar-shell-impact-warning",
                     "rmc-mortar-shell-impact-warning-above");
+            }
+
+            if (!active.FallSpawned &&
+                TryComp(uid, out MortarShellComponent? shell) &&
+                shell.FallEffect is { } fallEffect &&
+                time >= active.LandAt - _spriteDescent.GetDuration(fallEffect))
+            {
+                active.FallSpawned = true;
+                Dirty(uid, active);
+                SpawnAtPosition(fallEffect, active.Coordinates);
             }
 
             if (time >= active.LandAt)

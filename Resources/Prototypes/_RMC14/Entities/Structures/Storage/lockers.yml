@@ -524,6 +524,8 @@
   id: RMCCabinet
   name: cabinet
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisWood
   - type: Sprite
     sprite: _RMC14/Structures/Storage/Lockers/cabinet.rsi
 

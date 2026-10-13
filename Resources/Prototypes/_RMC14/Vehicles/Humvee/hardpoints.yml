@@ -127,6 +127,13 @@
   name: humvee cannon
   description: A fixed forward cannon for a humvee hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
+  - type: ParticleOnHardpointDamage
+    damagedEffects:
+    - RMCVehicleDamagedSmoke
+    destroyedEffects:
+    - RMCVehicleWreckSmoke
   - type: Sprite
     state: humveecannon
   - type: HardpointItem
@@ -204,6 +211,8 @@
   name: humvee launcher
   description: A launcher hardpoint for a humvee.
   components:
+  - type: ParticleOnMuzzleFlash
+    effect: RMCGunFiringSmoke
   - type: Sprite
     state: humveelauncher
   - type: HardpointItem

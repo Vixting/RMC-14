@@ -10,7 +10,7 @@ namespace Content.Shared._RMC14.Particles.Effects;
 public sealed partial class SpawnParticleEffect : EventEntityEffect<SpawnParticleEffect>
 {
     [DataField(required: true)]
-    public ProtoId<ParticleEffectPrototype> Effect;
+    public ProtoId<ParticleEffectPrototype> Particle;
 
     [DataField]
     public Color? ColorOverride;

@@ -11,6 +11,9 @@ public sealed partial class OrbitalCannonExplosionComponent : Component
     public bool Laser;
 
     [DataField, AutoNetworkedField]
+    public EntProtoId? FallEffect;
+
+    [DataField, AutoNetworkedField]
     public List<OrbitalCannonExplosion> Steps = new();
 
     [DataField, AutoNetworkedField]
@@ -24,4 +27,7 @@ public sealed partial class OrbitalCannonExplosionComponent : Component
 
     [DataField, AutoNetworkedField]
     public TimeSpan LastStepAt;
+
+    [ViewVariables]
+    public List<OrbitalCannonPendingImpact> Pending = new();
 }

@@ -17,6 +17,7 @@ namespace Content.Client._RMC14.Particles;
 /// </summary>
 public sealed class ExplosionParticleSystem : EntitySystem
 {
+    [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly ParticleSystem _particles = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
@@ -40,7 +41,7 @@ public sealed class ExplosionParticleSystem : EntitySystem
     {
         if (!_prototype.TryIndex<ExplosionPrototype>(ent.Comp.ExplosionType, out var type) ||
             type.Particles is not { } particlesId ||
-            !_prototype.TryIndex(particlesId, out var particles) ||
+            !particlesId.TryGet(out var particles, _prototype, _compFactory) ||
             ent.Comp.Intensity.Count == 0)
         {
             return;
@@ -50,19 +51,31 @@ public sealed class ExplosionParticleSystem : EntitySystem
             return;
 
         var power = RMCExplosionVisuals.EpicenterPower(ent.Comp.Intensity, type.PowerPerIntensity);
-        var tier = particles.GetTier(power, ent.Comp.RMCTinyParticles);
+        var tier = GetTier(particles, power);
         PlayTier(tier, ent.Comp.Epicenter);
     }
 
     private void OnSpawnStartup(Entity<ParticleExplosionOnSpawnComponent> ent, ref ComponentStartup args)
     {
         if (!_random.Prob(ent.Comp.Probability) ||
-            !_prototype.TryIndex(ent.Comp.Particles, out var particles))
+            !ent.Comp.Particles.TryGet(out var particles, _prototype, _compFactory))
         {
             return;
         }
 
         PlayTier(particles.Tiny, _transform.GetMapCoordinates(ent));
+    }
+
+    private static ExplosionParticleTier GetTier(ExplosionParticlesComponent particles, float power)
+    {
+        ExplosionParticleTier? best = null;
+        foreach (var tier in particles.Tiers)
+        {
+            if (power >= tier.MinPower && (best == null || tier.MinPower > best.MinPower))
+                best = tier;
+        }
+
+        return best ?? particles.Tiny;
     }
 
     private void PlayTier(ExplosionParticleTier tier, MapCoordinates coords)

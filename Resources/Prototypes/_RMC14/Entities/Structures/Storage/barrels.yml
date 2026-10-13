@@ -40,6 +40,8 @@
   categories: [ HideSpawnMenu ]
   description: A storage barrel.
   components:
+  - type: ParticleDebris
+    effect: RMCImpactDebrisSparks
   - type: VehicleSmashable
   - type: Sprite
     sprite: _RMC14/Structures/barrels.rsi
