@@ -28,6 +28,8 @@
     fillBaseName: icon-
   - type: Destructible
     thresholds: []
+  - type: DestroyedByExplosion
+    isExplodable: true
   - type: InteractedBlacklist
     blacklist:
       components:
@@ -77,6 +79,8 @@
     fillBaseName: fill-
   - type: Destructible
     thresholds: []
+  - type: DestroyedByExplosion
+    isExplodable: true
   - type: InteractedBlacklist
     blacklist:
       components:

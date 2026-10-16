@@ -1,3 +1,4 @@
+using System.Numerics;
 using Content.Shared._RMC14.Armor;
 using Content.Shared._RMC14.BlurredVision;
 using Content.Shared._RMC14.Deafness;
@@ -27,7 +28,6 @@ using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using System.Numerics;
 
 namespace Content.Shared._RMC14.Explosion;
 
@@ -184,7 +184,7 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
 
             foreach (var held in _heldItems)
             {
-                ExplosionThrowItem(held, args.Epicenter, damage.Double());
+                ExplosionThrowItem(ent.Comp, held, args.Epicenter, damage.Double());
             }
 
             var knockoutMinusArmor = Math.Max(knockoutValue * bombArmorMult * 0.5, 0.5);
@@ -298,7 +298,7 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
             _body.GibBody(ent, true);
     }
 
-    private void ExplosionThrowItem(EntityUid item, MapCoordinates epicenter, double severity)
+    private void ExplosionThrowItem(StunOnExplosionReceivedComponent holder, EntityUid item, MapCoordinates epicenter, double severity)
     {
         if (TerminatingOrDeleted(item) ||
             !TryComp(item, out ItemComponent? itemComp) ||
@@ -312,7 +312,7 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
             return;
 
         var weightClass = Math.Log2(_item.GetSizePrototype(itemComp.Size).Weight) + 1;
-        var range = Math.Min(Math.Round(severity / weightClass * 0.2, MidpointRounding.AwayFromZero), 14);
+        var range = Math.Min(Math.Round(severity / weightClass * holder.HeldThrowRangePerSeverity, MidpointRounding.AwayFromZero), holder.HeldThrowMaxRange);
 
         var direction = _transform.GetWorldPosition(xform) - epicenter.Position;
         if (IsOnEpicenterTile(item, epicenter) || direction.LengthSquared() == 0)
@@ -333,7 +333,7 @@ public abstract class SharedRMCExplosionSystem : EntitySystem
                 (float) Math.Round(_random.NextDouble(-scatter, scatter), MidpointRounding.AwayFromZero));
         }
 
-        var speed = (float) Math.Max(range * 2.5, 4);
+        var speed = (float) Math.Max(range * holder.HeldThrowSpeedPerRange, holder.HeldThrowMinSpeed);
         _throwing.TryThrow(item, target, speed);
     }
 

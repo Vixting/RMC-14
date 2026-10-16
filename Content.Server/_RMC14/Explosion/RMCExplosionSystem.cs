@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Numerics;
-using Content.Server._RMC14.Scorch;
 using Content.Server.Decals;
 using Content.Server.Explosion.Components;
 using Content.Server.Explosion.EntitySystems;
@@ -63,8 +62,6 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         SubscribeLocalEvent<CMVocalizeTriggerComponent, ActiveTimerTriggerEvent>(OnVocalizeTriggered);
 
         SubscribeLocalEvent<RMCExplosiveDeleteComponent, EntityStuckEvent>(OnExplosiveDeleteWallsStuck);
-
-        SubscribeLocalEvent<RMCScorchEffectComponent, CMExplosiveTriggeredEvent>(OnScorchEffectTriggered);
 
         SubscribeLocalEvent<ExplosionVisualsComponent, RMCExplosionSpawnedEvent>(OnExplosionSpawned);
         SubscribeLocalEvent<ExplosionVisualsComponent, RMCExplosionFinishedEvent>(OnExplosionFinished);
@@ -257,71 +254,6 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         var brightness = _random.NextFloat(settings.MinBrightness, 1f);
         var color = new Color(brightness, brightness, brightness, _random.NextFloat(settings.MinAlpha, 1f));
         _decals.TryAddDecal(decalId, coordinates.Offset(jitter), out _, color, _random.NextAngle(), cleanable: true);
-    }
-
-    private void OnScorchEffectTriggered(Entity<RMCScorchEffectComponent> ent, ref CMExplosiveTriggeredEvent args)
-    {
-        if (ent.Comp.Radius > 0)
-        {
-            if (!_rmcMap.TryGetTileRefForEnt(Transform(ent).Coordinates, out var grid, out var tile))
-                return;
-
-            var centerDecals = GetDecals(ent.Comp.CenterDecalTag);
-            var edgeDecals = GetDecals(ent.Comp.EdgeDecalTag);
-            if (centerDecals.Length == 0 || edgeDecals.Length == 0)
-                return;
-
-            var radius = Math.Max(1, ent.Comp.Radius);
-            var centerRadius = Math.Max(0, ent.Comp.CenterRadius);
-            var centerRadiusSq = centerRadius * centerRadius;
-            var radiusSq = radius * radius;
-            var center = tile.GridIndices;
-
-            for (var dx = -radius; dx <= radius; dx++)
-            {
-                for (var dy = -radius; dy <= radius; dy++)
-                {
-                    var distSq = dx * dx + dy * dy;
-                    if (distSq > radiusSq)
-                        continue;
-
-                    var indices = new Vector2i(center.X + dx, center.Y + dy);
-                    var coords = _map.GridTileToLocal(tile.GridUid, grid, indices);
-                    var decalCoords = coords.Offset(new Vector2(-0.5f, -0.5f));
-                    var decals = distSq <= centerRadiusSq ? centerDecals : edgeDecals;
-                    var decalId = decals[_random.Next(decals.Length)];
-                    var rotation = ent.Comp.RandomRotation ? _random.NextAngle() : Angle.FromDegrees(_random.Next(4) * 90);
-                    _decals.TryAddDecal(decalId, decalCoords, out _, rotation: rotation, cleanable: true);
-                }
-            }
-        }
-        else
-        {
-            var decals = GetDecals(ent.Comp.CenterDecalTag);
-            if (decals.Length == 0)
-                return;
-
-            var count = Math.Max(1, ent.Comp.Count);
-            // Decals spawn based on bottom left corner, if bigger decals are used the offset will have to change
-            var baseCoords = Transform(ent).Coordinates.Offset(new Vector2(-0.5f, -0.5f));
-            var scatterRadius = Math.Max(0f, ent.Comp.ScatterRadius);
-
-            for (var i = 0; i < count; i++)
-            {
-                var decalId = decals[_random.Next(decals.Length)];
-                var offset = Vector2.Zero;
-                if (scatterRadius > 0f)
-                {
-                    var angle = _random.NextAngle();
-                    var dist = _random.NextFloat() * scatterRadius;
-                    offset = angle.ToVec() * dist;
-                }
-
-                var coords = baseCoords.Offset(offset);
-                var rotation = ent.Comp.RandomRotation ? _random.NextAngle() : Angle.FromDegrees(_random.Next(4) * 90);
-                _decals.TryAddDecal(decalId, coords, out _, rotation: rotation, cleanable: true);
-            }
-        }
     }
 
     private void OnRandomTimerTriggerExamined(Entity<RandomTimerTriggerComponent> ent, ref ExaminedEvent args)

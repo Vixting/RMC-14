@@ -56,7 +56,7 @@ public sealed class RMCParticleEffectSystem : EntitySystem
 
     public override void Update(float frameTime)
     {
-        if (_net.IsClient || _pendingEffects.Count == 0 && _pendingStops.Count == 0)
+        if (_net.IsClient || (_pendingEffects.Count == 0 && _pendingStops.Count == 0))
             return;
 
         _bySession.Clear();

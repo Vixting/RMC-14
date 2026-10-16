@@ -382,8 +382,7 @@ public abstract class SharedMortarSystem : EntitySystem
         }
 
         var coords = _transform.ToMapCoordinates(args.Coordinates);
-        // TODO RMC14: make this effect look good then uncomment
-        // Spawn(ent.Comp.Flare, coords);
+        Spawn(ent.Comp.Flare, coords);
         var camera = Spawn(ent.Comp.Camera, coords);
 
         if (_rmcPlanet.TryGetOffset(coords, out var offset))

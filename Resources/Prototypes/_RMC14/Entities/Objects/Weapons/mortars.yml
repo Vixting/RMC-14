@@ -191,10 +191,6 @@
     layers:
     - state: flare
       shader: unshaded
-  - type: ParticleEmitter
-    effect: RMCMortarFlareSmoke
-    extraEffects:
-    - RMCMortarFlareSparks
   - type: RMCSpriteDescent
     startOffset: 0, 4.7
     duration: 180

@@ -1,23 +1,25 @@
 using System.Numerics;
+using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._RMC14.Particles;
 
-[RegisterComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
+[Access(Other = AccessPermissions.ReadExecute)]
 public sealed partial class ParticleEmitterComponent : Component
 {
-    [DataField(required: true)]
+    [DataField(required: true), AutoNetworkedField]
     public ProtoId<ParticleEffectPrototype> Effect;
 
-    [DataField]
+    [DataField, AutoNetworkedField]
     public List<ProtoId<ParticleEffectPrototype>> ExtraEffects = new();
 
-    [DataField]
+    [DataField, AutoNetworkedField]
     public Color? ColorOverride;
 
-    [DataField]
+    [DataField, AutoNetworkedField]
     public float Intensity = 1f;
 
-    [DataField]
+    [DataField, AutoNetworkedField]
     public Vector2 SpawnOffset;
 }

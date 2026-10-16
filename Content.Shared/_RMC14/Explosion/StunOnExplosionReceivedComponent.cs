@@ -18,4 +18,16 @@ public sealed partial class StunOnExplosionReceivedComponent : Component
 
     [DataField, AutoNetworkedField]
     public TimeSpan BlurTime = TimeSpan.FromSeconds(5);
+
+    [DataField, AutoNetworkedField]
+    public double HeldThrowRangePerSeverity = 0.2;
+
+    [DataField, AutoNetworkedField]
+    public double HeldThrowMaxRange = 14;
+
+    [DataField, AutoNetworkedField]
+    public double HeldThrowSpeedPerRange = 2.5;
+
+    [DataField, AutoNetworkedField]
+    public double HeldThrowMinSpeed = 4;
 }

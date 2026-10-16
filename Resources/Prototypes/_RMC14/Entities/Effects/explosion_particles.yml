@@ -19,7 +19,7 @@
       - RMCExplosionWaterFallingTiny
       - RMCExplosionWaterSplashTiny
     tiers:
-    - minPower: 100
+    - minPower: 0
       flash: RMCExplosionFlash
       effects:
       - RMCExplosionSmokeWaveSmall

@@ -27,7 +27,7 @@ public sealed class StructureDebrisParticleSystem : EntitySystem
             !args.DamageIncreased ||
             args.Origin is not { } origin ||
             origin == ent.Owner ||
-            args.Tool is { } tool && HasComp<ProjectileComponent>(tool))
+            (args.Tool is { } tool && HasComp<ProjectileComponent>(tool)))
         {
             return;
         }

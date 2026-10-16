@@ -37,7 +37,7 @@ public sealed class DamageBloodParticleSystem : EntitySystem
             args.DamageDelta is not { } delta ||
             args.Origin is not { } origin ||
             origin == ent.Owner ||
-            args.Tool is { } projectile && HasComp<ProjectileComponent>(projectile) ||
+            (args.Tool is { } projectile && HasComp<ProjectileComponent>(projectile)) ||
             !_prototype.TryIndex(BruteGroup, out var brute) ||
             !_bloodColor.TryGetHitBloodColor(ent, out var blood))
         {

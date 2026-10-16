@@ -34,6 +34,8 @@
   - type: MREItem
   - type: Destructible
     thresholds: []
+  - type: DestroyedByExplosion
+    isExplodable: true
   - type: InteractedBlacklist
     blacklist:
       components:

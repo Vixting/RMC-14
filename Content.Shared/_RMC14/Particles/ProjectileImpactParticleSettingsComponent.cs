@@ -4,6 +4,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._RMC14.Particles;
 
 [RegisterComponent]
+[Access(typeof(ProjectileImpactParticleSystem), Other = AccessPermissions.ReadExecute)]
 public sealed partial class ProjectileImpactParticleSettingsComponent : Component
 {
     [DataField]
