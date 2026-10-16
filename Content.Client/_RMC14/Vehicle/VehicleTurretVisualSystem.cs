@@ -91,6 +91,9 @@ public sealed class VehicleTurretVisualSystem : EntitySystem
 
     private void OnIntegrityState(Entity<HardpointIntegrityComponent> ent, ref AfterAutoHandleStateEvent args)
     {
+        var ev = new HardpointIntegrityStateChangedEvent();
+        RaiseLocalEvent(ent, ref ev);
+
         if (!HasComp<VehicleTurretComponent>(ent.Owner))
             return;
 

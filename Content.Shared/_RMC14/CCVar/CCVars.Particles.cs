@@ -16,4 +16,10 @@ public sealed partial class CCVars
     /// </summary>
     public static readonly CVarDef<int> ParticleGlobalBudget =
         CVarDef.Create("particles.global_budget", 8000, CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
+    /// Max IgnoreQualitySettings emitters allowed while ParticleQuality is off.
+    /// </summary>
+    public static readonly CVarDef<int> ParticleIgnoreQualityMaxEmitters =
+        CVarDef.Create("particles.ignore_quality_max_emitters", 8, CVar.CLIENTONLY | CVar.ARCHIVE);
 }

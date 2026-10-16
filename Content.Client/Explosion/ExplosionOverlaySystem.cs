@@ -94,6 +94,7 @@ public sealed class ExplosionOverlaySystem : EntitySystem
         textures.FireColor = type.FireColor;
         textures.IntensityPerState = type.IntensityPerState;
         // RMC14
+        textures.RMCType = type;
         textures.RMCPowerPerIntensity = type.PowerPerIntensity;
         textures.RMCStartTime = component.RMCStartTime > TimeSpan.Zero ? component.RMCStartTime : _timing.CurTime;
         textures.RMCHeatColor = type.LightColor;

@@ -380,7 +380,7 @@ public sealed partial class ExplosionSystem : SharedExplosionSystem
         var rmcPowered = queued.Proto.PowerPerIntensity > 0;
         if (rmcPowered &&
             queued.Proto.BigSound is { } rmcBigSound &&
-            RMCExplosionVisuals.EpicenterPower(iterationIntensity, queued.Proto.PowerPerIntensity) >= RMCExplosionVisuals.BigSoundMinPower)
+            RMCExplosionVisuals.EpicenterPower(iterationIntensity, queued.Proto.PowerPerIntensity) >= queued.Proto.BigSoundMinPower)
         {
             sound = rmcBigSound;
         }

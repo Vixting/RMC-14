@@ -1,3 +1,4 @@
+using Content.Shared.Explosion; // RMC14
 using Robust.Client.Graphics;
 using Robust.Shared.Graphics;
 
@@ -25,6 +26,8 @@ public sealed partial class ExplosionVisualsTexturesComponent : Component
     public Color? FireColor;
 
     // RMC14
+    public ExplosionPrototype? RMCType;
+
     public float RMCPowerPerIntensity;
 
     public TimeSpan RMCStartTime;

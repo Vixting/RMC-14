@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Explosion;
 using Content.Shared._RMC14.Particles;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
@@ -22,6 +23,9 @@ public sealed partial class ExplosionPrototype
     public SoundSpecifier? BigSound;
 
     [DataField]
+    public float BigSoundMinPower = 300;
+
+    [DataField]
     public ResPath? SparkTexturePath;
 
     [DataField]
@@ -29,4 +33,19 @@ public sealed partial class ExplosionPrototype
 
     [DataField]
     public EntProtoId<ExplosionParticlesComponent>? Particles;
+
+    [DataField]
+    public RMCExplosionSmokeVisuals Smoke = new();
+
+    [DataField]
+    public RMCExplosionSparkVisuals Sparks = new();
+
+    [DataField]
+    public RMCExplosionShockWaveVisuals ShockWave = new();
+
+    [DataField]
+    public RMCExplosionLightVisuals Light = new();
+
+    [DataField]
+    public RMCExplosionScorch Scorch = new();
 }

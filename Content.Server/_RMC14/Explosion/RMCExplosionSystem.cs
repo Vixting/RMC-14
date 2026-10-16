@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Content.Server._RMC14.Scorch;
 using Content.Server.Decals;
 using Content.Server.Explosion.Components;
 using Content.Server.Explosion.EntitySystems;
@@ -11,6 +12,7 @@ using Content.Shared.Coordinates;
 using Content.Shared.Decals;
 using Content.Shared.Doors.Components;
 using Content.Shared.Examine;
+using Content.Shared.GameTicking;
 using Content.Shared.Explosion;
 using Content.Shared.Explosion.Components;
 using Content.Shared.Humanoid;
@@ -45,22 +47,9 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TriggerSystem _trigger = default!;
 
-    private const string HeavyScorchTag = "RMCScorch";
-    private const string LightScorchTag = "RMCScorchSmall";
-    private const float ExplosionScorchHeavyPower = 200;
-    private const float ExplosionScorchLightPower = 100;
-    private const int ExplosionScorchCoreRings = 1;
-    private const float ExplosionScorchNoiseFrequency = 0.18f;
-    private const float ExplosionScorchFullCoveragePower = 600;
-    private const float ExplosionScorchMinCoverage = 0.35f;
-    private const float ExplosionScorchMaxCoverage = 0.85f;
-    private const float ExplosionScorchJitter = 0.25f;
-    private const float ExplosionScorchMinAlpha = 0.6f;
-    private const float ExplosionScorchMinBrightness = 0.8f;
-    private const double ExplosionScorchRingSeconds = 0.015;
     private static readonly ProtoId<TagPrototype> WallTag = "Wall";
 
-    private readonly List<PendingScorch> _pendingScorches = new();
+    private readonly PriorityQueue<PendingScorch, TimeSpan> _pendingScorches = new();
 
     private readonly Dictionary<string, ProtoId<DecalPrototype>[]> _scorchDecalsByTag = new();
 
@@ -75,13 +64,19 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
 
         SubscribeLocalEvent<RMCExplosiveDeleteComponent, EntityStuckEvent>(OnExplosiveDeleteWallsStuck);
 
+        SubscribeLocalEvent<RMCScorchEffectComponent, CMExplosiveTriggeredEvent>(OnScorchEffectTriggered);
+
         SubscribeLocalEvent<ExplosionVisualsComponent, RMCExplosionSpawnedEvent>(OnExplosionSpawned);
         SubscribeLocalEvent<ExplosionVisualsComponent, RMCExplosionFinishedEvent>(OnExplosionFinished);
 
         SubscribeLocalEvent<RandomTimerTriggerComponent, ExaminedEvent>(OnRandomTimerTriggerExamined);
 
-        CacheDecals(HeavyScorchTag);
-        CacheDecals(LightScorchTag);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
+    {
+        _pendingScorches.Clear();
     }
 
     private void OnActiveTimerTrigger(ref ActiveTimerTriggerEvent ev)
@@ -138,9 +133,10 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
             return;
         }
 
+        var scorch = type.Scorch;
         var noise = new FastNoiseLite(_random.Next());
         noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        noise.SetFrequency(ExplosionScorchNoiseFrequency);
+        noise.SetFrequency(scorch.NoiseFrequency);
 
         var time = _timing.CurTime;
         foreach (var (gridUid, iterations) in ent.Comp.Tiles)
@@ -151,12 +147,12 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
                     continue;
 
                 var power = ent.Comp.Intensity[iteration] * type.PowerPerIntensity;
-                var at = time + TimeSpan.FromSeconds(ExplosionScorchRingSeconds * iteration);
-                var core = iteration <= ExplosionScorchCoreRings;
+                var at = time + scorch.RingDelay * iteration;
+                var core = iteration <= scorch.CoreRings;
                 foreach (var tile in tiles)
                 {
                     var density = Math.Clamp(noise.GetNoise(tile.X, tile.Y) * 0.5f + 0.5f, 0f, 1f);
-                    _pendingScorches.Add(new PendingScorch(at, gridUid, tile, power, density, core));
+                    _pendingScorches.Enqueue(new PendingScorch(scorch, gridUid, tile, power, density, core), at);
                 }
             }
         }
@@ -167,7 +163,7 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         if (!_prototypeManager.TryIndex(ent.Comp.ExplosionType, out ExplosionPrototype? type))
             return;
 
-        var visualLifetime = RMCExplosionVisuals.VisualLifetime(ent.Comp.Intensity, type.PowerPerIntensity);
+        var visualLifetime = RMCExplosionVisuals.VisualLifetime(type, ent.Comp.Intensity);
         var remaining = visualLifetime - (_timing.CurTime - ent.Comp.RMCStartTime).TotalSeconds;
         args.Lifetime = Math.Max(args.Lifetime, (float) remaining);
     }
@@ -176,30 +172,24 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
     {
         base.Update(frameTime);
 
-        if (_pendingScorches.Count == 0)
-            return;
-
-        var heavyDecals = GetDecals(HeavyScorchTag);
-        var lightDecals = GetDecals(LightScorchTag);
         var time = _timing.CurTime;
-        for (var i = _pendingScorches.Count - 1; i >= 0; i--)
+        while (_pendingScorches.TryPeek(out _, out var at) && at <= time)
         {
-            var scorch = _pendingScorches[i];
-            if (scorch.At > time)
-                continue;
-
-            _pendingScorches.RemoveAt(i);
+            var scorch = _pendingScorches.Dequeue();
+            var settings = scorch.Settings;
+            var heavyDecals = GetDecals(settings.HeavyDecalTag);
+            var lightDecals = GetDecals(settings.LightDecalTag);
             if (heavyDecals.Length == 0 ||
                 lightDecals.Length == 0 ||
                 !TryComp(scorch.Grid, out MapGridComponent? grid) ||
-                RollScorch(scorch.Power) is not { } heavy)
+                RollScorch(settings, scorch.Power) is not { } heavy)
             {
                 continue;
             }
 
             if (!scorch.Core)
             {
-                var coverage = Math.Clamp(scorch.Power / ExplosionScorchFullCoveragePower, ExplosionScorchMinCoverage, ExplosionScorchMaxCoverage);
+                var coverage = Math.Clamp(scorch.Power / settings.FullCoveragePower, settings.MinCoverage, settings.MaxCoverage);
                 if (scorch.Density < 1 - coverage)
                     continue;
 
@@ -207,22 +197,22 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
                     heavy = false;
             }
 
-            ScorchTile((scorch.Grid, grid), scorch.Tile, heavy, heavyDecals, lightDecals);
+            ScorchTile(settings, (scorch.Grid, grid), scorch.Tile, heavy, heavyDecals, lightDecals);
         }
     }
 
-    private bool? RollScorch(float power)
+    private bool? RollScorch(RMCExplosionScorch settings, float power)
     {
-        if (power >= ExplosionScorchHeavyPower)
+        if (power >= settings.HeavyPower)
             return true;
 
-        if (power >= ExplosionScorchLightPower)
-            return _random.Prob((power - ExplosionScorchLightPower) / (ExplosionScorchHeavyPower - ExplosionScorchLightPower));
+        if (power >= settings.LightPower)
+            return _random.Prob((power - settings.LightPower) / (settings.HeavyPower - settings.LightPower));
 
-        return _random.Prob(Math.Max(0, power) / ExplosionScorchLightPower) ? false : null;
+        return _random.Prob(Math.Max(0, power) / settings.LightPower) ? false : null;
     }
 
-    private void ScorchTile(Entity<MapGridComponent> grid, Vector2i tile, bool heavy, ProtoId<DecalPrototype>[] heavyDecals, ProtoId<DecalPrototype>[] lightDecals)
+    private void ScorchTile(RMCExplosionScorch settings, Entity<MapGridComponent> grid, Vector2i tile, bool heavy, ProtoId<DecalPrototype>[] heavyDecals, ProtoId<DecalPrototype>[] lightDecals)
     {
         if (!_map.TryGetTileRef(grid, grid.Comp, tile, out var tileRef) ||
             tileRef.Tile.IsEmpty ||
@@ -239,7 +229,7 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         }
 
         var coordinates = _map.GridTileToLocal(grid, grid.Comp, tile).Offset(new Vector2(-0.5f, -0.5f));
-        var bounds = Box2.CenteredAround(coordinates.Position, new Vector2(ExplosionScorchJitter * 2 + 0.1f));
+        var bounds = Box2.CenteredAround(coordinates.Position, new Vector2(settings.Jitter * 2 + 0.1f));
         var existing = _decals.GetDecalsIntersecting(grid, bounds);
         foreach (var (_, decal) in existing)
         {
@@ -262,11 +252,76 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
         var decals = heavy ? heavyDecals : lightDecals;
         var decalId = decals[_random.Next(decals.Length)];
         var jitter = new Vector2(
-            _random.NextFloat(-ExplosionScorchJitter, ExplosionScorchJitter),
-            _random.NextFloat(-ExplosionScorchJitter, ExplosionScorchJitter));
-        var brightness = _random.NextFloat(ExplosionScorchMinBrightness, 1f);
-        var color = new Color(brightness, brightness, brightness, _random.NextFloat(ExplosionScorchMinAlpha, 1f));
+            _random.NextFloat(-settings.Jitter, settings.Jitter),
+            _random.NextFloat(-settings.Jitter, settings.Jitter));
+        var brightness = _random.NextFloat(settings.MinBrightness, 1f);
+        var color = new Color(brightness, brightness, brightness, _random.NextFloat(settings.MinAlpha, 1f));
         _decals.TryAddDecal(decalId, coordinates.Offset(jitter), out _, color, _random.NextAngle(), cleanable: true);
+    }
+
+    private void OnScorchEffectTriggered(Entity<RMCScorchEffectComponent> ent, ref CMExplosiveTriggeredEvent args)
+    {
+        if (ent.Comp.Radius > 0)
+        {
+            if (!_rmcMap.TryGetTileRefForEnt(Transform(ent).Coordinates, out var grid, out var tile))
+                return;
+
+            var centerDecals = GetDecals(ent.Comp.CenterDecalTag);
+            var edgeDecals = GetDecals(ent.Comp.EdgeDecalTag);
+            if (centerDecals.Length == 0 || edgeDecals.Length == 0)
+                return;
+
+            var radius = Math.Max(1, ent.Comp.Radius);
+            var centerRadius = Math.Max(0, ent.Comp.CenterRadius);
+            var centerRadiusSq = centerRadius * centerRadius;
+            var radiusSq = radius * radius;
+            var center = tile.GridIndices;
+
+            for (var dx = -radius; dx <= radius; dx++)
+            {
+                for (var dy = -radius; dy <= radius; dy++)
+                {
+                    var distSq = dx * dx + dy * dy;
+                    if (distSq > radiusSq)
+                        continue;
+
+                    var indices = new Vector2i(center.X + dx, center.Y + dy);
+                    var coords = _map.GridTileToLocal(tile.GridUid, grid, indices);
+                    var decalCoords = coords.Offset(new Vector2(-0.5f, -0.5f));
+                    var decals = distSq <= centerRadiusSq ? centerDecals : edgeDecals;
+                    var decalId = decals[_random.Next(decals.Length)];
+                    var rotation = ent.Comp.RandomRotation ? _random.NextAngle() : Angle.FromDegrees(_random.Next(4) * 90);
+                    _decals.TryAddDecal(decalId, decalCoords, out _, rotation: rotation, cleanable: true);
+                }
+            }
+        }
+        else
+        {
+            var decals = GetDecals(ent.Comp.CenterDecalTag);
+            if (decals.Length == 0)
+                return;
+
+            var count = Math.Max(1, ent.Comp.Count);
+            // Decals spawn based on bottom left corner, if bigger decals are used the offset will have to change
+            var baseCoords = Transform(ent).Coordinates.Offset(new Vector2(-0.5f, -0.5f));
+            var scatterRadius = Math.Max(0f, ent.Comp.ScatterRadius);
+
+            for (var i = 0; i < count; i++)
+            {
+                var decalId = decals[_random.Next(decals.Length)];
+                var offset = Vector2.Zero;
+                if (scatterRadius > 0f)
+                {
+                    var angle = _random.NextAngle();
+                    var dist = _random.NextFloat() * scatterRadius;
+                    offset = angle.ToVec() * dist;
+                }
+
+                var coords = baseCoords.Offset(offset);
+                var rotation = ent.Comp.RandomRotation ? _random.NextAngle() : Angle.FromDegrees(_random.Next(4) * 90);
+                _decals.TryAddDecal(decalId, coords, out _, rotation: rotation, cleanable: true);
+            }
+        }
     }
 
     private void OnRandomTimerTriggerExamined(Entity<RandomTimerTriggerComponent> ent, ref ExaminedEvent args)
@@ -330,8 +385,8 @@ public sealed class RMCExplosionSystem : SharedRMCExplosionSystem
 
         _scorchDecalsByTag[decalTag] = decals;
         if (decals.Length == 0)
-            Log.Error($"Failed to get any decals for RMCScorchEffectComponent. Check that at least one decal has tag {decalTag}.");
+            Log.Error($"Failed to get any scorch decals. Check that at least one decal has tag {decalTag}.");
     }
 
-    private readonly record struct PendingScorch(TimeSpan At, EntityUid Grid, Vector2i Tile, float Power, float Density, bool Core);
+    private readonly record struct PendingScorch(RMCExplosionScorch Settings, EntityUid Grid, Vector2i Tile, float Power, float Density, bool Core);
 }

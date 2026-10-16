@@ -1,8 +1,9 @@
+using Content.Client._RMC14.Vehicle;
 using Content.Shared._RMC14.Particles;
 using Content.Shared._RMC14.Vehicle;
 using Robust.Shared.Containers;
 
-namespace Content.Client._RMC14.Particles;
+namespace Content.Client._RMC14.Particles.Visuals;
 
 /// <summary>
 /// Keeps smoke emitters attached to damaged or destroyed installed hardpoints until they are repaired or removed.
@@ -17,7 +18,16 @@ public sealed class HardpointWreckParticleSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
+        SubscribeLocalEvent<ParticleOnHardpointDamageComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<ParticleOnHardpointDamageComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<ParticleOnHardpointDamageComponent, HardpointIntegrityStateChangedEvent>(OnIntegrityStateChanged);
+        SubscribeLocalEvent<ParticleOnHardpointDamageComponent, EntGotInsertedIntoContainerMessage>(OnInserted);
+        SubscribeLocalEvent<ParticleOnHardpointDamageComponent, EntGotRemovedFromContainerMessage>(OnRemoved);
+    }
+
+    private void OnStartup(Entity<ParticleOnHardpointDamageComponent> ent, ref ComponentStartup args)
+    {
+        Refresh(ent);
     }
 
     private void OnShutdown(Entity<ParticleOnHardpointDamageComponent> ent, ref ComponentShutdown args)
@@ -26,41 +36,55 @@ public sealed class HardpointWreckParticleSystem : EntitySystem
             RemoveEmitters(active.Emitters);
     }
 
-    public override void FrameUpdate(float frameTime)
+    private void OnIntegrityStateChanged(Entity<ParticleOnHardpointDamageComponent> ent, ref HardpointIntegrityStateChangedEvent args)
     {
-        var query = EntityQueryEnumerator<ParticleOnHardpointDamageComponent, HardpointIntegrityComponent>();
-        while (query.MoveNext(out var uid, out var particles, out var integrity))
+        Refresh(ent);
+    }
+
+    private void OnInserted(Entity<ParticleOnHardpointDamageComponent> ent, ref EntGotInsertedIntoContainerMessage args)
+    {
+        Refresh(ent);
+    }
+
+    private void OnRemoved(Entity<ParticleOnHardpointDamageComponent> ent, ref EntGotRemovedFromContainerMessage args)
+    {
+        Refresh(ent);
+    }
+
+    private void Refresh(Entity<ParticleOnHardpointDamageComponent> ent)
+    {
+        var state = TryComp(ent, out HardpointIntegrityComponent? integrity)
+            ? GetState(ent, ent.Comp, integrity)
+            : HardpointDamageState.Intact;
+
+        var current = _active.TryGetValue(ent, out var active) ? active.State : HardpointDamageState.Intact;
+        if (state == current)
+            return;
+
+        if (current != HardpointDamageState.Intact)
         {
-            var state = GetState(uid, particles, integrity);
-            var current = _active.TryGetValue(uid, out var active) ? active.State : HardpointDamageState.Intact;
-            if (state == current)
-                continue;
-
-            if (current != HardpointDamageState.Intact)
-            {
-                RemoveEmitters(active.Emitters);
-                _active.Remove(uid);
-            }
-
-            var effects = state switch
-            {
-                HardpointDamageState.Damaged => particles.DamagedEffects,
-                HardpointDamageState.Destroyed => particles.DestroyedEffects,
-                _ => null,
-            };
-
-            if (effects == null)
-                continue;
-
-            var emitters = new List<ActiveEmitter>();
-            foreach (var effect in effects)
-            {
-                if (_particles.CreateParticle(effect, uid) is { } emitter)
-                    emitters.Add(emitter);
-            }
-
-            _active[uid] = (state, emitters);
+            RemoveEmitters(active.Emitters);
+            _active.Remove(ent);
         }
+
+        var effects = state switch
+        {
+            HardpointDamageState.Damaged => ent.Comp.DamagedEffects,
+            HardpointDamageState.Destroyed => ent.Comp.DestroyedEffects,
+            _ => null,
+        };
+
+        if (effects == null)
+            return;
+
+        var emitters = new List<ActiveEmitter>();
+        foreach (var effect in effects)
+        {
+            if (_particles.CreateParticle(effect, ent) is { } emitter)
+                emitters.Add(emitter);
+        }
+
+        _active[ent] = (state, emitters);
     }
 
     private HardpointDamageState GetState(EntityUid uid, ParticleOnHardpointDamageComponent particles, HardpointIntegrityComponent integrity)

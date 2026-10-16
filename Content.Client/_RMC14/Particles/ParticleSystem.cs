@@ -19,14 +19,13 @@ namespace Content.Client._RMC14.Particles;
 /// </summary>
 public sealed partial class ParticleSystem : EntitySystem
 {
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IResourceCache _resourceCache = default!;
-    [Dependency] private readonly SpriteSystem _spriteSystem = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private readonly List<ActiveEmitter> _emitters = new();
     private readonly List<(ProtoId<ParticleEffectPrototype> Id, MapCoordinates Coords, int Depth)> _pendingSubEmitters = new();
@@ -38,11 +37,12 @@ public sealed partial class ParticleSystem : EntitySystem
     private readonly Dictionary<string, (Texture[] Frames, float[] Delays, Texture[][] Alternates)> _frameCache = new();
     private readonly HashSet<string> _frameResolveFailures = new();
     private int _quality;
+    private int _maxBudget;
     private int _globalBudget;
+    private int _ignoreQualityMaxEmitters;
     private uint _nextHandle = 1;
 
     private static readonly float[] QualityMultipliers = { 0f, 0.25f, 0.5f, 1f };
-    private static readonly int[] QualityBudgets = { 0, 2250, 5500, 8000 };
 
     private const int HardMaxParticles = 8000;
     private const int IgnoreQualityMaxParticles = 64;
@@ -52,14 +52,14 @@ public sealed partial class ParticleSystem : EntitySystem
         base.Initialize();
         _overlay = new ParticleOverlay(this);
         _overlayManager.AddOverlay(_overlay);
-        _cfg.OnValueChanged(CCVars.ParticleQuality, OnQualityChanged, invokeImmediately: true);
-        _cfg.OnValueChanged(CCVars.ParticleGlobalBudget, v => _globalBudget = v, invokeImmediately: true);
+        Subs.CVar(_cfg, CCVars.ParticleQuality, OnQualityChanged, true);
+        Subs.CVar(_cfg, CCVars.ParticleGlobalBudget, OnGlobalBudgetChanged, true);
+        Subs.CVar(_cfg, CCVars.ParticleIgnoreQualityMaxEmitters, v => _ignoreQualityMaxEmitters = v, true);
     }
 
     public override void Shutdown()
     {
         base.Shutdown();
-        _cfg.UnsubValueChanged(CCVars.ParticleQuality, OnQualityChanged);
         _overlayManager.RemoveOverlay(_overlay);
         _emitters.Clear();
         _liveParticleCount = 0;
@@ -68,8 +68,28 @@ public sealed partial class ParticleSystem : EntitySystem
     private void OnQualityChanged(int quality)
     {
         _quality = quality;
-        if (quality >= 0 && quality < QualityBudgets.Length)
-            _globalBudget = QualityBudgets[quality];
+        UpdateBudget();
+    }
+
+    private void OnGlobalBudgetChanged(int budget)
+    {
+        _maxBudget = budget;
+        UpdateBudget();
+    }
+
+    private void UpdateBudget()
+    {
+        _globalBudget = (int) (_maxBudget * GetQualityMultiplier());
+    }
+
+    private float GetQualityMultiplier()
+    {
+        return QualityMultipliers[Math.Clamp(_quality, 0, QualityMultipliers.Length - 1)];
+    }
+
+    private int GetBudget(ParticleEffectPrototype proto)
+    {
+        return proto.IgnoreQualitySettings ? _maxBudget : _globalBudget;
     }
 
     public IReadOnlyList<ActiveEmitter> GetEmitters() => _emitters;
@@ -109,7 +129,7 @@ public sealed partial class ParticleSystem : EntitySystem
                 if (e.Proto.IgnoreQualitySettings)
                     ignoreCount++;
             }
-            if (ignoreCount >= 8)
+            if (ignoreCount >= _ignoreQualityMaxEmitters)
                 return null;
         }
 
@@ -137,7 +157,8 @@ public sealed partial class ParticleSystem : EntitySystem
 
     public void UpdateRuntime(uint handle, ParticleRuntimeOverrides overrides)
     {
-        if (handle == 0) return;
+        if (handle == 0)
+            return;
         foreach (var emitter in _emitters)
         {
             if (emitter.Handle == handle)
@@ -220,16 +241,19 @@ public sealed partial class ParticleSystem : EntitySystem
             for (var i = _emitters.Count - 1; i >= 0; i--)
             {
                 var e = _emitters[i];
-                if (e.Proto.IgnoreQualitySettings) continue;
+                if (e.Proto.IgnoreQualitySettings)
+                    continue;
                 foreach (var p in e.Particles)
                 {
-                    if (!p.Alive) continue;
+                    if (!p.Alive)
+                        continue;
                     p.Alive = false;
                     _liveParticleCount--;
                 }
                 _emitters.RemoveAt(i);
             }
-            if (_emitters.Count == 0) return;
+            if (_emitters.Count == 0)
+                return;
         }
 
         var eye = _eye.CurrentEye;
@@ -290,7 +314,8 @@ public sealed partial class ParticleSystem : EntitySystem
 
     public void StopEffect(uint handle)
     {
-        if (handle == 0) return;
+        if (handle == 0)
+            return;
         foreach (var emitter in _emitters)
         {
             if (emitter.Handle == handle)
@@ -305,7 +330,8 @@ public sealed partial class ParticleSystem : EntitySystem
 
     public void UpdateIntensity(uint handle, float intensity)
     {
-        if (handle == 0) return;
+        if (handle == 0)
+            return;
         foreach (var emitter in _emitters)
         {
             if (emitter.Handle == handle)
@@ -401,16 +427,18 @@ public sealed partial class ParticleSystem : EntitySystem
             while (emitter.AnimTimer >= emitter.Delays[emitter.AnimFrame])
             {
                 var delay = emitter.Delays[emitter.AnimFrame];
-                if (delay <= 0f) break;
+                if (delay <= 0f)
+                    break;
                 emitter.AnimTimer -= delay;
                 emitter.AnimFrame = (emitter.AnimFrame + 1) % emitter.Frames.Length;
             }
         }
 
-        int liveCount = 0;
+        var liveCount = 0;
         foreach (var p in emitter.Particles)
         {
-            if (!p.Alive) continue;
+            if (!p.Alive)
+                continue;
             liveCount++;
             p.Age += TimeSpan.FromSeconds(dt);
 
@@ -435,17 +463,19 @@ public sealed partial class ParticleSystem : EntitySystem
 
         if (!emitter.Exhausted)
         {
-            for (int b = 0; b < proto.Bursts.Count; b++)
+            for (var b = 0; b < proto.Bursts.Count; b++)
             {
-                if (emitter.FiredBursts[b]) continue;
+                if (emitter.FiredBursts[b])
+                    continue;
                 var burst = proto.Bursts[b];
-                if (emitter.Age < burst.Time) continue;
+                if (emitter.Age < burst.Time)
+                    continue;
 
-                var qualityMult = proto.IgnoreQualitySettings ? 1f : QualityMultipliers[Math.Clamp(_quality, 0, QualityMultipliers.Length - 1)];
+                var qualityMult = proto.IgnoreQualitySettings ? 1f : GetQualityMultiplier();
                 var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(maxCount, IgnoreQualityMaxParticles) : maxCount;
                 var scaledMax = (int)Math.Ceiling(Math.Min(effectiveMax, HardMaxParticles) * qualityMult * emitter.Intensity);
                 var toEmit = (int)Math.Ceiling(burst.Count * qualityMult * emitter.Intensity);
-                for (int j = 0; j < toEmit && _liveParticleCount < _globalBudget && liveCount < scaledMax; j++)
+                for (var j = 0; j < toEmit && _liveParticleCount < GetBudget(proto) && liveCount < scaledMax; j++)
                 {
                     EmitParticle(emitter, eyeAngle);
                     liveCount++;
@@ -456,14 +486,14 @@ public sealed partial class ParticleSystem : EntitySystem
 
         if (!emitter.Exhausted && !proto.Burst)
         {
-            var qualityMult = proto.IgnoreQualitySettings ? 1f : QualityMultipliers[Math.Clamp(_quality, 0, QualityMultipliers.Length - 1)];
+            var qualityMult = proto.IgnoreQualitySettings ? 1f : GetQualityMultiplier();
             var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(maxCount, IgnoreQualityMaxParticles) : maxCount;
             var scaledMax = (int)Math.Ceiling(Math.Min(effectiveMax, HardMaxParticles) * qualityMult * emitter.Intensity);
-            var available = _globalBudget - _liveParticleCount;
+            var available = GetBudget(proto) - _liveParticleCount;
             var canEmit = Math.Min(scaledMax - liveCount, available);
             if (canEmit > 0)
             {
-                float emissionMult = 1f;
+                var emissionMult = 1f;
                 if (proto.EmissionOverTime.Count > 0)
                 {
                     var t = duration > 0f
@@ -473,10 +503,10 @@ public sealed partial class ParticleSystem : EntitySystem
                 }
 
                 emitter.EmitAccum += emissionRate * emissionMult * dt * emitter.Intensity;
-                int toEmit = (int)emitter.EmitAccum;
+                var toEmit = (int) emitter.EmitAccum;
                 emitter.EmitAccum -= toEmit;
                 toEmit = Math.Min(toEmit, canEmit);
-                for (int i = 0; i < toEmit; i++)
+                for (var i = 0; i < toEmit; i++)
                     EmitParticle(emitter, eyeAngle);
             }
         }
@@ -489,11 +519,11 @@ public sealed partial class ParticleSystem : EntitySystem
     {
         var proto = emitter.Proto;
         var eyeAngle = (float)_eye.CurrentEye.Rotation;
-        var qualityMult = proto.IgnoreQualitySettings ? 1f : QualityMultipliers[Math.Clamp(_quality, 0, QualityMultipliers.Length - 1)];
+        var qualityMult = proto.IgnoreQualitySettings ? 1f : GetQualityMultiplier();
         var maxCount = emitter.Overrides?.MaxCount ?? proto.MaxCount;
         var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(maxCount, IgnoreQualityMaxParticles) : maxCount;
         var count = (int)Math.Ceiling(Math.Min(effectiveMax, HardMaxParticles) * qualityMult * emitter.Intensity);
-        for (int i = 0; i < count && _liveParticleCount < _globalBudget; i++)
+        for (var i = 0; i < count && _liveParticleCount < GetBudget(proto); i++)
             EmitParticle(emitter, eyeAngle);
     }
 
@@ -641,7 +671,8 @@ public sealed partial class ParticleSystem : EntitySystem
         emitter.Age += TimeSpan.FromSeconds(dt);
         foreach (var p in emitter.Particles)
         {
-            if (!p.Alive) continue;
+            if (!p.Alive)
+                continue;
             p.Age += TimeSpan.FromSeconds(dt);
             if (p.Age >= p.Lifetime)
             {
@@ -696,21 +727,16 @@ public sealed partial class ParticleSystem : EntitySystem
         {
             case SpriteSpecifier.Rsi rsi:
             {
-                RSI? resource;
-                try
-                {
-                    var path = rsi.RsiPath.IsRooted
-                        ? rsi.RsiPath
-                        : SpriteSpecifierSerializer.TextureRoot / rsi.RsiPath;
-                    resource = _resourceCache.GetResource<RSIResource>(path).RSI;
-                }
-                catch
-                {
-                    return false;
-                }
+                var path = rsi.RsiPath.IsRooted
+                    ? rsi.RsiPath
+                    : SpriteSpecifierSerializer.TextureRoot / rsi.RsiPath;
 
-                if (!resource.TryGetState(rsi.RsiState, out var state))
+                if (!_resourceCache.TryGetResource<RSIResource>(path, out var resource) ||
+                    !resource.RSI.TryGetState(rsi.RsiState, out var state))
+                {
+                    Log.Error($"Failed to resolve particle sprite {path} state {rsi.RsiState}");
                     return false;
+                }
 
                 frames = state.GetFrames(RsiDirection.South);
                 delays = state.GetDelays();
@@ -718,15 +744,17 @@ public sealed partial class ParticleSystem : EntitySystem
             }
             case SpriteSpecifier.Texture tex:
             {
-                try
+                var path = tex.TexturePath.IsRooted
+                    ? tex.TexturePath
+                    : SpriteSpecifierSerializer.TextureRoot / tex.TexturePath;
+
+                if (!_resourceCache.TryGetResource<TextureResource>(path, out var texture))
                 {
-                    frames = new[] { _spriteSystem.Frame0(tex) };
-                }
-                catch
-                {
+                    Log.Error($"Failed to resolve particle texture {path}");
                     return false;
                 }
 
+                frames = new Texture[] { texture };
                 return true;
             }
             default:
@@ -755,51 +783,81 @@ public sealed partial class ParticleSystem : EntitySystem
 
     public static float SampleCurve(List<ParticleCurveKey> curve, float t)
     {
-        if (curve.Count == 0) return 1f;
-        if (curve.Count == 1) return curve[0].Value;
+        if (curve.Count == 0)
+            return 1f;
+        if (curve.Count == 1)
+            return curve[0].Value;
 
         ParticleCurveKey? prev = null, next = null;
         foreach (var key in curve)
         {
-            if (key.Time <= t) prev = key;
-            else { next = key; break; }
+            if (key.Time <= t)
+            {
+                prev = key;
+                continue;
+            }
+
+            next = key;
+            break;
         }
-        if (prev == null) return curve[0].Value;
-        if (next == null) return prev.Value;
+        if (prev == null)
+            return curve[0].Value;
+        if (next == null)
+            return prev.Value;
         var span = next.Time - prev.Time;
         return span <= 0f ? prev.Value : prev.Value + (next.Value - prev.Value) * ((t - prev.Time) / span);
     }
 
     public static Color SampleColorCurve(List<ColorCurveKey> curve, float t)
     {
-        if (curve.Count == 0) return Color.White;
-        if (curve.Count == 1) return curve[0].Color;
+        if (curve.Count == 0)
+            return Color.White;
+        if (curve.Count == 1)
+            return curve[0].Color;
 
         ColorCurveKey? prev = null, next = null;
         foreach (var key in curve)
         {
-            if (key.Time <= t) prev = key;
-            else { next = key; break; }
+            if (key.Time <= t)
+            {
+                prev = key;
+                continue;
+            }
+
+            next = key;
+            break;
         }
-        if (prev == null) return curve[0].Color;
-        if (next == null) return prev.Color;
+        if (prev == null)
+            return curve[0].Color;
+        if (next == null)
+            return prev.Color;
         var span = next.Time - prev.Time;
         return span <= 0f ? prev.Color : Color.InterpolateBetween(prev.Color, next.Color, (t - prev.Time) / span);
     }
 
     public static Vector2 SampleVector2Curve(List<Vector2CurveKey> curve, float t)
     {
-        if (curve.Count == 0) return Vector2.Zero;
-        if (curve.Count == 1) return curve[0].Value;
+        if (curve.Count == 0)
+            return Vector2.Zero;
+        if (curve.Count == 1)
+            return curve[0].Value;
 
         Vector2CurveKey? prev = null, next = null;
         foreach (var key in curve)
         {
-            if (key.Time <= t) prev = key;
-            else { next = key; break; }
+            if (key.Time <= t)
+            {
+                prev = key;
+                continue;
+            }
+
+            next = key;
+            break;
         }
-        if (prev == null) return curve[0].Value;
-        if (next == null) return prev.Value;
+        if (prev == null)
+            return curve[0].Value;
+        if (next == null)
+            return prev.Value;
         var span = next.Time - prev.Time;
         return span <= 0f ? prev.Value : Vector2.Lerp(prev.Value, next.Value, (t - prev.Time) / span);
     }

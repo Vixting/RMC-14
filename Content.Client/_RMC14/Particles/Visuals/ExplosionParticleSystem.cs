@@ -10,7 +10,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
-namespace Content.Client._RMC14.Particles;
+namespace Content.Client._RMC14.Particles.Visuals;
 
 /// <summary>
 /// Plays an explosion types particle set at the epicenter of its explosions

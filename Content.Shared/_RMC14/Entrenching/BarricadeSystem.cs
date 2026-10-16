@@ -41,10 +41,6 @@ public sealed class BarricadeSystem : EntitySystem
     [Dependency] private readonly UseDelaySystem _useDelay = default!;
     [Dependency] private readonly SharedWeaponMountSystem _weaponMount = default!;
 
-    private static readonly ProtoId<ParticleEffectPrototype> DigDirt = "RMCDigDirt";
-    private static readonly ProtoId<ParticleEffectPrototype> DigDirtBurst = "RMCDigDirtBurst";
-    private static readonly Color DirtFallback = Color.FromHex("#5E4A30");
-
     private EntityQuery<BarricadeComponent> _barricadeQuery;
 
     public override void Initialize()
@@ -151,7 +147,7 @@ public sealed class BarricadeSystem : EntitySystem
         args.Handled = true;
         tool.Comp.TotalLayers = tool.Comp.LayersPerDig;
         Dirty(tool);
-        PlayDirt(coordinates, DigDirtBurst, args.User);
+        PlayDirt(tool.Comp, coordinates, tool.Comp.DigDirtBurst, args.User);
 
         var userCoordinates = _transform.GetMoverCoordinates(args.User);
         var emptyNearby = _lookup.GetEntitiesInRange<EmptySandbagComponent>(userCoordinates, 1.5f);
@@ -163,7 +159,7 @@ public sealed class BarricadeSystem : EntitySystem
                 BreakOnMove = true,
             };
             if (_doAfter.TryStartDoAfter(doAfter))
-                PlayDirt(_transform.GetMoverCoordinates(empty), DigDirt, args.User, tool, tool.Comp.FillDelay);
+                PlayDirt(tool.Comp, _transform.GetMoverCoordinates(empty), tool.Comp.DigDirt, args.User, tool, tool.Comp.FillDelay);
 
             _popup.PopupClient(Loc.GetString("cm-entrenching-begin-filling"), args.User, args.User);
             break;
@@ -233,7 +229,7 @@ public sealed class BarricadeSystem : EntitySystem
             BreakOnMove = true,
         };
         if (_doAfter.TryStartDoAfter(doAfter))
-            PlayDirt(_transform.GetMoverCoordinates(empty), DigDirt, null, tool, tool.Comp.FillDelay);
+            PlayDirt(tool.Comp, _transform.GetMoverCoordinates(empty), tool.Comp.DigDirt, null, tool, tool.Comp.FillDelay);
 
         _popup.PopupClient(Loc.GetString("cm-entrenching-begin-filling"), args.User, args.User);
     }
@@ -312,15 +308,15 @@ public sealed class BarricadeSystem : EntitySystem
         }
     }
 
-    private void PlayDirt(EntityCoordinates coordinates, ProtoId<ParticleEffectPrototype> effect, EntityUid? user, EntityUid? source = null, TimeSpan? duration = null)
+    private void PlayDirt(EntrenchingToolComponent tool, EntityCoordinates coordinates, ProtoId<ParticleEffectPrototype> effect, EntityUid? user, EntityUid? source = null, TimeSpan? duration = null)
     {
         var ev = new RMCParticleEffectEvent(new List<ProtoId<ParticleEffectPrototype>> { effect },
             _transform.ToMapCoordinates(coordinates),
-            color: DirtFallback,
+            color: tool.DirtColor,
             duration: duration)
         {
             TileTint = true,
-            Brightness = 0.7f,
+            Brightness = tool.DirtBrightness,
             Source = GetNetEntity(source),
         };
 
@@ -348,7 +344,7 @@ public sealed class BarricadeSystem : EntitySystem
         };
 
         if (_doAfter.TryStartDoAfter(doAfter))
-            PlayDirt(coordinates, DigDirt, user, tool, tool.Comp.DigDelay);
+            PlayDirt(tool.Comp, coordinates, tool.Comp.DigDirt, user, tool, tool.Comp.DigDelay);
 
         _popup.PopupClient(Loc.GetString("cm-entrenching-start-digging"), user, user);
         _audio.PlayPredicted(tool.Comp.DigSound, user, user);

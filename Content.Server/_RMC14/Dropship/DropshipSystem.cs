@@ -85,10 +85,6 @@ public sealed class DropshipSystem : SharedDropshipSystem
 
     private const float DepartureLocationSearchRange = 12;
 
-    private static readonly ProtoId<ParticleEffectPrototype> LandingDust = "RMCDropshipLandingDust";
-    private static readonly TimeSpan LandingDustCutoff = TimeSpan.FromSeconds(0.9);
-    private const float LandingDustRadiusPerTile = 0.375f;
-
     public override void Initialize()
     {
         base.Initialize();
@@ -353,15 +349,15 @@ public sealed class DropshipSystem : SharedDropshipSystem
                 Dirty(ent);
             }
 
-            var dustTime = ftl.StateTime.End - _timing.CurTime - LandingDustCutoff;
-            if (dustTime > TimeSpan.Zero)
+            var dustTime = ftl.StateTime.End - _timing.CurTime - dropship.LandingDustCutoff;
+            if (dropship.LandingDust is { } landingDust && dustTime > TimeSpan.Zero)
             {
                 var coords = _transform.GetMapCoordinates(destination);
                 float? radius = null;
                 if (TryComp(ent.Comp.Ship, out MapGridComponent? shipGrid))
-                    radius = Math.Max(shipGrid.LocalAABB.Width, shipGrid.LocalAABB.Height) * LandingDustRadiusPerTile;
+                    radius = Math.Max(shipGrid.LocalAABB.Width, shipGrid.LocalAABB.Height) * dropship.LandingDustRadiusPerTile;
 
-                var dustEv = new RMCParticleEffectEvent([LandingDust], coords, duration: dustTime, radius: radius);
+                var dustEv = new RMCParticleEffectEvent([landingDust], coords, duration: dustTime, radius: radius);
                 _particleEffects.PlayPvs(dustEv);
             }
         }

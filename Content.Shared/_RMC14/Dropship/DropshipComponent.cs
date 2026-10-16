@@ -1,3 +1,4 @@
+using Content.Shared._RMC14.Particles;
 using Content.Shared.Doors.Components;
 using Content.Shared.Shuttles.Systems;
 using Robust.Shared.Audio;
@@ -97,4 +98,13 @@ public sealed partial class DropshipComponent : Component
         {
             Params = AudioParams.Default.WithVolume(2f).WithReferenceDistance(10).WithMaxDistance(30).WithLoop(true),
         };
+
+    [DataField, AutoNetworkedField]
+    public ProtoId<ParticleEffectPrototype>? LandingDust = "RMCDropshipLandingDust";
+
+    [DataField, AutoNetworkedField]
+    public TimeSpan LandingDustCutoff = TimeSpan.FromSeconds(0.9);
+
+    [DataField, AutoNetworkedField]
+    public float LandingDustRadiusPerTile = 0.375f;
 }
