@@ -51,9 +51,12 @@ public sealed class ParticleOverlay : Overlay
         _sortBuffer.Clear();
         foreach (var emitter in _system.GetEmitters())
         {
-            if (emitter.MapCoords.MapId != mapId) continue;
-            if (!IsEmitterVisible(emitter, args.WorldAABB, eyeAngle)) continue;
-            if (emitter.Frames.Length == 0) continue;
+            if (emitter.MapCoords.MapId != mapId)
+                continue;
+            if (!IsEmitterVisible(emitter, args.WorldAABB, eyeAngle))
+                continue;
+            if (emitter.Frames.Length == 0)
+                continue;
             _sortBuffer.Add(emitter);
         }
 
@@ -71,7 +74,7 @@ public sealed class ParticleOverlay : Overlay
             var baseHalfSize = (ovr?.ParticleSize ?? proto.ParticleSize) * 0.5f;
             var pivot = proto.Pivot;
 
-            string? wantedShader = ovr?.Shader ?? (string.IsNullOrEmpty(proto.Shader) ? null : proto.Shader);
+            var wantedShader = ovr?.Shader ?? (string.IsNullOrEmpty(proto.Shader) ? null : proto.Shader);
             if (wantedShader != activeShader)
             {
                 if (wantedShader != null)
@@ -96,7 +99,8 @@ public sealed class ParticleOverlay : Overlay
 
             foreach (var particle in emitter.Particles)
             {
-                if (!particle.Alive) continue;
+                if (!particle.Alive)
+                    continue;
 
                 var frames = particle.Variant > 0 && particle.Variant <= emitter.AlternateFrames.Length
                     ? emitter.AlternateFrames[particle.Variant - 1]

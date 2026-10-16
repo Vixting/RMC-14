@@ -10,34 +10,30 @@ public sealed class RMCExplosionLightSystem : EntitySystem
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
-    private const float PowerPerEnergy = 100;
-    private const float MinEnergy = 1;
-    private const float MaxEnergy = 8;
-    private const float FlashMultiplier = 1.5f;
-    private const double FlashSeconds = 0.1;
-    private const float StartRadiusMultiplier = 0.7f;
-
     public override void FrameUpdate(float frameTime)
     {
         var time = _timing.CurTime;
         var query = EntityQueryEnumerator<ExplosionVisualsComponent, ExplosionVisualsTexturesComponent>();
         while (query.MoveNext(out var visuals, out var textures))
         {
-            if (textures.RMCPowerPerIntensity <= 0 ||
+            if (textures.RMCType is not { } type ||
+                textures.RMCPowerPerIntensity <= 0 ||
                 visuals.Intensity.Count == 0 ||
                 !_lights.TryGetLight(textures.LightEntity, out var light))
             {
                 continue;
             }
 
+            var settings = type.Light;
             var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, textures.RMCPowerPerIntensity);
-            var peak = Math.Clamp(power / PowerPerEnergy, MinEnergy, MaxEnergy);
+            var peak = Math.Clamp(power / settings.PowerPerEnergy, settings.MinEnergy, settings.MaxEnergy);
             var elapsed = (time - textures.RMCStartTime).TotalSeconds;
-            var fadeEnd = RMCExplosionVisuals.SmokeEnd(visuals.Intensity, textures.RMCPowerPerIntensity);
+            var fadeEnd = RMCExplosionVisuals.SmokeEnd(type, visuals.Intensity);
+            var flashSeconds = settings.FlashDuration.TotalSeconds;
 
-            var flash = 1 + (FlashMultiplier - 1) * (float) Math.Max(0, 1 - elapsed / FlashSeconds);
-            var fade = 1 - SmoothStep(FlashSeconds, fadeEnd, elapsed);
-            var grow = StartRadiusMultiplier + (1 - StartRadiusMultiplier) * (float) Math.Min(elapsed / FlashSeconds, 1);
+            var flash = 1 + (settings.FlashMultiplier - 1) * (float) Math.Max(0, 1 - elapsed / flashSeconds);
+            var fade = 1 - SmoothStep(flashSeconds, fadeEnd, elapsed);
+            var grow = settings.StartRadiusMultiplier + (1 - settings.StartRadiusMultiplier) * (float) Math.Min(elapsed / flashSeconds, 1);
 
             _lights.SetEnergy(textures.LightEntity, peak * flash * fade, light);
             _lights.SetRadius(textures.LightEntity, visuals.Intensity.Count * grow, light);
