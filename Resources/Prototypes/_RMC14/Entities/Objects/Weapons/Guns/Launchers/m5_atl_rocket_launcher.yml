@@ -4,7 +4,9 @@
   abstract: true
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCRocketBackblast
+    effects:
+    - RMCRocketBackblast
+    - RMCRocketBackblastFlash
     reverse: true
   - type: GuideHelp
     guides:
@@ -162,6 +164,10 @@
       falloff: 10
   - type: DeleteOnTrigger
   - type: IgnoreSwiftSteps
+  - type: ParticleEmitter
+    effects:
+    - RMCRocketExhaust
+    - RMCRocketSmokeTrail
 
 - type: entity
   parent: RMCBaseProjectileRocket84mm

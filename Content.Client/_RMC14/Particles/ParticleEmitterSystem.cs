@@ -25,10 +25,9 @@ public sealed class ParticleEmitterSystem : EntitySystem
         RemoveEmitters(ent.Owner);
 
         var emitters = new List<ActiveEmitter>();
-        SpawnEmitter(ent, ent.Comp.Effect, emitters);
-        foreach (var extra in ent.Comp.ExtraEffects)
+        foreach (var effect in ent.Comp.Effects)
         {
-            SpawnEmitter(ent, extra, emitters);
+            SpawnEmitter(ent, effect, emitters);
         }
 
         if (emitters.Count > 0)

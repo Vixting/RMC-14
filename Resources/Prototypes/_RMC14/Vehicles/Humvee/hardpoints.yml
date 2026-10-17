@@ -128,7 +128,8 @@
   description: A fixed forward cannon for a humvee hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
@@ -212,7 +213,8 @@
   description: A launcher hardpoint for a humvee.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: Sprite
     state: humveelauncher
   - type: HardpointItem

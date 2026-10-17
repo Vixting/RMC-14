@@ -393,6 +393,11 @@
   components:
   - type: Sprite
     sprite: _RMC14/Objects/Weapons/Grenades/molotov.rsi
+  - type: ParticleOnThrown
+    effects:
+    - RMCMolotovFlame
+    - RMCMolotovSmoke
+    requirePrimed: true
   - type: OnUseTimerTrigger
     examinable: false
   - type: RandomTimerTrigger

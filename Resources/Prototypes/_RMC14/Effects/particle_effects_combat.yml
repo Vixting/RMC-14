@@ -2043,32 +2043,62 @@
   alphaOverLifetime:
     - time: 0
       value: 0.0
-    - time: 0.06
-      value: 0.3
+    - time: 0.05
+      value: 0.45
     - time: 0.4
-      value: 0.18
+      value: 0.28
     - time: 1
       value: 0.0
   sizeOverLifetime:
     - time: 0
       value: 1.0
     - time: 1
-      value: 3.5
-  lifetime: 0.9
-  lifetimeVariance: 0.25
-  speed: 7.5
-  speedVariance: 4
-  drag: 4.5
+      value: 5.0
+  lifetime: 1.6
+  lifetimeVariance: 0.4
+  speed: 11
+  speedVariance: 5
+  drag: 4
   constantForce: 0, 0.3
-  noiseStrength: 0.8
+  noiseStrength: 0.9
   noiseFrequency: 4
-  particleSize: 0.4
-  sizeVariance: 0.3
-  maxCount: 18
+  particleSize: 0.55
+  sizeVariance: 0.35
+  maxCount: 40
   burst: true
-  spreadAngle: 45
+  spreadAngle: 60
   startRotationVariance: 180
   rotationSpeedVariance: 90
+
+- type: particleEffect
+  id: RMCRocketBackblastFlash
+  sprite:
+    sprite: Effects/fire.rsi
+    state: fire
+  shader: unshaded
+  colorOverLifetime:
+    - time: 0.0
+      color: "#FFF4C2FF"
+    - time: 0.3
+      color: "#FF9A2EE6"
+    - time: 1.0
+      color: "#B0200000"
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 1.8
+  lifetime: 0.22
+  lifetimeVariance: 0.06
+  speed: 9
+  speedVariance: 3
+  drag: 6
+  particleSize: 0.45
+  sizeVariance: 0.3
+  maxCount: 16
+  burst: true
+  spreadAngle: 35
+  startRotationVariance: 180
 
 - type: particleEffect
   id: RMCVehicleWreckSmoke
@@ -2154,6 +2184,146 @@
   shape:
     type: CircleFill
     radius: 0.25
+
+# Molotov
+
+- type: particleEffect
+  id: RMCMolotovFlame
+  sprite:
+    sprite: Effects/fire.rsi
+    state: fire
+  shader: unshaded
+  colorOverLifetime:
+    - time: 0.0
+      color: "#FFE08AFF"
+    - time: 0.35
+      color: "#FF8A1FE6"
+    - time: 1.0
+      color: "#B0200000"
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 0.4
+  lifetime: 0.35
+  lifetimeVariance: 0.1
+  speed: 0.3
+  speedVariance: 0.2
+  constantForce: 0, 1.5
+  particleSize: 0.28
+  sizeVariance: 0.3
+  emissionRate: 45
+  maxCount: 24
+  duration: 0
+  spreadAngle: 360
+  startRotationVariance: 180
+  shape:
+    type: CircleFill
+    radius: 0.06
+
+- type: particleEffect
+  id: RMCMolotovSmoke
+  sprite:
+    sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#3A3A3AFF"
+  endColor: "#6E6E6EFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.15
+      value: 0.45
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.0
+  lifetime: 0.9
+  lifetimeVariance: 0.2
+  speed: 0.2
+  speedVariance: 0.1
+  drag: 1
+  constantForce: 0, 0.6
+  noiseStrength: 0.3
+  noiseFrequency: 4
+  particleSize: 0.3
+  sizeVariance: 0.25
+  emissionRate: 25
+  maxCount: 30
+  duration: 0
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 90
+
+# Rocket trails
+
+- type: particleEffect
+  id: RMCRocketExhaust
+  sprite:
+    sprite: Effects/fire.rsi
+    state: fire
+  shader: unshaded
+  colorOverLifetime:
+    - time: 0.0
+      color: "#FFF4C2FF"
+    - time: 0.4
+      color: "#FF9A2EE6"
+    - time: 1.0
+      color: "#C0300000"
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 0.3
+  lifetime: 0.15
+  lifetimeVariance: 0.05
+  speed: 0.2
+  speedVariance: 0.1
+  particleSize: 0.32
+  sizeVariance: 0.25
+  emissionRate: 140
+  maxCount: 30
+  duration: 0
+  spreadAngle: 360
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCRocketSmokeTrail
+  sprite:
+    sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#B4B4B4FF"
+  endColor: "#8C8C8CFF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.08
+      value: 0.5
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 4.0
+  lifetime: 1.6
+  lifetimeVariance: 0.4
+  speed: 0.15
+  speedVariance: 0.1
+  drag: 1.5
+  constantForce: 0, 0.3
+  noiseStrength: 0.25
+  noiseFrequency: 3
+  particleSize: 0.3
+  sizeVariance: 0.25
+  emissionRate: 120
+  maxCount: 220
+  duration: 0
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
 
 # Dropship landing
 

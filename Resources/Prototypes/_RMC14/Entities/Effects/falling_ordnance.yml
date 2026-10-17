@@ -10,7 +10,8 @@
     startOffset: 0, 15
     duration: 1
   - type: ParticleEmitter
-    effect: RMCFallingOrdnanceTrail
+    effects:
+    - RMCFallingOrdnanceTrail
   - type: TimedDespawn
     lifetime: 1
 

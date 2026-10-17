@@ -5,7 +5,8 @@
   description: A light tank cannon hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
@@ -79,7 +80,8 @@
   description: A light anti-air minigun hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
@@ -177,7 +179,8 @@
   description: An ACE autocannon hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke

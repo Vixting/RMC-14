@@ -5,7 +5,9 @@
   description: "The HJRA-12 Handheld Anti-Tank Grenade Launcher is the standard Anti-Armor weapon of the SPP. It is designed to be easy to use and to take out or disable armored vehicles."
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCRocketBackblast
+    effects:
+    - RMCRocketBackblast
+    - RMCRocketBackblastFlash
     reverse: true
   - type: Sprite
     sprite: _RMC14/Objects/Weapons/Guns/RocketLaunchers/hjra12/hjra12_inhands.rsi
@@ -245,6 +247,10 @@
     - range: 7
       falloff: 10
   - type: IgnoreSwiftSteps
+  - type: ParticleEmitter
+    effects:
+    - RMCRocketExhaust
+    - RMCRocketSmokeTrail
 
 - type: Tag
   id: RMCRocketHJRA12

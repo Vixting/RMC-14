@@ -5,7 +5,8 @@
   name: turret
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: Sentry
   - type: Eye
   - type: DeviceNetwork

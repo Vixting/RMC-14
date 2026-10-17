@@ -65,7 +65,8 @@
   description: A tank-mounted grenade launcher hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: Sprite
     state: glauncher
   - type: HardpointItem
@@ -140,7 +141,8 @@
   description: A tank-mounted TOW launcher hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: Sprite
     state: tow_launcher
   - type: HardpointItem
@@ -212,7 +214,8 @@
   description: A cupola-mounted weapon hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: Sprite
     state: m56_cupola
   - type: HardpointItem

@@ -33,7 +33,8 @@
   description: A fixed forward cannon for an APC hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: Sprite
     state: front_cannon
   - type: HardpointItem
@@ -80,7 +81,8 @@
   description: A dual cannon turret for an APC hardpoint.
   components:
   - type: ParticleOnMuzzleFlash
-    effect: RMCGunFiringSmoke
+    effects:
+    - RMCGunFiringSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke

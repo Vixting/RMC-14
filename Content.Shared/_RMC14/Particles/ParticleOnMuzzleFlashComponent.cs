@@ -11,7 +11,7 @@ namespace Content.Shared._RMC14.Particles;
 public sealed partial class ParticleOnMuzzleFlashComponent : Component
 {
     [DataField(required: true), AutoNetworkedField]
-    public ProtoId<ParticleEffectPrototype> Effect;
+    public List<ProtoId<ParticleEffectPrototype>> Effects = new();
 
     [DataField, AutoNetworkedField]
     public Color? ColorOverride;
