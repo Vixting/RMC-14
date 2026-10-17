@@ -51,22 +51,23 @@ public sealed class ExplosionParticleSystem : EntitySystem
             return;
 
         var power = RMCExplosionVisuals.EpicenterPower(ent.Comp.Intensity, type.PowerPerIntensity);
-        var tier = GetTier(particles, power);
-        PlayTier(tier, ent.Comp.Epicenter);
+        if (GetTier(particles, power) is { } tier)
+            PlayTier(tier, ent.Comp.Epicenter);
     }
 
     private void OnSpawnStartup(Entity<ParticleExplosionOnSpawnComponent> ent, ref ComponentStartup args)
     {
         if (!_random.Prob(ent.Comp.Probability) ||
-            !ent.Comp.Particles.TryGet(out var particles, _prototype, _compFactory))
+            !ent.Comp.Particles.TryGet(out var particles, _prototype, _compFactory) ||
+            GetLowestTier(particles) is not { } tier)
         {
             return;
         }
 
-        PlayTier(particles.Tiny, _transform.GetMapCoordinates(ent));
+        PlayTier(tier, _transform.GetMapCoordinates(ent));
     }
 
-    private static ExplosionParticleTier GetTier(ExplosionParticlesComponent particles, float power)
+    private static ExplosionParticleTier? GetTier(ExplosionParticlesComponent particles, float power)
     {
         ExplosionParticleTier? best = null;
         foreach (var tier in particles.Tiers)
@@ -75,7 +76,19 @@ public sealed class ExplosionParticleSystem : EntitySystem
                 best = tier;
         }
 
-        return best ?? particles.Tiny;
+        return best ?? GetLowestTier(particles);
+    }
+
+    private static ExplosionParticleTier? GetLowestTier(ExplosionParticlesComponent particles)
+    {
+        ExplosionParticleTier? lowest = null;
+        foreach (var tier in particles.Tiers)
+        {
+            if (lowest == null || tier.MinPower < lowest.MinPower)
+                lowest = tier;
+        }
+
+        return lowest;
     }
 
     private void PlayTier(ExplosionParticleTier tier, MapCoordinates coords)

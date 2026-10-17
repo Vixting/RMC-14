@@ -62,9 +62,7 @@ public sealed partial class ParticleEffectPrototype : IPrototype, IInheritingPro
     [AbstractDataField]
     public bool Abstract { get; private set; }
 
-    [DataField(required: true)] public SpriteSpecifier Sprite { get; private set; } = default!;
-
-    [DataField] public List<SpriteSpecifier> AlternateSprites { get; private set; } = new();
+    [DataField(required: true)] public List<SpriteSpecifier> Sprites { get; private set; } = new();
 
     [DataField] public Vector2 Pivot { get; private set; }
     [DataField] public Color StartColor { get; private set; } = Color.White;

@@ -698,16 +698,17 @@ public sealed partial class ParticleSystem : EntitySystem
         if (_frameResolveFailures.Contains(protoId))
             return;
 
-        if (!TryResolveSprite(emitter.Proto.Sprite, out var frames, out var delays))
+        var sprites = emitter.Proto.Sprites;
+        if (sprites.Count == 0 || !TryResolveSprite(sprites[0], out var frames, out var delays))
         {
             _frameResolveFailures.Add(protoId);
             return;
         }
 
         var alternates = new List<Texture[]>();
-        foreach (var sprite in emitter.Proto.AlternateSprites)
+        for (var i = 1; i < sprites.Count; i++)
         {
-            if (TryResolveSprite(sprite, out var altFrames, out _) && altFrames.Length > 0)
+            if (TryResolveSprite(sprites[i], out var altFrames, out _) && altFrames.Length > 0)
                 alternates.Add(altFrames);
         }
 

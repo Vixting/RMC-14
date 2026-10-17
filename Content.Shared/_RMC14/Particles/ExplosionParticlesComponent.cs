@@ -7,12 +7,6 @@ namespace Content.Shared._RMC14.Particles;
 [Access(Other = AccessPermissions.ReadExecute)]
 public sealed partial class ExplosionParticlesComponent : Component
 {
-    /// <summary>
-    /// Used for anything below the weakest tier.
-    /// </summary>
     [DataField(required: true)]
-    public ExplosionParticleTier Tiny = new();
-
-    [DataField]
     public List<ExplosionParticleTier> Tiers = new();
 }

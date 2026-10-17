@@ -4,20 +4,6 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: ExplosionParticles
-    tiny:
-      effects:
-      - RMCExplosionSmokeTiny
-      tileColorEffects:
-      - effect: RMCExplosionFallingDebrisTiny
-        brightness: 0.7
-        fallback: "#5E4A30"
-      - effect: RMCExplosionDirtKickupTiny
-        brightness: 1.7
-        fallback: "#BA9F6D"
-      waterEffects:
-      - RMCExplosionWaterSmokeTiny
-      - RMCExplosionWaterFallingTiny
-      - RMCExplosionWaterSplashTiny
     tiers:
     - minPower: 0
       flash: RMCExplosionFlash
@@ -85,14 +71,29 @@
   id: RMCExplosionParticlesGrenade
   components:
   - type: ExplosionParticles
-    tiers: []
+    tiers:
+    - minPower: 0
+      effects:
+      - RMCExplosionSmokeTiny
+      tileColorEffects:
+      - effect: RMCExplosionFallingDebrisTiny
+        brightness: 0.7
+        fallback: "#5E4A30"
+      - effect: RMCExplosionDirtKickupTiny
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      waterEffects:
+      - RMCExplosionWaterSmokeTiny
+      - RMCExplosionWaterFallingTiny
+      - RMCExplosionWaterSplashTiny
 
 - type: entity
   id: RMCExplosionParticlesGau
   categories: [ HideSpawnMenu ]
   components:
   - type: ExplosionParticles
-    tiny:
+    tiers:
+    - minPower: 0
       effects:
       - RMCGauFlash
       - RMCGauSmoke

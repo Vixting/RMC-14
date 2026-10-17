@@ -1,7 +1,7 @@
 - type: particleEffect
   id: RMCWeldingSparks
-  sprite:
-    sprite: _RMC14/Particles/generic.rsi
+  sprites:
+  - sprite: _RMC14/Particles/generic.rsi
     state: curl
   shader: unshaded
   colorOverLifetime:
@@ -33,8 +33,8 @@
 
 - type: particleEffect
   id: RMCGibMist
-  sprite:
-    sprite: _RMC14/Particles/generic.rsi
+  sprites:
+  - sprite: _RMC14/Particles/generic.rsi
     state: soft_dot_big
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFF00"
@@ -79,8 +79,8 @@
 
 - type: particleEffect
   id: RMCWeldingBurst
-  sprite:
-    sprite: _RMC14/Particles/generic.rsi
+  sprites:
+  - sprite: _RMC14/Particles/generic.rsi
     state: curl
   shader: unshaded
   colorOverLifetime:
@@ -111,8 +111,8 @@
 
 - type: particleEffect
   id: RMCSmoke
-  sprite:
-    sprite: Effects/chemsmoke.rsi
+  sprites:
+  - sprite: Effects/chemsmoke.rsi
     state: chemsmoke
   startColor: "#CCCCCCCC"
   endColor: "#CCCCCC00"
@@ -137,8 +137,8 @@
 
 - type: particleEffect
   id: RMCFireEmbers
-  sprite:
-    sprite: Effects/fire.rsi
+  sprites:
+  - sprite: Effects/fire.rsi
     state: fire
   shader: unshaded
   colorOverLifetime:
@@ -166,8 +166,8 @@
 
 - type: particleEffect
   id: RMCFootstepDust
-  sprite:
-    sprite: Effects/chemsmoke.rsi
+  sprites:
+  - sprite: Effects/chemsmoke.rsi
     state: chemsmoke
   startColor: "#CCCCCC88"
   endColor: "#CCCCCC00"

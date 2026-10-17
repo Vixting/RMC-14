@@ -1,8 +1,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_64.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_64.rsi
     state: smoke
   colorOverLifetime:
     - time: 0
@@ -40,8 +40,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmokeDeva
-  sprite:
-    sprite: _RMC14/Particles/smoke_64.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_64.rsi
     state: smoke
   colorOverLifetime:
     - time: 0
@@ -79,8 +79,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmokeSmall
-  sprite:
-    sprite: _RMC14/Particles/smoke_64.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_64.rsi
     state: smoke
   colorOverLifetime:
     - time: 0
@@ -118,8 +118,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmokeTiny
-  sprite:
-    sprite: _RMC14/Particles/smoke_64.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_64.rsi
     state: smoke
   colorOverLifetime:
     - time: 0
@@ -155,8 +155,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmokeWave
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke3
   colorOverLifetime:
     - time: 0
@@ -189,8 +189,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmokeWaveDeva
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke3
   colorOverLifetime:
     - time: 0
@@ -223,8 +223,8 @@
 
 - type: particleEffect
   id: RMCExplosionSmokeWaveSmall
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke3
   colorOverLifetime:
     - time: 0
@@ -257,8 +257,8 @@
 
 - type: particleEffect
   id: RMCExplosionDirtKickup
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: dirt
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -294,8 +294,8 @@
 
 - type: particleEffect
   id: RMCExplosionDirtKickupTiny
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: dirt
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -331,8 +331,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterSplash
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: water
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -368,8 +368,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterSplashTiny
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: water
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -405,8 +405,8 @@
 
 - type: particleEffect
   id: RMCExplosionDirtKickupLarge
-  sprite:
-    sprite: _RMC14/Particles/plume_tall.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume_tall.rsi
     state: dirt
   colorOverLifetime:
     - time: 0
@@ -446,8 +446,8 @@
 
 - type: particleEffect
   id: RMCExplosionDirtKickupLargeDeva
-  sprite:
-    sprite: _RMC14/Particles/plume_tall.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume_tall.rsi
     state: dirt
   colorOverLifetime:
     - time: 0
@@ -487,8 +487,8 @@
 
 - type: particleEffect
   id: RMCExplosionDirtKickupLargeSmall
-  sprite:
-    sprite: _RMC14/Particles/plume_tall.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume_tall.rsi
     state: dirt
   colorOverLifetime:
     - time: 0
@@ -528,8 +528,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterSplashLarge
-  sprite:
-    sprite: _RMC14/Particles/plume_tall.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume_tall.rsi
     state: water
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -562,10 +562,9 @@
 
 - type: particleEffect
   id: RMCExplosionFallingDebris
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -600,10 +599,9 @@
 
 - type: particleEffect
   id: RMCExplosionFallingDebrisSmall
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -638,10 +636,9 @@
 
 - type: particleEffect
   id: RMCExplosionFallingDebrisTiny
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -676,8 +673,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterFalling
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: pixel
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -709,8 +706,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterFallingTiny
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: pixel
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -744,10 +741,9 @@
 
 - type: particleEffect
   id: RMCExplosionWaterSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke4
-  alternateSprites:
   - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
@@ -781,10 +777,9 @@
 
 - type: particleEffect
   id: RMCExplosionWaterSmokeTiny
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke4
-  alternateSprites:
   - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
@@ -818,8 +813,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterWave
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -849,8 +844,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterWaveDeva
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -880,8 +875,8 @@
 
 - type: particleEffect
   id: RMCExplosionWaterWaveSmall
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -913,8 +908,8 @@
 
 - type: particleEffect
   id: RMCImpactSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#E0DCD4FF"
   endColor: "#E0DCD4FF"
@@ -950,10 +945,9 @@
 
 - type: particleEffect
   id: RMCImpactFlash
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -984,8 +978,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisSparks
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: spark
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1015,8 +1009,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisWood
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: wood
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1046,8 +1040,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisRock
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: rock
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1077,8 +1071,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisGlass
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: glass
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1108,8 +1102,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisLeaf
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: leaf
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1139,8 +1133,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisSnow
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: snow
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1170,8 +1164,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisPaper
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: paper
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1201,8 +1195,8 @@
 
 - type: particleEffect
   id: RMCImpactDebrisIce
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: ice
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1234,10 +1228,9 @@
 
 - type: particleEffect
   id: RMCGauFlash
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -1268,8 +1261,8 @@
 
 - type: particleEffect
   id: RMCGauSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#D8D0C0FF"
   endColor: "#D8D0C0FF"
@@ -1305,8 +1298,8 @@
 
 - type: particleEffect
   id: RMCGauDirtSpike
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: dirt
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1345,8 +1338,8 @@
 
 - type: particleEffect
   id: RMCGauSnowSpike
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: dirt
   startColor: "#D6DEE6FF"
   endColor: "#D6DEE6FF"
@@ -1385,8 +1378,8 @@
 
 - type: particleEffect
   id: RMCGauWaterSpike
-  sprite:
-    sprite: _RMC14/Particles/plume.rsi
+  sprites:
+  - sprite: _RMC14/Particles/plume.rsi
     state: water
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1425,10 +1418,9 @@
 
 - type: particleEffect
   id: RMCGauDebris
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -1463,10 +1455,9 @@
 
 - type: particleEffect
   id: RMCGauSnowDebris
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -1501,8 +1492,8 @@
 
 - type: particleEffect
   id: RMCGauWaterDroplets
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: pixel
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1536,8 +1527,8 @@
 
 - type: particleEffect
   id: RMCSpitSplash
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1571,10 +1562,9 @@
 
 - type: particleEffect
   id: RMCSpitSplashBlobs
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -1607,8 +1597,8 @@
 
 - type: particleEffect
   id: RMCAcidSizzle
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#E8FFE8FF"
   endColor: "#E8FFE8FF"
@@ -1648,10 +1638,9 @@
 
 - type: particleEffect
   id: RMCDigDirt
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -1685,10 +1674,9 @@
 
 - type: particleEffect
   id: RMCDigDirtBurst
-  sprite:
-    sprite: _RMC14/Particles/debris.rsi
+  sprites:
+  - sprite: _RMC14/Particles/debris.rsi
     state: impact
-  alternateSprites:
   - sprite: _RMC14/Particles/debris.rsi
     state: impact_2
   - sprite: _RMC14/Particles/debris.rsi
@@ -1723,8 +1711,8 @@
 
 - type: particleEffect
   id: RMCDestructionDust
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#A8A49CFF"
   endColor: "#A8A49CFF"
@@ -1764,10 +1752,9 @@
 
 - type: particleEffect
   id: RMCMortarLaunchSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
-  alternateSprites:
   - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke4
   startColor: "#D2CDC4FF"
@@ -1807,8 +1794,8 @@
 
 - type: particleEffect
   id: RMCBloodSplatterEdge
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#8C8C8CFF"
   endColor: "#8C8C8CFF"
@@ -1851,8 +1838,8 @@
 
 - type: particleEffect
   id: RMCBloodSplatter
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1895,10 +1882,9 @@
 
 - type: particleEffect
   id: RMCBloodSplatterSpray
-  sprite:
-    sprite: _RMC14/Particles/blood_splatter.rsi
+  sprites:
+  - sprite: _RMC14/Particles/blood_splatter.rsi
     state: splatter1
-  alternateSprites:
   - sprite: _RMC14/Particles/blood_splatter.rsi
     state: splatter2
   - sprite: _RMC14/Particles/blood_splatter.rsi
@@ -1928,8 +1914,8 @@
 
 - type: particleEffect
   id: RMCGibBloodCloud
-  sprite:
-    sprite: _RMC14/Particles/smoke_32.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_32.rsi
     state: smoke
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -1961,10 +1947,9 @@
 
 - type: particleEffect
   id: RMCGibChunks
-  sprite:
-    sprite: _RMC14/Particles/gibs.rsi
+  sprites:
+  - sprite: _RMC14/Particles/gibs.rsi
     state: mgibbl3
-  alternateSprites:
   - sprite: _RMC14/Particles/gibs.rsi
     state: mgibbl5
   startColor: "#FFFFFFFF"
@@ -2002,8 +1987,8 @@
 
 - type: particleEffect
   id: RMCGunFiringSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -2032,10 +2017,9 @@
 
 - type: particleEffect
   id: RMCRocketBackblast
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
-  alternateSprites:
   - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke4
   startColor: "#D8D4CCFF"
@@ -2072,8 +2056,8 @@
 
 - type: particleEffect
   id: RMCRocketBackblastFlash
-  sprite:
-    sprite: Effects/fire.rsi
+  sprites:
+  - sprite: Effects/fire.rsi
     state: fire
   shader: unshaded
   colorOverLifetime:
@@ -2102,10 +2086,9 @@
 
 - type: particleEffect
   id: RMCVehicleWreckSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke3
-  alternateSprites:
   - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke4
   colorOverLifetime:
@@ -2145,8 +2128,8 @@
 
 - type: particleEffect
   id: RMCVehicleDamagedSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_96.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
     state: smoke5
   startColor: "#C8C8C8FF"
   endColor: "#C8C8C8FF"
@@ -2189,8 +2172,8 @@
 
 - type: particleEffect
   id: RMCMolotovFlame
-  sprite:
-    sprite: Effects/fire.rsi
+  sprites:
+  - sprite: Effects/fire.rsi
     state: fire
   shader: unshaded
   colorOverLifetime:
@@ -2223,8 +2206,8 @@
 
 - type: particleEffect
   id: RMCMolotovSmoke
-  sprite:
-    sprite: _RMC14/Particles/smoke_32.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_32.rsi
     state: smoke
   startColor: "#3A3A3AFF"
   endColor: "#6E6E6EFF"
@@ -2261,8 +2244,8 @@
 
 - type: particleEffect
   id: RMCRocketExhaust
-  sprite:
-    sprite: Effects/fire.rsi
+  sprites:
+  - sprite: Effects/fire.rsi
     state: fire
   shader: unshaded
   colorOverLifetime:
@@ -2291,8 +2274,8 @@
 
 - type: particleEffect
   id: RMCRocketSmokeTrail
-  sprite:
-    sprite: _RMC14/Particles/smoke_32.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_32.rsi
     state: smoke
   startColor: "#B4B4B4FF"
   endColor: "#8C8C8CFF"
@@ -2329,8 +2312,8 @@
 
 - type: particleEffect
   id: RMCDropshipLandingDust
-  sprite:
-    sprite: _RMC14/Particles/smoke_32.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_32.rsi
     state: smoke
   startColor: "#FFFFFFFF"
   endColor: "#FFFFFFFF"
@@ -2361,8 +2344,8 @@
 
 - type: particleEffect
   id: RMCFallingOrdnanceTrail
-  sprite:
-    sprite: _RMC14/Particles/smoke_32.rsi
+  sprites:
+  - sprite: _RMC14/Particles/smoke_32.rsi
     state: smoke
   startColor: "#C8C8C8FF"
   endColor: "#8C8C8CFF"
