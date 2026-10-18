@@ -1,8 +1,6 @@
-﻿using Content.Shared._RMC14.Particles;
-using Robust.Shared.Audio;
+﻿using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._RMC14.Entrenching;
@@ -31,18 +29,6 @@ public sealed partial class EntrenchingToolComponent : Component
 
     [DataField, AutoNetworkedField]
     public SoundSpecifier FillSound = new SoundCollectionSpecifier("CMEntrenchingRustle", AudioParams.Default.WithVolume(-6));
-
-    [DataField, AutoNetworkedField]
-    public ProtoId<ParticleEffectPrototype> DigDirt = "RMCDigDirt";
-
-    [DataField, AutoNetworkedField]
-    public ProtoId<ParticleEffectPrototype> DigDirtBurst = "RMCDigDirtBurst";
-
-    [DataField, AutoNetworkedField]
-    public Color DirtColor = Color.FromHex("#5E4A30");
-
-    [DataField, AutoNetworkedField]
-    public float DirtBrightness = 0.7f;
 }
 
 [Serializable, NetSerializable]

@@ -4,7 +4,7 @@ using Content.Server.Administration.Logs;
 using Content.Server.Atmos.Components;
 using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NPC.Pathfinding;
-using Content.Server._RMC14.Explosion; // RMC14
+using Content.Server._RMC14.Explosion;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Camera;

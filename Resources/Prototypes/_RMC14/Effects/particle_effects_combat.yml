@@ -1636,77 +1636,6 @@
 
 # Digging
 
-- type: particleEffect
-  id: RMCDigDirt
-  sprites:
-  - sprite: _RMC14/Particles/debris.rsi
-    state: impact
-  - sprite: _RMC14/Particles/debris.rsi
-    state: impact_2
-  - sprite: _RMC14/Particles/debris.rsi
-    state: impact_3
-  startColor: "#FFFFFFFF"
-  endColor: "#FFFFFFFF"
-  alphaOverLifetime:
-    - time: 0
-      value: 1.0
-    - time: 0.7
-      value: 1.0
-    - time: 1
-      value: 0.0
-  lifetime: 0.6
-  lifetimeVariance: 0.15
-  speed: 3
-  speedVariance: 1
-  drag: 0.5
-  constantForce: 0, -9
-  particleSize: 0.13
-  sizeVariance: 0.4
-  emissionRate: 12
-  maxCount: 14
-  duration: 1
-  spreadAngle: 100
-  startRotationVariance: 180
-  rotationSpeedVariance: 360
-  shape:
-    type: CircleFill
-    radius: 0.25
-
-- type: particleEffect
-  id: RMCDigDirtBurst
-  sprites:
-  - sprite: _RMC14/Particles/debris.rsi
-    state: impact
-  - sprite: _RMC14/Particles/debris.rsi
-    state: impact_2
-  - sprite: _RMC14/Particles/debris.rsi
-    state: impact_3
-  startColor: "#FFFFFFFF"
-  endColor: "#FFFFFFFF"
-  alphaOverLifetime:
-    - time: 0
-      value: 1.0
-    - time: 0.7
-      value: 1.0
-    - time: 1
-      value: 0.0
-  lifetime: 0.7
-  lifetimeVariance: 0.15
-  speed: 3.5
-  speedVariance: 1.4
-  drag: 0.5
-  constantForce: 0, -9
-  particleSize: 0.15
-  sizeVariance: 0.4
-  maxCount: 12
-  burst: true
-  spreadAngle: 140
-  startRotationVariance: 180
-  rotationSpeedVariance: 360
-  shape:
-    type: CircleFill
-    radius: 0.3
-
 # Structure destruction
 
 - type: particleEffect
@@ -2305,6 +2234,306 @@
   maxCount: 220
   duration: 0
   spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+
+# Vehicle muzzles
+
+- type: particleEffect
+  id: RMCCannonMuzzleFlash
+  sprites:
+  - sprite: Effects/fire.rsi
+    state: fire
+  shader: unshaded
+  colorOverLifetime:
+    - time: 0.0
+      color: "#FFF6D0FF"
+    - time: 0.25
+      color: "#FFB040F0"
+    - time: 1.0
+      color: "#C0300000"
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.2
+  lifetime: 0.25
+  lifetimeVariance: 0.08
+  speed: 14
+  speedVariance: 5
+  drag: 9
+  particleSize: 0.7
+  sizeVariance: 0.3
+  maxCount: 24
+  burst: true
+  spreadAngle: 40
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCCannonMuzzleSmoke
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  startColor: "#D0CCC4FF"
+  endColor: "#D0CCC4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.04
+      value: 0.5
+    - time: 0.4
+      value: 0.3
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 6.0
+  lifetime: 2.2
+  lifetimeVariance: 0.5
+  speed: 13
+  speedVariance: 6
+  drag: 4.5
+  constantForce: 0, 0.3
+  noiseStrength: 0.8
+  noiseFrequency: 3
+  particleSize: 0.6
+  sizeVariance: 0.3
+  maxCount: 36
+  burst: true
+  spreadAngle: 70
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+
+- type: particleEffect
+  id: RMCCannonBlastDust
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#B9A88AFF"
+  endColor: "#B9A88AFF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.05
+      value: 0.4
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 4.0
+  lifetime: 1.6
+  lifetimeVariance: 0.4
+  speed: 7
+  speedVariance: 3
+  drag: 5
+  noiseStrength: 0.5
+  noiseFrequency: 3
+  particleSize: 0.5
+  sizeVariance: 0.3
+  maxCount: 28
+  burst: true
+  spreadAngle: 360
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+
+- type: particleEffect
+  id: RMCAutocannonMuzzleFlash
+  sprites:
+  - sprite: Effects/fire.rsi
+    state: fire
+  shader: unshaded
+  colorOverLifetime:
+    - time: 0.0
+      color: "#FFF6D0FF"
+    - time: 0.3
+      color: "#FFB040E6"
+    - time: 1.0
+      color: "#C0300000"
+  lifetime: 0.12
+  lifetimeVariance: 0.04
+  speed: 9
+  speedVariance: 3
+  drag: 10
+  particleSize: 0.4
+  sizeVariance: 0.3
+  maxCount: 8
+  burst: true
+  spreadAngle: 30
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCAutocannonMuzzleSmoke
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#D0CCC4FF"
+  endColor: "#D0CCC4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.05
+      value: 0.25
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.5
+  lifetime: 0.9
+  lifetimeVariance: 0.2
+  speed: 9
+  speedVariance: 3
+  drag: 6
+  noiseStrength: 0.6
+  noiseFrequency: 4
+  particleSize: 0.45
+  sizeVariance: 0.25
+  maxCount: 10
+  burst: true
+  spreadAngle: 35
+  startRotationVariance: 180
+  rotationSpeedVariance: 90
+
+- type: particleEffect
+  id: RMCLauncherMuzzleSmoke
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke4
+  startColor: "#D0CCC4FF"
+  endColor: "#D0CCC4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.05
+      value: 0.35
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 4.0
+  lifetime: 1.4
+  lifetimeVariance: 0.3
+  speed: 7
+  speedVariance: 3
+  drag: 4
+  constantForce: 0, 0.3
+  noiseStrength: 0.7
+  noiseFrequency: 3
+  particleSize: 0.5
+  sizeVariance: 0.3
+  maxCount: 16
+  burst: true
+  spreadAngle: 50
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+
+- type: particleEffect
+  id: RMCGrenadeLauncherMuzzleSmoke
+  sprites:
+  - sprite: _RMC14/Particles/smoke_96.rsi
+    state: smoke5
+  startColor: "#D0CCC4FF"
+  endColor: "#D0CCC4FF"
+  alphaOverLifetime:
+    - time: 0
+      value: 0.0
+    - time: 0.05
+      value: 0.25
+    - time: 1
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.5
+  lifetime: 0.9
+  lifetimeVariance: 0.2
+  speed: 5
+  speedVariance: 2
+  drag: 5
+  noiseStrength: 0.5
+  noiseFrequency: 3
+  particleSize: 0.35
+  sizeVariance: 0.25
+  maxCount: 7
+  burst: true
+  spreadAngle: 40
+  startRotationVariance: 180
+  rotationSpeedVariance: 60
+
+- type: particleEffect
+  id: RMCFlamerNozzleFlame
+  sprites:
+  - sprite: Effects/fire.rsi
+    state: fire
+  shader: unshaded
+  colorOverLifetime:
+    - time: 0.0
+      color: "#FFF2B0FF"
+    - time: 0.3
+      color: "#FF9A2EE6"
+    - time: 1.0
+      color: "#B0200000"
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 2.0
+  lifetime: 0.35
+  lifetimeVariance: 0.1
+  speed: 7
+  speedVariance: 3
+  drag: 3
+  particleSize: 0.5
+  sizeVariance: 0.3
+  maxCount: 22
+  burst: true
+  spreadAngle: 25
+  startRotationVariance: 180
+
+- type: particleEffect
+  id: RMCFlamerNozzleSmoke
+  sprites:
+  - sprite: _RMC14/Particles/smoke_32.rsi
+    state: smoke
+  startColor: "#2E2A28FF"
+  endColor: "#4A4542FF"
+  alphaOverLifetime:
+    - time: 0.0
+      value: 0.0
+    - time: 0.1
+      value: 0.45
+    - time: 1.0
+      value: 0.0
+  sizeOverLifetime:
+    - time: 0
+      value: 1.0
+    - time: 1
+      value: 3.5
+  lifetime: 1.3
+  lifetimeVariance: 0.3
+  speed: 2.5
+  speedVariance: 1
+  drag: 2
+  constantForce: 0, 0.6
+  noiseStrength: 0.4
+  noiseFrequency: 3
+  particleSize: 0.4
+  sizeVariance: 0.3
+  maxCount: 12
+  burst: true
+  spreadAngle: 60
   startRotationVariance: 180
   rotationSpeedVariance: 60
 

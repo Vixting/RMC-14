@@ -66,7 +66,7 @@
   components:
   - type: ParticleOnMuzzleFlash
     effects:
-    - RMCGunFiringSmoke
+    - RMCGrenadeLauncherMuzzleSmoke
   - type: Sprite
     state: glauncher
   - type: HardpointItem
@@ -142,7 +142,8 @@
   components:
   - type: ParticleOnMuzzleFlash
     effects:
-    - RMCGunFiringSmoke
+    - RMCAutocannonMuzzleFlash
+    - RMCLauncherMuzzleSmoke
   - type: Sprite
     state: tow_launcher
   - type: HardpointItem

@@ -214,7 +214,7 @@
   components:
   - type: ParticleOnMuzzleFlash
     effects:
-    - RMCGunFiringSmoke
+    - RMCLauncherMuzzleSmoke
   - type: Sprite
     state: humveelauncher
   - type: HardpointItem

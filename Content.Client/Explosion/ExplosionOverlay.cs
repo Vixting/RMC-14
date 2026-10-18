@@ -1,5 +1,5 @@
 using System.Numerics;
-using Content.Client._RMC14.Explosion; // RMC14
+using Content.Client._RMC14.Explosion;
 using Content.Shared.Explosion.Components;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
@@ -8,7 +8,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Timing; // RMC14
+using Robust.Shared.Timing;
 
 namespace Content.Client.Explosion;
 
@@ -20,7 +20,7 @@ public sealed class ExplosionOverlay : Overlay
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IGameTiming _timing = default!; // RMC14
+    [Dependency] private readonly IGameTiming _timing = default!;
     private readonly SharedTransformSystem _transformSystem;
     private SharedAppearanceSystem _appearance;
 

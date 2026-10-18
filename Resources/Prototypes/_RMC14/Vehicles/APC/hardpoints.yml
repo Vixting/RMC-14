@@ -82,7 +82,8 @@
   components:
   - type: ParticleOnMuzzleFlash
     effects:
-    - RMCGunFiringSmoke
+    - RMCAutocannonMuzzleFlash
+    - RMCAutocannonMuzzleSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke

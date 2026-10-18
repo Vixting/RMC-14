@@ -1,6 +1,6 @@
 using System.Numerics;
 using Content.Server.Atmos.EntitySystems;
-using Content.Server._RMC14.Explosion; // RMC14
+using Content.Server._RMC14.Explosion;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared.CCVar;
 using Content.Shared.Damage;

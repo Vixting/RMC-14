@@ -6,7 +6,9 @@
   components:
   - type: ParticleOnMuzzleFlash
     effects:
-    - RMCGunFiringSmoke
+    - RMCCannonMuzzleFlash
+    - RMCCannonMuzzleSmoke
+    - RMCCannonBlastDust
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
@@ -180,7 +182,8 @@
   components:
   - type: ParticleOnMuzzleFlash
     effects:
-    - RMCGunFiringSmoke
+    - RMCAutocannonMuzzleFlash
+    - RMCAutocannonMuzzleSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
@@ -212,6 +215,7 @@
     overlayDamagedState: ace_autocannon_1
   - type: GunUseGunOrigin
   - type: GunIgnoreContainerOwnerCollision
+  - type: GunIgnorePrediction
   - type: Gun
     fireRate: 1.4286
     projectileSpeed: 50
@@ -254,6 +258,10 @@
   name: DRGN flamer
   description: A DRGN flamer hardpoint.
   components:
+  - type: ParticleOnMuzzleFlash
+    effects:
+    - RMCFlamerNozzleFlame
+    - RMCFlamerNozzleSmoke
   - type: ParticleOnHardpointDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
@@ -291,6 +299,7 @@
   - type: UserIFF
     factions:
     - FactionMarine
+  - type: GunIgnorePrediction
   - type: Gun
     fireRate: 0.5
     projectileSpeed: 20

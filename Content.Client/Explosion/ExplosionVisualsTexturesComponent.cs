@@ -1,4 +1,4 @@
-using Content.Shared.Explosion; // RMC14
+using Content.Shared.Explosion;
 using Robust.Client.Graphics;
 using Robust.Shared.Graphics;
 

@@ -9,10 +9,6 @@ namespace Content.Shared.Explosion;
 
 public sealed partial class ExplosionPrototype
 {
-    /// <summary>
-    ///     cm13 explosion power per point of intensity. When above 0 the tile overlay is drawn as cm13's passing smoke
-    ///     wave and a shockwave distortion is shown for strong enough explosions.
-    /// </summary>
     [DataField]
     public float PowerPerIntensity;
 
