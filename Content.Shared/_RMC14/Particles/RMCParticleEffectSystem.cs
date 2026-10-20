@@ -1,6 +1,9 @@
+using Content.Shared._RMC14.Particles.Effects;
+using Content.Shared.EntityEffects;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Shared._RMC14.Particles;
@@ -15,6 +18,18 @@ public sealed class RMCParticleEffectSystem : EntitySystem
     private readonly List<(RMCParticleEffectEvent Effect, ICommonSession? Excluded)> _pendingEffects = new();
     private readonly List<(NetEntity Source, MapCoordinates Coords)> _pendingStops = new();
     private readonly Dictionary<ICommonSession, RMCParticleEffectBatchEvent> _bySession = new();
+
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<ExecuteEntityEffectEvent<SpawnParticleEffect>>(OnSpawnParticleEffect);
+    }
+
+    private void OnSpawnParticleEffect(ref ExecuteEntityEffectEvent<SpawnParticleEffect> args)
+    {
+        var coords = _transform.GetMapCoordinates(args.Args.TargetEntity);
+        var effects = new List<ProtoId<ParticleEffectPrototype>> { args.Effect.Particle };
+        PlayPvs(new RMCParticleEffectEvent(effects, coords, color: args.Effect.ColorOverride));
+    }
 
     public void PlayPvs(RMCParticleEffectEvent ev)
     {

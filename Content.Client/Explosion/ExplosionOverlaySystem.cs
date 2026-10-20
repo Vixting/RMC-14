@@ -1,11 +1,12 @@
+using Content.Client._RMC14.Timing; // RMC14
 using Content.Shared.Explosion;
 using Content.Shared.Explosion.Components;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
+using Robust.Client.Timing; // RMC14
 using Robust.Shared.GameStates;
 using Robust.Shared.Graphics.RSI;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
 namespace Content.Client.Explosion;
@@ -22,7 +23,7 @@ public sealed class ExplosionOverlaySystem : EntitySystem
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!; // RMC14
 
     public override void Initialize()
     {
@@ -96,7 +97,7 @@ public sealed class ExplosionOverlaySystem : EntitySystem
         // RMC14
         textures.RMCType = type;
         textures.RMCPowerPerIntensity = type.PowerPerIntensity;
-        textures.RMCStartTime = component.RMCStartTime > TimeSpan.Zero ? component.RMCStartTime : _timing.CurTime;
+        textures.RMCStartTime = component.RMCStartTime > TimeSpan.Zero ? component.RMCStartTime : _timing.LastRealTime();
         textures.RMCHeatColor = type.LightColor;
         textures.RMCSeed = uid.Id;
         if (type.PowerPerIntensity > 0)

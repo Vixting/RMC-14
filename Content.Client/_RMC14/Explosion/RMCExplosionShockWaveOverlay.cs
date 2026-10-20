@@ -1,11 +1,12 @@
 using System.Numerics;
 using Content.Client.Explosion;
+using Content.Client._RMC14.Timing;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared.Explosion.Components;
 using Robust.Client.Graphics;
+using Robust.Client.Timing;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 
 namespace Content.Client._RMC14.Explosion;
 
@@ -13,7 +14,7 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!;
 
     private static readonly ProtoId<ShaderPrototype> ShockWaveShader = "RMCShockWave";
 
@@ -47,21 +48,20 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
             return false;
 
         _count = 0;
-        var time = _timing.CurTime;
+        var time = _timing.LastRealTime();
 
         var explosions = _entMan.EntityQueryEnumerator<ExplosionVisualsComponent, ExplosionVisualsTexturesComponent>();
         while (_count < MaxCount && explosions.MoveNext(out _, out var visuals, out var textures))
         {
             if (textures.RMCType is not { } type ||
                 textures.RMCPowerPerIntensity <= 0 ||
-                visuals.Intensity.Count == 0 ||
                 visuals.Epicenter.MapId != args.MapId)
             {
                 continue;
             }
 
             var shockWave = type.ShockWave;
-            var power = visuals.Intensity[0] * textures.RMCPowerPerIntensity;
+            var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, textures.RMCPowerPerIntensity);
             if (power < shockWave.MinPower)
                 continue;
 

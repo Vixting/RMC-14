@@ -21,9 +21,25 @@ public sealed class ParticleOnEventSystem : EntitySystem
         SubscribeLocalEvent<ThrownItemComponent, ComponentRemove>(OnThrownRemove);
         SubscribeLocalEvent<ParticleOnThrownComponent, ComponentShutdown>(OnThrownShutdown);
         SubscribeLocalEvent<ParticleOnMuzzleFlashComponent, RMCMuzzleFlashCreatedEvent>(OnMuzzleFlash);
+        SubscribeLocalEvent<RMCParticlesResetEvent>(OnParticlesReset);
     }
 
     private void OnThrownStartup(Entity<ThrownItemComponent> ent, ref ComponentStartup args)
+    {
+        StartThrownEmitters(ent);
+    }
+
+    private void OnParticlesReset(ref RMCParticlesResetEvent args)
+    {
+        _thrownEmitters.Clear();
+        var query = EntityQueryEnumerator<ThrownItemComponent, ParticleOnThrownComponent>();
+        while (query.MoveNext(out var uid, out _, out _))
+        {
+            StartThrownEmitters(uid);
+        }
+    }
+
+    private void StartThrownEmitters(EntityUid ent)
     {
         if (!TryComp(ent, out ParticleOnThrownComponent? particles))
             return;
@@ -35,7 +51,7 @@ public sealed class ParticleOnEventSystem : EntitySystem
             return;
         }
 
-        StopThrownEmitter(ent.Owner);
+        StopThrownEmitter(ent);
 
         var emitters = new List<ActiveEmitter>();
         foreach (var effect in particles.Effects)
@@ -44,7 +60,7 @@ public sealed class ParticleOnEventSystem : EntitySystem
         }
 
         if (emitters.Count > 0)
-            _thrownEmitters[ent.Owner] = emitters;
+            _thrownEmitters[ent] = emitters;
     }
 
     private void StartThrownEmitter(EntityUid uid, ParticleOnThrownComponent particles, ProtoId<ParticleEffectPrototype> effect, List<ActiveEmitter> emitters)
@@ -54,10 +70,10 @@ public sealed class ParticleOnEventSystem : EntitySystem
     }
 
     private void OnThrownRemove(Entity<ThrownItemComponent> ent, ref ComponentRemove args)
-        => StopThrownEmitter(ent.Owner);
+        => StopThrownEmitter(ent);
 
     private void OnThrownShutdown(Entity<ParticleOnThrownComponent> ent, ref ComponentShutdown args)
-        => StopThrownEmitter(ent.Owner);
+        => StopThrownEmitter(ent);
 
     private void StopThrownEmitter(EntityUid uid)
     {

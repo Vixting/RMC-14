@@ -1,18 +1,19 @@
 using Content.Client.Explosion;
+using Content.Client._RMC14.Timing;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared.Explosion.Components;
-using Robust.Shared.Timing;
+using Robust.Client.Timing;
 
 namespace Content.Client._RMC14.Explosion;
 
 public sealed class RMCExplosionLightSystem : EntitySystem
 {
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!;
 
     public override void FrameUpdate(float frameTime)
     {
-        var time = _timing.CurTime;
+        var time = _timing.LastRealTime();
         var query = EntityQueryEnumerator<ExplosionVisualsComponent, ExplosionVisualsTexturesComponent>();
         while (query.MoveNext(out var visuals, out var textures))
         {

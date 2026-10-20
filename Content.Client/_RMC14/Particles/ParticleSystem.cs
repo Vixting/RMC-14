@@ -41,10 +41,13 @@ public sealed partial class ParticleSystem : EntitySystem
     private int _globalBudget;
     private int _ignoreQualityMaxEmitters;
     private uint _nextHandle = 1;
+    private bool _initialized;
+    private bool _resetPending;
 
     private static readonly float[] QualityMultipliers = { 0f, 0.25f, 0.5f, 1f };
 
     private const int HardMaxParticles = 8000;
+    private const float ViewBoundsScale = 2f;
     private const int IgnoreQualityMaxParticles = 64;
 
     public override void Initialize()
@@ -55,6 +58,7 @@ public sealed partial class ParticleSystem : EntitySystem
         Subs.CVar(_cfg, CCVars.ParticleQuality, OnQualityChanged, true);
         Subs.CVar(_cfg, CCVars.ParticleGlobalBudget, OnGlobalBudgetChanged, true);
         Subs.CVar(_cfg, CCVars.ParticleIgnoreQualityMaxEmitters, v => _ignoreQualityMaxEmitters = v, true);
+        _initialized = true;
     }
 
     public override void Shutdown()
@@ -67,6 +71,9 @@ public sealed partial class ParticleSystem : EntitySystem
 
     private void OnQualityChanged(int quality)
     {
+        if (_initialized && _quality == 0 && quality > 0)
+            _resetPending = true;
+
         _quality = quality;
         UpdateBudget();
     }
@@ -101,13 +108,16 @@ public sealed partial class ParticleSystem : EntitySystem
         var count = _emitters.Count;
         _emitters.Clear();
         _liveParticleCount = 0;
+        if (_quality > 0)
+            _resetPending = true;
+
         return count;
     }
 
     public ActiveEmitter? SpawnEffect(ProtoId<ParticleEffectPrototype> effectId, MapCoordinates coords, EntityUid? attachedEntity = null, Color? colorOverride = null, ParticleRuntimeOverrides? overrides = null, Vector2? initialVelocity = null)
         => SpawnEffect(effectId, coords, depth: 0, attachedEntity: attachedEntity, colorOverride: colorOverride, overrides: overrides, initialVelocity: initialVelocity);
 
-    private ActiveEmitter? SpawnEffect(ProtoId<ParticleEffectPrototype> effectId, MapCoordinates coords, int depth, EntityUid? attachedEntity = null, Color? colorOverride = null, ParticleRuntimeOverrides? overrides = null, Vector2? initialVelocity = null)
+    private ActiveEmitter? SpawnEffect(ProtoId<ParticleEffectPrototype> effectId, MapCoordinates coords, int depth, EntityUid? attachedEntity = null, Color? colorOverride = null, ParticleRuntimeOverrides? overrides = null, Vector2? initialVelocity = null, EntityUid? targetEntity = null, Vector2? targetPosition = null)
     {
         if (depth > MaxSubEmitterDepth)
         {
@@ -145,6 +155,13 @@ public sealed partial class ParticleSystem : EntitySystem
             emitter.EmitterVelocity = initialVelocity.Value;
             emitter.PreviousPosition = coords.Position;
             emitter.VelocityInitialized = true;
+        }
+
+        if (targetEntity != null || targetPosition != null)
+        {
+            emitter.TargetEntity = targetEntity;
+            emitter.TargetPosition = targetPosition;
+            UpdateEmitAngle(emitter, (float) _eye.CurrentEye.Rotation);
         }
 
         _emitters.Add(emitter);
@@ -219,23 +236,20 @@ public sealed partial class ParticleSystem : EntitySystem
     }
 
     public ActiveEmitter? SpawnEffectAimAt(ProtoId<ParticleEffectPrototype> effectId, MapCoordinates coords, EntityUid targetEntity, EntityUid? attachedEntity = null)
-    {
-        var emitter = SpawnEffect(effectId, coords, attachedEntity);
-        if (emitter != null)
-            emitter.TargetEntity = targetEntity;
-        return emitter;
-    }
+        => SpawnEffect(effectId, coords, depth: 0, attachedEntity: attachedEntity, targetEntity: targetEntity);
 
     public ActiveEmitter? SpawnEffectAimAt(ProtoId<ParticleEffectPrototype> effectId, MapCoordinates coords, Vector2 targetWorldPosition, EntityUid? attachedEntity = null)
-    {
-        var emitter = SpawnEffect(effectId, coords, attachedEntity);
-        if (emitter != null)
-            emitter.TargetPosition = targetWorldPosition;
-        return emitter;
-    }
+        => SpawnEffect(effectId, coords, depth: 0, attachedEntity: attachedEntity, targetPosition: targetWorldPosition);
 
     public override void FrameUpdate(float frameTime)
     {
+        if (_resetPending)
+        {
+            _resetPending = false;
+            var ev = new RMCParticlesResetEvent();
+            RaiseLocalEvent(ref ev);
+        }
+
         if (_quality == 0)
         {
             for (var i = _emitters.Count - 1; i >= 0; i--)
@@ -257,10 +271,8 @@ public sealed partial class ParticleSystem : EntitySystem
         }
 
         var eye = _eye.CurrentEye;
-        var eyePos = eye.Position.Position;
         var eyeAngle = (float)eye.Rotation;
-        var halfSize = new Vector2(eye.Zoom.X > 0 ? 20f / eye.Zoom.X : 20f, eye.Zoom.Y > 0 ? 15f / eye.Zoom.Y : 15f) * 1.5f;
-        var viewBounds = new Box2(eyePos - halfSize, eyePos + halfSize);
+        var viewBounds = _eye.GetWorldViewport().Scale(ViewBoundsScale);
         var currentMapId = eye.Position.MapId;
 
         _pendingSubEmitters.Clear();
@@ -269,10 +281,17 @@ public sealed partial class ParticleSystem : EntitySystem
         {
             var emitter = _emitters[i];
 
-            if (emitter.AttachedEntity is { } attachedEnt && Deleted(attachedEnt))
+            if (emitter.AttachedEntity is { } attachedEnt)
             {
-                emitter.Exhausted = true;
-                emitter.AttachedEntity = null;
+                if (Deleted(attachedEnt))
+                {
+                    emitter.Exhausted = true;
+                    emitter.AttachedEntity = null;
+                }
+                else
+                {
+                    emitter.MapCoords = _transform.GetMapCoordinates(attachedEnt);
+                }
             }
 
             var inView = emitter.MapCoords.MapId == currentMapId
@@ -344,36 +363,8 @@ public sealed partial class ParticleSystem : EntitySystem
 
     public static void UpdateIntensity(ActiveEmitter emitter, float intensity) => emitter.Intensity = intensity;
 
-    private void TickEmitter(ActiveEmitter emitter, float dt, float eyeAngle)
+    private void UpdateEmitAngle(ActiveEmitter emitter, float eyeAngle)
     {
-        var proto = emitter.Proto;
-
-        var newPos = emitter.MapCoords.Position;
-        if (emitter.AttachedEntity is { } attachedEnt)
-        {
-            if (Deleted(attachedEnt))
-            {
-                emitter.Exhausted = true;
-                emitter.AttachedEntity = null;
-            }
-            else
-            {
-                var attachedCoords = _transform.GetMapCoordinates(attachedEnt);
-                newPos = attachedCoords.Position;
-                emitter.MapCoords = attachedCoords;
-            }
-        }
-
-        if (!emitter.VelocityInitialized)
-        {
-            emitter.PreviousPosition = newPos;
-            emitter.VelocityInitialized = true;
-        }
-
-        if (dt > 0f)
-            emitter.EmitterVelocity = (newPos - emitter.PreviousPosition) / dt;
-        emitter.PreviousPosition = newPos;
-
         Vector2? targetWorldPos = null;
         if (emitter.TargetEntity is { } targetEnt)
         {
@@ -402,6 +393,24 @@ public sealed partial class ParticleSystem : EntitySystem
             var baseAngle = emitter.Overrides?.EmitAngle ?? emitter.Proto.EmitAngle;
             emitter.EffectiveEmitAngle = (float)baseAngle.Theta;
         }
+    }
+
+    private void TickEmitter(ActiveEmitter emitter, float dt, float eyeAngle)
+    {
+        var proto = emitter.Proto;
+
+        var newPos = emitter.MapCoords.Position;
+        if (!emitter.VelocityInitialized)
+        {
+            emitter.PreviousPosition = newPos;
+            emitter.VelocityInitialized = true;
+        }
+
+        if (dt > 0f)
+            emitter.EmitterVelocity = (newPos - emitter.PreviousPosition) / dt;
+        emitter.PreviousPosition = newPos;
+
+        UpdateEmitAngle(emitter, eyeAngle);
 
         var ovr          = emitter.Overrides;
         var drag         = ovr?.Drag          ?? proto.Drag;
@@ -669,6 +678,12 @@ public sealed partial class ParticleSystem : EntitySystem
     private void AgeOffScreenParticles(ActiveEmitter emitter, float dt)
     {
         emitter.Age += TimeSpan.FromSeconds(dt);
+        emitter.VelocityInitialized = false;
+
+        var duration = emitter.Overrides?.Duration ?? emitter.Proto.Duration;
+        if (emitter.Proto.Burst || duration > TimeSpan.Zero && emitter.Age >= duration)
+            emitter.Exhausted = true;
+
         foreach (var p in emitter.Particles)
         {
             if (!p.Alive)

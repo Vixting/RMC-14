@@ -1,14 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
+using Content.Client._RMC14.Timing;
 using Content.Shared._RMC14.Explosion;
 using Content.Shared._RMC14.Map;
 using Content.Shared._RMC14.Particles;
 using Content.Shared._RMC14.Water;
 using Content.Shared.Explosion;
 using Content.Shared.Explosion.Components;
+using Robust.Client.Timing;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Timing;
 
 namespace Content.Client._RMC14.Particles.Visuals;
 
@@ -22,7 +23,7 @@ public sealed class ExplosionParticleSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly RMCMapSystem _rmcMap = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!;
     [Dependency] private readonly ParticleTileColorSystem _tileColor = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefinition = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
@@ -47,7 +48,7 @@ public sealed class ExplosionParticleSystem : EntitySystem
             return;
         }
 
-        if (ent.Comp.RMCStartTime > TimeSpan.Zero && _timing.CurTime - ent.Comp.RMCStartTime > MaxAge)
+        if (ent.Comp.RMCStartTime > TimeSpan.Zero && _timing.LastRealTime() - ent.Comp.RMCStartTime > MaxAge)
             return;
 
         var power = RMCExplosionVisuals.EpicenterPower(ent.Comp.Intensity, type.PowerPerIntensity);

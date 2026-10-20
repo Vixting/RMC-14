@@ -1,14 +1,15 @@
 using System.Numerics;
 using Content.Client._RMC14.Explosion;
+using Content.Client._RMC14.Timing; // RMC14
 using Content.Shared.Explosion.Components;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
+using Robust.Client.Timing; // RMC14
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
-using Robust.Shared.Timing;
 
 namespace Content.Client.Explosion;
 
@@ -20,7 +21,7 @@ public sealed class ExplosionOverlay : Overlay
     [Dependency] private readonly IRobustRandom _robustRandom = default!;
     [Dependency] private readonly IEntityManager _entMan = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IClientGameTiming _timing = default!; // RMC14
     private readonly SharedTransformSystem _transformSystem;
     private SharedAppearanceSystem _appearance;
 
@@ -54,7 +55,7 @@ public sealed class ExplosionOverlay : Overlay
 
             index = Math.Min(index, visuals.Intensity.Count - 1);
             DrawExplosion(drawHandle, args.WorldBounds, visuals, index, xforms, textures);
-            RMCExplosionSmokeRenderer.DrawSparkStreaks(drawHandle, visuals, textures, _timing.CurTime); // RMC14
+            RMCExplosionSmokeRenderer.DrawSparkStreaks(drawHandle, visuals, textures, _timing.LastRealTime()); // RMC14
         }
 
         drawHandle.SetTransform(Matrix3x2.Identity);
@@ -107,7 +108,7 @@ public sealed class ExplosionOverlay : Overlay
         // RMC14
         if (textures.RMCPowerPerIntensity > 0)
         {
-            RMCExplosionSmokeRenderer.DrawSmokeWave(drawHandle, gridBounds, tileSets, visuals, tileSize, textures, rmcEpicenter, _timing.CurTime);
+            RMCExplosionSmokeRenderer.DrawSmokeWave(drawHandle, gridBounds, tileSets, visuals, tileSize, textures, rmcEpicenter, _timing.LastRealTime());
             return;
         }
         // RMC14

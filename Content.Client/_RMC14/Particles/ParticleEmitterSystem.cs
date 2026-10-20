@@ -18,9 +18,24 @@ public sealed class ParticleEmitterSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<ParticleEmitterComponent, ComponentInit>(OnCompInit);
         SubscribeLocalEvent<ParticleEmitterComponent, ComponentShutdown>(OnCompShutdown);
+        SubscribeLocalEvent<RMCParticlesResetEvent>(OnParticlesReset);
     }
 
     private void OnCompInit(Entity<ParticleEmitterComponent> ent, ref ComponentInit args)
+    {
+        StartEmitters(ent);
+    }
+
+    private void OnParticlesReset(ref RMCParticlesResetEvent args)
+    {
+        var query = EntityQueryEnumerator<ParticleEmitterComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            StartEmitters((uid, comp));
+        }
+    }
+
+    private void StartEmitters(Entity<ParticleEmitterComponent> ent)
     {
         RemoveEmitters(ent.Owner);
 

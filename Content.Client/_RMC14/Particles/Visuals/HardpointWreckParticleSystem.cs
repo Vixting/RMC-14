@@ -23,6 +23,17 @@ public sealed class HardpointWreckParticleSystem : EntitySystem
         SubscribeLocalEvent<ParticleOnHardpointDamageComponent, HardpointIntegrityStateChangedEvent>(OnIntegrityStateChanged);
         SubscribeLocalEvent<ParticleOnHardpointDamageComponent, EntGotInsertedIntoContainerMessage>(OnInserted);
         SubscribeLocalEvent<ParticleOnHardpointDamageComponent, EntGotRemovedFromContainerMessage>(OnRemoved);
+        SubscribeLocalEvent<RMCParticlesResetEvent>(OnParticlesReset);
+    }
+
+    private void OnParticlesReset(ref RMCParticlesResetEvent args)
+    {
+        _active.Clear();
+        var query = EntityQueryEnumerator<ParticleOnHardpointDamageComponent>();
+        while (query.MoveNext(out var uid, out var comp))
+        {
+            Refresh((uid, comp));
+        }
     }
 
     private void OnStartup(Entity<ParticleOnHardpointDamageComponent> ent, ref ComponentStartup args)

@@ -221,7 +221,8 @@ public sealed partial class ExplosionSystem
         HashSet<EntityUid> processed,
         string id,
         float? fireStacks,
-        EntityUid? cause)
+        EntityUid? cause,
+        bool hideShockwaveSmoke = false) // RMC14
     {
         var size = grid.Comp.TileSize;
         var gridBox = new Box2(tile * size, (tile + 1) * size).Scale(0.9f);
@@ -267,7 +268,7 @@ public sealed partial class ExplosionSystem
             }
         }
 
-        if (!tileBlocked && !RMCHidesShockwaveSmoke(id)) // RMC14
+        if (!tileBlocked && !hideShockwaveSmoke) // RMC14
             Spawn(ShockwaveSmoke, new EntityCoordinates(grid.Owner, tile));
 
         // Next, we get the intersecting entities AGAIN, but purely for throwing. This way, glass shards spawned from
@@ -887,7 +888,8 @@ sealed class Explosion
                     ProcessedEntities,
                     ExplosionType.ID,
                     ExplosionType.FireStacks,
-                    Cause);
+                    Cause,
+                    ExplosionType.PowerPerIntensity > 0); // RMC14
 
                 // If the floor is not blocked by some dense object, damage the floor tiles.
                 if (canDamageFloor)

@@ -1,4 +1,5 @@
 using Content.Client._RMC14.Particles;
+using Content.Client._RMC14.Timing;
 using Content.Shared._RMC14.Particles;
 using Content.Shared._RMC14.Sprite;
 using Robust.Client.ComponentTrees;
@@ -22,8 +23,7 @@ public sealed class RMCSpriteDescentVisualsSystem : EntitySystem
 
     public override void FrameUpdate(float frameTime)
     {
-        var predictedTicks = Math.Max(0, (int) (_timing.CurTick.Value - _timing.LastRealTick.Value));
-        var time = _timing.CurTime - _timing.TickPeriod * predictedTicks;
+        var time = _timing.LastRealTime();
         var query = EntityQueryEnumerator<RMCSpriteDescentComponent, SpriteComponent>();
         while (query.MoveNext(out var uid, out var descent, out var sprite))
         {
