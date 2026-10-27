@@ -1,6 +1,6 @@
 using Content.Shared.Damage;
 using Content.Shared.Inventory;
-using Robust.Shared.Map; // RMC14
+using Robust.Shared.Map;
 
 namespace Content.Shared.Explosion;
 

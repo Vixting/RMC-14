@@ -1,9 +1,9 @@
-using Content.Client._RMC14.Timing; // RMC14
+using Content.Client._RMC14.Timing;
 using Content.Shared.Explosion;
 using Content.Shared.Explosion.Components;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
-using Robust.Client.Timing; // RMC14
+using Robust.Client.Timing;
 using Robust.Shared.GameStates;
 using Robust.Shared.Graphics.RSI;
 using Robust.Shared.Prototypes;
@@ -23,7 +23,7 @@ public sealed class ExplosionOverlaySystem : EntitySystem
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly IClientGameTiming _timing = default!; // RMC14
+    [Dependency] private readonly IClientGameTiming _timing = default!;
 
     public override void Initialize()
     {

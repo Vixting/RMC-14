@@ -19,25 +19,12 @@ public sealed class ParticleOverlay : Overlay
         (a, b) => (a.Overrides?.RenderLayer ?? a.Proto.RenderLayer)
             .CompareTo(b.Overrides?.RenderLayer ?? b.Proto.RenderLayer);
 
-    private const float CullMargin = 2f;
-
     public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
 
     public ParticleOverlay(ParticleSystem system)
     {
         IoCManager.InjectDependencies(this);
         _system = system;
-    }
-
-    private static bool IsEmitterVisible(ActiveEmitter emitter, Box2 worldAABB, float eyeAngle)
-    {
-        var origin = emitter.MapCoords.Position;
-        var bounds = new Box2(origin, origin);
-        var spawnOffset = emitter.Overrides?.SpawnOffset ?? emitter.SpawnOffset;
-        if (spawnOffset != Vector2.Zero)
-            bounds = bounds.ExtendToContain(origin + new Angle(eyeAngle).RotateVec(spawnOffset));
-
-        return worldAABB.Intersects(bounds.Enlarged(CullMargin));
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -52,8 +39,6 @@ public sealed class ParticleOverlay : Overlay
         foreach (var emitter in _system.GetEmitters())
         {
             if (emitter.MapCoords.MapId != mapId)
-                continue;
-            if (!IsEmitterVisible(emitter, args.WorldAABB, eyeAngle))
                 continue;
             if (emitter.Frames.Length == 0)
                 continue;
@@ -110,6 +95,27 @@ public sealed class ParticleOverlay : Overlay
 
                 var t = particle.AgeRatio;
 
+                var halfSize = baseHalfSize * particle.SpawnIntensity * particle.SizeMultiplier;
+                if (proto.SizeOverLifetime.Count > 0)
+                    halfSize *= ParticleSystem.SampleCurve(proto.SizeOverLifetime, t);
+
+                var halfHeight = halfSize * aspect;
+
+                var local = particle.LocalOffset;
+                var worldOffset = new Vector2(local.X * cosR - local.Y * sinR,
+                                              local.X * sinR + local.Y * cosR);
+                var origin = proto.WorldSpace ? particle.SpawnOrigin : screenOrigin;
+                var worldPos = origin + worldOffset;
+
+                var stretchFactor = ovr?.StretchFactor ?? proto.StretchFactor;
+                var maxStretch = stretchFactor > 0f ? 1f + particle.Velocity.Length() * stretchFactor : 1f;
+                var extent = new Vector2(
+                    halfSize * (1f + MathF.Abs(pivot.X)),
+                    halfHeight * maxStretch * (1f + MathF.Abs(pivot.Y))).Length();
+
+                if (!args.WorldAABB.Enlarged(extent).Contains(worldPos))
+                    continue;
+
                 Color color;
                 if (proto.ColorOverLifetime.Count > 0)
                     color = ParticleSystem.SampleColorCurve(proto.ColorOverLifetime, t);
@@ -130,19 +136,6 @@ public sealed class ParticleOverlay : Overlay
                     color = color.WithAlpha(color.A * alpha);
                 }
 
-                var halfSize = baseHalfSize * particle.SpawnIntensity * particle.SizeMultiplier;
-                if (proto.SizeOverLifetime.Count > 0)
-                    halfSize *= ParticleSystem.SampleCurve(proto.SizeOverLifetime, t);
-
-                var halfHeight = halfSize * aspect;
-
-                var local = particle.LocalOffset;
-                var worldOffset = new Vector2(local.X * cosR - local.Y * sinR,
-                                              local.X * sinR + local.Y * cosR);
-                var origin = proto.WorldSpace ? particle.SpawnOrigin : screenOrigin;
-                var worldPos = origin + worldOffset;
-
-                var stretchFactor = ovr?.StretchFactor ?? proto.StretchFactor;
                 if (stretchFactor > 0f)
                 {
                     var velLenSq = particle.Velocity.LengthSquared();

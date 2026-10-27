@@ -1,6 +1,7 @@
 using System.Numerics;
+using Content.Shared._RMC14.CCVar;
 using Content.Shared._RMC14.Particles;
-using Content.Shared.CCVar;
+using Content.Shared.GameTicking;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -55,10 +56,17 @@ public sealed partial class ParticleSystem : EntitySystem
         base.Initialize();
         _overlay = new ParticleOverlay(this);
         _overlayManager.AddOverlay(_overlay);
-        Subs.CVar(_cfg, CCVars.ParticleQuality, OnQualityChanged, true);
-        Subs.CVar(_cfg, CCVars.ParticleGlobalBudget, OnGlobalBudgetChanged, true);
-        Subs.CVar(_cfg, CCVars.ParticleIgnoreQualityMaxEmitters, v => _ignoreQualityMaxEmitters = v, true);
+        Subs.CVar(_cfg, RMCCVars.RMCParticleQuality, OnQualityChanged, true);
+        Subs.CVar(_cfg, RMCCVars.RMCParticleGlobalBudget, OnGlobalBudgetChanged, true);
+        Subs.CVar(_cfg, RMCCVars.RMCParticleIgnoreQualityMaxEmitters, v => _ignoreQualityMaxEmitters = v, true);
+        SubscribeNetworkEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
         _initialized = true;
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
+    {
+        KillAll();
+        _pendingSubEmitters.Clear();
     }
 
     public override void Shutdown()

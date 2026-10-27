@@ -1,10 +1,10 @@
 using System.Numerics;
-using Content.Client._RMC14.Explosion;
-using Content.Client._RMC14.Timing; // RMC14
+using Content.Client._RMC14.Explosion; // RMC14
+using Content.Client._RMC14.Timing;
 using Content.Shared.Explosion.Components;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
-using Robust.Client.Timing; // RMC14
+using Robust.Client.Timing;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
