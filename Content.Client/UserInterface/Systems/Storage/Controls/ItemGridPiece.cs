@@ -10,7 +10,10 @@ using Robust.Client.UserInterface.CustomControls;
 
 namespace Content.Client.UserInterface.Systems.Storage.Controls;
 
-public sealed class ItemGridPiece : Control, IEntityControl
+// RMC
+// public sealed class ItemGridPiece : Control, IEntityControl
+public sealed partial class ItemGridPiece : Control, IEntityControl
+// RMC
 {
     private readonly IEntityManager _entityManager;
     private readonly StorageUIController _storageController;
@@ -20,10 +23,6 @@ public sealed class ItemGridPiece : Control, IEntityControl
     public readonly EntityUid Entity;
     public ItemStorageLocation Location;
     public ItemGridPieceMarks? Marked;
-
-    // RMC
-    private readonly Entity<StorageComponent>? _ghostStorage;
-    public bool GhostHardReserved;
 
     public event Action<GUIBoundKeyEventArgs, ItemGridPiece>? OnPiecePressed;
     public event Action<GUIBoundKeyEventArgs, ItemGridPiece>? OnPieceUnpressed;
@@ -53,11 +52,10 @@ public sealed class ItemGridPiece : Control, IEntityControl
     private Texture? _markedSecondTexture;
     #endregion
 
-    public ItemGridPiece(
-        Entity<ItemComponent> entity,
-        ItemStorageLocation location,
-        IEntityManager entityManager,
-        Entity<StorageComponent>? ghostStorage = null) // RMC
+    // RMC
+    // public ItemGridPiece(Entity<ItemComponent> entity, ItemStorageLocation location,  IEntityManager entityManager)
+    public ItemGridPiece(Entity<ItemComponent> entity, ItemStorageLocation location,  IEntityManager entityManager, Entity<StorageComponent>? ghostStorage = null)
+    // RMC
     {
         IoCManager.InjectDependencies(this);
 
@@ -66,11 +64,15 @@ public sealed class ItemGridPiece : Control, IEntityControl
 
         Entity = entity.Owner;
         Location = location;
-        _ghostStorage = ghostStorage; // RMC
 
         Visible = true;
+        MouseFilter = MouseFilterMode.Stop;
+
         // RMC
-        MouseFilter = _ghostStorage == null ? MouseFilterMode.Stop : MouseFilterMode.Pass;
+        _ghostStorage = ghostStorage;
+        if (_ghostStorage != null)
+            MouseFilter = MouseFilterMode.Pass;
+        // RMC
 
         TooltipSupplier = SupplyTooltip;
 
@@ -123,48 +125,28 @@ public sealed class ItemGridPiece : Control, IEntityControl
         }
 
         // RMC
-        EntityUid storageOwner;
-        StorageComponent? storageComp;
+        // var containerSystem = _entityManager.System<ContainerSystem>();
+        // if (!containerSystem.TryGetContainingContainer((Entity, null), out var container) ||
+        //     !_entityManager.TryGetComponent(container.Owner, out StorageComponent? storageComp))
+        // {
+        //     return;
+        // }
+        //
+        // var adjustedShape = _entityManager.System<ItemSystem>().GetAdjustedItemShape((container.Owner, storageComp), (Entity, itemComponent), Location.Rotation, Vector2i.Zero);
+        if (!TryGetPieceStorage(out var storage))
+            return;
 
+        var adjustedShape = _entityManager.System<ItemSystem>().GetAdjustedItemShape((storage.Owner, storage.Comp), (Entity, itemComponent), Location.Rotation, Vector2i.Zero);
         // RMC
-        if (_ghostStorage is { } ghost)
-        {
-            storageOwner = ghost.Owner;
-            storageComp = ghost.Comp;
-        }
-        else
-        {
-            var containerSystem = _entityManager.System<ContainerSystem>();
-            if (!containerSystem.TryGetContainingContainer((Entity, null), out var container) ||
-                !_entityManager.TryGetComponent(container.Owner, out storageComp))
-            {
-                return;
-            }
-
-            storageOwner = container.Owner; //RMC
-        }
-
-        var adjustedShape = _entityManager.System<ItemSystem>().GetAdjustedItemShape((storageOwner, storageComp), (Entity, itemComponent), Location.Rotation, Vector2i.Zero);
         var boundingGrid = adjustedShape.GetBoundingBox();
         var size = _centerTexture!.Size * 2 * UIScale;
 
+        var hovering = !_storageController.IsDragging && UserInterfaceManager.CurrentlyHovered == this;
+        //yeah, this coloring is kinda hardcoded. deal with it. B)
+        Color? colorModulate = hovering  ? null : Color.FromHex("#a8a8a8");
         // RMC
-        Color? colorModulate;
-        var ghostHovering = false;
-        if (_ghostStorage != null)
-        {
-            ghostHovering = UserInterfaceManager.CurrentlyHovered == this;
-            var alpha = ghostHovering ? 0.65f : 0.35f;
-            colorModulate = GhostHardReserved
-                ? new Color(1f, 0.25f, 0.25f, alpha)
-                : new Color(1f, 1f, 1f, alpha);
-        }
-        else
-        {
-            var hovering = !_storageController.IsDragging && UserInterfaceManager.CurrentlyHovered == this;
-            //yeah, this coloring is kinda hardcoded. deal with it. B)
-            colorModulate = hovering ? null : Color.FromHex("#a8a8a8");
-        }
+        colorModulate = GetGhostModulate() ?? colorModulate;
+        // RMC
 
         var marked = Marked != null;
         Vector2i? maybeMarkedPos = null;
@@ -233,37 +215,26 @@ public sealed class ItemGridPiece : Control, IEntityControl
             handle.SetTransform(pos, iconRotation);
             var box = new UIBox2(root, root + sprite.Size * scale);
             // RMC
-            handle.DrawTextureRect(sprite, box, _ghostStorage != null ? colorModulate : null);
+            // handle.DrawTextureRect(sprite, box);
+            handle.DrawTextureRect(sprite, box, GetGhostModulate());
+            // RMC
             handle.SetTransform(GlobalPixelPosition, Angle.Zero);
         }
         else
         {
+            _entityManager.System<SpriteSystem>().ForceUpdate(Entity);
             // RMC
-            var spriteSystem = _entityManager.System<SpriteSystem>();
-            spriteSystem.ForceUpdate(Entity);
-
-            Color? originalSpriteColor = null;
-            if (_ghostStorage != null && _entityManager.TryGetComponent(Entity, out SpriteComponent? ghostSprite))
-            {
-                originalSpriteColor = ghostSprite.Color;
-                var tint = colorModulate ?? Color.White;
-                ghostSprite.Color = new Color(
-                    originalSpriteColor.Value.R * tint.R,
-                    originalSpriteColor.Value.G * tint.G,
-                    originalSpriteColor.Value.B * tint.B,
-                    tint.A);
-            }
-
+            var originalSpriteColor = TintGhostSprite();
+            // RMC
             handle.DrawEntity(Entity,
                 PixelPosition + iconPosition,
                 Vector2.One * 2 * UIScale,
                 Angle.Zero,
                 eyeRotation: iconRotation,
                 overrideDirection: Direction.South);
-
             // RMC
-            if (originalSpriteColor is { } restoreColor && _entityManager.TryGetComponent(Entity, out SpriteComponent? restoreSprite))
-                restoreSprite.Color = restoreColor;
+            RestoreGhostSprite(originalSpriteColor);
+            // RMC
         }
 
         if (maybeMarkedPos is {} markedPos)
@@ -282,16 +253,12 @@ public sealed class ItemGridPiece : Control, IEntityControl
         }
 
         // RMC
+        // _entityManager.System<RMCIconLabelSystem>().DrawStorage(Entity, UIScale, iconPosition, handle);
         if (_ghostStorage == null)
-        {
             _entityManager.System<RMCIconLabelSystem>().DrawStorage(Entity, UIScale, iconPosition, handle);
-        }
-        else if (ghostHovering)
-        {
-            var outlineSize = size * 2 * new Vector2(boundingGrid.Width + 1, boundingGrid.Height + 1);
-            var outlineColor = GhostHardReserved ? new Color(1f, 0.35f, 0.35f) : Color.White;
-            handle.DrawRect(new UIBox2(PixelPosition, PixelPosition + outlineSize), outlineColor.WithAlpha(0.9f), filled: false);
-        }
+        else
+            DrawGhostOutline(handle, size, boundingGrid);
+        // RMC
     }
 
     protected override bool HasPoint(Vector2 point)

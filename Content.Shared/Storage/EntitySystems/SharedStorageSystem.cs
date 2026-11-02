@@ -838,7 +838,7 @@ public abstract class SharedStorageSystem : EntitySystem
         SaveItemLocation(storage!, item.Owner);
     }
 
-    // RMC
+    // RMC start
     private void OnRMCSaveLayout(RMCStorageSaveLayoutEvent msg, EntitySessionEventArgs args)
     {
         if (!ValidateInput(args, msg.Storage, out _, out var storage))
@@ -847,7 +847,6 @@ public abstract class SharedStorageSystem : EntitySystem
         RMCStorage.SaveLayout(storage, msg.Hard);
     }
 
-    // RMC
     private void OnRMCClearReservedSlot(RMCStorageClearReservedSlotEvent msg, EntitySessionEventArgs args)
     {
         if (!ValidateInput(args, msg.Storage, out _, out var storage))
@@ -859,7 +858,6 @@ public abstract class SharedStorageSystem : EntitySystem
         RMCStorage.ClearReservedSlot(storage, item.Value);
     }
 
-    // RMC
     private void OnRMCToggleHardReserved(RMCStorageToggleHardReservedEvent msg, EntitySessionEventArgs args)
     {
         if (!ValidateInput(args, msg.Storage, out _, out var storage))
@@ -870,6 +868,7 @@ public abstract class SharedStorageSystem : EntitySystem
 
         RMCStorage.ToggleHardReserved(storage, item.Value);
     }
+    // RMC end
 
     private void OnBoundUIOpen(Entity<StorageComponent> ent, ref BoundUIOpenedEvent args)
     {
@@ -964,6 +963,7 @@ public abstract class SharedStorageSystem : EntitySystem
     // RMC made own meth
     public void CompactStorage(Entity<StorageComponent> entity)
     {
+        // RMC
         var items = new List<(EntityUid Id, ItemStorageLocation Location)>();
         foreach (var (item, location) in entity.Comp.StoredItems)
         {
@@ -1430,49 +1430,26 @@ public abstract class SharedStorageSystem : EntitySystem
             }
         }
 
-        // RMC
-        ItemStorageLocation? reservedFallback = null;
-
-        for (var y = storageBounding.Bottom; y <= storageBounding.Top; y++)
-        {
-            for (var x = storageBounding.Left; x <= storageBounding.Right; x++)
-            {
-                // RMC14
-                // for (var angle = startAngle; angle <= Angle.FromDegrees(360 - startAngle); angle += Math.PI / 2f)
-                // {
-                var location = new ItemStorageLocation(Angle.Zero, (x, y));
-                if (ItemFitsInGridLocation(itemEnt, storageEnt, location))
-                {
-                    if (RMCStorage.IsHardReservedForOther(storageEnt, itemEnt, location))
-                    {
-                        continue;
-                    }
-
-                    if (RMCStorage.IsReservedForOther(storageEnt, itemEnt, location))
-                    {
-                        reservedFallback ??= location;
-                    }
-                    else
-                    {
-                        storageLocation = location;
-                        return true;
-                    }
-
-                    continue;
-                }
-                // }
-                // RMC14
-            }
-        }
-
-        // RMC
-        if (reservedFallback != null)
-        {
-            storageLocation = reservedFallback;
-            return true;
-        }
-
-        return false;
+        // RMC14
+        // for (var y = storageBounding.Bottom; y <= storageBounding.Top; y++)
+        // {
+        //     for (var x = storageBounding.Left; x <= storageBounding.Right; x++)
+        //     {
+        //         // for (var angle = startAngle; angle <= Angle.FromDegrees(360 - startAngle); angle += Math.PI / 2f)
+        //         // {
+        //         var location = new ItemStorageLocation(Angle.Zero, (x, y));
+        //         if (ItemFitsInGridLocation(itemEnt, storageEnt, location))
+        //         {
+        //             storageLocation = location;
+        //             return true;
+        //         }
+        //         // }
+        //     }
+        // }
+        //
+        // return false;
+        return RMCStorage.TryGetFirstGridLocation(storageEnt, itemEnt, out storageLocation);
+        // RMC14
     }
 
     /// <summary>

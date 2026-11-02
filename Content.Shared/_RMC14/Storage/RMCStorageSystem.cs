@@ -880,6 +880,45 @@ public sealed class RMCStorageSystem : EntitySystem
         return false;
     }
 
+    public bool TryGetFirstGridLocation(
+        Entity<StorageComponent?> storage,
+        Entity<ItemComponent?> item,
+        [NotNullWhen(true)] out ItemStorageLocation? location)
+    {
+        location = null;
+
+        if (!Resolve(storage, ref storage.Comp, false) || !Resolve(item, ref item.Comp, false))
+            return false;
+
+        ItemStorageLocation? reservedFallback = null;
+        var storageBounding = storage.Comp.Grid.GetBoundingBox();
+
+        for (var y = storageBounding.Bottom; y <= storageBounding.Top; y++)
+        {
+            for (var x = storageBounding.Left; x <= storageBounding.Right; x++)
+            {
+                var candidate = new ItemStorageLocation(Angle.Zero, (x, y));
+                if (!_storage.ItemFitsInGridLocation(item, storage, candidate))
+                    continue;
+
+                if (IsHardReservedForOther(storage, item, candidate))
+                    continue;
+
+                if (IsReservedForOther(storage, item, candidate))
+                {
+                    reservedFallback ??= candidate;
+                    continue;
+                }
+
+                location = candidate;
+                return true;
+            }
+        }
+
+        location = reservedFallback;
+        return location != null;
+    }
+
     public bool IsReservedForOther(Entity<StorageComponent?> storage, Entity<ItemComponent?> item, ItemStorageLocation location)
     {
         if (!TryComp(storage.Owner, out RMCStorageReservedSlotsComponent? reserved) || reserved.Reserved.Count == 0)

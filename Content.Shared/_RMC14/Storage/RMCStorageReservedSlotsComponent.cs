@@ -4,6 +4,7 @@ using Robust.Shared.GameStates;
 namespace Content.Shared._RMC14.Storage;
 
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
+[Access(typeof(RMCStorageSystem), Other = AccessPermissions.ReadExecute)]
 public sealed partial class RMCStorageReservedSlotsComponent : Component
 {
     [DataField, AutoNetworkedField]
