@@ -312,6 +312,7 @@ public sealed partial class StorageWindow : BaseWindow
         _sidebar.AddChild(exitContainer);
 
         // RMC
+        var saveLayoutButton = new TextureButton
         {
             Name = "SaveLayoutButton",
             TextureNormal = _saveLayoutTexture,
