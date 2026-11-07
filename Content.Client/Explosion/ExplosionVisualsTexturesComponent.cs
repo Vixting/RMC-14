@@ -1,4 +1,3 @@
-using Content.Shared.Explosion;
 using Robust.Client.Graphics;
 using Robust.Shared.Graphics;
 
@@ -24,22 +23,4 @@ public sealed partial class ExplosionVisualsTexturesComponent : Component
     public List<Texture[]> FireFrames = new();
 
     public Color? FireColor;
-
-    // RMC14
-    public ExplosionPrototype? RMCType;
-
-    public float RMCPowerPerIntensity;
-
-    public TimeSpan RMCStartTime;
-
-    public List<Texture> RMCSmokeFrames = new();
-
-    public List<Texture> RMCCoreFrames = new();
-
-    public List<Texture[]> RMCSparkFrames = new();
-
-    public Color RMCHeatColor = Color.White;
-
-    public int RMCSeed;
-    // RMC14
 }

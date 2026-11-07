@@ -99,12 +99,12 @@ public sealed partial class DropshipComponent : Component
             Params = AudioParams.Default.WithVolume(2f).WithReferenceDistance(10).WithMaxDistance(30).WithLoop(true),
         };
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public ProtoId<ParticleEffectPrototype>? LandingDust = "RMCDropshipLandingDust";
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public TimeSpan LandingDustCutoff = TimeSpan.FromSeconds(0.9);
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public float LandingDustRadiusPerTile = 0.375f;
 }

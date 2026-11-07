@@ -18,7 +18,7 @@ public sealed class RMCExplosionLightSystem : EntitySystem
         while (query.MoveNext(out var visuals, out var textures))
         {
             if (textures.RMCType is not { } type ||
-                textures.RMCPowerPerIntensity <= 0 ||
+                type.PowerPerIntensity <= 0 ||
                 visuals.Intensity.Count == 0 ||
                 !_lights.TryGetLight(textures.LightEntity, out var light))
             {
@@ -26,9 +26,9 @@ public sealed class RMCExplosionLightSystem : EntitySystem
             }
 
             var settings = type.Light;
-            var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, textures.RMCPowerPerIntensity);
+            var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, type.PowerPerIntensity);
             var peak = Math.Clamp(power / settings.PowerPerEnergy, settings.MinEnergy, settings.MaxEnergy);
-            var elapsed = (time - textures.RMCStartTime).TotalSeconds;
+            var elapsed = (time - visuals.RMCStartTime).TotalSeconds;
             var fadeEnd = RMCExplosionVisuals.SmokeEnd(type, visuals.Intensity);
             var flashSeconds = settings.FlashDuration.TotalSeconds;
 

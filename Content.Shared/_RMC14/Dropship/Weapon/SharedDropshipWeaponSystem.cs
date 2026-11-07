@@ -777,6 +777,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
             Fire = ev.Fire,
             SoundEveryShots = ev.SoundEveryShots,
             FallEffect = ev.FallEffect,
+            FallAt = time + ev.TravelTime + MarkerImpactDelay - _spriteDescent.GetDuration(ev.FallEffect),
         };
 
         AddComp(inFlight, inFlightComp, true);
@@ -821,6 +822,7 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
             Fire = ammo.Fire,
             SoundEveryShots = ammo.SoundEveryShots,
             FallEffect = ammo.FallEffect,
+            FallAt = time + ammo.TravelTime + MarkerImpactDelay - _spriteDescent.GetDuration(ammo.FallEffect),
         };
 
         AddComp(inFlight, inFlightComp, true);
@@ -1472,12 +1474,9 @@ public abstract class SharedDropshipWeaponSystem : EntitySystem
                 }
             }
 
-            if (!flight.FallSpawned &&
-                flight.FallEffect is { } fallEffect &&
-                time >= flight.MarkerAt + MarkerImpactDelay - _spriteDescent.GetDuration(fallEffect))
+            if (flight.FallEffect is { } fallEffect && time >= flight.FallAt)
             {
-                flight.FallSpawned = true;
-                Dirty(uid, flight);
+                flight.FallEffect = null;
                 SpawnAtPosition(fallEffect, flight.Target.SnapToGrid(EntityManager, _mapManager));
             }
 

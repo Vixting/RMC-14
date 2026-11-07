@@ -20,9 +20,10 @@ public sealed class RMCSpriteDescentSystem : EntitySystem
         Dirty(ent);
     }
 
-    public TimeSpan GetDuration(EntProtoId prototype)
+    public TimeSpan GetDuration(EntProtoId? prototype)
     {
-        if (_prototypes.Index(prototype).TryGetComponent(out RMCSpriteDescentComponent? descent, EntityManager.ComponentFactory))
+        if (prototype is { } id &&
+            _prototypes.Index(id).TryGetComponent(out RMCSpriteDescentComponent? descent, EntityManager.ComponentFactory))
             return descent.Duration;
 
         return TimeSpan.Zero;

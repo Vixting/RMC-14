@@ -282,12 +282,15 @@ public abstract class SharedMortarSystem : EntitySystem
         var time = _timing.CurTime;
         mortar.Comp.LastFiredAt = time;
 
+        var landAt = time + travelTime + shell.ImpactDelay;
         var active = new ActiveMortarShellComponent
         {
             Coordinates = _transform.ToCoordinates(coordinates),
             WarnAt = time + travelTime,
             ImpactWarnAt = time + travelTime + shell.ImpactWarningDelay,
-            LandAt = time + travelTime + shell.ImpactDelay,
+            LandAt = landAt,
+            FallEffect = shell.FallEffect,
+            FallAt = landAt - _spriteDescent.GetDuration(shell.FallEffect),
         };
 
         AddComp(shellId, active, true);
@@ -562,13 +565,16 @@ public abstract class SharedMortarSystem : EntitySystem
             return;
 
         var time = _timing.CurTime;
+        var landAt = time + shell.TravelDelay + shell.ImpactDelay;
 
         var active = new ActiveMortarShellComponent
         {
             Coordinates = _transform.ToCoordinates(coords),
             WarnAt = time + shell.TravelDelay,
             ImpactWarnAt = time + shell.TravelDelay + shell.ImpactWarningDelay,
-            LandAt = time + shell.TravelDelay + shell.ImpactDelay,
+            LandAt = landAt,
+            FallEffect = shell.FallEffect,
+            FallAt = landAt - _spriteDescent.GetDuration(shell.FallEffect),
         };
 
         AddComp(explosion, active, true);
@@ -604,13 +610,9 @@ public abstract class SharedMortarSystem : EntitySystem
                     "rmc-mortar-shell-impact-warning-above");
             }
 
-            if (!active.FallSpawned &&
-                TryComp(uid, out MortarShellComponent? shell) &&
-                shell.FallEffect is { } fallEffect &&
-                time >= active.LandAt - _spriteDescent.GetDuration(fallEffect))
+            if (active.FallEffect is { } fallEffect && time >= active.FallAt)
             {
-                active.FallSpawned = true;
-                Dirty(uid, active);
+                active.FallEffect = null;
                 SpawnAtPosition(fallEffect, active.Coordinates);
             }
 

@@ -265,14 +265,8 @@ public sealed partial class ParticleSystem : EntitySystem
                 var e = _emitters[i];
                 if (e.Proto.IgnoreQualitySettings)
                     continue;
-                foreach (var p in e.Particles)
-                {
-                    if (!p.Alive)
-                        continue;
-                    p.Alive = false;
-                    _liveParticleCount--;
-                }
-                _emitters.RemoveAt(i);
+                _liveParticleCount -= e.LiveCount;
+                RemoveEmitterAt(i);
             }
             if (_emitters.Count == 0)
                 return;
@@ -310,8 +304,8 @@ public sealed partial class ParticleSystem : EntitySystem
             else
                 AgeOffScreenParticles(emitter, frameTime);
 
-            if (emitter.Exhausted && !emitter.HasLiveParticles())
-                _emitters.RemoveAt(i);
+            if (emitter.Exhausted && emitter.LiveCount == 0)
+                RemoveEmitterAt(i);
         }
 
         var subIdx = 0;
@@ -451,12 +445,10 @@ public sealed partial class ParticleSystem : EntitySystem
             }
         }
 
-        var liveCount = 0;
         foreach (var p in emitter.Particles)
         {
             if (!p.Alive)
                 continue;
-            liveCount++;
             p.Age += TimeSpan.FromSeconds(dt);
 
             if (p.Age >= p.Lifetime)
@@ -470,8 +462,8 @@ public sealed partial class ParticleSystem : EntitySystem
                 }
                 p.Alive = false;
                 _liveParticleCount--;
+                emitter.LiveCount--;
                 emitter.FreePool.Enqueue(p);
-                liveCount--;
                 continue;
             }
 
@@ -492,10 +484,9 @@ public sealed partial class ParticleSystem : EntitySystem
                 var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(maxCount, IgnoreQualityMaxParticles) : maxCount;
                 var scaledMax = (int)Math.Ceiling(Math.Min(effectiveMax, HardMaxParticles) * qualityMult * emitter.Intensity);
                 var toEmit = (int)Math.Ceiling(burst.Count * qualityMult * emitter.Intensity);
-                for (var j = 0; j < toEmit && _liveParticleCount < GetBudget(proto) && liveCount < scaledMax; j++)
+                for (var j = 0; j < toEmit && _liveParticleCount < GetBudget(proto) && emitter.LiveCount < scaledMax; j++)
                 {
                     EmitParticle(emitter, eyeAngle);
-                    liveCount++;
                 }
                 emitter.FiredBursts[b] = true;
             }
@@ -507,7 +498,7 @@ public sealed partial class ParticleSystem : EntitySystem
             var effectiveMax = proto.IgnoreQualitySettings && _quality < 3 ? Math.Min(maxCount, IgnoreQualityMaxParticles) : maxCount;
             var scaledMax = (int)Math.Ceiling(Math.Min(effectiveMax, HardMaxParticles) * qualityMult * emitter.Intensity);
             var available = GetBudget(proto) - _liveParticleCount;
-            var canEmit = Math.Min(scaledMax - liveCount, available);
+            var canEmit = Math.Min(scaledMax - emitter.LiveCount, available);
             if (canEmit > 0)
             {
                 var emissionMult = 1f;
@@ -564,6 +555,7 @@ public sealed partial class ParticleSystem : EntitySystem
 
         p.Alive = true;
         _liveParticleCount++;
+        emitter.LiveCount++;
 
         var ovr = emitter.Overrides;
         var lifetime    = (float)(ovr?.Lifetime        ?? proto.Lifetime).TotalSeconds;
@@ -701,9 +693,17 @@ public sealed partial class ParticleSystem : EntitySystem
             {
                 p.Alive = false;
                 _liveParticleCount--;
+                emitter.LiveCount--;
                 emitter.FreePool.Enqueue(p);
             }
         }
+    }
+
+    private void RemoveEmitterAt(int index)
+    {
+        var last = _emitters.Count - 1;
+        _emitters[index] = _emitters[last];
+        _emitters.RemoveAt(last);
     }
 
     private void ResolveFrames(ActiveEmitter emitter)

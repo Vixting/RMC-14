@@ -1,5 +1,5 @@
 using System.Numerics;
-using Content.Client._RMC14.Explosion; // RMC14
+using Content.Client._RMC14.Explosion;
 using Content.Client._RMC14.Timing;
 using Content.Shared.Explosion.Components;
 using JetBrains.Annotations;
@@ -106,7 +106,7 @@ public sealed class ExplosionOverlay : Overlay
         Vector2 rmcEpicenter = default) // RMC14
     {
         // RMC14
-        if (textures.RMCPowerPerIntensity > 0)
+        if (textures.RMCType is { PowerPerIntensity: > 0 })
         {
             RMCExplosionSmokeRenderer.DrawSmokeWave(drawHandle, gridBounds, tileSets, visuals, tileSize, textures, rmcEpicenter, _timing.LastRealTime());
             return;

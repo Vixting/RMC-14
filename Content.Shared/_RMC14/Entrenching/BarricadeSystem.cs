@@ -195,8 +195,7 @@ public sealed class BarricadeSystem : EntitySystem
         if (tool.Comp.TotalLayers <= 0)
         {
             args.Repeat = false;
-            if (tool.Comp.LastDigLocation.IsValid(EntityManager))
-                StartDigging(tool, args.User, tool.Comp.LastDigLocation);
+            StartDigging(tool, args.User, tool.Comp.LastDigLocation);
         }
     }
 
@@ -205,7 +204,7 @@ public sealed class BarricadeSystem : EntitySystem
         if (_net.IsClient || args.Handled)
             return;
 
-        if (!TryComp(args.Used, out EntrenchingToolComponent? toolComp) || toolComp.TotalLayers <= 0)
+        if (!TryComp(args.Used, out EntrenchingToolComponent? toolComp))
             return;
 
         args.Handled = true;

@@ -58,10 +58,12 @@ public sealed class RMCParticleEffectBatchEvent : EntityEventArgs
 {
     public List<NetEntity> Stops;
     public List<RMCParticleEffectEvent> Effects;
+    public List<RMCImpactParticles> Impacts;
 
-    public RMCParticleEffectBatchEvent(List<NetEntity> stops, List<RMCParticleEffectEvent> effects)
+    public RMCParticleEffectBatchEvent(List<NetEntity> stops, List<RMCParticleEffectEvent> effects, List<RMCImpactParticles> impacts)
     {
         Stops = stops;
         Effects = effects;
+        Impacts = impacts;
     }
 }

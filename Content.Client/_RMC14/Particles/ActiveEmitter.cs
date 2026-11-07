@@ -46,14 +46,5 @@ public sealed class ActiveEmitter
     // Pooled particle list — dead slots stay in the list and are reused from FreePool.
     public readonly List<ParticleData> Particles = new();
     public readonly Queue<ParticleData> FreePool = new();
-
-    public bool HasLiveParticles()
-    {
-        foreach (var p in Particles)
-        {
-            if (p.Alive)
-                return true;
-        }
-        return false;
-    }
+    public int LiveCount;
 }

@@ -19,13 +19,11 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly SharedGunSystem _gun = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly RMCParticleEffectSystem _particleEffects = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private static readonly EntProtoId<ProjectileImpactParticleSettingsComponent> Settings = "RMCProjectileImpactParticleSettings";
-
-    private readonly List<(ProjectileImpactParticles Impact, ICommonSession? Excluded)> _pending = new();
-    private readonly Dictionary<ICommonSession, List<ProjectileImpactParticles>> _bySession = new();
 
     public override void Initialize()
     {
@@ -44,52 +42,14 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
         if (GetImpact(ent, args.Target) is not { } impact)
             return;
 
-        if (_net.IsClient)
-        {
-            RaiseLocalEvent(new ProjectileImpactParticlesEvent(new List<ProjectileImpactParticles> { impact }));
-            return;
-        }
-
         ICommonSession? excluded = null;
-        if (_gun.GunPrediction && TryComp(ent, out PredictedProjectileServerComponent? predicted))
+        if (_net.IsServer && _gun.GunPrediction && TryComp(ent, out PredictedProjectileServerComponent? predicted))
             excluded = predicted.Shooter;
 
-        _pending.Add((impact, excluded));
+        _particleEffects.PlayImpact(impact, excluded);
     }
 
-    public override void Update(float frameTime)
-    {
-        if (_net.IsClient || _pending.Count == 0)
-            return;
-
-        _bySession.Clear();
-        foreach (var (impact, excluded) in _pending)
-        {
-            foreach (var session in Filter.Pvs(impact.Coords).Recipients)
-            {
-                if (session == excluded)
-                    continue;
-
-                if (!_bySession.TryGetValue(session, out var impacts))
-                {
-                    impacts = new List<ProjectileImpactParticles>();
-                    _bySession[session] = impacts;
-                }
-
-                impacts.Add(impact);
-            }
-        }
-
-        _pending.Clear();
-        foreach (var (session, impacts) in _bySession)
-        {
-            RaiseNetworkEvent(new ProjectileImpactParticlesEvent(impacts), session);
-        }
-
-        _bySession.Clear();
-    }
-
-    private ProjectileImpactParticles? GetImpact(Entity<ProjectileComponent> ent, EntityUid target)
+    private RMCImpactParticles? GetImpact(Entity<ProjectileComponent> ent, EntityUid target)
     {
         if (GetTravelDirection(ent, target) is not { } direction ||
             !Settings.TryGet(out var settings, _prototype, _compFactory))
@@ -105,7 +65,7 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
             if (Prototype(ent) is not { } proto)
                 return null;
 
-            return new ProjectileImpactParticles(coords, direction, null, null, 1f, proto.ID, mob);
+            return new RMCImpactParticles(coords, direction, null, null, 1f, proto.ID, mob);
         }
 
         if (mob)
@@ -113,7 +73,7 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
             if (!_bloodColor.TryGetHitBloodColor(target, out var blood))
                 return null;
 
-            return new ProjectileImpactParticles(coords, direction, blood, null, intensity);
+            return new RMCImpactParticles(coords, direction, blood, null, intensity);
         }
 
         ProtoId<ParticleEffectPrototype>? debris = null;
@@ -126,15 +86,7 @@ public sealed class ProjectileImpactParticleSystem : EntitySystem
             debris = settings.MetalDebris;
         }
 
-        return new ProjectileImpactParticles(coords, direction, null, debris, intensity);
-    }
-
-    public void QueueImpact(ProjectileImpactParticles impact, ICommonSession? excluded)
-    {
-        if (_net.IsClient)
-            return;
-
-        _pending.Add((impact, excluded));
+        return new RMCImpactParticles(coords, direction, null, debris, intensity);
     }
 
     public bool TryGetIntensity(FixedPoint2 damage, out float intensity)

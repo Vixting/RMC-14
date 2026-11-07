@@ -17,6 +17,7 @@ public sealed class RMCParticleEffectSystem : EntitySystem
 
     private readonly List<(RMCParticleEffectEvent Effect, ICommonSession? Excluded)> _pendingEffects = new();
     private readonly List<(NetEntity Source, MapCoordinates Coords)> _pendingStops = new();
+    private readonly List<(RMCImpactParticles Impact, ICommonSession? Excluded)> _pendingImpacts = new();
     private readonly Dictionary<ICommonSession, RMCParticleEffectBatchEvent> _bySession = new();
 
     public override void Initialize()
@@ -37,6 +38,21 @@ public sealed class RMCParticleEffectSystem : EntitySystem
             return;
 
         _pendingEffects.Add((ev, null));
+    }
+
+    /// <summary>
+    /// Queues impact for all session in PVS except <paramref name="excluded"/>
+    /// </summary>
+    public void PlayImpact(RMCImpactParticles impact, ICommonSession? excluded = null)
+    {
+        if (_net.IsServer)
+        {
+            _pendingImpacts.Add((impact, excluded));
+            return;
+        }
+
+        var impacts = new List<RMCImpactParticles> { impact };
+        RaiseLocalEvent(new RMCParticleEffectBatchEvent(new List<NetEntity>(), new List<RMCParticleEffectEvent>(), impacts));
     }
 
     public void PlayPredicted(RMCParticleEffectEvent ev, EntityUid? user)
@@ -71,7 +87,7 @@ public sealed class RMCParticleEffectSystem : EntitySystem
 
     public override void Update(float frameTime)
     {
-        if (_net.IsClient || (_pendingEffects.Count == 0 && _pendingStops.Count == 0))
+        if (_net.IsClient || (_pendingEffects.Count == 0 && _pendingStops.Count == 0 && _pendingImpacts.Count == 0))
             return;
 
         _bySession.Clear();
@@ -94,8 +110,20 @@ public sealed class RMCParticleEffectSystem : EntitySystem
             }
         }
 
+        foreach (var (impact, excluded) in _pendingImpacts)
+        {
+            foreach (var session in Filter.Pvs(impact.Coords).Recipients)
+            {
+                if (session == excluded)
+                    continue;
+
+                GetBatch(session).Impacts.Add(impact);
+            }
+        }
+
         _pendingStops.Clear();
         _pendingEffects.Clear();
+        _pendingImpacts.Clear();
         foreach (var (session, batch) in _bySession)
         {
             RaiseNetworkEvent(batch, session);
@@ -108,7 +136,7 @@ public sealed class RMCParticleEffectSystem : EntitySystem
     {
         if (!_bySession.TryGetValue(session, out var batch))
         {
-            batch = new RMCParticleEffectBatchEvent(new List<NetEntity>(), new List<RMCParticleEffectEvent>());
+            batch = new RMCParticleEffectBatchEvent(new List<NetEntity>(), new List<RMCParticleEffectEvent>(), new List<RMCImpactParticles>());
             _bySession[session] = batch;
         }
 

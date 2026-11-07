@@ -1,9 +1,7 @@
-using Content.Client._RMC14.Timing;
 using Content.Shared.Explosion;
 using Content.Shared.Explosion.Components;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
-using Robust.Client.Timing;
 using Robust.Shared.GameStates;
 using Robust.Shared.Graphics.RSI;
 using Robust.Shared.Prototypes;
@@ -23,7 +21,6 @@ public sealed class ExplosionOverlaySystem : EntitySystem
     [Dependency] private readonly SharedPointLightSystem _lights = default!;
     [Dependency] private readonly SharedMapSystem _mapSystem = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly IClientGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -55,11 +52,6 @@ public sealed class ExplosionOverlaySystem : EntitySystem
         component.SpaceTileSize = state.SpaceTileSize;
         component.RMCStartTime = state.RMCStartTime; // RMC14
         component.RMCParticlesOverride = state.RMCParticlesOverride; // RMC14
-
-        // RMC14
-        if (TryComp(uid, out ExplosionVisualsTexturesComponent? textures) && state.RMCStartTime > TimeSpan.Zero)
-            textures.RMCStartTime = state.RMCStartTime;
-        // RMC14
     }
 
     private void OnCompRemove(EntityUid uid, ExplosionVisualsComponent component, ComponentRemove args)
@@ -96,9 +88,6 @@ public sealed class ExplosionOverlaySystem : EntitySystem
         textures.IntensityPerState = type.IntensityPerState;
         // RMC14
         textures.RMCType = type;
-        textures.RMCPowerPerIntensity = type.PowerPerIntensity;
-        textures.RMCStartTime = component.RMCStartTime > TimeSpan.Zero ? component.RMCStartTime : _timing.LastRealTime();
-        textures.RMCHeatColor = type.LightColor;
         textures.RMCSeed = uid.Id;
         if (type.PowerPerIntensity > 0)
         {

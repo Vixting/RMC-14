@@ -22,7 +22,7 @@ public sealed class VehicleTurretVisualSystem : EntitySystem
         UpdatesAfter.Add(typeof(VehicleTurretSystem));
         SubscribeLocalEvent<VehicleTurretVisualComponent, ComponentInit>(OnVisualInit);
         SubscribeLocalEvent<VehicleTurretVisualComponent, AfterAutoHandleStateEvent>(OnVisualState);
-        SubscribeLocalEvent<HardpointIntegrityComponent, AfterAutoHandleStateEvent>(OnIntegrityState);
+        SubscribeLocalEvent<HardpointIntegrityComponent, HardpointIntegrityStateChangedEvent>(OnIntegrityState);
     }
 
     public override void FrameUpdate(float frameTime)
@@ -89,11 +89,8 @@ public sealed class VehicleTurretVisualSystem : EntitySystem
         UpdateVisual(ent);
     }
 
-    private void OnIntegrityState(Entity<HardpointIntegrityComponent> ent, ref AfterAutoHandleStateEvent args)
+    private void OnIntegrityState(Entity<HardpointIntegrityComponent> ent, ref HardpointIntegrityStateChangedEvent args)
     {
-        var ev = new HardpointIntegrityStateChangedEvent();
-        RaiseLocalEvent(ent, ref ev);
-
         if (!HasComp<VehicleTurretComponent>(ent.Owner))
             return;
 

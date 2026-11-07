@@ -25,7 +25,7 @@ public static class RMCExplosionSmokeRenderer
         var ringSeconds = smoke.RingDelay.TotalSeconds;
         var maxStartDelay = smoke.MaxStartDelay.TotalSeconds;
         var maxLifetime = RMCExplosionVisuals.SmokeLifetime(smoke, float.MaxValue);
-        var elapsed = (curTime - textures.RMCStartTime).TotalSeconds;
+        var elapsed = (curTime - visuals.RMCStartTime).TotalSeconds;
         var newestRing = (int) (elapsed / ringSeconds);
         var oldestRing = (int) Math.Ceiling((elapsed - maxLifetime - maxStartDelay) / ringSeconds);
         var baseColor = textures.FireColor ?? Color.White;
@@ -35,7 +35,7 @@ public static class RMCExplosionSmokeRenderer
             if (!tileSets.TryGetValue(ring, out var tiles))
                 continue;
 
-            var power = visuals.Intensity[ring] * textures.RMCPowerPerIntensity;
+            var power = visuals.Intensity[ring] * type.PowerPerIntensity;
             var lifetime = RMCExplosionVisuals.SmokeLifetime(smoke, power);
             var ringAlpha = ring == 0 ? 1f : Math.Clamp(power / 255f, 0f, 1f);
             var heat = Math.Clamp((power - smoke.HeatMinPower) / (smoke.HeatFullPower - smoke.HeatMinPower), 0f, 1f);
@@ -64,7 +64,7 @@ public static class RMCExplosionSmokeRenderer
                 var position = centre + jitter + drift;
                 var rotation = Angle.FromDegrees(Hash01(hash, 4) * 360);
 
-                var tint = Color.InterpolateBetween(Color.White, textures.RMCHeatColor, heat * (1 - eased));
+                var tint = Color.InterpolateBetween(Color.White, type.LightColor, heat * (1 - eased));
                 var color = new Color(baseColor.R * tint.R, baseColor.G * tint.G, baseColor.B * tint.B, baseColor.A * alpha);
 
                 var scale = smoke.Overlap * (smoke.StartScale + (smoke.EndScale - smoke.StartScale) * eased);
@@ -91,18 +91,18 @@ public static class RMCExplosionSmokeRenderer
         TimeSpan curTime)
     {
         if (textures.RMCType is not { } type ||
-            textures.RMCPowerPerIntensity <= 0 ||
+            type.PowerPerIntensity <= 0 ||
             textures.RMCSparkFrames.Count == 0)
         {
             return;
         }
 
         var sparks = type.Sparks;
-        var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, textures.RMCPowerPerIntensity);
+        var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, type.PowerPerIntensity);
         if (power < sparks.MinPower)
             return;
 
-        var elapsed = (curTime - textures.RMCStartTime).TotalSeconds;
+        var elapsed = (curTime - visuals.RMCStartTime).TotalSeconds;
         var t = (float) (elapsed / sparks.Duration.TotalSeconds);
         if (t is < 0 or >= 1)
             return;
@@ -112,7 +112,7 @@ public static class RMCExplosionSmokeRenderer
         var count = Math.Clamp((int) (power / sparks.PowerPerStreak), sparks.MinStreaks, sparks.MaxStreaks);
         var reach = Math.Clamp(power / sparks.PowerPerTile, sparks.MinReach, sparks.MaxReach);
         var eased = 1 - (1 - t) * (1 - t);
-        var tint = Color.InterpolateBetween(textures.RMCHeatColor, Color.White, t);
+        var tint = Color.InterpolateBetween(type.LightColor, Color.White, t);
         var color = tint.WithAlpha(1 - t);
 
         for (var i = 0; i < count; i++)

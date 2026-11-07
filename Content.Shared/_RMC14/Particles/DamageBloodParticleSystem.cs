@@ -16,6 +16,7 @@ public sealed class DamageBloodParticleSystem : EntitySystem
 {
     [Dependency] private readonly ParticleBloodColorSystem _bloodColor = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly RMCParticleEffectSystem _particleEffects = default!;
     [Dependency] private readonly ISharedPlayerManager _player = default!;
     [Dependency] private readonly ProjectileImpactParticleSystem _projectileImpact = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
@@ -75,17 +76,10 @@ public sealed class DamageBloodParticleSystem : EntitySystem
                 direction = diff.ToAngle();
         }
 
-        var impact = new ProjectileImpactParticles(coords, direction, blood, null, intensity);
-        if (_net.IsClient)
-        {
-            RaiseLocalEvent(new ProjectileImpactParticlesEvent(new List<ProjectileImpactParticles> { impact }));
-            return;
-        }
-
         ICommonSession? excluded = null;
-        if (predicted && origin != null)
+        if (_net.IsServer && predicted && origin != null)
             _player.TryGetSessionByEntity(origin.Value, out excluded);
 
-        _projectileImpact.QueueImpact(impact, excluded);
+        _particleEffects.PlayImpact(new RMCImpactParticles(coords, direction, blood, null, intensity), excluded);
     }
 }

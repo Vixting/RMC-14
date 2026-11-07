@@ -54,20 +54,20 @@ public sealed class RMCExplosionShockWaveOverlay : Overlay, IEntityEventSubscrib
         while (_count < MaxCount && explosions.MoveNext(out _, out var visuals, out var textures))
         {
             if (textures.RMCType is not { } type ||
-                textures.RMCPowerPerIntensity <= 0 ||
+                type.PowerPerIntensity <= 0 ||
                 visuals.Epicenter.MapId != args.MapId)
             {
                 continue;
             }
 
             var shockWave = type.ShockWave;
-            var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, textures.RMCPowerPerIntensity);
+            var power = RMCExplosionVisuals.EpicenterPower(visuals.Intensity, type.PowerPerIntensity);
             if (power < shockWave.MinPower)
                 continue;
 
             var radius = power / shockWave.PowerPerRadius;
             var duration = RMCExplosionVisuals.ShockWaveDuration(shockWave, power);
-            var progress = (time - textures.RMCStartTime).TotalSeconds / duration;
+            var progress = (time - visuals.RMCStartTime).TotalSeconds / duration;
             if (progress is < 0 or >= 1)
                 continue;
 

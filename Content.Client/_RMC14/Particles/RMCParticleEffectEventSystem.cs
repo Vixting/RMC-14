@@ -25,9 +25,8 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
         base.Initialize();
         SubscribeAllEvent<RMCParticleEffectEvent>(OnParticleEffect);
         SubscribeAllEvent<RMCParticleEffectStopEvent>(OnParticleEffectStop);
-        SubscribeNetworkEvent<RMCParticleEffectBatchEvent>(OnParticleEffectBatch);
+        SubscribeAllEvent<RMCParticleEffectBatchEvent>(OnParticleEffectBatch);
         SubscribeNetworkEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
-        SubscribeAllEvent<ProjectileImpactParticlesEvent>(OnProjectileImpacts);
     }
 
     private void OnParticleEffect(RMCParticleEffectEvent ev)
@@ -75,6 +74,11 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
         {
             OnParticleEffect(effect);
         }
+
+        foreach (var impact in ev.Impacts)
+        {
+            PlayImpact(impact);
+        }
     }
 
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
@@ -108,40 +112,37 @@ public sealed class RMCParticleEffectEventSystem : EntitySystem
         };
     }
 
-    private void OnProjectileImpacts(ProjectileImpactParticlesEvent ev)
+    private void PlayImpact(RMCImpactParticles impact)
     {
-        foreach (var impact in ev.Impacts)
+        var back = impact.Direction + Math.PI;
+        if (impact.Projectile is { } projectile)
         {
-            var back = impact.Direction + Math.PI;
-            if (impact.Projectile is { } projectile)
-            {
-                PlayProjectileImpact(impact, projectile, back);
-                continue;
-            }
-
-            if (impact.Blood is { } blood)
-            {
-                var bloodOverrides = new ParticleRuntimeOverrides { Intensity = impact.Intensity };
-                _particles.CreateParticle(BloodPuffEdge, impact.Coords, back, blood, bloodOverrides);
-                _particles.CreateParticle(BloodPuff, impact.Coords, back, blood, bloodOverrides);
-                var sprayOverrides = new ParticleRuntimeOverrides
-                {
-                    StartRotation = _particles.WorldToParticleRotation(impact.Direction),
-                    Intensity = impact.Intensity,
-                };
-                _particles.CreateParticle(BloodSpray, impact.Coords, back, blood, sprayOverrides);
-                continue;
-            }
-
-            var impactOverrides = new ParticleRuntimeOverrides { Intensity = impact.Intensity };
-            _particles.CreateParticle(ImpactSmoke, impact.Coords, back, overrides: impactOverrides);
-            _particles.CreateParticle(ImpactFlash, impact.Coords, back, overrides: impactOverrides);
-            if (impact.Debris is { } debris)
-                _particles.CreateParticle(debris, impact.Coords, back, overrides: impactOverrides);
+            PlayProjectileImpact(impact, projectile, back);
+            return;
         }
+
+        if (impact.Blood is { } blood)
+        {
+            var bloodOverrides = new ParticleRuntimeOverrides { Intensity = impact.Intensity };
+            _particles.CreateParticle(BloodPuffEdge, impact.Coords, back, blood, bloodOverrides);
+            _particles.CreateParticle(BloodPuff, impact.Coords, back, blood, bloodOverrides);
+            var sprayOverrides = new ParticleRuntimeOverrides
+            {
+                StartRotation = _particles.WorldToParticleRotation(impact.Direction),
+                Intensity = impact.Intensity,
+            };
+            _particles.CreateParticle(BloodSpray, impact.Coords, back, blood, sprayOverrides);
+            return;
+        }
+
+        var impactOverrides = new ParticleRuntimeOverrides { Intensity = impact.Intensity };
+        _particles.CreateParticle(ImpactSmoke, impact.Coords, back, overrides: impactOverrides);
+        _particles.CreateParticle(ImpactFlash, impact.Coords, back, overrides: impactOverrides);
+        if (impact.Debris is { } debris)
+            _particles.CreateParticle(debris, impact.Coords, back, overrides: impactOverrides);
     }
 
-    private void PlayProjectileImpact(ProjectileImpactParticles impact, EntProtoId projectile, Angle back)
+    private void PlayProjectileImpact(RMCImpactParticles impact, EntProtoId projectile, Angle back)
     {
         if (!_prototype.TryIndex(projectile, out var proto) ||
             !proto.TryGetComponent(out ParticleProjectileImpactComponent? comp, _compFactory))
