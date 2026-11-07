@@ -84,11 +84,6 @@
     effects:
     - RMCAutocannonMuzzleFlash
     - RMCAutocannonMuzzleSmoke
-  - type: ParticleOnHardpointDamage
-    damagedEffects:
-    - RMCVehicleDamagedSmoke
-    destroyedEffects:
-    - RMCVehicleWreckSmoke
   - type: Sprite
     state: dual_cannon
   - type: HardpointItem

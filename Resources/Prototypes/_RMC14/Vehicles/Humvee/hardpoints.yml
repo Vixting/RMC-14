@@ -130,11 +130,6 @@
   - type: ParticleOnMuzzleFlash
     effects:
     - RMCGunFiringSmoke
-  - type: ParticleOnHardpointDamage
-    damagedEffects:
-    - RMCVehicleDamagedSmoke
-    destroyedEffects:
-    - RMCVehicleWreckSmoke
   - type: Sprite
     state: humveecannon
   - type: HardpointItem

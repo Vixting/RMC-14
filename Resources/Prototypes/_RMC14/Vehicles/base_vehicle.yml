@@ -10,8 +10,7 @@
     movementKind: Grid
   - type: LagCompensation
   - type: Clickable
-  - type: ParticleOnHardpointDamage
-    requireInstalled: false
+  - type: ParticleOnVehicleDamage
     damagedEffects:
     - RMCVehicleDamagedSmoke
     destroyedEffects:

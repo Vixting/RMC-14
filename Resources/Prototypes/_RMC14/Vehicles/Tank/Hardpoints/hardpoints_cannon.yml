@@ -9,11 +9,6 @@
     - RMCCannonMuzzleFlash
     - RMCCannonMuzzleSmoke
     - RMCCannonBlastDust
-  - type: ParticleOnHardpointDamage
-    damagedEffects:
-    - RMCVehicleDamagedSmoke
-    destroyedEffects:
-    - RMCVehicleWreckSmoke
   - type: Sprite
     state: ltb_cannon
   - type: HardpointItem
@@ -84,11 +79,6 @@
   - type: ParticleOnMuzzleFlash
     effects:
     - RMCGunFiringSmoke
-  - type: ParticleOnHardpointDamage
-    damagedEffects:
-    - RMCVehicleDamagedSmoke
-    destroyedEffects:
-    - RMCVehicleWreckSmoke
   - type: Sprite
     state: ltaaap_minigun
   - type: HardpointItem
@@ -184,11 +174,6 @@
     effects:
     - RMCAutocannonMuzzleFlash
     - RMCAutocannonMuzzleSmoke
-  - type: ParticleOnHardpointDamage
-    damagedEffects:
-    - RMCVehicleDamagedSmoke
-    destroyedEffects:
-    - RMCVehicleWreckSmoke
   - type: Sprite
     state: ace_autocannon
   - type: HardpointItem
@@ -262,11 +247,6 @@
     effects:
     - RMCFlamerNozzleFlame
     - RMCFlamerNozzleSmoke
-  - type: ParticleOnHardpointDamage
-    damagedEffects:
-    - RMCVehicleDamagedSmoke
-    destroyedEffects:
-    - RMCVehicleWreckSmoke
   - type: Sprite
     state: drgn_flamer
   - type: HardpointItem
