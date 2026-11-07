@@ -6,6 +6,20 @@
   - type: ExplosionParticles
     tiers:
     - minPower: 0
+      effects:
+      - RMCExplosionSmokeTiny
+      tileColorEffects:
+      - effect: RMCExplosionFallingDebrisTiny
+        brightness: 0.7
+        fallback: "#5E4A30"
+      - effect: RMCExplosionDirtKickupTiny
+        brightness: 1.7
+        fallback: "#BA9F6D"
+      waterEffects:
+      - RMCExplosionWaterSmokeTiny
+      - RMCExplosionWaterFallingTiny
+      - RMCExplosionWaterSplashTiny
+    - minPower: 50
       flash: RMCExplosionFlash
       effects:
       - RMCExplosionSmokeWaveSmall

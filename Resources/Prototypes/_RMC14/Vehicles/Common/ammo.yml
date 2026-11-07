@@ -480,6 +480,11 @@
     intensitySlope: 5
     totalIntensity: 35
     maxTileBreak: 0
+  - type: RMCExplosionParticlesOverride
+    particles: RMCExplosionParticlesGrenade
+  - type: CMExplosionEffect
+    minShrapnel: 2
+    maxShrapnel: 5
   - type: RMCKnockOutOnCollide
     paralyzeTime: 6
   - type: TriggerOnFixedDistanceStop
