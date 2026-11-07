@@ -12,10 +12,4 @@ public sealed partial class ParticleDebrisComponent : Component
 {
     [DataField, AutoNetworkedField]
     public ProtoId<ParticleEffectPrototype>? Effect;
-
-    [DataField, AutoNetworkedField]
-    public int DestructionCount = 24;
-
-    [DataField, AutoNetworkedField]
-    public float DestructionIntensity = 1.4f;
 }
