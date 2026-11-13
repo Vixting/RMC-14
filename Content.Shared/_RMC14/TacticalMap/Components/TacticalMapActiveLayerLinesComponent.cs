@@ -7,6 +7,9 @@ namespace Content.Shared._RMC14.TacticalMap;
 [Access(typeof(SharedTacticalMapSystem))]
 public sealed partial class TacticalMapActiveLayerLinesComponent : Component
 {
+    [AutoNetworkedField]
+    public Guid UpdateId;
+
     [DataField, AutoNetworkedField]
     public List<TacticalMapLine> Lines = new();
 }

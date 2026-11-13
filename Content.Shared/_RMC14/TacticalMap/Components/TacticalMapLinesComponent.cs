@@ -1,4 +1,4 @@
-﻿using Robust.Shared.GameStates;
+using Robust.Shared.GameStates;
 
 namespace Content.Shared._RMC14.TacticalMap;
 
@@ -6,6 +6,9 @@ namespace Content.Shared._RMC14.TacticalMap;
 [Access(typeof(SharedTacticalMapSystem))]
 public sealed partial class TacticalMapLinesComponent : Component
 {
+    [DataField, AutoNetworkedField]
+    public TacticalMapCoordinateGrid? CoordinateGrid;
+
     [DataField, AutoNetworkedField]
     public List<TacticalMapLine> Lines = new();
 }

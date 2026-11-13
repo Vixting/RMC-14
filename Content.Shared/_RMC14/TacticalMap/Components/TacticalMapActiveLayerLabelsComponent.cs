@@ -8,6 +8,9 @@ namespace Content.Shared._RMC14.TacticalMap;
 [Access(typeof(SharedTacticalMapSystem))]
 public sealed partial class TacticalMapActiveLayerLabelsComponent : Component
 {
+    [AutoNetworkedField]
+    public Guid UpdateId;
+
     [DataField, AutoNetworkedField]
     public Dictionary<Vector2i, TacticalMapLabelData> Labels = new();
 }

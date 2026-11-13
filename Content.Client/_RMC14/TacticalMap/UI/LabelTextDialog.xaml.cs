@@ -75,7 +75,7 @@ public sealed partial class LabelTextDialog : DefaultWindow
 
     private void HandleConfirm()
     {
-        string text = TextEdit.Text?.Trim() ?? string.Empty;
+        var text = TextEdit.Text?.Trim() ?? string.Empty;
         OnLabelConfirmed?.Invoke(text);
         Close();
     }
@@ -86,14 +86,15 @@ public sealed partial class LabelTextDialog : DefaultWindow
         Close();
     }
 
-    public static void Show(Vector2i position, string existingText = "",
+    public static LabelTextDialog Show(Vector2i position, string existingText = "",
         Action<string>? onConfirmed = null, Action? onDeleted = null)
     {
-        LabelTextDialog dialog = new LabelTextDialog(position, existingText);
+        var dialog = new LabelTextDialog(position, existingText);
         if (onConfirmed != null)
             dialog.OnLabelConfirmed += onConfirmed;
         if (onDeleted != null)
             dialog.OnLabelDeleted += onDeleted;
         dialog.OpenCentered();
+        return dialog;
     }
 }

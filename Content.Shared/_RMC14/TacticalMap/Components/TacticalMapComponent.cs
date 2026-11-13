@@ -10,6 +10,11 @@ namespace Content.Shared._RMC14.TacticalMap;
 [Serializable, NetSerializable]
 public sealed partial class TacticalMapLayerData
 {
+    public Guid LastCanvasUpdate;
+
+    [DataField]
+    public TacticalMapCoordinateGrid? CoordinateGrid;
+
     [DataField]
     public Dictionary<int, TacticalMapBlip> Blips = new();
 
@@ -44,4 +49,19 @@ public sealed partial class TacticalMapComponent : Component
 
     [DataField]
     public bool MapDirty;
+
+    [DataField]
+    public int MaxCanvasLabels = 128;
+
+    [DataField]
+    public int MaxLabelLength = 128;
+
+    [DataField]
+    public float MaxLineThickness = 8f;
+
+    [DataField]
+    public int ReplayMaxFrames = 2000;
+
+    [DataField]
+    public TimeSpan ReplayKeyframeInterval = TimeSpan.FromSeconds(10);
 }

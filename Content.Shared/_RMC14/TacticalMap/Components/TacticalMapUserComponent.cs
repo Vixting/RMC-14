@@ -25,6 +25,8 @@ public sealed partial class TacticalMapUserComponent : Component
     [DataField, AutoNetworkedField]
     public bool LiveUpdate;
 
+    public bool? IntrinsicLiveUpdate;
+
     [DataField]
     public List<ProtoId<TacticalMapLayerPrototype>> BaseLayers = new();
 

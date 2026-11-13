@@ -54,6 +54,7 @@ public sealed partial class TacticalMapReplayWindow : RMCPopOutWindow
 
     private sealed class ReplayLayerState
     {
+        public TacticalMapCoordinateGrid? CoordinateGrid;
         public readonly List<TacticalMapLine> Lines = new();
         public readonly Dictionary<Vector2i, TacticalMapLabelData> Labels = new();
         public readonly Dictionary<int, TacticalMapBlip> Blips = new();
@@ -320,6 +321,7 @@ public sealed partial class TacticalMapReplayWindow : RMCPopOutWindow
 
         var labels = new Dictionary<Vector2i, TacticalMapLabelData>();
         var blips = new List<TacticalMapBlip>();
+        TacticalMapCoordinateGrid? grid = null;
 
         foreach (var (layerId, state) in _resolvedLayers)
         {
@@ -328,6 +330,9 @@ public sealed partial class TacticalMapReplayWindow : RMCPopOutWindow
             {
                 continue;
             }
+
+            if (state.CoordinateGrid is { } settings)
+                grid = settings;
 
             if (_showLines && state.Lines.Count > 0)
             {
@@ -351,6 +356,7 @@ public sealed partial class TacticalMapReplayWindow : RMCPopOutWindow
         }
 
         Wrapper.UpdateTacticalLabels(labels);
+        Wrapper.UpdateCoordinateGrid(grid);
         Wrapper.UpdateBlips(_showBlips ? blips.ToArray() : Array.Empty<TacticalMapBlip>());
     }
 
@@ -434,6 +440,9 @@ public sealed partial class TacticalMapReplayWindow : RMCPopOutWindow
 
     private static void ApplyLayerDelta(ReplayLayerState state, TacticalMapReplayLayerDelta delta)
     {
+        if (delta.CoordinateGridChanged)
+            state.CoordinateGrid = delta.CoordinateGrid;
+
         if (delta.LinesChanged)
         {
             if (delta.LinesIsFull)

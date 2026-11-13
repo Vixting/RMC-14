@@ -20,7 +20,7 @@ namespace Content.Client._RMC14.TacticalMap.Controls;
 
 public sealed partial class TacticalMapControl
 {
-    private sealed class CachedMapTexture
+    internal sealed class CachedMapTexture
     {
         public Dictionary<Vector2i, Color>? Colors;
         public Dictionary<Vector2i, EntProtoId<AreaComponent>>? Areas;
@@ -45,11 +45,18 @@ public sealed partial class TacticalMapControl
         public Dictionary<Vector2i, string> AreaLabels = new();
     }
 
-    private static readonly Dictionary<EntityUid, CachedMapTexture> _textureCache = new();
+    private Dictionary<EntityUid, CachedMapTexture> TextureCache =>
+        _entitySystemManager.GetEntitySystem<TacticalMapSystem>().TextureCache;
 
     public void SetCurrentMap(EntityUid? mapEntity)
     {
         _currentMapEntity = mapEntity;
+        if (mapEntity == null)
+        {
+            ClearMapTexture();
+            _labelDialog?.Dispose();
+            _labelDialog = null;
+        }
     }
 
     public void SetCurrentMapName(string? mapName)
@@ -59,97 +66,39 @@ public sealed partial class TacticalMapControl
 
     public void UpdateTexture(Entity<AreaGridComponent> grid)
     {
-        _currentAreaGridEntity = grid.Owner;
+        if (_currentAreaGridEntity != grid.Owner)
+            ClearHoverInfo();
 
         if (TryApplyCachedTexture(grid))
             return;
 
+        ClearMapTexture();
+        _currentAreaGridEntity = grid.Owner;
         if (grid.Comp.Colors.Count == 0)
-        {
-            _tileMask = null;
-            _tileMaskWidth = 0;
-            _tileMaskHeight = 0;
-            _backgroundTexture = null;
-            _overlayLinkedLzTexture = null;
-            _overlayIconTextures.Clear();
             return;
-        }
 
         var colors = grid.Comp.Colors;
-        var hasValue = false;
-        Vector2i fullMin = default;
-        Vector2i fullMax = default;
-        foreach (var (pos, _) in colors)
-        {
-            if (!hasValue)
-            {
-                fullMin = pos;
-                fullMax = pos;
-                hasValue = true;
-            }
-            else
-            {
-                fullMin = Vector2i.ComponentMin(fullMin, pos);
-                fullMax = Vector2i.ComponentMax(fullMax, pos);
-            }
-        }
-
-        if (!hasValue)
-        {
-            _tileMask = null;
-            _tileMaskWidth = 0;
-            _tileMaskHeight = 0;
-            _backgroundTexture = null;
-            _overlayLinkedLzTexture = null;
-            _overlayIconTextures.Clear();
+        if (!AreaSystem.TryGetTacticalMapBounds(grid.Comp, out var boundsMin, out var boundsMax))
             return;
-        }
-
-        Vector2i boundsMin;
-        Vector2i boundsMax;
-        if (grid.Comp.HasTacMapBounds)
-        {
-            boundsMin = Vector2i.ComponentMax(fullMin, grid.Comp.TacMapBoundsMin);
-            boundsMax = Vector2i.ComponentMin(fullMax, grid.Comp.TacMapBoundsMax);
-
-            if (boundsMax.X < boundsMin.X || boundsMax.Y < boundsMin.Y)
-            {
-                boundsMin = fullMin;
-                boundsMax = fullMax;
-            }
-        }
-        else
-        {
-            boundsMin = fullMin;
-            boundsMax = fullMax;
-        }
 
         _min = boundsMin;
         _delta = boundsMax - boundsMin;
 
         if (_delta.X <= 0 || _delta.Y <= 0)
-        {
-            _tileMask = null;
-            _tileMaskWidth = 0;
-            _tileMaskHeight = 0;
-            _backgroundTexture = null;
-            _overlayLinkedLzTexture = null;
-            _overlayIconTextures.Clear();
             return;
-        }
 
-        int width = _delta.X + 1;
-        int height = _delta.Y + 1;
+        var width = _delta.X + 1;
+        var height = _delta.Y + 1;
         _tileMaskWidth = width;
         _tileMaskHeight = height;
         _tileMask = new bool[width * height];
 
-        Image<Rgba32> image = new(width, height);
-        Image<Rgba32> background = new(width, height);
+        using var image = new Image<Rgba32>(width, height);
+        using var background = new Image<Rgba32>(width, height);
         Image<Rgba32>? linkedLzOverlay = null;
         var iconOverlays = new Dictionary<string, Image<Rgba32>>();
-        bool canLookupAreas = _entitySystemManager.TryGetEntitySystem(out SharedAreaLookupSystem? areaLookupSystem);
-        bool hasLinkedLzOverlay = false;
+        var canLookupAreas = _entitySystemManager.TryGetEntitySystem(out SharedAreaLookupSystem? areaLookupSystem);
+        var hasLinkedLzOverlay = false;
         foreach ((Vector2i position, Color color) in colors)
         {
             if (position.X < boundsMin.X || position.X > boundsMax.X ||
@@ -176,13 +125,13 @@ public sealed partial class TacticalMapControl
                     if (lzIds.Length > 0)
                     {
                         linkedLzOverlay ??= new Image<Rgba32>(width, height);
-                        Color lzColor = BlendLinkedLzColors(lzIds);
+                        var lzColor = BlendLinkedLzColors(lzIds);
                         linkedLzOverlay[x, y] = new Rgba32(lzColor.R, lzColor.G, lzColor.B, lzColor.A);
                         hasLinkedLzOverlay = true;
                     }
                 }
 
-                string iconState = GetAreaIconState(areaComp);
+                var iconState = GetAreaIconState(areaComp);
                 if (!string.IsNullOrWhiteSpace(iconState))
                 {
                     if (!iconOverlays.TryGetValue(iconState, out var iconOverlay))
@@ -191,23 +140,25 @@ public sealed partial class TacticalMapControl
                         iconOverlays[iconState] = iconOverlay;
                     }
 
-                    Color iconColor = GetAreaIconOverlayColor(iconState);
+                    var iconColor = GetAreaIconOverlayColor(iconState);
                     iconOverlay[x, y] = new Rgba32(iconColor.R, iconColor.G, iconColor.B, iconColor.A);
                 }
             }
         }
 
+        using var linkedLzImage = linkedLzOverlay;
         _backgroundTexture = Texture.LoadFromImage(background);
         var mapTexture = Texture.LoadFromImage(image);
         Texture = mapTexture;
-        _overlayLinkedLzTexture = hasLinkedLzOverlay && linkedLzOverlay != null
-            ? Texture.LoadFromImage(linkedLzOverlay)
+        _overlayLinkedLzTexture = hasLinkedLzOverlay && linkedLzImage != null
+            ? Texture.LoadFromImage(linkedLzImage)
             : null;
         _overlayIconTextures.Clear();
         var overlayTextures = new Dictionary<string, Texture>(iconOverlays.Count);
         foreach (var (state, iconOverlay) in iconOverlays)
         {
-            var overlayTexture = Texture.LoadFromImage(iconOverlay);
+            using var overlayImage = iconOverlay;
+            var overlayTexture = Texture.LoadFromImage(overlayImage);
             _overlayIconTextures[state] = overlayTexture;
             overlayTextures[state] = overlayTexture;
         }
@@ -256,15 +207,16 @@ public sealed partial class TacticalMapControl
 
     private bool TryApplyCachedTexture(Entity<AreaGridComponent> grid)
     {
-        if (!_textureCache.TryGetValue(grid.Owner, out var cached))
+        if (!TextureCache.TryGetValue(grid.Owner, out var cached))
             return false;
 
         if (!IsCacheValid(cached, grid.Comp))
         {
-            _textureCache.Remove(grid.Owner);
+            TextureCache.Remove(grid.Owner);
             return false;
         }
 
+        _currentAreaGridEntity = grid.Owner;
         _min = cached.Min;
         _delta = cached.Delta;
         _tileMask = cached.TileMask;
@@ -301,9 +253,42 @@ public sealed partial class TacticalMapControl
                cached.AreaEntitiesCount == grid.AreaEntities.Count;
     }
 
-    private static void CacheTexture(Entity<AreaGridComponent> grid, CachedMapTexture cached)
+    private void CacheTexture(Entity<AreaGridComponent> grid, CachedMapTexture cached)
     {
-        _textureCache[grid.Owner] = cached;
+        TextureCache[grid.Owner] = cached;
+    }
+
+    private void ClearMapTexture()
+    {
+        ClearHoverInfo();
+        Texture = null;
+        _currentAreaGridEntity = null;
+        _backgroundTexture = null;
+        _overlayLinkedLzTexture = null;
+        _overlayIconTextures.Clear();
+        _areaLabels = new Dictionary<Vector2i, string>();
+        _coordinateColumns.Clear();
+        _coordinateRows.Clear();
+        _tileMask = null;
+        _tileMaskWidth = 0;
+        _tileMaskHeight = 0;
+        _min = default;
+        _delta = default;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            OnHoverAreaInfo = null;
+            _labelDialog?.Dispose();
+            _labelDialog = null;
+            _gridShader.Dispose();
+            _coordinateGridShader.Dispose();
+            ClearMapTexture();
+        }
+
+        base.Dispose(disposing);
     }
 
     private static Color GetLinkedLzOverlayColor(string linkedLz)
@@ -337,11 +322,11 @@ public sealed partial class TacticalMapControl
 
     private static Color BlendLinkedLzColors(IReadOnlyList<string> linkedLzIds)
     {
-        float r = 0f;
-        float g = 0f;
-        float b = 0f;
-        float maxAlpha = 0f;
-        int count = 0;
+        var r = 0f;
+        var g = 0f;
+        var b = 0f;
+        var maxAlpha = 0f;
+        var count = 0;
 
         foreach (var id in linkedLzIds)
         {
@@ -356,7 +341,7 @@ public sealed partial class TacticalMapControl
         if (count == 0)
             return Color.Transparent;
 
-        float blendAlpha = maxAlpha;
+        var blendAlpha = maxAlpha;
         if (count > 1)
             blendAlpha = MathF.Min(0.4f, maxAlpha + 0.06f * (count - 1));
 
@@ -418,19 +403,19 @@ public sealed partial class TacticalMapControl
             return false;
 
         string? areaId = null;
-        string areaName = Loc.GetString("rmc-tacmap-alert-no-area");
+        var areaName = Loc.GetString("rmc-tacmap-alert-no-area");
         string? linkedLz = null;
-        bool hasArea = false;
-        bool cas = false;
-        bool mortarFire = false;
-        bool mortarPlacement = false;
-        bool lasing = false;
-        bool medevac = false;
-        bool paradropping = false;
-        bool orbitalBombard = false;
-        bool supplyDrop = false;
-        bool fulton = false;
-        bool landingZone = false;
+        var hasArea = false;
+        var cas = false;
+        var mortarFire = false;
+        var mortarPlacement = false;
+        var lasing = false;
+        var medevac = false;
+        var paradropping = false;
+        var orbitalBombard = false;
+        var supplyDrop = false;
+        var fulton = false;
+        var landingZone = false;
         string? areaLabel = null;
 
         if (!_entitySystemManager.TryGetEntitySystem(out SharedAreaLookupSystem? areaLookupSystem))
@@ -547,24 +532,24 @@ public sealed partial class TacticalMapControl
         if (!IsWithinMap(_mortarOverlayCenter.Value))
             return;
 
-        int maxRange = _mortarOverlayMaxRange;
-        int minRange = _mortarOverlayMinRange;
+        var maxRange = _mortarOverlayMaxRange;
+        var minRange = _mortarOverlayMinRange;
         if (maxRange <= 0)
             return;
 
-        int maxRangeSquared = maxRange * maxRange;
-        int minRangeSquared = minRange * minRange;
-        Vector2i center = _mortarOverlayCenter.Value;
+        var maxRangeSquared = maxRange * maxRange;
+        var minRangeSquared = minRange * minRange;
+        var center = _mortarOverlayCenter.Value;
 
         for (int dx = -maxRange; dx <= maxRange; dx++)
         {
             for (int dy = -maxRange; dy <= maxRange; dy++)
             {
-                int distanceSquared = dx * dx + dy * dy;
+                var distanceSquared = dx * dx + dy * dy;
                 if (distanceSquared > maxRangeSquared || distanceSquared < minRangeSquared)
                     continue;
 
-                Vector2i indices = new(center.X + dx, center.Y + dy);
+                var indices = new Vector2i(center.X + dx, center.Y + dy);
                 if (!IsWithinMap(indices))
                     continue;
 
@@ -633,8 +618,8 @@ public sealed partial class TacticalMapControl
                 continue;
 
             var roofTile = mapSystem.TileIndicesFor(xform.GridUid.Value, grid, xform.Coordinates);
-            float dx = indices.X - roofTile.X;
-            float dy = indices.Y - roofTile.Y;
+            var dx = indices.X - roofTile.X;
+            var dy = indices.Y - roofTile.Y;
             if (dx * dx + dy * dy <= roof.Range * roof.Range)
                 return true;
         }
@@ -644,18 +629,18 @@ public sealed partial class TacticalMapControl
 
     public void ShowTunnelInfo(Vector2i indices, string tunnelName, Vector2 screenPosition)
     {
-        if (_tunnelInfoLabel == null)
+        if (TunnelInfoLabel == null)
             return;
 
-        _tunnelInfoLabel.Text = tunnelName;
-        _tunnelInfoLabel.Visible = true;
+        TunnelInfoLabel.Text = tunnelName;
+        TunnelInfoLabel.Visible = true;
 
-        LayoutContainer.SetPosition(_tunnelInfoLabel, screenPosition + new Vector2(-(_tunnelInfoLabel.DesiredSize.X / 2), -45));
+        LayoutContainer.SetPosition(TunnelInfoLabel, screenPosition + new Vector2(-(TunnelInfoLabel.DesiredSize.X / 2), -45));
     }
 
     public void HideTunnelInfo()
     {
-        if (_tunnelInfoLabel != null)
-            _tunnelInfoLabel.Visible = false;
+        if (TunnelInfoLabel != null)
+            TunnelInfoLabel.Visible = false;
     }
 }

@@ -10,6 +10,8 @@ namespace Content.Client._RMC14.TacticalMap.Controls;
 
 public sealed partial class TacticalMapControl
 {
+    private LabelTextDialog? _labelDialog;
+
     private Vector2i? GetLabelAtPosition(Vector2 controlPosition)
     {
         if (Texture == null)
@@ -18,9 +20,9 @@ public sealed partial class TacticalMapControl
         if (CurrentLabelMode == LabelMode.None)
             return null;
 
-        Vector2 pixelPosition = LogicalToPixel(controlPosition);
+        var pixelPosition = LogicalToPixel(controlPosition);
         (Vector2 actualSize, Vector2 actualTopLeft, float overlayScale) = GetDrawParameters();
-        float clickTolerance = LabelClickTolerance * overlayScale;
+        var clickTolerance = LabelClickTolerance * overlayScale;
 
         Vector2i? CheckLabels(Dictionary<Vector2i, TacticalMapLabelData> labels, float yOffsetMultiplier)
         {
@@ -30,13 +32,13 @@ public sealed partial class TacticalMapControl
                 if (string.IsNullOrWhiteSpace(label))
                     continue;
 
-                Vector2 position = IndicesToPosition(indices) * overlayScale + actualTopLeft;
+                var position = IndicesToPosition(indices) * overlayScale + actualTopLeft;
                 position = position with { Y = position.Y - (LabelYOffset + LabelStackOffset * yOffsetMultiplier) * overlayScale };
 
-                float fontSize = GetLabelFontSize(overlayScale);
-                float textWidth = label.Length * fontSize * 0.6f;
-                float textHeight = fontSize;
-                Vector2 textSize = new(textWidth, textHeight);
+                var fontSize = GetLabelFontSize(overlayScale);
+                var textWidth = label.Length * fontSize * 0.6f;
+                var textHeight = fontSize;
+                var textSize = new Vector2(textWidth, textHeight);
                 UIBox2 labelRect = UIBox2.FromDimensions(
                     position - textSize / 2 - new Vector2(clickTolerance),
                     textSize + new Vector2(clickTolerance * 2)
@@ -53,13 +55,13 @@ public sealed partial class TacticalMapControl
         {
             foreach ((Vector2i indices, string label) in labels)
             {
-                Vector2 position = IndicesToPosition(indices) * overlayScale + actualTopLeft;
+                var position = IndicesToPosition(indices) * overlayScale + actualTopLeft;
                 position = position with { Y = position.Y - (LabelYOffset + LabelStackOffset * yOffsetMultiplier) * overlayScale };
 
-                float fontSize = GetLabelFontSize(overlayScale);
-                float textWidth = label.Length * fontSize * 0.6f;
-                float textHeight = fontSize;
-                Vector2 textSize = new(textWidth, textHeight);
+                var fontSize = GetLabelFontSize(overlayScale);
+                var textWidth = label.Length * fontSize * 0.6f;
+                var textHeight = fontSize;
+                var textSize = new Vector2(textWidth, textHeight);
                 UIBox2 labelRect = UIBox2.FromDimensions(
                     position - textSize / 2 - new Vector2(clickTolerance),
                     textSize + new Vector2(clickTolerance * 2)
@@ -93,9 +95,9 @@ public sealed partial class TacticalMapControl
         if (Texture == null)
             return null;
 
-        Vector2 pixelPosition = LogicalToPixel(controlPosition);
+        var pixelPosition = LogicalToPixel(controlPosition);
         (Vector2 actualSize, Vector2 actualTopLeft, float overlayScale) = GetDrawParameters();
-        float clickTolerance = LabelClickTolerance * overlayScale;
+        var clickTolerance = LabelClickTolerance * overlayScale;
 
         foreach ((Vector2i indices, TacticalMapLabelData data) in TacticalLabels)
         {
@@ -103,16 +105,16 @@ public sealed partial class TacticalMapControl
             if (string.IsNullOrWhiteSpace(label))
                 continue;
 
-            Vector2 position = IndicesToPosition(indices) * overlayScale + actualTopLeft;
-            float stackOffset = CurrentLabelMode == LabelMode.All && _areaLabels.ContainsKey(indices)
+            var position = IndicesToPosition(indices) * overlayScale + actualTopLeft;
+            var stackOffset = CurrentLabelMode == LabelMode.All && _areaLabels.ContainsKey(indices)
                 ? LabelStackOffset
                 : 0f;
             position = position with { Y = position.Y - (LabelYOffset + stackOffset) * overlayScale };
 
-            float fontSize = GetLabelFontSize(overlayScale);
-            float textWidth = label.Length * fontSize * 0.6f;
-            float textHeight = fontSize;
-            Vector2 textSize = new(textWidth, textHeight);
+            var fontSize = GetLabelFontSize(overlayScale);
+            var textWidth = label.Length * fontSize * 0.6f;
+            var textHeight = fontSize;
+            var textSize = new Vector2(textWidth, textHeight);
             UIBox2 labelRect = UIBox2.FromDimensions(
                 position - textSize / 2 - new Vector2(clickTolerance),
                 textSize + new Vector2(clickTolerance * 2)
@@ -148,11 +150,17 @@ public sealed partial class TacticalMapControl
 
     private void ShowLabelInputDialog(Vector2i position, string existingText = "")
     {
-        LabelTextDialog.Show(
+        var map = _currentAreaGridEntity;
+        var mapName = _currentMapName;
+        _labelDialog?.Dispose();
+        _labelDialog = LabelTextDialog.Show(
             position,
             existingText,
             onConfirmed: text =>
             {
+                if (_currentAreaGridEntity != map || _currentMapName != mapName)
+                    return;
+
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     if (!string.IsNullOrEmpty(existingText))
@@ -166,7 +174,11 @@ public sealed partial class TacticalMapControl
                         OnEditLabel?.Invoke(position, text);
                 }
             },
-            onDeleted: () => OnDeleteLabel?.Invoke(position)
+            onDeleted: () =>
+            {
+                if (_currentAreaGridEntity == map && _currentMapName == mapName)
+                    OnDeleteLabel?.Invoke(position);
+            }
         );
     }
 

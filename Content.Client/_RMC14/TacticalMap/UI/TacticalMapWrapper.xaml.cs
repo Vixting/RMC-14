@@ -56,9 +56,6 @@ public sealed partial class TacticalMapWrapper : Control
     private static readonly ResPath AreaInfoRsiPath = new("/Textures/_RMC14/Structures/Machines/ceiling.rsi");
     private static readonly ISawmill Sawmill = Logger.GetSawmill("tactical_map");
 
-    private const float CrtMinorGridSpacing = 4f;
-    private const float CrtMajorGridSpacing = 16f;
-    private const float CrtGridThickness = 1f;
     private const string OrbitalRadiusPrototypeId = "RMCOrbitalCannonExplosionExplosive";
     private const string MortarRadiusPrototypeId = "RMCMortarShellHE";
     private const string MortarPrototypeId = "RMCMortarKit";
@@ -77,11 +74,7 @@ public sealed partial class TacticalMapWrapper : Control
     private const float LayerVisibilityButtonMinWidth = 80f;
     private const float CompactTopButtonThreshold = 500f;
     private const float CompactTopButtonWidth = 22f;
-    private static readonly ProtoId<TacticalMapLayerPrototype> GlobalMarineLayer = "Marines";
 
-    private static readonly Color CrtTintColor = Color.FromHex("#0B1B2E").WithAlpha(0.08f);
-    private static readonly Color CrtMinorGridColor = Color.FromHex("#2C4F7B").WithAlpha(0.07f);
-    private static readonly Color CrtMajorGridColor = Color.FromHex("#5F8CC7").WithAlpha(0.12f);
     private static readonly Color OrbitalRadiusColor = Color.FromHex("#F2C94C");
     private static readonly Color MortarRadiusColor = Color.FromHex("#4FC3FF");
     private static readonly Color MortarRangeColor = Color.FromHex("#43B581");
@@ -190,12 +183,20 @@ public sealed partial class TacticalMapWrapper : Control
     private bool _roof3OverlayEnabled;
     private bool _roof4OverlayEnabled;
     private bool _canvasDirty;
+    private Guid? _pendingCanvasUpdate;
+    private bool _editedAfterCanvasSubmit;
+    public event Action<Vector2i, TacticalMapLabelData?>? PersonalLabelChanged;
+    private readonly Dictionary<Vector2i, TacticalMapLabelData> _sharedMapLabels = new();
+    private readonly Dictionary<Vector2i, TacticalMapLabelData> _personalLabels = new();
+    private static readonly ProtoId<ShaderPrototype> CrtShader = "RMCTacticalMapCRT";
+    private readonly ShaderInstance _crtShader;
     private bool _suppressViewSync;
 
     public TacticalMapWrapper()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
+        _crtShader = _prototypes.Index(CrtShader).Instance();
         InvalidatePlayerCache();
 
         InitializeSettingsManager();
@@ -259,6 +260,13 @@ public sealed partial class TacticalMapWrapper : Control
         _currentMapId = mapId;
         _mapIdSet = true;
         _settingsLoaded = false;
+        MarkCanvasSynced();
+        UpdateCoordinateGrid(null);
+        Canvas.Lines.Clear();
+        Canvas.TacticalLabels.Clear();
+        _sharedMapLabels.Clear();
+        _personalLabels.Clear();
+        RebuildMapLabels();
 
         Map.SetCurrentMap(null);
         Map.SetCurrentMapName(mapId);
@@ -385,18 +393,18 @@ public sealed partial class TacticalMapWrapper : Control
     public void SetupUpdateButton(System.Action<TacticalMapUpdateCanvasMsg> sendMessage)
     {
         UpdateCanvasButton.Button.OnPressed += _ => {
-            Dictionary<Vector2i, TacticalMapLabelData> canvasLabels = new(Canvas.TacticalLabels);
-            sendMessage(new TacticalMapUpdateCanvasMsg(Canvas.Lines, canvasLabels));
-            NotifyCanvasUpdated();
+            var lines = new List<TacticalMapLine>(Canvas.Lines);
+            var canvasLabels = new Dictionary<Vector2i, TacticalMapLabelData>(Canvas.TacticalLabels);
+            var updateId = Guid.NewGuid();
+            _pendingCanvasUpdate = updateId;
+            _editedAfterCanvasSubmit = false;
+            _updateFeedbackUntil = TimeSpan.Zero;
+            sendMessage(new TacticalMapUpdateCanvasMsg(lines, canvasLabels, updateId,
+                _canManageCoordinateGrid && _coordinateGridEdited ? GetCoordinateGridDraft() : null));
         };
     }
 
-    public void NotifyCanvasUpdated()
-    {
-        var time = IoCManager.Resolve<IGameTiming>();
-        _updateFeedbackUntil = time.CurTime + TimeSpan.FromSeconds(UpdateFeedbackSeconds);
-        MarkCanvasSynced();
-    }
+
 
     public void UpdateTexture(Entity<AreaGridComponent> grid)
     {
@@ -762,8 +770,13 @@ public sealed partial class TacticalMapWrapper : Control
     public void SetCanvasAccess(bool canDraw)
     {
         _canDraw = canDraw;
+        CoordinateGridSettings.Visible = canDraw && _canManageCoordinateGrid;
         if (!canDraw)
+        {
+            _coordinateGridEdited = false;
             _canvasDirty = false;
+            _pendingCanvasUpdate = null;
+        }
         UpdateCanvasDrawingState();
         ApplyFocusVisibility();
         if (_lastDrawLayers.Count > 0)
@@ -801,6 +814,7 @@ public sealed partial class TacticalMapWrapper : Control
         SetupAreaLabels();
         SetupBlipSize();
         SetupSettingsToggle();
+        SetupCoordinateGrid();
         SetupOverlayControls();
         LoadMortarRanges();
         LoadHiveRanges();
@@ -877,7 +891,7 @@ public sealed partial class TacticalMapWrapper : Control
     {
         Map.OnCreateLabel += (position, text) => {
             var labelData = new TacticalMapLabelData(text, _colors[_currentSelectedColorIndex].Color);
-            Map.TacticalLabels[position] = labelData;
+            SetMapLabel(position, labelData);
         };
 
         Canvas.OnCreateLabel += (position, text) => {
@@ -891,7 +905,7 @@ public sealed partial class TacticalMapWrapper : Control
             var color = Map.TacticalLabels.TryGetValue(position, out var existing)
                 ? existing.Color
                 : _colors[_currentSelectedColorIndex].Color;
-            Map.TacticalLabels[position] = new TacticalMapLabelData(text, color);
+            SetMapLabel(position, new TacticalMapLabelData(text, color));
         };
 
         Canvas.OnEditLabel += (position, text) => {
@@ -905,7 +919,7 @@ public sealed partial class TacticalMapWrapper : Control
         };
 
         Map.OnDeleteLabel += position => {
-            Map.TacticalLabels.Remove(position);
+            SetMapLabel(position, null);
         };
 
         Canvas.OnDeleteLabel += position => {
@@ -917,8 +931,8 @@ public sealed partial class TacticalMapWrapper : Control
         Map.OnMoveLabel += (oldPos, newPos) => {
             if (Map.TacticalLabels.TryGetValue(oldPos, out var data))
             {
-                Map.TacticalLabels.Remove(oldPos);
-                Map.TacticalLabels[newPos] = data;
+                SetMapLabel(oldPos, null);
+                SetMapLabel(newPos, data);
             }
         };
 
@@ -1068,7 +1082,10 @@ public sealed partial class TacticalMapWrapper : Control
         if (!_canDraw)
             return;
 
-        // dirty canvas is protected from server snapshots until submitted.
+        if (_pendingCanvasUpdate != null)
+            _editedAfterCanvasSubmit = true;
+
+        // Keep edits until the server acknowledges the submitted snapshot.
         if (_canvasDirty)
             return;
 
@@ -1078,6 +1095,9 @@ public sealed partial class TacticalMapWrapper : Control
 
     public void MarkCanvasSynced()
     {
+        _coordinateGridEdited = false;
+        _pendingCanvasUpdate = null;
+        _editedAfterCanvasSubmit = false;
         if (!_canvasDirty)
             return;
 
@@ -1088,7 +1108,7 @@ public sealed partial class TacticalMapWrapper : Control
     public bool CanApplyCanvasSnapshot()
     {
         // open edits win over replicated active-layer snapshots.
-        return !_canvasDirty;
+        return !_canvasDirty && _pendingCanvasUpdate == null;
     }
 
     private void UpdateFocusHoverState()
@@ -2077,10 +2097,9 @@ public sealed partial class TacticalMapWrapper : Control
         button.Text = compact
             ? GetCompactButtonText(fullText)
             : fullText;
+        button.Button.ToolTip = button.Text != fullText ? fullText : null;
         if (_responsiveTopButtonMinWidths.TryGetValue(button, out var minWidth))
             button.MinWidth = compact ? CompactTopButtonWidth : minWidth;
-        button.ToolTip = fullText;
-        button.Button.ToolTip = fullText;
     }
 
     private void SetButtonDisplayText(TacticalMapButton button, string text)
@@ -2195,7 +2214,7 @@ public sealed partial class TacticalMapWrapper : Control
         if (layer == null && _lastDrawLayers.Count > 0)
             layer = _lastDrawLayers[0];
 
-        return layer != null && layer.Value == GlobalMarineLayer;
+        return layer != null && _prototypes.TryIndex(layer.Value, out var definition) && definition.CanUpdateBlips;
     }
 
     private void UpdateBlipStaleAlpha()
@@ -2231,40 +2250,19 @@ public sealed partial class TacticalMapWrapper : Control
     {
         if (!_crtEffectEnabled)
             return;
+
         if (_focusModeEnabled && !_focusHovered)
             return;
 
-        Vector2 size = new(PixelWidth, PixelHeight);
+        var size = new Vector2(PixelWidth, PixelHeight);
         if (size.X <= 1f || size.Y <= 1f)
             return;
 
-        UIBox2 rect = UIBox2.FromDimensions(Vector2.Zero, size);
+        var rect = UIBox2.FromDimensions(Vector2.Zero, size);
 
-        handle.DrawRect(rect, CrtTintColor);
-
-        for (float y = 0f; y < size.Y; y += CrtMinorGridSpacing)
-        {
-            float lineBottom = Math.Min(y + CrtGridThickness, size.Y);
-            handle.DrawRect(new UIBox2(0f, y, size.X, lineBottom), CrtMinorGridColor);
-        }
-
-        for (float x = 0f; x < size.X; x += CrtMinorGridSpacing)
-        {
-            float lineRight = Math.Min(x + CrtGridThickness, size.X);
-            handle.DrawRect(new UIBox2(x, 0f, lineRight, size.Y), CrtMinorGridColor);
-        }
-
-        for (float y = 0f; y < size.Y; y += CrtMajorGridSpacing)
-        {
-            float lineBottom = Math.Min(y + CrtGridThickness, size.Y);
-            handle.DrawRect(new UIBox2(0f, y, size.X, lineBottom), CrtMajorGridColor);
-        }
-
-        for (float x = 0f; x < size.X; x += CrtMajorGridSpacing)
-        {
-            float lineRight = Math.Min(x + CrtGridThickness, size.X);
-            handle.DrawRect(new UIBox2(x, 0f, lineRight, size.Y), CrtMajorGridColor);
-        }
+        handle.UseShader(_crtShader);
+        handle.DrawRect(rect, Color.White);
+        handle.UseShader(null);
     }
 
     private bool IsInQueenEyeMode()
@@ -2342,5 +2340,84 @@ public sealed partial class TacticalMapWrapper : Control
         }
 
         return false;
+    }
+
+    public void AcknowledgeCanvasUpdate(Guid linesUpdate, Guid labelsUpdate)
+    {
+        if (_pendingCanvasUpdate is not { } pending || pending != linesUpdate || pending != labelsUpdate)
+            return;
+
+        var time = IoCManager.Resolve<IGameTiming>();
+        _updateFeedbackUntil = time.CurTime + TimeSpan.FromSeconds(UpdateFeedbackSeconds);
+        if (_editedAfterCanvasSubmit)
+        {
+            _pendingCanvasUpdate = null;
+            _editedAfterCanvasSubmit = false;
+        }
+        else
+            MarkCanvasSynced();
+    }
+
+    public void UpdateMapLabels(IReadOnlyDictionary<Vector2i, TacticalMapLabelData>? shared,
+        IReadOnlyDictionary<Vector2i, TacticalMapLabelData>? personal)
+    {
+        _sharedMapLabels.Clear();
+        _personalLabels.Clear();
+        if (shared != null)
+        {
+            foreach (var (position, label) in shared)
+                _sharedMapLabels[position] = label;
+        }
+        if (personal != null)
+        {
+            foreach (var (position, label) in personal)
+                _personalLabels[position] = label;
+        }
+        RebuildMapLabels();
+    }
+
+    private void RebuildMapLabels()
+    {
+        Map.UpdateTacticalLabels(_sharedMapLabels);
+        foreach (var (position, label) in _personalLabels)
+            Map.TacticalLabels[position] = label;
+    }
+
+    private void SetMapLabel(Vector2i position, TacticalMapLabelData? label)
+    {
+        if (_canDraw)
+        {
+            if (label is { } drawing)
+            {
+                Canvas.TacticalLabels[position] = drawing;
+                Map.TacticalLabels[position] = drawing;
+            }
+            else
+            {
+                Canvas.TacticalLabels.Remove(position);
+                Map.TacticalLabels.Remove(position);
+            }
+            MarkCanvasDirty();
+            return;
+        }
+
+        if (label is { } value)
+            _personalLabels[position] = value;
+        else
+            _personalLabels.Remove(position);
+
+        PersonalLabelChanged?.Invoke(position, label);
+        RebuildMapLabels();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _contextPopup?.Dispose();
+            _overlayLegendPopup?.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 }

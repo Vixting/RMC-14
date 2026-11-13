@@ -87,14 +87,16 @@ public sealed partial class TacticalMapControl : TextureRect
     private static readonly Color EraserPreviewColor = Color.White.WithAlpha(0.45f);
     private static readonly ResPath LabelFontPath = new("/Fonts/NotoSans/NotoSans-Bold.ttf");
 
-    [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
     [Dependency] private readonly IEntityManager _entityManager = default!;
-    [Dependency] private readonly IResourceCache _resourceCache = default!;
+    [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IResourceCache _resourceCache = default!;
 
     private readonly Font _font;
+    private static readonly ProtoId<ShaderPrototype> GridShader = "RMCTacMapGrid";
     private readonly ShaderInstance _gridShader;
-    private readonly Label? _tunnelInfoLabel;
+    private static readonly ProtoId<ShaderPrototype> CoordinateGridShader = "RMCTacMapCoordinateGrid";
+    private readonly ShaderInstance _coordinateGridShader;
     private readonly Vector2[] _reusableLineVectors = new Vector2[6];
     private readonly Dictionary<int, VectorFont> _labelFontCache = new();
 
@@ -194,18 +196,8 @@ public sealed partial class TacticalMapControl : TextureRect
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         _font = new VectorFont(_resourceCache.GetResource<FontResource>(LabelFontPath), 10);
-        _gridShader = _prototypeManager.Index<ShaderPrototype>("RMCTacMapGrid").InstanceUnique();
+        _gridShader = _prototypeManager.Index(GridShader).InstanceUnique();
+        _coordinateGridShader = _prototypeManager.Index(CoordinateGridShader).InstanceUnique();
 
-        _tunnelInfoLabel = new Label
-        {
-            Visible = false,
-            StyleClasses = { "LabelHeading" },
-            FontColorOverride = Color.Black,
-            Margin = new Thickness(8, 8),
-            HorizontalAlignment = HAlignment.Center,
-            VerticalAlignment = VAlignment.Center,
-        };
-
-        AddChild(_tunnelInfoLabel);
     }
 }

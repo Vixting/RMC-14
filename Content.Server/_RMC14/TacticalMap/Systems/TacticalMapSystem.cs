@@ -7,6 +7,7 @@ using Content.Server._RMC14.Overwatch;
 using Content.Server._RMC14.Xenonids.Watch;
 using Content.Server.Administration.Logs;
 using Content.Server.GameTicking.Events;
+using Content.Shared._RMC14.Areas;
 using Content.Shared._RMC14.CCVar;
 using Content.Shared._RMC14.Dropship.Weapon;
 using Content.Shared._RMC14.Marines;
@@ -19,7 +20,6 @@ using Content.Shared._RMC14.Sensor;
 using Content.Shared._RMC14.TacticalMap;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared._RMC14.Xenonids.Egg;
-using Content.Shared._RMC14.Xenonids.Evolution;
 using Content.Shared._RMC14.Xenonids.Eye;
 using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.HiveLeader;
@@ -27,6 +27,7 @@ using Content.Shared._RMC14.Xenonids.Weeds;
 using Content.Shared.Actions;
 using Content.Shared.Atmos.Rotting;
 using Content.Shared.Database;
+using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs;
@@ -58,7 +59,6 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly XenoEvolutionSystem _evolution = default!;
     [Dependency] private readonly TacticalMapLayerAccessSystem _layerAccess = default!;
     [Dependency] private readonly MarineAnnounceSystem _marineAnnounce = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -149,6 +149,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         SubscribeLocalEvent<UnrevivableComponent, MapInitEvent>(OnUnrevivableMapInit);
         SubscribeLocalEvent<UnrevivableComponent, ComponentRemove>(OnUnrevivablRemove);
         SubscribeLocalEvent<RoundStartingEvent>(OnRoundStart);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
 
         SubscribeLocalEvent<TacticalMapLiveUpdateOnOviComponent, MapInitEvent>(OnLiveUpdateOnOviMapInit);
         SubscribeLocalEvent<TacticalMapLiveUpdateOnOviComponent, MobStateChangedEvent>(OnLiveUpdateOnOviStateChanged);
@@ -258,8 +259,9 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
             if (!onOvi.Enabled)
                 continue;
 
-            user.LiveUpdate = ev.Attached;
-            Dirty(uid, user);
+            _tacMapLiveUpdate.RefreshLiveUpdate((uid, user));
+            if (TryResolveUserMap((uid, user), out var map))
+                map.Comp.MapDirty = true;
         }
     }
 
@@ -396,6 +398,8 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         }
         else if (ent.Comp.Background != null)
             UpdateIcon(ent);
+
+        _toUpdate.Add(ent);
     }
 
     private void OnLayerTrackedSquadMemberUpdated(Entity<TacticalMapLayerTrackedComponent> ent, ref SquadMemberUpdatedEvent args)
@@ -484,7 +488,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
 
     private void OnRoundStart(RoundStartingEvent ev)
     {
-        _nextForceMapUpdate = TimeSpan.FromSeconds(30);
+        _nextForceMapUpdate = _timing.CurTime + _forceMapUpdateEvery;
     }
 
     private void OnLiveUpdateOnOviMapInit(Entity<TacticalMapLiveUpdateOnOviComponent> ent, ref MapInitEvent args)
@@ -495,8 +499,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
             return;
         }
 
-        user.LiveUpdate = _evolution.HasOvipositor();
-        Dirty(ent, user);
+        _tacMapLiveUpdate.RefreshLiveUpdate((ent.Owner, user));
     }
 
     private void OnLiveUpdateOnOviStateChanged(Entity<TacticalMapLiveUpdateOnOviComponent> ent, ref MobStateChangedEvent args)
@@ -509,6 +512,8 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
     {
         EnsureComp<ActiveTacticalMapUserComponent>(ent);
         RefreshUserVisibleLayers(ent);
+        if (TryResolveUserMap(ent, out var map))
+            UpdateUserData(ent, map.Comp);
         UpdateTacticalMapState(ent);
     }
 
@@ -552,6 +557,8 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         else
             ent.Comp.ObjectivesSquad = null;
 
+        if (TryResolveComputerMap(ent, out var map))
+            UpdateMapData(ent, map.Comp);
         UpdateTacticalMapComputerState(ent);
     }
 
@@ -774,6 +781,9 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
             return;
         }
 
+        if (!ent.Comp.Blips.ContainsKey(args.Target) || _mobState.IsDead(target.Value))
+            return;
+
         if (!HasComp<XenoComponent>(target.Value))
         {
             _popup.PopupCursor("That blip is not a xeno.", args.Actor, PopupType.MediumCaution);
@@ -876,12 +886,14 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         if (!TryGetDrawLayer(ent.Comp.VisibleLayers, ent.Comp.ActiveLayer, out var layer))
             return;
 
-        if (!TryStartUserUpdateCooldown(ent))
+        if (LayerAllowsBlipUpdates(layer) && !TryStartUserUpdateCooldown(ent))
             return;
 
         // non-marines refresh blip snapshots when drawing.
         var updateBlips = LayerAllowsBlipUpdates(layer) && !HasComp<MarineComponent>(user);
-        UpdateCanvas(map, lines, labels, layer, user, updateBlips, ent.Comp.Sound);
+        if (args.CoordinateGrid is { } grid && HasComp<XenoComponent>(ent.Owner) && layer == GlobalXenoLayer)
+            UpdateCoordinateGrid(map, GlobalXenoLayer, grid);
+        UpdateCanvas(map, lines, labels, layer, user, updateBlips, args.UpdateId, ent.Comp.Sound);
     }
 
     private void OnComputerUpdateCanvasMsg(Entity<TacticalMapComputerComponent> ent, ref TacticalMapUpdateCanvasMsg args)
@@ -911,9 +923,9 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         // only groundside computers refresh shared blip snapshots.
         var updateBlips = isGroundside && LayerAllowsBlipUpdates(layer);
         var time = _timing.CurTime;
-        if (updateBlips)
+        if (updateBlips || isGroundside && args.CoordinateGrid != null)
         {
-            // groundside blip updates share one command-wide cooldown.
+            // Groundside updates share one command-wide cooldown.
             if (time < ent.Comp.NextAnnounceAt)
                 return;
 
@@ -929,7 +941,9 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
                 Dirty(uid, computer);
             }
         }
-        UpdateCanvas(map, lines, labels, layer, user, updateBlips);
+        if (isGroundside && args.CoordinateGrid is { } grid)
+            UpdateCoordinateGrid(map, GlobalMarineLayer, grid);
+        UpdateCanvas(map, lines, labels, layer, user, updateBlips, args.UpdateId);
     }
 
     private void OnUserQueenEyeMoveMsg(Entity<TacticalMapUserComponent> ent, ref TacticalMapQueenEyeMoveMsg args)
@@ -1560,6 +1574,9 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
 
     public override void UpdateUserData(Entity<TacticalMapUserComponent> user, TacticalMapComponent map)
     {
+        if (TerminatingOrDeleted(user))
+            return;
+
         // user state is filtered before being networked to the client.
         var lines = EnsureComp<TacticalMapLinesComponent>(user);
         var labels = EnsureComp<TacticalMapLabelsComponent>(user);
@@ -1586,6 +1603,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
 
         BuildLineAndLabelState(map, visibleLayers, out var combinedLines, out var combinedLabels);
         lines.Lines = combinedLines;
+        lines.CoordinateGrid = GetCoordinateGrid(map, visibleLayers);
         labels.Labels = combinedLabels;
 
         var activeLines = EnsureComp<TacticalMapActiveLayerLinesComponent>(user);
@@ -1594,6 +1612,8 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         BuildLineAndLabelState(map, activeLayers, out var activeLayerLines, out var activeLayerLabels);
         activeLines.Lines = activeLayerLines;
         activeLabels.Labels = activeLayerLabels;
+        activeLines.UpdateId = GetCanvasUpdateId(map, activeLayers);
+        activeLabels.UpdateId = activeLines.UpdateId;
 
         Dirty(user);
         Dirty(user, lines);
@@ -1673,13 +1693,17 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         blips[user.Id] = blip.Value;
     }
 
-    private void UpdateCanvas(Entity<TacticalMapComponent> map, List<TacticalMapLine> lines, Dictionary<Vector2i, TacticalMapLabelData> labels, ProtoId<TacticalMapLayerPrototype> layer, EntityUid user, bool updateBlips, SoundSpecifier? sound = null)
+    private void UpdateCanvas(Entity<TacticalMapComponent> map, List<TacticalMapLine> lines,
+        Dictionary<Vector2i, TacticalMapLabelData> labels, ProtoId<TacticalMapLayerPrototype> layer,
+        EntityUid user, bool updateBlips, Guid updateId, SoundSpecifier? sound = null)
     {
+        SanitizeCanvas(map, ref lines, ref labels);
         var layerData = EnsureLayer(map.Comp, layer);
         map.Comp.MapDirty = true;
 
         layerData.Lines = lines;
         layerData.Labels = new Dictionary<Vector2i, TacticalMapLabelData>(labels);
+        layerData.LastCanvasUpdate = updateId;
         if (updateBlips)
         {
             // store the latest seen positions for non-live viewers.
@@ -1745,6 +1769,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
 
         BuildLineAndLabelState(map, visibleLayers, out var combinedLines, out var combinedLabels);
         lines.Lines = combinedLines;
+        lines.CoordinateGrid = GetCoordinateGrid(map, visibleLayers);
         labels.Labels = combinedLabels;
 
         var activeLines = EnsureComp<TacticalMapActiveLayerLinesComponent>(computer);
@@ -1753,6 +1778,8 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         BuildLineAndLabelState(map, activeLayers, out var activeLayerLines, out var activeLayerLabels);
         activeLines.Lines = activeLayerLines;
         activeLabels.Labels = activeLayerLabels;
+        activeLines.UpdateId = GetCanvasUpdateId(map, activeLayers);
+        activeLabels.UpdateId = activeLines.UpdateId;
 
         Dirty(computer, lines);
         Dirty(computer, labels);
@@ -1868,5 +1895,81 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
 
             _replay.RecordSnapshot(mapId, map);
         }
+    }
+
+    private static Guid GetCanvasUpdateId(TacticalMapComponent map,
+        IReadOnlyList<ProtoId<TacticalMapLayerPrototype>> layers)
+    {
+        return layers.Count == 1 && map.Layers.TryGetValue(layers[0], out var layer)
+            ? layer.LastCanvasUpdate
+            : Guid.Empty;
+    }
+
+    private static TacticalMapCoordinateGrid? GetCoordinateGrid(TacticalMapComponent map,
+        IReadOnlyList<ProtoId<TacticalMapLayerPrototype>> layers)
+    {
+        var layer = layers.Contains(GlobalMarineLayer) ? GlobalMarineLayer : GlobalXenoLayer;
+        return layers.Contains(layer) && map.Layers.TryGetValue(layer, out var data)
+            ? data.CoordinateGrid
+            : null;
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent args)
+    {
+        _toInit.Clear();
+        _toUpdate.Clear();
+        _nextForceMapUpdate = TimeSpan.Zero;
+    }
+
+    private void SanitizeCanvas(Entity<TacticalMapComponent> map,
+        ref List<TacticalMapLine> lines,
+        ref Dictionary<Vector2i, TacticalMapLabelData> labels)
+    {
+        var validLines = new List<TacticalMapLine>();
+        var validLabels = new Dictionary<Vector2i, TacticalMapLabelData>();
+        foreach (var line in lines)
+        {
+            if (validLines.Count >= LineLimit)
+                break;
+
+            if (!float.IsFinite(line.Start.X) || !float.IsFinite(line.Start.Y) ||
+                !float.IsFinite(line.End.X) || !float.IsFinite(line.End.Y) ||
+                !float.IsFinite(line.Thickness))
+            {
+                continue;
+            }
+
+            validLines.Add(line with { Thickness = Math.Clamp(line.Thickness, 1f, Math.Max(1f, map.Comp.MaxLineThickness)) });
+        }
+
+        foreach (var (position, label) in labels)
+        {
+            if (validLabels.Count >= map.Comp.MaxCanvasLabels)
+                break;
+
+            if (string.IsNullOrWhiteSpace(label.Text))
+            {
+                continue;
+            }
+
+            var length = Math.Min(label.Text.Length, Math.Max(1, map.Comp.MaxLabelLength));
+            validLabels.Add(position, label with { Text = label.Text[..length] });
+        }
+
+        lines = validLines;
+        labels = validLabels;
+    }
+
+    private void UpdateCoordinateGrid(Entity<TacticalMapComponent> map,
+        ProtoId<TacticalMapLayerPrototype> layer, TacticalMapCoordinateGrid grid)
+    {
+        if (!TryComp<AreaGridComponent>(map.Owner, out var areas) ||
+            !AreaSystem.TryGetTacticalMapBounds(areas, out var minimum, out var maximum))
+        {
+            return;
+        }
+
+        EnsureLayer(map.Comp, layer).CoordinateGrid = grid.Clamped(maximum - minimum + Vector2i.One);
+        map.Comp.MapDirty = true;
     }
 }
