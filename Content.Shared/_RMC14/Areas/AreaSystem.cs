@@ -20,7 +20,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._RMC14.Areas;
 
-public sealed class AreaSystem : EntitySystem
+public sealed partial class AreaSystem : EntitySystem
 {
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
@@ -442,6 +442,7 @@ public sealed class AreaSystem : EntitySystem
                 }
 
                 areaGrid.Colors.Clear();
+                areaGrid.Labels.Clear();
                 Dirty(ent, areaGrid);
 
                 var excludedBoundsAreas = new HashSet<EntProtoId<AreaComponent>>();

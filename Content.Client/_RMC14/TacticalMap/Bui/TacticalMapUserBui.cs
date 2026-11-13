@@ -35,11 +35,15 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
 
     protected override void Open()
     {
+        if (IsOpened)
+            return;
+
         base.Open();
 
         Window = this.CreatePopOutableWindow<TacticalMapWindow>();
         Window.Wrapper.SetCanvasAccess(false);
         Window.OnFinalClose += SaveSettings;
+        Window.Wrapper.PersonalLabelChanged += OnPersonalLabelChanged;
 
         try
         {
@@ -78,11 +82,18 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
             Window.Wrapper.VisibleLayersChanged -= OnVisibleLayersChanged;
             Window.Wrapper.CloseRequested -= OnCloseRequested;
             Window.OnFinalClose -= SaveSettings;
+            Window.Wrapper.PersonalLabelChanged -= OnPersonalLabelChanged;
             Window.Wrapper.Map.OnBlipEntityClicked = null;
             Window.Wrapper.Canvas.OnBlipEntityClicked = null;
         }
 
         base.Dispose(disposing);
+    }
+
+    private void OnPersonalLabelChanged(Vector2i position, TacticalMapLabelData? label)
+    {
+        EntMan.System<TacticalMapSystem>().SetPersonalLabel(_player.LocalEntity, _activeMap, position, label);
+        UpdateLabels();
     }
 
     private void OnMapSelected(NetEntity map)
@@ -156,6 +167,9 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
 
         if (!TryGetActiveMapInfo(out var mapInfo))
             return;
+
+        if (_currentMapId != mapInfo.MapId)
+            SaveSettings();
 
         _currentMapId = mapInfo.MapId;
         Window.SetMapId(_currentMapId);
@@ -340,6 +354,11 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
         // the map shows visible layers, the canvas shows only the active layer
         UpdateLayerSelector();
 
+        var activeLinesState = EntMan.GetComponentOrNull<TacticalMapActiveLayerLinesComponent>(Owner);
+        var activeLabelsState = EntMan.GetComponentOrNull<TacticalMapActiveLayerLabelsComponent>(Owner);
+        Window.Wrapper.AcknowledgeCanvasUpdate(activeLinesState?.UpdateId ?? Guid.Empty,
+            activeLabelsState?.UpdateId ?? Guid.Empty);
+
         var lineLimit = EntMan.System<TacticalMapSystem>().LineLimit;
         Window.Wrapper.SetLineLimit(lineLimit);
         UpdateBlips();
@@ -349,6 +368,7 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
         Window.Wrapper.Map.Lines.Clear();
 
         var lines = EntMan.GetComponentOrNull<TacticalMapLinesComponent>(Owner);
+        Window.Wrapper.UpdateCoordinateGrid(lines?.CoordinateGrid);
         if (lines != null)
             Window.Wrapper.Map.Lines.AddRange(lines.Lines);
 
@@ -365,6 +385,7 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
         Window.Wrapper.UpdateCanvasBackground();
         var user = EntMan.GetComponentOrNull<TacticalMapUserComponent>(Owner);
         Window.Wrapper.SetCanvasAccess(user?.CanDraw ?? false);
+        Window.Wrapper.SetCoordinateGridAccess(user?.CanDraw == true && EntMan.HasComponent<XenoComponent>(Owner));
     }
 
     private void UpdateBlips()
@@ -404,14 +425,8 @@ public sealed class TacticalMapUserBui(EntityUid owner, Enum uiKey) : RMCPopOutB
             return;
 
         var labels = EntMan.GetComponentOrNull<TacticalMapLabelsComponent>(Owner);
-        if (labels != null)
-        {
-            Window.Wrapper.Map.UpdateTacticalLabels(labels.Labels);
-        }
-        else
-        {
-            Window.Wrapper.Map.UpdateTacticalLabels(new Dictionary<Vector2i, TacticalMapLabelData>());
-        }
+        var personal = EntMan.System<TacticalMapSystem>().GetPersonalLabels(_player.LocalEntity, _activeMap);
+        Window.Wrapper.UpdateMapLabels(labels?.Labels, personal);
 
         if (Window.Wrapper.CanApplyCanvasSnapshot())
         {

@@ -41,7 +41,7 @@ public sealed partial class TacticalMapControl
         if (Texture == null)
             return;
 
-        Vector2 availableSize = new(PixelWidth, PixelHeight);
+        var availableSize = new Vector2(PixelWidth, PixelHeight);
         if (availableSize.X <= 0 || availableSize.Y <= 0)
             return;
 
@@ -54,22 +54,20 @@ public sealed partial class TacticalMapControl
         if (Texture == null)
             return false;
 
-        Vector2 availableSize = new(PixelWidth, PixelHeight);
+        var availableSize = new Vector2(PixelWidth, PixelHeight);
 
         if (availableSize.X <= 0 || availableSize.Y <= 0)
             return false;
 
-        Vector2 targetPosition = IndicesToPosition(indices);
+        var targetPosition = IndicesToPosition(indices);
 
-        Vector2 textureSize = Texture.Size;
-        float baseScaleX = availableSize.X / textureSize.X;
-        float baseScaleY = availableSize.Y / textureSize.Y;
-        float baseScale = Math.Min(baseScaleX, baseScaleY);
-        float actualScale = baseScale * _zoomFactor;
-        Vector2 actualSize = textureSize * actualScale;
-        float overlayScale = actualScale / MapScale;
+        var textureSize = Texture.Size;
+        var baseScale = GetFittedMapScale(availableSize);
+        var actualScale = baseScale * _zoomFactor;
+        var actualSize = textureSize * actualScale;
+        var overlayScale = actualScale / MapScale;
 
-        Vector2 screenCenter = availableSize / 2;
+        var screenCenter = availableSize / 2;
         _panOffset = screenCenter - targetPosition * overlayScale - (availableSize - actualSize) / 2;
         _panOffset = ClampPanOffset(availableSize, _zoomFactor, _panOffset);
 
@@ -104,7 +102,7 @@ public sealed partial class TacticalMapControl
 
         (Vector2 actualSize, Vector2 actualTopLeft, float overlayScale) = GetDrawParameters();
 
-        Vector2 relativeToTexture = (pixelPosition - actualTopLeft) / overlayScale;
+        var relativeToTexture = (pixelPosition - actualTopLeft) / overlayScale;
 
         return new Vector2i(
             (int)(relativeToTexture.X / MapScale) + _min.X,
@@ -124,20 +122,20 @@ public sealed partial class TacticalMapControl
 
     private Vector2 LogicalToPixel(Vector2 logicalPosition)
     {
-        float uiScale = GetUIScale();
+        var uiScale = GetUIScale();
         return logicalPosition * uiScale;
     }
 
     private Vector2 PixelToLogical(Vector2 pixelPosition)
     {
-        float uiScale = GetUIScale();
+        var uiScale = GetUIScale();
         return pixelPosition / uiScale;
     }
 
     private float GetScaledBlipSize(float overlayScale)
     {
-        float baseScaledSize = BaseBlipSize * (1.0f + (overlayScale - 1.0f) * 0.6f);
-        float zoomReduction = 1.0f / (float)Math.Pow(Math.Max(_zoomFactor, 0.3f), 0.3f);
+        var baseScaledSize = BaseBlipSize * (1.0f + (overlayScale - 1.0f) * 0.6f);
+        var zoomReduction = 1.0f / (float)Math.Pow(Math.Max(_zoomFactor, 0.3f), 0.3f);
         return baseScaledSize * zoomReduction * BlipSizeMultiplier;
     }
 
@@ -146,17 +144,15 @@ public sealed partial class TacticalMapControl
         if (Texture == null)
             return (Vector2.Zero, Vector2.Zero, 1.0f);
 
-        Vector2 textureSize = Texture.Size;
-        Vector2 availableSize = new(PixelWidth, PixelHeight);
+        var textureSize = Texture.Size;
+        var availableSize = new Vector2(PixelWidth, PixelHeight);
 
-        float baseScaleX = availableSize.X / textureSize.X;
-        float baseScaleY = availableSize.Y / textureSize.Y;
-        float baseScale = Math.Min(baseScaleX, baseScaleY);
-        float actualScale = baseScale * _zoomFactor;
+        var baseScale = GetFittedMapScale(availableSize);
+        var actualScale = baseScale * _zoomFactor;
 
-        Vector2 actualSize = textureSize * actualScale;
-        Vector2 actualTopLeft = (availableSize - actualSize) / 2 + _panOffset;
-        float overlayScale = actualScale / MapScale;
+        var actualSize = textureSize * actualScale;
+        var actualTopLeft = (availableSize - actualSize) / 2 + _panOffset;
+        var overlayScale = actualScale / MapScale;
 
         return (actualSize, actualTopLeft, overlayScale);
     }
@@ -169,13 +165,11 @@ public sealed partial class TacticalMapControl
         if (IsAtFitZoom(zoomFactor))
             return Vector2.Zero;
 
-        Vector2 textureSize = Texture.Size;
-        float baseScaleX = availableSize.X / textureSize.X;
-        float baseScaleY = availableSize.Y / textureSize.Y;
-        float baseScale = Math.Min(baseScaleX, baseScaleY);
-        Vector2 actualSize = textureSize * (baseScale * zoomFactor);
+        var actualSize = Texture.Size * (GetFittedMapScale(availableSize) * zoomFactor);
+        if (CoordinateGrid.Enabled)
+            actualSize += new Vector2(GetCoordinateGridHeaderMargin() * 2f);
 
-        Vector2 maxPan = new(
+        var maxPan = new Vector2(
             Math.Max(0f, (actualSize.X - availableSize.X) * 0.5f),
             Math.Max(0f, (actualSize.Y - availableSize.Y) * 0.5f));
 
@@ -192,7 +186,7 @@ public sealed partial class TacticalMapControl
         if (zoomFactor >= FitZoom + PanResistanceZoomRange)
             return 1f;
 
-        float normalized = (zoomFactor - FitZoom) / PanResistanceZoomRange;
+        var normalized = (zoomFactor - FitZoom) / PanResistanceZoomRange;
         return MathF.Pow(Math.Clamp(normalized, 0f, 1f), PanResistanceExponent);
     }
 
@@ -203,9 +197,9 @@ public sealed partial class TacticalMapControl
         if (Texture == null)
             return false;
 
-        Vector2 logicalPixelPosition = LogicalToPixel(controlPosition);
+        var logicalPixelPosition = LogicalToPixel(controlPosition);
         (Vector2 actualSize, Vector2 actualTopLeft, _) = GetDrawParameters();
-        UIBox2 mapRect = UIBox2.FromDimensions(actualTopLeft, actualSize);
+        var mapRect = UIBox2.FromDimensions(actualTopLeft, actualSize);
 
         if (requireInside && !mapRect.Contains(logicalPixelPosition))
             return false;
@@ -223,7 +217,7 @@ public sealed partial class TacticalMapControl
 
     private Vector2 PositionToLineCoordinatesFloat(Vector2 controlPosition, Vector2 actualTopLeft, float overlayScale)
     {
-        Vector2 pixelPosition = LogicalToPixel(controlPosition);
+        var pixelPosition = LogicalToPixel(controlPosition);
         return (pixelPosition - actualTopLeft) / overlayScale;
     }
 }

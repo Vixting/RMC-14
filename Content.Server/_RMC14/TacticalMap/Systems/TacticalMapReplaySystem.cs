@@ -21,9 +21,6 @@ public sealed class TacticalMapReplaySystem : EntitySystem
     [Dependency] private readonly GameTicker _gameTicker = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
-    private const int MaxFramesPerMap = 2000;
-    private static readonly TimeSpan KeyframeInterval = TimeSpan.FromSeconds(10);
-
     private sealed class ReplayRecording
     {
         public string MapId = string.Empty;
@@ -35,6 +32,7 @@ public sealed class TacticalMapReplaySystem : EntitySystem
 
     private sealed class LayerSnapshot
     {
+        public TacticalMapCoordinateGrid? CoordinateGrid;
         public readonly List<TacticalMapLine> Lines = new();
         public readonly Dictionary<Vector2i, TacticalMapLabelData> Labels = new();
         public readonly Dictionary<int, TacticalMapBlip> Blips = new();
@@ -56,7 +54,7 @@ public sealed class TacticalMapReplaySystem : EntitySystem
         var recording = GetOrCreateRecording(mapId, map);
         var now = _timing.CurTime;
         var isInitial = recording.Frames.Count == 0;
-        var allowKeyframe = isInitial || now - recording.LastKeyframeAt >= KeyframeInterval;
+        var allowKeyframe = isInitial || now - recording.LastKeyframeAt >= map.ReplayKeyframeInterval;
 
         if (!TryBuildFrame(map, recording, allowKeyframe, isInitial, out var frame))
         {
@@ -75,10 +73,18 @@ public sealed class TacticalMapReplaySystem : EntitySystem
 
         recording.Frames.Add(frame);
 
-        if (recording.Frames.Count > MaxFramesPerMap)
+        var maxFrames = Math.Max(1, map.ReplayMaxFrames);
+        if (recording.Frames.Count > maxFrames)
         {
-            var removeCount = recording.Frames.Count - MaxFramesPerMap;
-            recording.Frames.RemoveRange(0, removeCount);
+            var first = recording.Frames.FindIndex(recording.Frames.Count - maxFrames, snapshot => snapshot.IsKeyframe);
+            if (first >= 0)
+                recording.Frames.RemoveRange(0, first);
+            else
+            {
+                recording.Frames.Clear();
+                recording.Frames.Add(BuildKeyframeFrame(map));
+                recording.LastKeyframeAt = now;
+            }
         }
     }
 
@@ -106,13 +112,13 @@ public sealed class TacticalMapReplaySystem : EntitySystem
 
         if (!_cfg.GetCVar(RMCCVars.RMCTacticalMapReplayPublicAfterRound))
         {
-            reason = "Tactical map replay access for non-admins is currently disabled.";
+            reason = Loc.GetString("rmc-tactical-map-replay-disabled");
             return false;
         }
 
         if (_gameTicker.RunLevel != GameRunLevel.PostRound)
         {
-            reason = "Tactical map replay is only available on round end.";
+            reason = Loc.GetString("rmc-tactical-map-replay-round-end");
             return false;
         }
 
@@ -215,7 +221,9 @@ public sealed class TacticalMapReplaySystem : EntitySystem
                 true,
                 true,
                 new Dictionary<int, TacticalMapBlip>(),
-                new List<int>());
+                new List<int>(),
+                true,
+                null);
             layers.Add(delta);
             recording.LastState.Remove(layerId);
             hasChanges = true;
@@ -268,9 +276,11 @@ public sealed class TacticalMapReplaySystem : EntitySystem
         bool forceKeyframe,
         out TacticalMapReplayLayerDelta delta)
     {
-        bool linesChanged = false;
-        bool linesIsFull = false;
-        List<TacticalMapLine> linesDelta = new();
+        var gridChanged = forceKeyframe || layer.CoordinateGrid != snapshot.CoordinateGrid;
+        snapshot.CoordinateGrid = layer.CoordinateGrid;
+        var linesChanged = false;
+        var linesIsFull = false;
+        var linesDelta = new List<TacticalMapLine>();
 
         if (forceKeyframe)
         {
@@ -296,8 +306,8 @@ public sealed class TacticalMapReplaySystem : EntitySystem
             }
         }
 
-        bool labelsChanged = false;
-        bool labelsIsFull = forceKeyframe;
+        var labelsChanged = false;
+        var labelsIsFull = forceKeyframe;
         var labelUpdates = new Dictionary<Vector2i, TacticalMapLabelData>();
         var removedLabels = new List<Vector2i>();
 
@@ -334,8 +344,8 @@ public sealed class TacticalMapReplaySystem : EntitySystem
             }
         }
 
-        bool blipsChanged = false;
-        bool blipsIsFull = forceKeyframe;
+        var blipsChanged = false;
+        var blipsIsFull = forceKeyframe;
         var blipUpdates = new Dictionary<int, TacticalMapBlip>();
         var removedBlips = new List<int>();
 
@@ -384,9 +394,11 @@ public sealed class TacticalMapReplaySystem : EntitySystem
             blipsChanged,
             blipsIsFull,
             blipUpdates,
-            removedBlips);
+            removedBlips,
+            gridChanged,
+            layer.CoordinateGrid);
 
-        return linesChanged || labelsChanged || blipsChanged || forceKeyframe;
+        return linesChanged || labelsChanged || blipsChanged || gridChanged || forceKeyframe;
     }
 
     private List<TacticalMapReplayMap> BuildReplayMaps(string? mapIdFilter)
@@ -430,7 +442,9 @@ public sealed class TacticalMapReplaySystem : EntitySystem
                 true,
                 true,
                 new Dictionary<int, TacticalMapBlip>(layer.Blips),
-                new List<int>()));
+                new List<int>(),
+                true,
+                layer.CoordinateGrid));
         }
 
         return new TacticalMapReplayFrame(

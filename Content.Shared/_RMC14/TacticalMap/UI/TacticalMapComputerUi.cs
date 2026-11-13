@@ -11,10 +11,16 @@ public enum TacticalMapComputerUi
 }
 
 [Serializable, NetSerializable]
-public sealed class TacticalMapUpdateCanvasMsg(List<TacticalMapLine> lines, Dictionary<Vector2i, TacticalMapLabelData> labels) : BoundUserInterfaceMessage
+public sealed class TacticalMapUpdateCanvasMsg(
+    List<TacticalMapLine> lines,
+    Dictionary<Vector2i, TacticalMapLabelData> labels,
+    Guid updateId = default,
+    TacticalMapCoordinateGrid? coordinateGrid = null) : BoundUserInterfaceMessage
 {
     public readonly List<TacticalMapLine> Lines = lines;
     public readonly Dictionary<Vector2i, TacticalMapLabelData> Labels = labels;
+    public readonly Guid UpdateId = updateId;
+    public readonly TacticalMapCoordinateGrid? CoordinateGrid = coordinateGrid;
 }
 
 [Serializable, NetSerializable]

@@ -255,7 +255,7 @@ public abstract class SharedTacticalMapSystem : EntitySystem
 
         FilterSquadGroups(layers, allowedSquadGroups);
         ApplyLayerVisibilityRules(viewer, layers, accessLayers, includeAllSquads);
-        FilterEmptySquadLayers(layers);
+        FilterEmptySquadLayers(layers, viewer);
 
         return OrderLayers(layers, baseOrder);
     }
@@ -354,12 +354,20 @@ public abstract class SharedTacticalMapSystem : EntitySystem
         return false;
     }
 
-    protected void FilterEmptySquadLayers(HashSet<ProtoId<TacticalMapLayerPrototype>> layers)
+    protected void FilterEmptySquadLayers(HashSet<ProtoId<TacticalMapLayerPrototype>> layers, EntityUid? viewer)
     {
         if (layers.Count == 0)
             return;
 
-        // empty squads should not appear as selectable layers.
+        EntityUid? selectedSquad = null;
+        if (viewer != null &&
+            !HasComp<MarineCommunicationsComputerComponent>(viewer.Value) &&
+            TryComp(viewer.Value, out OverwatchConsoleComponent? console))
+        {
+            TryGetEntity(console.Squad, out selectedSquad);
+        }
+
+        // Overwatch must retain its assigned squad even before anyone joins it.
         var toRemove = new List<ProtoId<TacticalMapLayerPrototype>>();
         foreach (var layerId in layers)
         {
@@ -372,7 +380,7 @@ public abstract class SharedTacticalMapSystem : EntitySystem
                 continue;
             }
 
-            if (_squad.GetSquadMembersAlive(squad) <= 0)
+            if (squad.Owner != selectedSquad && _squad.GetSquadMembersAlive(squad) <= 0)
                 toRemove.Add(layerId);
         }
 

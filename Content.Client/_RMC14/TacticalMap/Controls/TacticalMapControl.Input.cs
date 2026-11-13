@@ -37,7 +37,7 @@ public sealed partial class TacticalMapControl
     {
         if (QueenEyeMode && !Drawing && !IsCanvas)
         {
-            Vector2i clickPosition = PositionToIndices(args.RelativePosition);
+            var clickPosition = PositionToIndices(args.RelativePosition);
             OnQueenEyeMove?.Invoke(clickPosition);
             args.Handle();
             return true;
@@ -63,7 +63,7 @@ public sealed partial class TacticalMapControl
             return true;
         }
 
-        Vector2i clickPosition = PositionToIndices(args.RelativePosition);
+        var clickPosition = PositionToIndices(args.RelativePosition);
         ShowLabelInputDialog(clickPosition);
         args.Handle();
         return true;
@@ -97,7 +97,7 @@ public sealed partial class TacticalMapControl
             _dragging = true;
             if (!EraserMode)
                 BeginStroke();
-            Vector2 startPixel = LogicalToPixel(args.RelativePosition);
+            var startPixel = LogicalToPixel(args.RelativePosition);
             _dragStart = startPixel.Floored();
             _lastDrag = _dragStart;
             _previewEnd = _dragStart;
@@ -159,7 +159,7 @@ public sealed partial class TacticalMapControl
         if (OnContextMenuRequested == null || Texture == null)
             return false;
 
-        Vector2i clickPosition = PositionToIndices(args.RelativePosition);
+        var clickPosition = PositionToIndices(args.RelativePosition);
         OnContextMenuRequested.Invoke(this, clickPosition, args.PointerLocation.Position);
         args.Handle();
         return true;
@@ -183,12 +183,12 @@ public sealed partial class TacticalMapControl
         {
             if (_draggingLabel != null && _labelDragStart != null && _currentDragPosition != null)
             {
-                Vector2 currentPixelPos = LogicalToPixel(args.RelativePosition);
-                Vector2 dragDiff = currentPixelPos - _labelDragStart.Value;
+                var currentPixelPos = LogicalToPixel(args.RelativePosition);
+                var dragDiff = currentPixelPos - _labelDragStart.Value;
 
                 if (dragDiff.Length() > MinDragDistance)
                 {
-                    Vector2i newPosition = PositionToIndices(args.RelativePosition);
+                    var newPosition = PositionToIndices(args.RelativePosition);
                     OnMoveLabel?.Invoke(_draggingLabel.Value, newPosition);
                 }
                 else
@@ -209,19 +209,19 @@ public sealed partial class TacticalMapControl
             {
                 if (!EraserMode && _dragStart != null && (StraightLineMode || SquareMode))
                 {
-                    Vector2i currentPos = LogicalToPixel(args.RelativePosition).Floored();
-                    Vector2i diff = currentPos - _dragStart.Value;
+                    var currentPos = LogicalToPixel(args.RelativePosition).Floored();
+                    var diff = currentPos - _dragStart.Value;
 
                     if (diff.Length >= MinDragDistance)
                     {
-                        Vector2i startIndices = PositionToIndices(PixelToLogical(new Vector2(_dragStart.Value.X, _dragStart.Value.Y)));
-                        Vector2i endIndices = PositionToIndices(args.RelativePosition);
+                        var startIndices = PositionToIndices(PixelToLogical(new Vector2(_dragStart.Value.X, _dragStart.Value.Y)));
+                        var endIndices = PositionToIndices(args.RelativePosition);
 
                         if (StraightLineMode)
                         {
                             endIndices = SnapToStraightLine(startIndices, endIndices);
-                            Vector2 lineStart = ConvertIndicesToLineCoordinates(startIndices);
-                            Vector2 lineEnd = ConvertIndicesToLineCoordinates(endIndices);
+                            var lineStart = ConvertIndicesToLineCoordinates(startIndices);
+                            var lineEnd = ConvertIndicesToLineCoordinates(endIndices);
                             AddLineToCanvas(lineStart, lineEnd, smooth: false);
                         }
                         else if (SquareMode)
@@ -268,8 +268,8 @@ public sealed partial class TacticalMapControl
         }
         else if (_dragging && Drawing && !LabelEditMode)
         {
-            Vector2 currentPixelPos = LogicalToPixel(args.RelativePosition);
-            Vector2i currentPos = currentPixelPos.Floored();
+            var currentPixelPos = LogicalToPixel(args.RelativePosition);
+            var currentPos = currentPixelPos.Floored();
 
             if (EraserMode)
             {
@@ -288,34 +288,34 @@ public sealed partial class TacticalMapControl
             {
                 if (_lastDrag != null)
                 {
-                    Vector2i diff = currentPos - _lastDrag.Value;
+                    var diff = currentPos - _lastDrag.Value;
                     if (diff.Length >= MinDragDistance)
                     {
                         if (Texture == null)
                             return;
 
                         (_, Vector2 actualTopLeft, float overlayScale) = GetDrawParameters();
-                        float minSegment = MinFreehandSegmentPixels / Math.Max(overlayScale, 0.001f);
+                        var minSegment = MinFreehandSegmentPixels / Math.Max(overlayScale, 0.001f);
 
-                        Vector2 lineStart = PositionToLineCoordinatesFloat(
+                        var lineStart = PositionToLineCoordinatesFloat(
                             PixelToLogical(new Vector2(_lastDrag.Value.X, _lastDrag.Value.Y)),
                             actualTopLeft,
                             overlayScale);
-                        Vector2 lineEnd = PositionToLineCoordinatesFloat(
+                        var lineEnd = PositionToLineCoordinatesFloat(
                             args.RelativePosition,
                             actualTopLeft,
                             overlayScale);
 
-                        Vector2 delta = lineEnd - lineStart;
-                        float distance = delta.Length();
+                        var delta = lineEnd - lineStart;
+                        var distance = delta.Length();
                         if (distance >= minSegment)
                         {
-                            int steps = (int)MathF.Ceiling(distance / minSegment);
-                            Vector2 step = delta / steps;
-                            Vector2 prev = lineStart;
+                            var steps = (int)MathF.Ceiling(distance / minSegment);
+                            var step = delta / steps;
+                            var prev = lineStart;
                             for (int i = 1; i <= steps; i++)
                             {
-                                Vector2 next = lineStart + step * i;
+                                var next = lineStart + step * i;
                                 AddLineSegment(prev, next);
                                 prev = next;
                             }
@@ -328,7 +328,7 @@ public sealed partial class TacticalMapControl
         }
         else if (_rightClickPanning && _lastPanPosition != null)
         {
-            Vector2 currentPixelPos = LogicalToPixel(args.RelativePosition);
+            var currentPixelPos = LogicalToPixel(args.RelativePosition);
 
             if (_rightClickStartPosition == null)
             {
@@ -348,8 +348,8 @@ public sealed partial class TacticalMapControl
                 _lastPanPosition = currentPixelPos;
             }
 
-            Vector2 panDelta = currentPixelPos - _lastPanPosition.Value;
-            float panResistance = GetPanResistance(_zoomFactor);
+            var panDelta = currentPixelPos - _lastPanPosition.Value;
+            var panResistance = GetPanResistance(_zoomFactor);
 
             if (panResistance <= 0f)
                 return;
@@ -384,8 +384,8 @@ public sealed partial class TacticalMapControl
 
         (Vector2 oldActualSize, Vector2 oldActualTopLeft, float oldOverlayScale) = GetDrawParameters();
 
-        float oldZoom = _zoomFactor;
-        float targetZoom = oldZoom;
+        var oldZoom = _zoomFactor;
+        var targetZoom = oldZoom;
 
         if (args.Delta.Y > 0)
             targetZoom *= ZoomSpeed;
@@ -396,20 +396,18 @@ public sealed partial class TacticalMapControl
 
         if (Math.Abs(targetZoom - oldZoom) > 0.001f)
         {
-            Vector2 relativeToTexture = (mousePixelPos - oldActualTopLeft) / oldOverlayScale;
-            Vector2 availableSize = new(PixelWidth, PixelHeight);
-            Vector2 newPan = Vector2.Zero;
+            var relativeToTexture = (mousePixelPos - oldActualTopLeft) / oldOverlayScale;
+            var availableSize = new Vector2(PixelWidth, PixelHeight);
+            var newPan = Vector2.Zero;
 
             if (!IsAtFitZoom(targetZoom))
             {
-                Vector2 textureSize = Texture.Size;
-                float baseScaleX = availableSize.X / textureSize.X;
-                float baseScaleY = availableSize.Y / textureSize.Y;
-                float baseScale = Math.Min(baseScaleX, baseScaleY);
-                float actualScale = baseScale * targetZoom;
-                Vector2 actualSize = textureSize * actualScale;
-                float overlayScale = actualScale / MapScale;
-                Vector2 centeredTopLeft = (availableSize - actualSize) / 2;
+                var textureSize = Texture.Size;
+                var baseScale = GetFittedMapScale(availableSize);
+                var actualScale = baseScale * targetZoom;
+                var actualSize = textureSize * actualScale;
+                var overlayScale = actualScale / MapScale;
+                var centeredTopLeft = (availableSize - actualSize) / 2;
 
                 newPan = mousePixelPos - relativeToTexture * overlayScale - centeredTopLeft;
             }
@@ -436,15 +434,15 @@ public sealed partial class TacticalMapControl
         if (_blips == null || Texture == null)
             return null;
 
-        Vector2 pixelPosition = LogicalToPixel(controlPosition);
+        var pixelPosition = LogicalToPixel(controlPosition);
         (Vector2 actualSize, Vector2 actualTopLeft, float overlayScale) = GetDrawParameters();
-        float clickTolerance = ClickTolerance * overlayScale;
+        var clickTolerance = ClickTolerance * overlayScale;
 
         for (var i = 0; i < _blips.Length; i++)
         {
             var blip = _blips[i];
-            Vector2 blipPosition = IndicesToPosition(blip.Indices) * overlayScale + actualTopLeft;
-            float scaledBlipSize = GetScaledBlipSize(overlayScale);
+            var blipPosition = IndicesToPosition(blip.Indices) * overlayScale + actualTopLeft;
+            var scaledBlipSize = GetScaledBlipSize(overlayScale);
 
             UIBox2 blipRect = UIBox2.FromDimensions(
                 blipPosition - new Vector2(clickTolerance, clickTolerance),
