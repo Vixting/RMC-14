@@ -1,0 +1,7 @@
+<ui:RMCTguiGroup
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui"
+    Orientation="Vertical">
+    <Label Name="TitleLabel" Margin="1 0 0 2" />
+    <BoxContainer Name="ContentContainer" Orientation="Vertical" />
+</ui:RMCTguiGroup>

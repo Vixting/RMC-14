@@ -1,0 +1,14 @@
+<ui:RMCTguiStatBar
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui"
+    Margin="0 0 0 4"
+    MinHeight="15"
+    HorizontalExpand="True"
+    MouseFilter="Pass">
+    <ui:RMCTguiStatFill Name="Fill" HorizontalExpand="True" VerticalExpand="True" />
+    <BoxContainer Orientation="Horizontal" Margin="5 0">
+        <ui:RMCTguiShadowLabel Name="NameLabel" HorizontalExpand="True" ClipText="True" />
+        <ui:RMCTguiShadowLabel Name="BaseValueLabel" Margin="5 0 0 0" Visible="False" />
+        <ui:RMCTguiShadowLabel Name="ValueLabel" Margin="5 0 0 0" />
+    </BoxContainer>
+</ui:RMCTguiStatBar>

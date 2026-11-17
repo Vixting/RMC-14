@@ -1,0 +1,9 @@
+<ui:RMCTguiDropdown
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui">
+    <BoxContainer Orientation="Horizontal">
+        <Label Name="SelectedLabel" HorizontalExpand="True" ClipText="True" VAlign="Center" />
+        <TextureRect Name="Arrow" TexturePath="/Textures/Interface/Nano/inverted_triangle.svg.png"
+                     VerticalAlignment="Center" Margin="5 0 0 0" />
+    </BoxContainer>
+</ui:RMCTguiDropdown>

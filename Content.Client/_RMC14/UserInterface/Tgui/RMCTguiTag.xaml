@@ -1,0 +1,7 @@
+<ui:RMCTguiTag
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui"
+    MouseFilter="Pass"
+    HorizontalAlignment="Left">
+    <Label Name="TagLabel" />
+</ui:RMCTguiTag>

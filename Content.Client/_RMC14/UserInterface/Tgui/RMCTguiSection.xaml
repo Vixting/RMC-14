@@ -1,0 +1,15 @@
+<ui:RMCTguiSection
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui">
+    <BoxContainer Orientation="Vertical">
+        <BoxContainer Name="TitleContainer" Orientation="Vertical" Visible="False">
+            <BoxContainer Orientation="Horizontal" Margin="5 3" SetHeight="19">
+                <Label Name="TitleLabel" VAlign="Center" />
+                <BoxContainer Name="TitleExtras" Access="Public" Orientation="Horizontal"
+                              HorizontalExpand="True" HorizontalAlignment="Right" Margin="8 0 0 0" />
+            </BoxContainer>
+            <PanelContainer Name="TitleRule" MinHeight="2" />
+        </BoxContainer>
+        <BoxContainer Name="ContentContainer" Orientation="Vertical" Margin="5 6" />
+    </BoxContainer>
+</ui:RMCTguiSection>

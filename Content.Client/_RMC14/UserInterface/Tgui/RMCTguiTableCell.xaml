@@ -1,0 +1,6 @@
+<ui:RMCTguiTableCell
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui"
+    HorizontalExpand="True">
+    <Label Name="CellLabel" Align="Center" />
+</ui:RMCTguiTableCell>

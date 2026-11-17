@@ -1,0 +1,19 @@
+<ui:RMCTguiWindow
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui"
+    MouseFilter="Stop">
+    <PanelContainer Name="WindowBackground" />
+    <BoxContainer Orientation="Vertical">
+        <PanelContainer Name="TitleBar" MinHeight="26">
+            <BoxContainer Orientation="Horizontal">
+                <Label Name="TitleLabel" HorizontalExpand="True" VAlign="Center" Margin="10 0 0 0" ClipText="True" />
+                <ContainerButton Name="CloseButton" SetSize="36 26">
+                    <Label Name="CloseLabel" Text="×" Align="Center" VAlign="Center" />
+                </ContainerButton>
+            </BoxContainer>
+        </PanelContainer>
+        <ScrollContainer HScrollEnabled="False" ReturnMeasure="True" VerticalExpand="True">
+            <BoxContainer Name="ContentsContainer" Orientation="Vertical" Margin="5" />
+        </ScrollContainer>
+    </BoxContainer>
+</ui:RMCTguiWindow>

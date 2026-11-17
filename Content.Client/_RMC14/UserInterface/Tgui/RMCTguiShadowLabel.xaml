@@ -1,0 +1,6 @@
+<ui:RMCTguiShadowLabel
+    xmlns="https://spacestation14.io"
+    xmlns:ui="clr-namespace:Content.Client._RMC14.UserInterface.Tgui">
+    <Label Name="ShadowLabel" Margin="1 1 0 0" VAlign="Center" />
+    <Label Name="TextLabel" Margin="0 0 1 1" VAlign="Center" />
+</ui:RMCTguiShadowLabel>
