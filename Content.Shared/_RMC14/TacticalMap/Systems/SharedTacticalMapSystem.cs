@@ -1,10 +1,13 @@
 using System.Linq;
 using Content.Shared._RMC14.CCVar;
+using Content.Shared._RMC14.Marines.Announce;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared._RMC14.Marines.Squads;
+using Content.Shared._RMC14.Xenonids.Egg;
 using Content.Shared._RMC14.Xenonids.Evolution;
 using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared.Inventory;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.NPC.Components;
 using Robust.Shared.Configuration;
 using Robust.Shared.GameStates;
@@ -14,8 +17,8 @@ namespace Content.Shared._RMC14.TacticalMap;
 public abstract class SharedTacticalMapSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _config = default!;
-    [Dependency] private readonly XenoEvolutionSystem _evolution = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly SkillsSystem _skills = default!;
     [Dependency] private readonly SquadSystem _squad = default!;
     [Dependency] protected readonly SharedUserInterfaceSystem UI = default!;
@@ -89,14 +92,23 @@ public abstract class SharedTacticalMapSystem : EntitySystem
         if (ent.Comp.LiveUpdate || HasComp<TacMapLiveUpdateComponent>(ent))
             args.Live = true;
 
-        if (TryComp(ent, out TacticalMapLiveUpdateOnOviComponent? ovi) && ovi.Enabled && _evolution.HasOvipositor())
-            args.Live = true;
-
         if (TryComp(ent, out NpcFactionMemberComponent? factions))
             args.Factions.UnionWith(factions.Factions);
 
         if (TryComp(ent, out HiveMemberComponent? hive) && hive.Hive is { } hiveId)
+        {
             args.Hives.Add(hiveId);
+            if (TryComp(ent, out TacticalMapLiveUpdateOnOviComponent? ovi) &&
+                ovi.Enabled &&
+                TryComp(hiveId, out HiveComponent? hiveComponent) &&
+                hiveComponent.CurrentQueen is { } queen &&
+                !TerminatingOrDeleted(queen) &&
+                HasComp<XenoAttachedOvipositorComponent>(queen) &&
+                !_mobState.IsDead(queen))
+            {
+                args.Live = true;
+            }
+        }
 
         if (_squad.TryGetMemberSquad(ent.Owner, out var squad))
             args.Squads.Add(squad.Owner);
@@ -260,6 +272,19 @@ public abstract class SharedTacticalMapSystem : EntitySystem
         var ev = new TacticalMapCanDrawEvent(actor, channel);
         RaiseLocalEvent(viewer, ref ev);
         return !ev.Cancelled;
+    }
+
+    public bool CanPublishCoordinateGrid(EntityUid actor, EntityUid viewer, EntityUid channel)
+    {
+        if (!TryComp(channel, out TacticalMapChannelComponent? component) || !CanDraw(actor, viewer, channel))
+            return false;
+
+        return component.Scope switch
+        {
+            TacticalMapChannelScope.Faction => HasComp<MarineCommunicationsComputerComponent>(viewer),
+            TacticalMapChannelScope.Hive => viewer == actor && HasComp<XenoOvipositorCapableComponent>(actor),
+            _ => false,
+        };
     }
 
     public void OpenComputerMap(Entity<TacticalMapComputerComponent?> computer, EntityUid user)

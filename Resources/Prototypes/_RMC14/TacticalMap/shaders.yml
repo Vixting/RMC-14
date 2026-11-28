@@ -1,0 +1,4 @@
+- type: shader
+  id: RMCTacMapCoordinateGrid
+  kind: source
+  path: /Textures/_RMC14/Shaders/tacmap_coordinate_grid.swsl

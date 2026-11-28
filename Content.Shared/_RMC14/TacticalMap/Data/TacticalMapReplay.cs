@@ -43,7 +43,8 @@ public readonly record struct TacticalMapReplayCanvas(
     float Time,
     int Channel,
     List<TacticalMapStroke> Strokes,
-    Dictionary<Vector2i, TacticalMapLabelData> Labels);
+    Dictionary<Vector2i, TacticalMapLabelData> Labels,
+    TacticalMapCoordinateGrid CoordinateGrid);
 
 [Serializable, NetSerializable]
 public readonly record struct TacticalMapReplayFrame(float Time, List<TacticalMapReplayBlip> Blips);

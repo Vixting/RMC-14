@@ -17,7 +17,8 @@ public sealed class TacticalMapCanvasDraft(EntityUid channel)
     public int BaseVersion { get; private set; } = -1;
 
     // sent, waiting for the server to send the new version back
-    public bool Submitted { get; private set; }
+    public Guid? SubmittedUpdate { get; private set; }
+    public TacticalMapCoordinateGrid? CoordinateGrid { get; private set; }
     public readonly List<TacticalMapStroke> Strokes = new();
     public readonly Dictionary<Vector2i, TacticalMapLabelData> Labels = new();
 
@@ -30,7 +31,7 @@ public sealed class TacticalMapCanvasDraft(EntityUid channel)
         {
             _dirty = value;
             if (value)
-                Submitted = false;
+                SubmittedUpdate = null;
         }
     }
 
@@ -39,7 +40,7 @@ public sealed class TacticalMapCanvasDraft(EntityUid channel)
     // take the servers copy unless there are unsent edits
     public bool ShouldResetTo(TacticalMapCanvasLayer layer)
     {
-        return BaseVersion != layer.Version && (!Dirty || Submitted);
+        return BaseVersion != layer.Version && (!Dirty || SubmittedUpdate == layer.LastUpdateId);
     }
 
     public void ResetFrom(TacticalMapCanvasLayer layer)
@@ -54,13 +55,20 @@ public sealed class TacticalMapCanvasDraft(EntityUid channel)
 
         BaseVersion = layer.Version;
         Dirty = false;
-        Submitted = false;
+        SubmittedUpdate = null;
+        CoordinateGrid = null;
         _undo.Clear();
     }
 
-    public void MarkSubmitted()
+    public void SetCoordinateGrid(TacticalMapCoordinateGrid grid)
     {
-        Submitted = true;
+        CoordinateGrid = grid;
+        Dirty = true;
+    }
+
+    public void MarkSubmitted(Guid updateId)
+    {
+        SubmittedUpdate = updateId;
     }
 
     public void Checkpoint()

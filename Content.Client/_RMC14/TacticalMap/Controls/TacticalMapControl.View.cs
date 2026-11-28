@@ -48,7 +48,8 @@ public sealed partial class TacticalMapControl
             if (!_hasBase || PixelWidth <= 0 || PixelHeight <= 0)
                 return 1f;
 
-            var baseScale = MathF.Min((float) PixelWidth / _width, (float) PixelHeight / _height);
+            var margin = GetCoordinateGrid() is { Enabled: true } ? 2 * CoordinateHeaderSize : 0;
+            var baseScale = MathF.Min(Math.Max(1f, PixelWidth - margin) / _width, Math.Max(1f, PixelHeight - margin) / _height);
             return baseScale * _zoom;
         }
     }

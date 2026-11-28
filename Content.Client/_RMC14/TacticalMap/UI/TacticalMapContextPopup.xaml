@@ -14,6 +14,8 @@
             <controls:TacticalMapDivider Name="ButtonDivider" />
             <BoxContainer Name="ButtonColumn" Orientation="Vertical" SeparationOverride="3">
                 <controls:TacticalMapButton Name="CreateLabelButton" MinHeight="22" HorizontalExpand="True" />
+                <controls:TacticalMapButton Name="PersonalLabelButton" Text="{Loc rmc-tactical-map-personal-label}"
+                                            MinHeight="22" HorizontalExpand="True" />
                 <controls:TacticalMapButton Name="CreateMortarButton" MinHeight="22" HorizontalExpand="True" />
                 <controls:TacticalMapButton Name="DeleteMortarButton" Kind="Danger" MinHeight="22" HorizontalExpand="True" />
                 <controls:TacticalMapButton Name="CopyCoordinatesButton" Kind="Flat" MinHeight="22" HorizontalExpand="True" />

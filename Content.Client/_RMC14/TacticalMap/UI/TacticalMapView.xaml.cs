@@ -67,6 +67,7 @@ public sealed partial class TacticalMapView : Control
     private TacticalMapContextPopup? _contextPopup;
 
     public event Action<EntityUid>? MapSelected;
+    public event Action<EntityUid, Vector2i, TacticalMapLabelData?>? PersonalLabelChanged;
     public event Action? SubmitPressed;
     public event Action? ClearPressed;
     public event Action? UndoPressed;
@@ -111,6 +112,14 @@ public sealed partial class TacticalMapView : Control
         ToolPanel.ToolChanged += OnToolChanged;
         ToolPanel.ColorChanged += OnColorChanged;
         ToolPanel.ThicknessChanged += OnThicknessChanged;
+        ToolPanel.CoordinateGridChanged += grid =>
+        {
+            if (Map.Draft is { } draft && _drawLayer is { CanPublishCoordinateGrid: true })
+            {
+                draft.SetCoordinateGrid(grid);
+                RefreshDraft();
+            }
+        };
 
         OverlayPanel.OverlaysChanged += overlays => Map.Overlays = overlays;
 
@@ -290,6 +299,11 @@ public sealed partial class TacticalMapView : Control
         UpdatePanels();
     }
 
+    public void SetPersonalLabels(IReadOnlyDictionary<Vector2i, TacticalMapLabelData>? labels)
+    {
+        Map.PersonalLabels = labels;
+    }
+
     public void SetDrawing(bool drawing, EntityUid? drawTarget, TacticalMapCanvasDraft? draft, TacticalMapCanvasLayer? drawLayer)
     {
         _drawing = drawing;
@@ -301,6 +315,8 @@ public sealed partial class TacticalMapView : Control
         }
 
         Map.SetDraft(draft);
+        var grid = draft?.CoordinateGrid ?? drawLayer?.CoordinateGrid ?? TacticalMapCoordinateGrid.Default;
+        ToolPanel.SetCoordinateGrid(drawLayer is { CanPublishCoordinateGrid: true }, grid, Map.MapSize);
         ToolPanel.SetDrawTargets(_layers, drawTarget);
         UpdateModeLabel();
         UpdatePanels();
@@ -411,6 +427,19 @@ public sealed partial class TacticalMapView : Control
             Map.OpenLabelDialog(indices);
             popup.Close();
         };
+
+        popup.OnPersonalLabelPressed = _selectedMap is { } selected && PersonalLabelChanged != null
+            ? () =>
+            {
+                var existing = Map.PersonalLabels?.GetValueOrDefault(indices);
+                LabelTextDialog.Show(
+                    _theme,
+                    existing?.Text ?? string.Empty,
+                    text => PersonalLabelChanged?.Invoke(selected, indices, new TacticalMapLabelData(text, existing?.Color ?? Color.White)),
+                    () => PersonalLabelChanged?.Invoke(selected, indices, null));
+                popup.Close();
+            }
+            : null;
 
         popup.OnCreateMortarPressed = () =>
         {

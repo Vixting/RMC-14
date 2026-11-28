@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared._RMC14.TacticalMap;
+using Content.Shared.GameTicking;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map.Components;
 
@@ -13,6 +14,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
     private readonly Dictionary<EntityUid, EntityUid> _liveFeeds = new();
     private readonly Dictionary<EntityUid, int> _userHashes = new();
     private readonly HashSet<NetEntity> _seenBlips = new();
+    private readonly Dictionary<(EntityUid Actor, EntityUid Map), Dictionary<Vector2i, TacticalMapLabelData>> _personalLabels = new();
 
     // views compare these to know when to rebuild: channels/canvases vs just blips
     public int Revision { get; private set; }
@@ -29,6 +31,7 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
     public override void Initialize()
     {
         base.Initialize();
+        SubscribeNetworkEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
 
         SubscribeLocalEvent<TacticalMapComponent, ComponentHandleState>(OnMapHandleState);
         SubscribeLocalEvent<TacticalMapComponent, ComponentShutdown>(OnMapShutdown);
@@ -60,6 +63,56 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
         }
 
         BlipRevision++;
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
+    {
+        _personalLabels.Clear();
+        _liveFeeds.Clear();
+        _userHashes.Clear();
+        Revision++;
+        BlipRevision++;
+    }
+
+    public IReadOnlyDictionary<Vector2i, TacticalMapLabelData>? GetPersonalLabels(EntityUid? actor, EntityUid? map)
+    {
+        return actor is { } user && map is { } target ? _personalLabels.GetValueOrDefault((user, target)) : null;
+    }
+
+    public void SetPersonalLabel(EntityUid actor, EntityUid map, Vector2i tile, TacticalMapLabelData? label)
+    {
+        if (!TryComp(map, out TacticalMapComponent? component) ||
+            !component.HasBounds ||
+            tile.X < component.BoundsMin.X || tile.Y < component.BoundsMin.Y ||
+            tile.X > component.BoundsMax.X || tile.Y > component.BoundsMax.Y)
+        {
+            return;
+        }
+
+        var key = (actor, map);
+        if (label is not { } value || string.IsNullOrWhiteSpace(value.Text))
+        {
+            if (_personalLabels.TryGetValue(key, out var existing))
+            {
+                existing.Remove(tile);
+                if (existing.Count == 0)
+                    _personalLabels.Remove(key);
+            }
+
+            return;
+        }
+
+        if (!_personalLabels.TryGetValue(key, out var labels))
+        {
+            labels = new();
+            _personalLabels.Add(key, labels);
+        }
+
+        if (labels.Count < LabelLimit || labels.ContainsKey(tile))
+        {
+            var length = Math.Min(value.Text.Length, Math.Max(1, LabelMaxLength));
+            labels[tile] = value with { Text = value.Text[..length] };
+        }
     }
 
     private void OnChanged<TComp, TEvent>(Entity<TComp> ent, ref TEvent args) where TComp : IComponent
@@ -343,6 +396,9 @@ public sealed class TacticalMapSystem : SharedTacticalMapSystem
                 LastSubmitAt = canvas.LastSubmitAt,
                 NextSubmitAt = canvas.NextSubmitAt,
                 Drawable = actor != null && CanDraw(actor.Value, viewer, channel),
+                LastUpdateId = canvas.LastUpdateId,
+                CoordinateGrid = canvas.CoordinateGrid,
+                CanPublishCoordinateGrid = actor != null && CanPublishCoordinateGrid(actor.Value, viewer, channel),
                 Objectives = CompOrNull<TacticalMapObjectivesComponent>(channel)?.Objectives,
             });
         }

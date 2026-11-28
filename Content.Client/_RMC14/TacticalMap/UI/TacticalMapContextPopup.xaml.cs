@@ -31,6 +31,7 @@ public sealed partial class TacticalMapContextPopup : Popup, ITacticalMapThemed
     private TacticalMapTheme _theme = TacticalMapTheme.Marine;
 
     public Action? OnCreateLabelPressed;
+    public Action? OnPersonalLabelPressed;
     public Action? OnCreateMortarPressed;
     public Action? OnDeleteMortarPressed;
     public Action? OnCopyCoordinatesPressed;
@@ -41,6 +42,7 @@ public sealed partial class TacticalMapContextPopup : Popup, ITacticalMapThemed
         _sprite = IoCManager.Resolve<IEntityManager>().System<SpriteSystem>();
 
         CreateLabelButton.OnPressed += _ => OnCreateLabelPressed?.Invoke();
+        PersonalLabelButton.OnPressed += _ => OnPersonalLabelPressed?.Invoke();
         CreateMortarButton.OnPressed += _ => OnCreateMortarPressed?.Invoke();
         DeleteMortarButton.OnPressed += _ => OnDeleteMortarPressed?.Invoke();
         CopyCoordinatesButton.OnPressed += _ => OnCopyCoordinatesPressed?.Invoke();
@@ -102,6 +104,7 @@ public sealed partial class TacticalMapContextPopup : Popup, ITacticalMapThemed
             ? "ui-tactical-map-label-dialog-create-title"
             : "ui-tactical-map-label-dialog-edit-title");
         CreateLabelButton.Visible = showCreateLabel;
+        PersonalLabelButton.Visible = OnPersonalLabelPressed != null;
         CreateMortarButton.Text = Loc.GetString("ui-tactical-map-create-mortar");
         CreateMortarButton.Disabled = info.HasArea && !info.Allows(TacticalMapTileFlags.MortarPlacement);
         DeleteMortarButton.Text = Loc.GetString("ui-tactical-map-remove-mortar");

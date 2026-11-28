@@ -90,6 +90,7 @@ public sealed partial class TacticalMapSystem : SharedTacticalMapSystem
         _actorSessions.Clear();
         _anySessionDirty = false;
         _nextForceUpdate = TimeSpan.Zero;
+        _nextUpdate = TimeSpan.Zero;
     }
 
     public override void Update(float frameTime)

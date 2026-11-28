@@ -18,6 +18,9 @@ public sealed class TacticalMapCanvasLayer
     public TimeSpan LastSubmitAt;
     public TimeSpan NextSubmitAt;
     public bool Drawable;
+    public Guid LastUpdateId;
+    public TacticalMapCoordinateGrid CoordinateGrid;
+    public bool CanPublishCoordinateGrid;
     public IReadOnlyDictionary<SquadObjectiveType, string>? Objectives;
 }
 

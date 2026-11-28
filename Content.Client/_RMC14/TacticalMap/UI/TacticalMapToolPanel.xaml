@@ -31,6 +31,15 @@
         <Slider Name="ThicknessSlider" MinValue="1" MaxValue="8" Value="2" HorizontalExpand="True" MinHeight="14" />
     </controls:TacticalMapSection>
 
+    <controls:TacticalMapSection Name="CoordinateGridSection" Title="{Loc rmc-tactical-map-coordinate-grid}" Visible="False">
+        <BoxContainer Orientation="Vertical" SeparationOverride="4">
+            <controls:TacticalMapButton Name="CoordinateGridButton" Text="{Loc rmc-tactical-map-coordinate-grid}"
+                                        HorizontalExpand="True" MinHeight="22" />
+            <Slider Name="CoordinateGridSlider" MinValue="1" MaxValue="1024" Value="32" HorizontalExpand="True" />
+            <controls:TacticalMapLabel Name="CoordinateGridLabel" TextStyle="Small" />
+        </BoxContainer>
+    </controls:TacticalMapSection>
+
     <Control VerticalExpand="True" />
 
     <controls:TacticalMapSection Title="{Loc ui-tactical-map-section-actions}">

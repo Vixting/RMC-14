@@ -18,9 +18,13 @@ public enum TacticalMapComputerUi
 public sealed class TacticalMapSubmitCanvasMsg(
     NetEntity channel,
     List<TacticalMapStroke> strokes,
-    Dictionary<Vector2i, TacticalMapLabelData> labels) : BoundUserInterfaceMessage
+    Dictionary<Vector2i, TacticalMapLabelData> labels,
+    Guid updateId,
+    TacticalMapCoordinateGrid? coordinateGrid) : BoundUserInterfaceMessage
 {
     public readonly NetEntity Channel = channel;
+    public readonly Guid UpdateId = updateId;
+    public readonly TacticalMapCoordinateGrid? CoordinateGrid = coordinateGrid;
     public readonly List<TacticalMapStroke> Strokes = strokes;
     public readonly Dictionary<Vector2i, TacticalMapLabelData> Labels = labels;
 }

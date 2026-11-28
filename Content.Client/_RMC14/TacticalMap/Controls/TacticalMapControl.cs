@@ -49,6 +49,7 @@ public sealed partial class TacticalMapControl : Control
     private static readonly SpriteSpecifier.Rsi HiveLeaderRsi = new(MapBlipsRsi, "xenoleader");
     private static readonly SpriteSpecifier.Rsi MortarRsi = new(MapBlipsRsi, "mortar");
     private static readonly ResPath CrtOverlayPath = new("/Textures/_RMC14/Interface/TacticalMap/crt_overlay.png");
+    private static readonly ProtoId<ShaderPrototype> CoordinateGridShader = "RMCTacMapCoordinateGrid";
     private const string HiveCoreState = "core";
     private const string HivePylonState = "pylon";
 
@@ -62,6 +63,7 @@ public sealed partial class TacticalMapControl : Control
     private readonly TacticalMapSystem _tacticalMapSystem;
     private readonly ShaderInstance _gridShader;
     private readonly ShaderInstance _crtShader;
+    private readonly ShaderInstance _coordinateGridShader;
     private readonly Texture? _crtOverlayTexture;
 
     private readonly List<TacticalMapBlipView> _blips = new();
@@ -84,6 +86,7 @@ public sealed partial class TacticalMapControl : Control
     private TacticalMapTool? _tool;
 
     public readonly List<TacticalMapStroke> OverlayStrokes = new();
+    public IReadOnlyDictionary<Vector2i, TacticalMapLabelData>? PersonalLabels { get; set; }
 
     public TacticalMapCanvasDraft? Draft { get; private set; }
 
@@ -120,6 +123,7 @@ public sealed partial class TacticalMapControl : Control
         _tacticalMapSystem = _entMan.System<TacticalMapSystem>();
         _gridShader = _prototypes.Index<ShaderPrototype>("RMCTacMapGrid").InstanceUnique();
         _crtShader = _prototypes.Index<ShaderPrototype>("RMCTacMapCrt").InstanceUnique();
+        _coordinateGridShader = _prototypes.Index(CoordinateGridShader).InstanceUnique();
         if (_resourceCache.TryGetResource<TextureResource>(CrtOverlayPath, out var crtOverlay))
             _crtOverlayTexture = crtOverlay.Texture;
         MouseFilter = MouseFilterMode.Stop;
@@ -201,6 +205,15 @@ public sealed partial class TacticalMapControl : Control
     {
         _layers.Clear();
         _layers.AddRange(layers);
+        _publishedCoordinateGrid = TacticalMapCoordinateGrid.Default;
+        foreach (var layer in _layers)
+        {
+            if (!layer.CoordinateGrid.Enabled)
+                continue;
+
+            _publishedCoordinateGrid = layer.CoordinateGrid;
+            break;
+        }
     }
 
     public void SetMortarMarker(Vector2i center, int minRange, int maxRange)

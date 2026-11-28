@@ -352,6 +352,7 @@ public sealed partial class TacticalMapReplayWindow : DefaultWindow
                 SortOrder = channelIndex,
                 Strokes = canvas.Strokes,
                 Labels = canvas.Labels,
+                CoordinateGrid = canvas.CoordinateGrid,
             });
         }
 

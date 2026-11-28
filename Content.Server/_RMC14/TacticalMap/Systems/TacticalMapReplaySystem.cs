@@ -106,7 +106,8 @@ public sealed class TacticalMapReplaySystem : EntitySystem
         EntityUid map,
         EntityUid channelId,
         List<TacticalMapStroke> strokes,
-        Dictionary<Vector2i, TacticalMapLabelData> labels)
+        Dictionary<Vector2i, TacticalMapLabelData> labels,
+        TacticalMapCoordinateGrid grid)
     {
         if (!TryComp(map, out TacticalMapComponent? mapComp) ||
             !TryComp(channelId, out TacticalMapChannelComponent? channel))
@@ -119,7 +120,8 @@ public sealed class TacticalMapReplaySystem : EntitySystem
             (float) _timing.CurTime.TotalSeconds,
             GetChannelIndex(recording, channelId, channel),
             new List<TacticalMapStroke>(strokes),
-            new Dictionary<Vector2i, TacticalMapLabelData>(labels)));
+            new Dictionary<Vector2i, TacticalMapLabelData>(labels),
+            grid));
     }
 
     public bool TryRequestReplay(ICommonSession session, string? mapName, out string? reason)

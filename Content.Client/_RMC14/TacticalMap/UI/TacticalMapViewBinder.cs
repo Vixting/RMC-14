@@ -63,6 +63,7 @@ public sealed class TacticalMapViewBinder : IDisposable
         _view.LayerVisibilityToggled += OnLayerVisibilityToggled;
         _view.BlipActivated += OnBlipActivated;
         _view.PointActivated += OnPointActivated;
+        _view.PersonalLabelChanged += OnPersonalLabelChanged;
     }
 
     public void Refresh(bool force = false)
@@ -117,6 +118,7 @@ public sealed class TacticalMapViewBinder : IDisposable
             else
                 _layers.Clear();
 
+            _view.SetPersonalLabels(_tacticalMap.GetPersonalLabels(_player.LocalEntity, _view.SelectedMap));
             UpdateCanvas();
         }
 
@@ -240,8 +242,10 @@ public sealed class TacticalMapViewBinder : IDisposable
             .ToList();
 
         var labels = new Dictionary<Vector2i, TacticalMapLabelData>(draft.Labels);
-        _send(new TacticalMapSubmitCanvasMsg(_entMan.GetNetEntity(channel), strokes, labels));
-        draft.MarkSubmitted();
+        var updateId = Guid.NewGuid();
+        var grid = CurrentLayer is { CanPublishCoordinateGrid: true } ? draft.CoordinateGrid : null;
+        _send(new TacticalMapSubmitCanvasMsg(_entMan.GetNetEntity(channel), strokes, labels, updateId, grid));
+        draft.MarkSubmitted(updateId);
         _view.ShowSubmitFeedback();
     }
 
@@ -275,6 +279,15 @@ public sealed class TacticalMapViewBinder : IDisposable
             _hiddenLayers.Add(channel);
 
         PushCanvas();
+    }
+
+    private void OnPersonalLabelChanged(EntityUid map, Vector2i tile, TacticalMapLabelData? label)
+    {
+        if (_player.LocalEntity is not { } actor || _view.SelectedMap != map)
+            return;
+
+        _tacticalMap.SetPersonalLabel(actor, map, tile, label);
+        _view.SetPersonalLabels(_tacticalMap.GetPersonalLabels(actor, map));
     }
 
     private void OnBlipActivated(NetEntity target)
@@ -351,5 +364,6 @@ public sealed class TacticalMapViewBinder : IDisposable
         _view.LayerVisibilityToggled -= OnLayerVisibilityToggled;
         _view.BlipActivated -= OnBlipActivated;
         _view.PointActivated -= OnPointActivated;
+        _view.PersonalLabelChanged -= OnPersonalLabelChanged;
     }
 }

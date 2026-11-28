@@ -86,6 +86,7 @@ public sealed partial class TacticalMapControl
         if (!CrtOverlay)
             DrawGrid(handle, rect, scale);
 
+        DrawCoordinateGrid(handle, rect);
         DrawModeBorder(handle, rect);
         DrawStrokes(handle);
         _tool?.DrawPreview(this, handle);
@@ -398,12 +399,20 @@ public sealed partial class TacticalMapControl
             }
         }
 
-        if (!draftVisible)
-            return;
-
-        foreach (var (tile, label) in Draft!.Labels)
+        if (draftVisible)
         {
-            _labelBuffer[tile] = label;
+            foreach (var (tile, label) in Draft!.Labels)
+            {
+                _labelBuffer[tile] = label;
+            }
+        }
+
+        if (PersonalLabels != null)
+        {
+            foreach (var (tile, label) in PersonalLabels)
+            {
+                _labelBuffer[tile] = label;
+            }
         }
     }
 

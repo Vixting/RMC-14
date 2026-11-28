@@ -16,6 +16,12 @@ public sealed partial class TacticalMapCanvasComponent : Component
     public int Version;
 
     [DataField, AutoNetworkedField]
+    public TacticalMapCoordinateGrid CoordinateGrid = TacticalMapCoordinateGrid.Default;
+
+    [AutoNetworkedField]
+    public Guid LastUpdateId;
+
+    [DataField, AutoNetworkedField]
     public TimeSpan LastSubmitAt;
 
     [DataField, AutoNetworkedField]

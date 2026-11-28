@@ -405,12 +405,14 @@ public sealed partial class TacticalMapSystem
 
     private void OnUserSubmitCanvas(Entity<TacticalMapUserComponent> ent, ref TacticalMapSubmitCanvasMsg args)
     {
-        SubmitCanvas(ent, args.Actor, args);
+        if (args.UiKey.Equals(TacticalMapUserUi.Key) && UI.IsUiOpen(ent.Owner, TacticalMapUserUi.Key, args.Actor))
+            SubmitCanvas(ent, args.Actor, args);
     }
 
     private void OnComputerSubmitCanvas(Entity<TacticalMapComputerComponent> ent, ref TacticalMapSubmitCanvasMsg args)
     {
-        SubmitCanvas(ent, args.Actor, args);
+        if (args.UiKey.Equals(TacticalMapComputerUi.Key) && UI.IsUiOpen(ent.Owner, TacticalMapComputerUi.Key, args.Actor))
+            SubmitCanvas(ent, args.Actor, args);
     }
 
     private void SubmitCanvas(EntityUid viewer, EntityUid actor, TacticalMapSubmitCanvasMsg args)
@@ -429,12 +431,25 @@ public sealed partial class TacticalMapSystem
         if (now < canvas.NextSubmitAt)
             return;
 
+        if (args.Strokes is null || args.Labels is null ||
+            args.Strokes.Count > LineLimit || args.Labels.Count > LabelLimit)
+            return;
+
+        if (args.CoordinateGrid is { } grid)
+        {
+            if (!map.HasBounds || !CanPublishCoordinateGrid(actor, viewer, channelId.Value))
+                return;
+
+            canvas.CoordinateGrid = grid.Clamped(map.BoundsMax - map.BoundsMin + Vector2i.One);
+        }
+
         var strokes = SanitizeStrokes(map, args.Strokes);
         var labels = SanitizeLabels(map, args.Labels);
 
         canvas.Strokes = strokes;
         canvas.Labels = labels;
         canvas.Version++;
+        canvas.LastUpdateId = args.UpdateId;
         canvas.LastSubmitAt = now;
         canvas.NextSubmitAt = now + (channel.Cooldown ?? _announceCooldown);
         Dirty(channelId.Value, canvas);
@@ -448,7 +463,7 @@ public sealed partial class TacticalMapSystem
         var ev = new TacticalMapCanvasSubmittedEvent(channelId.Value, mapId, actor, strokes, labels);
         RaiseLocalEvent(channelId.Value, ref ev, true);
 
-        _replay.RecordCanvas(mapId, channelId.Value, strokes, labels);
+        _replay.RecordCanvas(mapId, channelId.Value, strokes, labels, canvas.CoordinateGrid);
     }
 
     private List<TacticalMapStroke> SanitizeStrokes(TacticalMapComponent map, List<TacticalMapStroke>? input)
